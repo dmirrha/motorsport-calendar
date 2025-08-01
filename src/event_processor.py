@@ -634,7 +634,7 @@ class EventProcessor:
         
         return groups
     
-    def _are_events_similar(self, event1: Dict[str, Any], event2: Dict[str, Any]]) -> bool:
+    def _are_events_similar(self, event1: Dict[str, Any], event2: Dict[str, Any]) -> bool:
         """Check if two events are similar (duplicates)."""
         # Check name similarity
         name1 = unidecode(event1.get('name', '')).lower()
