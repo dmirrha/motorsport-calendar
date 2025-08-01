@@ -1,0 +1,52 @@
+# Motorsport Calendar - Python Dependencies
+
+# Core HTTP and Web Scraping
+requests>=2.31.0
+beautifulsoup4>=4.12.0
+lxml>=4.9.0
+
+# Date and Time Processing
+python-dateutil>=2.8.0
+pytz>=2023.3
+
+# String Processing and Similarity
+fuzzywuzzy>=0.18.0
+python-levenshtein>=0.21.0
+unidecode>=1.3.0
+jellyfish>=0.11.0
+
+# Natural Language Processing for Category Detection
+nltk>=3.8.0
+
+# Machine Learning (Optional - for advanced category classification)
+scikit-learn>=1.3.0
+
+# iCal Generation
+icalendar>=5.0.0
+
+# Visual Interface and Progress
+rich>=13.5.0
+colorama>=0.4.6
+tqdm>=4.66.0
+colorlog>=6.7.0
+
+# Command Line Interface
+click>=8.1.0
+
+# Utilities
+pyyaml>=6.0.0
+uuid
+
+# Development and Testing (Optional)
+pytest>=7.4.0
+pytest-cov>=4.1.0
+black>=23.7.0
+flake8>=6.0.0
+
+# System and File Operations (Built-in, listed for reference)
+# pathlib - Built-in Python 3.8+
+# json - Built-in
+# logging - Built-in
+# os - Built-in
+# sys - Built-in
+# datetime - Built-in

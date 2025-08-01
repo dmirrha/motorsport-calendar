@@ -26,6 +26,7 @@ Race Calendar/
 │   ├── config_manager.py           # Gerenciamento de configurações
 │   ├── logger.py                   # Sistema de logging avançado
 │   ├── ui_manager.py               # Interface visual colorida
+│   ├── category_detector.py        # Detecção dinâmica de categorias
 │   └── utils.py                    # Utilitários e helpers
 ├── 
 ├── sources/                        # Módulos específicos por fonte
@@ -116,7 +117,16 @@ Race Calendar/
   - Formatação colorida de mensagens
   - Ícones e elementos visuais agradáveis
 
-### **8. sources/base_source.py** (Classe Base)
+### **8. src/category_detector.py** (Detecção Dinâmica de Categorias)
+- **Função**: Sistema inteligente de reconhecimento de categorias
+- **Responsabilidades**:
+  - Detecção automática de novas categorias de motorsport
+  - Mapeamento e normalização de variações de nomes
+  - Classificação por tipo (carros, motos, outros)
+  - Aprendizado e expansão da base de conhecimento
+  - Score de confiança para cada categoria detectada
+
+### **9. sources/base_source.py** (Classe Base)
 - **Função**: Interface comum para todas as fontes
 - **Responsabilidades**:
   - Definição da interface padrão
@@ -137,6 +147,13 @@ Race Calendar/
 - `python-dateutil` - Manipulação de datas
 - `pytz` - Timezones
 - `fuzzywuzzy` - Comparação de strings para duplicatas
+- `python-levenshtein` - Aceleração para fuzzywuzzy
+
+### **Detecção de Categorias:**
+- `nltk` - Processamento de linguagem natural
+- `unidecode` - Normalização de caracteres especiais
+- `jellyfish` - Algoritmos de similaridade de strings
+- `scikit-learn` - Machine learning para classificação (opcional)
 
 ### **Geração iCal:**
 - `icalendar` - Criação de arquivos iCal
@@ -166,15 +183,19 @@ Race Calendar/
    ↓
 4. logger.py (configura sistema de logging)
    ↓
-5. data_collector.py (coordena coleta)
+5. category_detector.py (inicializa detecção de categorias)
    ↓
-6. sources/*.py (coleta dados + salva payloads)
+6. data_collector.py (coordena coleta)
    ↓
-7. event_processor.py (processa e deduplica)
+7. sources/*.py (coleta dados + salva payloads)
    ↓
-8. ical_generator.py (gera arquivo iCal)
+8. category_detector.py (classifica categorias dinamicamente)
    ↓
-9. output/motorsport_events.ics (arquivo final)
+9. event_processor.py (processa e deduplica)
+   ↓
+10. ical_generator.py (gera arquivo iCal)
+   ↓
+11. output/motorsport_events.ics (arquivo final)
 ```
 
 ---

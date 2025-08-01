@@ -14,11 +14,34 @@ Um script Python para coletar automaticamente eventos de automobilismo do fim de
 
 ## 🏎️ Categorias Suportadas
 
-- **Fórmula 1** (F1)
-- **MotoGP**
-- **Stock Car Brasil**
-- **NASCAR**
-- **World Superbike (WSBK)**
+**✨ Suporte Dinâmico a TODAS as Categorias de Esporte Automotor**
+
+O script detecta automaticamente e coleta eventos de **qualquer categoria** encontrada nas fontes de dados, incluindo mas não limitado a:
+
+### **🏎️ Carros:**
+- Fórmula 1, F2, F3, F4
+- Stock Car Brasil, NASCAR
+- IndyCar, Super Fórmula
+- WEC (World Endurance Championship)
+- IMSA, DTM, Super GT
+- Fórmula E, Extreme E
+- Rally (WRC), Rallycross
+- Turismo, GT World Challenge
+
+### **🏍️ Motos:**
+- MotoGP, Moto2, Moto3
+- World Superbike (WSBK)
+- Supersport, Superstock
+- MotoE, MotoAmerica
+- British Superbike (BSB)
+
+### **🚗 Outras Modalidades:**
+- Karting, Drift
+- Arrancada, Autocross
+- Hill Climb, Time Attack
+- **E muito mais!**
+
+> 💡 **Flexibilidade Total:** O sistema se adapta automaticamente a novas categorias que apareçam nas fontes de dados, sem necessidade de atualizações no código.
 
 ## 🔧 Requisitos
 

@@ -11,7 +11,8 @@ Desenvolver um script Python que automatize a coleta de informações sobre even
 - O script deve coletar informações de eventos de automobilismo programados para o final de semana alvo
 - **Detecção automática do fim de semana**: O script deve identificar o final de semana alvo a partir da primeira data de evento encontrada nas fontes
 - **Remoção de duplicatas**: O script deve ser capaz de identificar e remover eventos duplicados encontrados em diferentes fontes
-- Deve incluir eventos de carros (F1, Stock Car, NASCAR, etc.) e motos (MotoGP, Superbike, etc.)
+- **Suporte dinâmico a categorias**: O script deve detectar e coletar eventos de QUALQUER categoria de esporte automotor encontrada nas fontes de dados
+- **Extensibilidade automática**: Novas categorias devem ser automaticamente suportadas sem modificação de código
 - Informações coletadas devem incluir:
   - Nome do evento/corrida
   - Data e horário
@@ -99,10 +100,12 @@ O arquivo `config.json` deve conter as seguintes seções:
 - Headers HTTP personalizados se necessário
 
 #### **Filtros de Eventos**
-- Lista de categorias incluídas (F1, MotoGP, Stock Car, etc.)
-- Lista de exclusão de categorias
-- Filtros por país/região
-- Filtros por tipo de evento (corrida, treino, classificação)
+- **Detecção dinâmica de categorias**: Sistema que identifica automaticamente todas as categorias disponíveis nas fontes
+- **Lista de inclusão configurável**: Permite especificar categorias específicas ou usar "*" para todas
+- **Lista de exclusão de categorias**: Permite excluir categorias específicas
+- **Filtros por país/região**: Configurável por localização
+- **Filtros por tipo de evento**: Corrida, treino, classificação, etc.
+- **Mapeamento inteligente**: Sistema que reconhece variações de nomes de categorias
 
 #### **Parâmetros iCal**
 - Nome do calendário
