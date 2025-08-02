@@ -218,6 +218,23 @@ class Logger:
         self.loggers['main'].debug(message)
         self.loggers['debug'].debug(message)
     
+    def debug(self, message: str) -> None:
+        """Alias for log_debug for compatibility."""
+        self.log_debug(message)
+    
+    def info(self, message: str) -> None:
+        """Alias for log_info for compatibility."""
+        self.log_info(message)
+    
+    def set_console_level(self, level: str) -> None:
+        """Set console logger level dynamically."""
+        if 'console' in self.loggers:
+            level_obj = getattr(logging, level.upper(), logging.INFO)
+            self.loggers['console'].setLevel(level_obj)
+            # Also update the handler level
+            for handler in self.loggers['console'].handlers:
+                handler.setLevel(level_obj)
+    
     def save_payload(self, source: str, data: Any, data_type: str = 'json', 
                     include_headers: bool = False, headers: Optional[Dict] = None) -> str:
         """

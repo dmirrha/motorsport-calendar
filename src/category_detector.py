@@ -573,3 +573,45 @@ class CategoryDetector:
             "confidence_threshold": self.confidence_threshold,
             "learning_enabled": self.learning_enabled
         }
+    
+    def detect_categories_batch(self, events: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
+        """
+        Detect categories for a batch of events.
+        
+        Args:
+            events: List of event dictionaries
+            
+        Returns:
+            List of category detection results
+        """
+        category_results = []
+        
+        for event in events:
+            # Use existing detect_category method for each event
+            raw_category = event.get('raw_category', '') or event.get('category', '')
+            event_name = event.get('name', '')
+            
+            # Combine category and name for better detection
+            text_to_analyze = f"{raw_category} {event_name}".strip()
+            
+            if text_to_analyze:
+                detected_result = self.detect_category(text_to_analyze)
+                # detect_category returns a tuple (category, confidence, details)
+                if isinstance(detected_result, tuple) and len(detected_result) >= 2:
+                    detected_category = detected_result[0]
+                    confidence = detected_result[1]
+                else:
+                    detected_category = str(detected_result)
+                    confidence = 1.0
+            else:
+                detected_category = 'Unknown'
+                confidence = 0.0
+            
+            # Return category information dictionary
+            category_results.append({
+                'category': detected_category,
+                'confidence': confidence,
+                'source': 'pattern_matching'
+            })
+        
+        return category_results

@@ -132,9 +132,22 @@ class ConfigManager:
         # Set the value
         config[keys[-1]] = value
     
+    def get_general_config(self) -> Dict[str, Any]:
+        """Get general configuration."""
+        return self.get('general', {})
+    
     def get_data_sources_config(self) -> Dict[str, Any]:
         """Get data sources configuration."""
         return self.get('data_sources', {})
+    
+    def get_deduplication_config(self) -> Dict[str, Any]:
+        """Get deduplication configuration."""
+        return self.get('deduplication', {
+            'similarity_threshold': 85,
+            'time_tolerance_minutes': 30,
+            'location_similarity_threshold': 80,
+            'category_similarity_threshold': 90
+        })
     
     def get_priority_sources(self) -> List[str]:
         """Get prioritized list of data sources."""

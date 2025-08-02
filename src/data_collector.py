@@ -74,13 +74,11 @@ class DataCollector:
         self.collection_timeout = data_sources_config.get('collection_timeout_seconds', 300)
         self.retry_failed_sources = data_sources_config.get('retry_failed_sources', True)
         
-        # Source priorities and exclusions
-        source_config = data_sources_config.get('sources', {})
-        for source_name, config in source_config.items():
-            if config.get('enabled', True):
-                self.source_priorities[source_name] = config.get('priority', 50)
-            else:
-                self.excluded_sources.add(source_name)
+        # Source priorities from priority_order list
+        priority_order = data_sources_config.get('priority_order', [])
+        for i, source_name in enumerate(priority_order):
+            # Higher priority for sources earlier in the list (reverse priority)
+            self.source_priorities[source_name] = 100 - (i * 10)
         
         # Excluded sources list
         excluded_list = data_sources_config.get('excluded_sources', [])

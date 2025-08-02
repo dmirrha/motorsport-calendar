@@ -252,7 +252,7 @@ class TomadaTempoSource(BaseSource):
         
         for pattern in patterns:
             match = re.search(pattern, text, re.IGNORECASE)
-            if match:
+            if match and match.group(1):
                 name = match.group(1).strip()
                 if len(name) > 3:  # Reasonable name length
                     return name
@@ -348,7 +348,7 @@ class TomadaTempoSource(BaseSource):
         
         for pattern in circuit_patterns:
             match = re.search(pattern, text, re.IGNORECASE)
-            if match:
+            if match and match.group(1):
                 location = match.group(1).strip()
                 if len(location) > 2:
                     return location
@@ -467,7 +467,8 @@ class TomadaTempoSource(BaseSource):
         current_event = {}
         
         for line in lines:
-            line = line.strip()
+            if line is not None:
+                line = line.strip()
             if not line or len(line) < 10:
                 continue
             

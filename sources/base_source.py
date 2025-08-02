@@ -256,13 +256,13 @@ class BaseSource(ABC):
         """
         normalized = {
             'event_id': self._generate_event_id(raw_event),
-            'name': raw_event.get('name', '').strip(),
-            'raw_category': raw_event.get('category', '').strip(),
+            'name': (raw_event.get('name') or '').strip(),
+            'raw_category': (raw_event.get('category') or '').strip(),
             'date': raw_event.get('date'),
             'time': raw_event.get('time'),
             'timezone': raw_event.get('timezone', 'America/Sao_Paulo'),
-            'location': raw_event.get('location', '').strip(),
-            'country': raw_event.get('country', '').strip(),
+            'location': (raw_event.get('location') or '').strip(),
+            'country': (raw_event.get('country') or '').strip(),
             'session_type': raw_event.get('session_type', 'race').lower(),
             'streaming_links': raw_event.get('streaming_links', []),
             'official_url': raw_event.get('official_url', ''),
@@ -274,7 +274,7 @@ class BaseSource(ABC):
         
         # Clean up empty values
         for key, value in normalized.items():
-            if isinstance(value, str) and not value.strip():
+            if isinstance(value, str) and value and not value.strip():
                 normalized[key] = None
         
         return normalized

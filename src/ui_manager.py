@@ -5,6 +5,7 @@ Provides colorful, step-by-step visual interface with progress bars,
 icons, and pleasant visual elements for terminal output.
 """
 
+import os
 import time
 from typing import Dict, List, Optional, Any
 from rich.console import Console
@@ -443,6 +444,29 @@ class UIManager:
         
         self.console.print(error_text)
     
+    def show_step_result(self, step_name: str, success: bool, message: str = "") -> None:
+        """Display step completion result."""
+        if not self.enabled:
+            return
+        
+        if success:
+            icon = self.icons['success']
+            style = "green"
+            status = "COMPLETED"
+        else:
+            icon = self.icons['error']
+            style = "red"
+            status = "FAILED"
+        
+        result_text = Text()
+        result_text.append(f"{icon} ", style=style)
+        result_text.append(f"{step_name} {status}", style=f"bold {style}")
+        
+        if message:
+            result_text.append(f": {message}", style=style)
+        
+        self.console.print(result_text)
+    
     def show_warning_message(self, message: str) -> None:
         """Display warning message."""
         if not self.enabled:
@@ -453,6 +477,125 @@ class UIManager:
         warning_text.append(message, style="bold yellow")
         
         self.console.print(warning_text)
+    
+    def show_final_summary(self, **kwargs) -> None:
+        """
+        Display final execution summary.
+        
+        Args:
+            **kwargs: Execution summary data as keyword arguments
+        """
+        if not self.enabled:
+            return
+        
+        # Create summary table
+        table = Table(title=f"{self.icons['trophy']} Execution Summary", box=box.ROUNDED)
+        table.add_column("Metric", style="cyan", no_wrap=True)
+        table.add_column("Value", style="green")
+        
+        # Convert kwargs to readable format
+        readable_metrics = {
+            'sources_successful': 'Sources Successful',
+            'sources_total': 'Total Sources',
+            'events_collected': 'Events Collected',
+            'events_processed': 'Events Processed',
+            'output_file': 'Output File',
+            'execution_time': 'Execution Time (s)'
+        }
+        
+        for key, value in kwargs.items():
+            display_key = readable_metrics.get(key, key.replace('_', ' ').title())
+            
+            if isinstance(value, (int, float)):
+                if key == 'execution_time':
+                    value_str = f"{value:.1f}s"
+                else:
+                    value_str = f"{value:,}" if isinstance(value, int) else f"{value:.2f}"
+            else:
+                value_str = str(value)
+            
+            table.add_row(display_key, value_str)
+        
+        self.console.print()
+        self.console.print(table)
+        self.console.print()
+    
+    def show_events_by_category(self, events_by_category: Dict[str, List[Dict[str, Any]]]) -> None:
+        """
+        Display events grouped by category.
+        
+        Args:
+            events_by_category: Dictionary of events grouped by category
+        """
+        if not self.enabled or not events_by_category:
+            return
+        
+        # Display each category
+        for category, category_events in events_by_category.items():
+            category_text = Text()
+            category_text.append(f"{self.icons['racing']} ", style="blue")
+            category_text.append(f"{category}", style="bold blue")
+            category_text.append(f" ({len(category_events)} events)", style="dim blue")
+            
+            self.console.print(category_text)
+            
+            for event in category_events:
+                event_text = Text()
+                event_text.append("  • ", style="dim")
+                event_text.append(event.get('name', 'Unknown Event'), style="white")
+                
+                if event.get('date'):
+                    event_text.append(f" - {event['date']}", style="dim cyan")
+                
+                if event.get('location'):
+                    event_text.append(f" @ {event['location']}", style="dim yellow")
+                
+                self.console.print(event_text)
+            
+            self.console.print()
+    
+    def show_import_instructions(self, output_file: str) -> None:
+        """
+        Display instructions for importing the iCal file into Google Calendar.
+        
+        Args:
+            output_file: Path to the generated iCal file
+        """
+        if not self.enabled:
+            return
+        
+        instructions_text = Text()
+        instructions_text.append(f"{self.icons['info']} ", style="blue")
+        instructions_text.append("Google Calendar Import Instructions:", style="bold blue")
+        
+        self.console.print()
+        self.console.print(instructions_text)
+        self.console.print()
+        
+        steps = [
+            "1. Open Google Calendar (calendar.google.com)",
+            "2. Click the '+' button next to 'Other calendars'",
+            "3. Select 'Create new calendar' or 'Import'",
+            f"4. Upload the file: {os.path.basename(output_file)}",
+            "5. Choose your preferred calendar settings",
+            "6. Click 'Import' to add the motorsport events"
+        ]
+        
+        for step in steps:
+            step_text = Text()
+            step_text.append("  • ", style="dim")
+            step_text.append(step, style="white")
+            self.console.print(step_text)
+        
+        self.console.print()
+        
+        tip_text = Text()
+        tip_text.append(f"{self.icons['target']} ", style="yellow")
+        tip_text.append("Tip: ", style="bold yellow")
+        tip_text.append("The events will appear in your calendar with reminders and direct broadcast links!", style="yellow")
+        
+        self.console.print(tip_text)
+        self.console.print()
     
     def show_completion_summary(self, summary: Dict[str, Any]) -> None:
         """

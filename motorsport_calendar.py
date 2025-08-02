@@ -86,11 +86,11 @@ class MotorsportCalendarGenerator:
             self.logger.log_step("🚀 Initializing Motorsport Calendar Generator")
             
             # Initialize UI manager
-            self.ui = UIManager(self.config, self.logger)
-            self.ui.show_header()
+            self.ui = UIManager(self.config)
+            self.ui.show_banner()
             
             # Initialize category detector
-            self.category_detector = CategoryDetector(self.config, self.logger, self.ui)
+            self.category_detector = CategoryDetector(self.config, self.logger)
             
             # Initialize data collector
             self.data_collector = DataCollector(self.config, self.logger, self.ui, self.category_detector)
@@ -146,7 +146,7 @@ class MotorsportCalendarGenerator:
             
             if not raw_events:
                 self.logger.log_warning("⚠️ No events collected from any source")
-                self.ui.show_warning("No events found for the target period")
+                self.ui.show_warning_message("No events found for the target period")
                 return False
             
             self.logger.log_success(f"📡 Collected {len(raw_events)} events from {self.execution_stats['successful_sources']} sources")
@@ -195,7 +195,7 @@ class MotorsportCalendarGenerator:
             self.logger.debug(f"Full traceback: {traceback.format_exc()}")
             
             self.execution_stats['error_message'] = error_msg
-            self.ui.show_error("Execution Failed", error_msg)
+            self.ui.show_error_message(error_msg)
             return False
         
         finally:

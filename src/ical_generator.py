@@ -70,9 +70,10 @@ class ICalGenerator:
         self.default_duration_minutes = ical_config.get('default_duration_minutes', self.default_duration_minutes)
         
         # Reminder settings
-        reminders_config = ical_config.get('reminders', {})
-        if reminders_config.get('enabled', True):
-            self.reminder_minutes = reminders_config.get('minutes_before', self.reminder_minutes)
+        reminders_config = ical_config.get('reminders', [])
+        if isinstance(reminders_config, list) and reminders_config:
+            # Extract minutes from reminder objects
+            self.reminder_minutes = [reminder.get('minutes', 60) for reminder in reminders_config]
         else:
             self.reminder_minutes = []
         
