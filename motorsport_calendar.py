@@ -11,7 +11,7 @@ Usage:
 Examples:
     python motorsport_calendar.py                    # Generate calendar for next weekend
     python motorsport_calendar.py --date 2024-08-10 # Generate for specific date
-    python motorsport_calendar.py --config custom.json # Use custom config
+    python motorsport_calendar.py --config config/config.json # Use custom config
     python motorsport_calendar.py --output ./calendars/ # Custom output directory
 """
 
@@ -22,16 +22,19 @@ import traceback
 from datetime import datetime, timedelta
 from pathlib import Path
 
-# Add src directory to Python path
-sys.path.insert(0, os.path.join(os.path.dirname(__file__), 'src'))
+# Ensure the src directory is in the Python path
+project_root = os.path.dirname(os.path.abspath(__file__))
+src_dir = os.path.join(project_root, 'src')
+if src_dir not in sys.path:
+    sys.path.insert(0, src_dir)
 
-from src.config_manager import ConfigManager
-from src.logger import Logger
-from src.ui_manager import UIManager
-from src.category_detector import CategoryDetector
-from src.data_collector import DataCollector
-from src.event_processor import EventProcessor
-from src.ical_generator import ICalGenerator
+from config_manager import ConfigManager
+from logger import Logger
+from ui_manager import UIManager
+from category_detector import CategoryDetector
+from data_collector import DataCollector
+from event_processor import EventProcessor
+from ical_generator import ICalGenerator
 
 
 class MotorsportCalendarGenerator:
@@ -330,7 +333,7 @@ Examples:
     parser.add_argument(
         '--version',
         action='version',
-        version='Motorsport Calendar Generator 1.0.0'
+        version='Motorsport Calendar Generator 0.1.2'
     )
     
     return parser.parse_args()

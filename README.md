@@ -131,8 +131,10 @@ O script exibe uma interface colorida com:
 
 ## 📊 Logging e Debug
 
-- **Logs centralizados** com múltiplos níveis
-- **Payloads raw** preservados por fonte
+O sistema de logs avançado oferece monitoramento detalhado e solução de problemas:
+
+- **Logs centralizados** com múltiplos níveis (DEBUG, INFO, WARNING, ERROR, CRITICAL)
+- **Payloads raw** preservados por fonte para análise detalhada
 - **Rotação automática** por execução
   - O arquivo principal de log é rotacionado a cada execução
   - Logs antigos são armazenados em `logs/rotated_logs/`
@@ -141,7 +143,9 @@ O script exibe uma interface colorida com:
   - Mantém apenas os logs mais recentes (configurável)
   - Remove automaticamente logs mais antigos que o período de retenção
   - Configuração flexível de retenção
-- **Debug completo** para troubleshooting
+- **Debug completo** para troubleshooting com informações detalhadas
+
+📘 **Documentação Detalhada:** Consulte [LOGGING_AND_CONFIGURATION.md](docs/LOGGING_AND_CONFIGURATION.md) para informações completas sobre configuração e personalização do sistema de logs.
 
 ## 🌐 Fontes de Dados
 

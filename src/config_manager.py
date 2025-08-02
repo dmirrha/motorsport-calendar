@@ -20,9 +20,9 @@ class ConfigManager:
         Initialize configuration manager.
         
         Args:
-            config_path: Path to configuration file. Defaults to 'config.json'
+            config_path: Path to configuration file. Defaults to 'config/config.json'
         """
-        self.config_path = config_path or "config.json"
+        self.config_path = config_path or "config/config.json"
         self.config: Dict[str, Any] = {}
         self.logger = logging.getLogger(__name__)
         

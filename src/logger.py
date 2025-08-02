@@ -44,36 +44,78 @@ class Logger:
     def _cleanup_old_logs(self) -> None:
         """Clean up old logs and payloads based on retention policy."""
         print("🔍 Verificando se a limpeza de logs está habilitada...")
-        if not self.config or not self.config.get('logging', {}).get('retention', {}).get('enabled', True):
-            print("ℹ️ Limpeza de logs desabilitada na configuração")
+        
+        if not self.config:
+            print(" Configuração de logs não encontrada")
             return
             
         try:
-            retention = self.config['logging']['retention']
-            base_dir = Path("logs")
-            debug_dir = base_dir / "debug"
-            payload_dir = base_dir / "payloads"
+            # Verifica se a limpeza está habilitada nas configurações
+            log_config = self.config.get_ical_config().get('logging', {})
+            retention_config = log_config.get('retention', {})
             
-            # Clean up old debug logs
-            if debug_dir.exists():
-                debug_logs = sorted(debug_dir.glob("*.log"), key=os.path.getmtime, reverse=True)
-                self._cleanup_files(debug_logs, retention.get('max_logs_to_keep', 10))
+            if not retention_config.get('enabled', True):
+                print(" Limpeza de logs desabilitada na configuração")
+                return
             
-            # Clean up old payloads
-            if payload_dir.exists():
-                payload_folders = sorted(payload_dir.iterdir(), 
-                                      key=lambda x: x.stat().st_mtime if x.is_dir() else 0, 
-                                      reverse=True)
-                self._cleanup_files(payload_folders, retention.get('max_payloads_to_keep', 20))
+            # Configurações de retenção
+            max_days = retention_config.get('max_days', 30)
+            max_logs = retention_config.get('max_logs_to_keep', 10)
+            max_payloads = retention_config.get('max_payloads_to_keep', 20)
+            
+            # Caminhos dos diretórios
+            base_dir = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+            logs_dir = os.path.join(base_dir, 'logs')
+            debug_dir = os.path.join(logs_dir, 'debug')
+            payload_dir = os.path.join(logs_dir, 'payloads')
+            
+            # Garante que o diretório de logs existe
+            if not os.path.exists(logs_dir):
+                print(f" Diretório de logs não encontrado: {logs_dir}")
+                return
                 
-            # Clean up files older than X days
-            max_age_days = retention.get('delete_older_than_days', 30)
-            if max_age_days > 0:
-                self._cleanup_old_files(debug_dir, max_age_days)
-                self._cleanup_old_files(payload_dir, max_age_days)
+            # Limpa logs antigos
+            if os.path.exists(debug_dir):
+                self._cleanup_old_files(debug_dir, "*.log", max_days)
                 
+                # Mantém apenas os N logs mais recentes
+                debug_logs = sorted(
+                    Path(debug_dir).glob("*.log"),
+                    key=os.path.getmtime,
+                    reverse=True
+                )
+                
+                for old_log in debug_logs[max_logs:]:
+                    try:
+                        old_log.unlink()
+                        print(f"  Removido log antigo: {old_log}")
+                    except Exception as e:
+                        print(f" Falha ao remover log {old_log}: {e}")
+            
+            # Limpa payloads antigos
+            if os.path.exists(payload_dir):
+                self._cleanup_old_files(payload_dir, "**/*.json", max_days)
+                
+                # Mantém apenas os N payloads mais recentes
+                payloads = []
+                for ext in ['*.json']:
+                    payloads.extend(Path(payload_dir).rglob(ext))
+                    
+                payloads.sort(key=os.path.getmtime, reverse=True)
+                
+                for old_payload in payloads[max_payloads:]:
+                    try:
+                        old_payload.unlink()
+                        print(f"  Removido payload antigo: {old_payload}")
+                    except Exception as e:
+                        print(f" Falha ao remover payload {old_payload}: {e}")
+                        
+            print(f" Limpeza de logs concluída (mantidos últimos {max_logs} logs e {max_payloads} payloads)")
+            
         except Exception as e:
-            print(f"⚠️ Failed to clean up old logs: {str(e)}")
+            print(f" Erro ao limpar logs antigos: {str(e)}")
+            import traceback
+            traceback.print_exc()
     
     def _cleanup_files(self, files: list, max_to_keep: int) -> None:
         """Remove files beyond the maximum to keep."""
@@ -89,90 +131,203 @@ class Logger:
                     print(f"⚠️ Failed to delete {file}: {str(e)}")
     
     def _cleanup_rotated_logs(self) -> None:
-        """Clean up old rotated logs based on retention policy."""
-        if not self.config or not self.config.get('logging', {}).get('retention', {}).get('enabled', True):
-            return
-            
+        """
+        Clean up old rotated logs based on retention policy.
+        
+        This method will:
+        1. Check if log rotation cleanup is enabled
+        2. Get retention settings from config
+        3. Remove logs beyond the maximum count
+        4. Remove logs older than the maximum age
+        """
         try:
-            retention = self.config['logging']['retention']
-            log_dir = Path("logs")
+            # Verificar se a limpeza está habilitada
+            if not self._get_log_config('retention.enabled', True):
+                return
+                
+            # Obter configurações de retenção
+            max_logs = self._get_log_config('retention.max_logs_to_keep', 10)
+            max_age_days = self._get_log_config('retention.delete_older_than_days', 30)
+            
+            # Configurar diretórios
+            base_dir = Path(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+            log_dir = base_dir / "logs"
             rotated_dir = log_dir / "rotated_logs"
             
             if not rotated_dir.exists():
                 return
                 
-            # Get all rotated log files
+            # Obter todos os arquivos de log rotacionados ordenados por data de modificação
             rotated_logs = sorted(
                 rotated_dir.glob("motorsport_calendar_*.log"),
                 key=os.path.getmtime,
                 reverse=True
             )
             
-            # Apply max logs to keep
-            max_logs = retention.get('max_logs_to_keep', 10)
-            if len(rotated_logs) > max_logs:
-                for log_file in rotated_logs[max_logs:]:
+            # Aplicar limite de quantidade de logs
+            if max_logs > 0 and len(rotated_logs) > max_logs:
+                logs_to_remove = rotated_logs[max_logs:]
+                for log_file in logs_to_remove:
                     try:
                         log_file.unlink()
-                        print(f"🧹 Removed old rotated log: {log_file}")
+                        self.logger.debug(f"Removido log rotacionado (limite de {max_logs} arquivos): {log_file.name}")
                     except Exception as e:
-                        print(f"⚠️ Failed to remove {log_file}: {e}")
+                        self.logger.warning(f"Falha ao remover {log_file.name}: {e}")
             
-            # Apply max age
-            max_age_days = retention.get('delete_older_than_days', 30)
+            # Aplicar limite de idade dos logs
             if max_age_days > 0:
                 cutoff_time = datetime.now().timestamp() - (max_age_days * 24 * 60 * 60)
                 for log_file in rotated_logs:
-                    if log_file.stat().st_mtime < cutoff_time:
-                        try:
+                    try:
+                        if log_file.stat().st_mtime < cutoff_time:
                             log_file.unlink()
-                            print(f"🧹 Removed old rotated log (age > {max_age_days}d): {log_file}")
-                        except Exception as e:
-                            print(f"⚠️ Failed to remove {log_file}: {e}")
+                            self.logger.debug(f"Removido log rotacionado (mais antigo que {max_age_days}d): {log_file.name}")
+                    except Exception as e:
+                        self.logger.warning(f"Falha ao verificar/remover {log_file.name}: {e}")
                             
         except Exception as e:
-            print(f"⚠️ Error cleaning up rotated logs: {e}")
+            self.logger.error(f"Erro ao limpar logs rotacionados: {e}", exc_info=True)
     
-    def _cleanup_old_files(self, directory: Path, max_age_days: int) -> None:
-        """Remove files older than specified days."""
-        if not directory.exists():
+    def _cleanup_old_files(self, directory: str, pattern: str, max_age_days: int) -> None:
+        """
+        Remove files older than specified days.
+        
+        Args:
+            directory: Path to the directory to clean up
+            pattern: File pattern to match (e.g., '*.log', '**/*.json')
+            max_age_days: Maximum age of files to keep (in days)
+        """
+        dir_path = Path(directory)
+        if not dir_path.exists():
             return
             
         cutoff_time = datetime.now().timestamp() - (max_age_days * 24 * 60 * 60)
         
-        for item in directory.rglob('*'):
-            try:
-                if item.is_file() and item.stat().st_mtime < cutoff_time:
-                    item.unlink()
-                elif item.is_dir() and not any(item.iterdir()):
-                    item.rmdir()
-            except Exception as e:
-                print(f"⚠️ Failed to delete {item}: {str(e)}")
+        try:
+            # Encontra todos os arquivos que correspondem ao padrão
+            for file_path in dir_path.glob(pattern):
+                try:
+                    if file_path.is_file() and file_path.stat().st_mtime < cutoff_time:
+                        file_path.unlink()
+                        print(f"🗑️  Removido arquivo antigo: {file_path}")
+                except Exception as e:
+                    print(f"⚠️ Falha ao remover {file_path}: {str(e)}")
+                    
+            # Remove diretórios vazios (após remover arquivos)
+            for item in dir_path.rglob('*'):
+                try:
+                    if item.is_dir() and not any(item.iterdir()):
+                        item.rmdir()
+                except Exception as e:
+                    print(f"⚠️ Falha ao remover diretório vazio {item}: {str(e)}")
+                    
+        except Exception as e:
+            print(f"⚠️ Erro ao limpar arquivos em {directory}: {str(e)}")
+            import traceback
+            traceback.print_exc()
     
     def _setup_directories(self) -> None:
-        """Create necessary logging directories."""
-        base_dir = Path("logs")
+        """
+        Create and configure all necessary logging directories.
         
-        print("🔄 Iniciando configuração de diretórios...")
-        # Clean up old logs before setting up new directories
-        print("🔄 Iniciando limpeza de logs antigos...")
-        self._cleanup_old_logs()
-        print("✅ Limpeza de logs concluída")
-        
-        directories = [
-            base_dir,
-            base_dir / "debug",
-            base_dir / "payloads"
-        ]
-        
-        for directory in directories:
-            directory.mkdir(parents=True, exist_ok=True)
+        This method will:
+        1. Set up the base log directory
+        2. Clean up old logs if enabled
+        3. Create required subdirectories
+        """
+        try:
+            # Get base log directory from config or use default
+            log_dir = self._get_log_config('directory', 'logs')
+            base_dir = Path(log_dir)
+            
+            # Set up main logger if available
+            if hasattr(self, 'logger'):
+                self.logger.debug(f"Configurando diretórios de log em: {base_dir.absolute()}")
+            else:
+                print(f"🔧 Configurando diretórios de log em: {base_dir.absolute()}")
+            
+            # Clean up old logs if enabled
+            if self._get_log_config('retention.enabled', True):
+                if hasattr(self, 'logger'):
+                    self.logger.debug("Iniciando limpeza de logs antigos...")
+                else:
+                    print("🔄 Iniciando limpeza de logs antigos...")
+                
+                self._cleanup_old_logs()
+                
+                if hasattr(self, 'logger'):
+                    self.logger.debug("Limpeza de logs concluída")
+                else:
+                    print("✅ Limpeza de logs concluída")
+            
+            # Define required directories
+            directories = [
+                base_dir,
+                base_dir / "debug",
+                base_dir / "payloads",
+                base_dir / "rotated_logs"
+            ]
+            
+            # Create directories
+            for directory in directories:
+                try:
+                    directory.mkdir(parents=True, exist_ok=True)
+                    if hasattr(self, 'logger'):
+                        self.logger.debug(f"Diretório verificado/criado: {directory}")
+                except Exception as e:
+                    error_msg = f"Falha ao criar diretório {directory}: {e}"
+                    if hasattr(self, 'logger'):
+                        self.logger.error(error_msg)
+                    else:
+                        print(f"❌ {error_msg}")
+                        
+        except Exception as e:
+            error_msg = f"Erro ao configurar diretórios de log: {e}"
+            if hasattr(self, 'logger'):
+                self.logger.error(error_msg, exc_info=True)
+            else:
+                print(f"❌ {error_msg}")
+                import traceback
+                traceback.print_exc()
     
     def _get_log_config(self, key: str, default: Any = None) -> Any:
-        """Get logging configuration value."""
-        if self.config:
-            return self.config.get(f'logging.{key}', default)
-        return default
+        """
+        Get logging configuration value.
+        
+        Args:
+            key: Configuration key in dot notation (e.g., 'retention.max_logs_to_keep')
+            default: Default value if key not found
+            
+        Returns:
+            Configured value or default
+        """
+        if not self.config:
+            return default
+            
+        try:
+            # Tenta obter a configuração do logging diretamente
+            if hasattr(self.config, 'get') and callable(getattr(self.config, 'get')):
+                return self.config.get(f'logging.{key}', default)
+            
+            # Se não conseguir, tenta obter a configuração de logging do iCal
+            ical_config = self.config.get_ical_config() if hasattr(self.config, 'get_ical_config') else {}
+            if 'logging' in ical_config:
+                # Navega pela estrutura aninhada usando a notação de pontos
+                keys = key.split('.')
+                value = ical_config['logging']
+                
+                for k in keys:
+                    if isinstance(value, dict) and k in value:
+                        value = value[k]
+                    else:
+                        return default
+                return value
+                
+            return default
+            
+        except Exception as e:
+            print(f"⚠️ Erro ao obter configuração de log para chave '{key}': {e}")
+            return default
     
     def _setup_main_logger(self) -> None:
         """Setup main application logger with rotation."""
