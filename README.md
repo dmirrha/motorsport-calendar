@@ -94,7 +94,13 @@ python motorsport_calendar.py --verbose
 
 ```
 motorsport-calendar/
-├── motorsport_calendar.py     # Script principal
+├── .github/
+│   └── import_issues/        # Gerenciamento de issues
+│       ├── imported/         # Issues já importadas
+│       ├── *.json            # Issues pendentes
+│       ├── import_issues.py  # Script de importação
+│       └── README.md         # Documentação
+├── motorsport_calendar.py    # Script principal
 ├── config.json               # Configuração principal
 ├── config.example.json       # Exemplo de configuração
 ├── requirements.txt          # Dependências
@@ -156,13 +162,61 @@ O script exibe uma interface colorida com:
 
 ## 📅 Importação no Google Calendar
 
-1. Execute o script para gerar o arquivo `.ics`
+1. Execute o script para gerar o arquivo .ics
 2. Abra o Google Calendar
 3. Clique em "+" ao lado de "Outros calendários"
 4. Selecione "Importar"
-5. Faça upload do arquivo `motorsport_events.ics`
+5. Faça upload do arquivo motorsport_events.ics
 
-## 🤝 Contribuição
+## 🐛 Gerenciamento de Issues
+
+O projeto utiliza um sistema automatizado para gerenciar issues através de arquivos JSON. Isso permite:
+
+- ✅ **Rastreabilidade**: Histórico completo de todas as issues
+- ✅ **Consistência**: Formato padronizado para todas as issues
+- ✅ **Automação**: Processo de importação simplificado
+- ✅ **Backup**: Histórico de todas as issues já criadas
+
+### 🔍 Issues Ativas
+
+1. [🐛 Correção na Detecção de Eventos sem Data](https://github.com/dmirrha/motorsport-calendar/issues/3)
+2. [🐛 Correção na Detecção do Final de Semana](https://github.com/dmirrha/motorsport-calendar/issues/5)
+3. [✨ Aprimoramento na Detecção de Categorias](https://github.com/dmirrha/motorsport-calendar/issues/2)
+4. [🔧 Melhoria no Tratamento de Erros e Logs](https://github.com/dmirrha/motorsport-calendar/issues/4)
+
+### 🔄 Fluxo de Trabalho
+
+1. **Criar Nova Issue**:
+   - Crie um novo arquivo JSON em `.github/import_issues/`
+   - Siga o [formato padrão](#-formato-do-arquivo-de-issue)
+
+2. **Importar Issues**:
+   ```bash
+   # Navegue até o diretório de importação
+   cd .github/import_issues/
+   
+   # Execute o script (ele pedirá autenticação na primeira vez)
+   python import_issues.py dmirrha/motorsport-calendar
+   ```
+
+3. **Verificação**:
+   - As issues importadas são movidas para `imported/` com timestamp
+   - Um relatório detalhado é exibido no terminal
+   - Links para as issues criadas são fornecidos
+
+### 📝 Formato do Arquivo de Issue
+
+```json
+{
+  "title": "Título da Issue",
+  "body": "Descrição detalhada em Markdown...",
+  "labels": ["bug", "high priority"],
+  "assignees": ["usuario"],
+  "milestone": null
+}
+```
+
+## Contribuição
 
 1. Fork o projeto
 2. Crie uma branch para sua feature (`git checkout -b feature/AmazingFeature`)
