@@ -152,6 +152,12 @@
       "debug_directory": "logs/debug",
       "payload_directory": "logs/payloads"
     },
+    "retention": {
+      "enabled": true,
+      "max_logs_to_keep": 10,
+      "max_payloads_to_keep": 20,
+      "delete_older_than_days": 30
+    },
     "levels": {
       "console": "INFO",
       "file": "DEBUG",

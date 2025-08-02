@@ -41,9 +41,123 @@ class Logger:
         self.main_logger = self.get_logger('main')
         self.main_logger.info(f"🏁 Motorsport Calendar Logger initialized - Execution ID: {self.execution_id}")
     
+    def _cleanup_old_logs(self) -> None:
+        """Clean up old logs and payloads based on retention policy."""
+        print("🔍 Verificando se a limpeza de logs está habilitada...")
+        if not self.config or not self.config.get('logging', {}).get('retention', {}).get('enabled', True):
+            print("ℹ️ Limpeza de logs desabilitada na configuração")
+            return
+            
+        try:
+            retention = self.config['logging']['retention']
+            base_dir = Path("logs")
+            debug_dir = base_dir / "debug"
+            payload_dir = base_dir / "payloads"
+            
+            # Clean up old debug logs
+            if debug_dir.exists():
+                debug_logs = sorted(debug_dir.glob("*.log"), key=os.path.getmtime, reverse=True)
+                self._cleanup_files(debug_logs, retention.get('max_logs_to_keep', 10))
+            
+            # Clean up old payloads
+            if payload_dir.exists():
+                payload_folders = sorted(payload_dir.iterdir(), 
+                                      key=lambda x: x.stat().st_mtime if x.is_dir() else 0, 
+                                      reverse=True)
+                self._cleanup_files(payload_folders, retention.get('max_payloads_to_keep', 20))
+                
+            # Clean up files older than X days
+            max_age_days = retention.get('delete_older_than_days', 30)
+            if max_age_days > 0:
+                self._cleanup_old_files(debug_dir, max_age_days)
+                self._cleanup_old_files(payload_dir, max_age_days)
+                
+        except Exception as e:
+            print(f"⚠️ Failed to clean up old logs: {str(e)}")
+    
+    def _cleanup_files(self, files: list, max_to_keep: int) -> None:
+        """Remove files beyond the maximum to keep."""
+        if len(files) > max_to_keep:
+            for file in files[max_to_keep:]:
+                try:
+                    if file.is_dir():
+                        import shutil
+                        shutil.rmtree(file)
+                    else:
+                        file.unlink()
+                except Exception as e:
+                    print(f"⚠️ Failed to delete {file}: {str(e)}")
+    
+    def _cleanup_rotated_logs(self) -> None:
+        """Clean up old rotated logs based on retention policy."""
+        if not self.config or not self.config.get('logging', {}).get('retention', {}).get('enabled', True):
+            return
+            
+        try:
+            retention = self.config['logging']['retention']
+            log_dir = Path("logs")
+            rotated_dir = log_dir / "rotated_logs"
+            
+            if not rotated_dir.exists():
+                return
+                
+            # Get all rotated log files
+            rotated_logs = sorted(
+                rotated_dir.glob("motorsport_calendar_*.log"),
+                key=os.path.getmtime,
+                reverse=True
+            )
+            
+            # Apply max logs to keep
+            max_logs = retention.get('max_logs_to_keep', 10)
+            if len(rotated_logs) > max_logs:
+                for log_file in rotated_logs[max_logs:]:
+                    try:
+                        log_file.unlink()
+                        print(f"🧹 Removed old rotated log: {log_file}")
+                    except Exception as e:
+                        print(f"⚠️ Failed to remove {log_file}: {e}")
+            
+            # Apply max age
+            max_age_days = retention.get('delete_older_than_days', 30)
+            if max_age_days > 0:
+                cutoff_time = datetime.now().timestamp() - (max_age_days * 24 * 60 * 60)
+                for log_file in rotated_logs:
+                    if log_file.stat().st_mtime < cutoff_time:
+                        try:
+                            log_file.unlink()
+                            print(f"🧹 Removed old rotated log (age > {max_age_days}d): {log_file}")
+                        except Exception as e:
+                            print(f"⚠️ Failed to remove {log_file}: {e}")
+                            
+        except Exception as e:
+            print(f"⚠️ Error cleaning up rotated logs: {e}")
+    
+    def _cleanup_old_files(self, directory: Path, max_age_days: int) -> None:
+        """Remove files older than specified days."""
+        if not directory.exists():
+            return
+            
+        cutoff_time = datetime.now().timestamp() - (max_age_days * 24 * 60 * 60)
+        
+        for item in directory.rglob('*'):
+            try:
+                if item.is_file() and item.stat().st_mtime < cutoff_time:
+                    item.unlink()
+                elif item.is_dir() and not any(item.iterdir()):
+                    item.rmdir()
+            except Exception as e:
+                print(f"⚠️ Failed to delete {item}: {str(e)}")
+    
     def _setup_directories(self) -> None:
         """Create necessary logging directories."""
         base_dir = Path("logs")
+        
+        print("🔄 Iniciando configuração de diretórios...")
+        # Clean up old logs before setting up new directories
+        print("🔄 Iniciando limpeza de logs antigos...")
+        self._cleanup_old_logs()
+        print("✅ Limpeza de logs concluída")
         
         directories = [
             base_dir,
@@ -61,15 +175,33 @@ class Logger:
         return default
     
     def _setup_main_logger(self) -> None:
-        """Setup main application logger."""
+        """Setup main application logger with rotation."""
         logger = logging.getLogger('motorsport_calendar')
         logger.setLevel(logging.DEBUG)
         
         # Clear existing handlers
         logger.handlers.clear()
         
-        # File handler with rotation
-        log_file = Path("logs") / "motorsport_calendar.log"
+        # Define log file paths
+        log_dir = Path("logs")
+        log_file = log_dir / "motorsport_calendar.log"
+        
+        # Rotate logs manually at the start of each execution
+        if log_file.exists():
+            # Create backup with timestamp
+            timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+            backup_dir = log_dir / "rotated_logs"
+            backup_dir.mkdir(exist_ok=True)
+            
+            # Rotate the current log file
+            backup_file = backup_dir / f"motorsport_calendar_{timestamp}.log"
+            try:
+                log_file.rename(backup_file)
+                print(f"✅ Rotated log file to {backup_file}")
+            except Exception as e:
+                print(f"⚠️ Failed to rotate log file: {e}")
+        
+        # File handler with rotation for new logs
         file_handler = logging.handlers.RotatingFileHandler(
             log_file,
             maxBytes=self._get_log_config('rotation.max_size_mb', 10) * 1024 * 1024,
@@ -86,6 +218,9 @@ class Logger:
         
         logger.addHandler(file_handler)
         self.loggers['main'] = logger
+        
+        # Clean up old rotated logs based on retention policy
+        self._cleanup_rotated_logs()
     
     def _setup_debug_logger(self) -> None:
         """Setup detailed debug logger for current execution."""
