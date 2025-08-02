@@ -11,6 +11,19 @@ Este arquivo documenta todas as alterações notáveis no projeto, seguindo o [V
   - Excluídos eventos de finais de semana futuros conforme especificado
   - Adicionados testes automatizados para validação da filtragem
 
+- **Sistema de Logs**: Corrigido acesso seguro às configurações
+  - Resolvido erro `'ConfigManager' object is not subscriptable` na limpeza de logs
+  - Implementado método `_get_log_config` para acesso consistente às configurações
+  - Melhorado tratamento de erros na rotação e limpeza de logs
+  - Adicionada verificação de existência de diretórios antes de operações de arquivo
+
+### Melhorado
+- **Estrutura do Projeto**: Reorganização dos diretórios para melhor organização
+  - Movidos arquivos de configuração para pasta `config/`
+  - Atualizados imports para usar caminhos absolutos
+  - Melhorada a organização do código fonte
+  - Atualizada documentação para refletir a nova estrutura
+
 ### Adicionado
 - Sistema de versionamento semântico
 - Documentação do processo de releases

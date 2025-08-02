@@ -2,6 +2,34 @@
 
 Este arquivo contém um registro acumulativo de todas as versões lançadas do projeto, com notas detalhadas sobre as mudanças em cada versão.
 
+## Versão 0.1.3 (2025-08-02)
+**Melhorias no Sistema de Logs e Configuração**
+
+### 🐛 Correções
+- **Sistema de Logs**: Corrigido acesso seguro às configurações
+  - Resolvido erro `'ConfigManager' object is not subscriptable` na limpeza de logs
+  - Implementado método `_get_log_config` para acesso consistente às configurações
+  - Melhorado tratamento de erros na rotação e limpeza de logs
+  - Adicionada verificação de existência de diretórios antes de operações de arquivo
+
+### 📚 Documentação
+- Adicionado arquivo `LOGGING_AND_CONFIGURATION.md` com documentação detalhada sobre:
+  - Configuração de níveis de log
+  - Estrutura de diretórios de logs
+  - Políticas de retenção e rotação
+  - Solução de problemas comuns
+  - Boas práticas para uso do sistema de logs
+
+## Versão 0.1.2 (2025-08-02)
+**Melhorias na Estrutura do Projeto**
+
+### 🚀 Melhorias
+- **Reorganização da Estrutura de Diretórios**:
+  - Movidos arquivos de configuração para diretório `config/`
+  - Atualizados imports para usar caminhos absolutos
+  - Melhorada a organização do código fonte
+  - Documentação atualizada para refletir a nova estrutura
+
 ## Versão 0.1.1 (2025-08-02)
 **Correção Crítica de Filtragem de Fim de Semana**
 
