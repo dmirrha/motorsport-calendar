@@ -1,0 +1,34 @@
+name-template: 'v$RESOLVED_VERSION'
+tag-template: 'v$RESOLVED_VERSION'
+categories:
+  - title: '🚀 Novas Funcionalidades'
+    label: 'feature'
+  - title: '🛠 Melhorias'
+    label: 'enhancement'
+  - title: '🐛 Correções de Bugs'
+    label: 'bug'
+  - title: '📚 Documentação'
+    label: 'documentation'
+  - title: '🧪 Testes'
+    label: 'test'
+  - title: '🧹 Manutenção'
+    label: 'chore'
+
+change-template: '- $TITLE (#$NUMBER) @$AUTHOR'
+change-title-escapes: '\\,*,`,'
+version-resolver:
+  major:
+    labels:
+      - 'major'
+  minor:
+    labels:
+      - 'minor'
+  patch:
+    labels:
+      - 'patch'
+  default: 'minor'
+
+template: |
+  ## Versão $RESOLVED_VERSION
+  
+  $CHANGES
