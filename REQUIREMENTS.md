@@ -294,21 +294,44 @@ Lista de dependências principais:
 6. **Arquivo de exemplo de configuração (`config.example.json`)**
 
 ### **Critérios de Aceitação**
-- [ ] Script executa sem erros em macOS
-- [ ] Coleta eventos do final de semana atual
-- [ ] Gera arquivo .ics válido
-- [ ] Arquivo importa corretamente no Google Calendar
-- [ ] Eventos aparecem com informações corretas
-- [ ] Logs informativos durante execução
-- [ ] **Script identifica corretamente o fim de semana alvo**
-- [ ] **Duplicatas são removidas mantendo dados da fonte prioritária**
-- [ ] **Normalização de dados funciona corretamente**
-- [x] **Interface visual colorida e agradável durante execução**
-- [x] **Payloads raw de todas as integrações são salvos**
-- [x] **Log centralizado debug é gerado a cada execução**
-- [x] **Rotação automática de logs a cada execução**
-- [x] **Limpeza automática de logs antigos baseada em política de retenção**
-- [x] **Configuração flexível de retenção de logs via JSON**
+
+#### **Funcionalidades Básicas**
+- [x] Script executa sem erros em macOS, Linux e Windows
+- [x] Coleta eventos do final de semana atual
+- [x] Gera arquivo .ics válido compatível com RFC 5545
+- [x] Arquivo importa corretamente no Google Calendar e outros clientes iCal
+- [x] Eventos aparecem com informações completas e formatadas
+- [x] Suporte a múltiplos fusos horários
+
+#### **Processamento de Dados**
+- [x] Script identifica corretamente o fim de semana alvo
+- [x] Duplicatas são removidas mantendo dados da fonte prioritária
+- [x] Normalização de dados funciona corretamente
+- [ ] **CRÍTICO:** Corrigir detecção da página alvo em tomadadetempo.com.br
+  - Identificar corretamente o link alvo da programação
+  - Garantir leitura correta dos eventos na página alvo
+  - Melhorar resiliência a mudanças na estrutura do site
+- [ ] Melhorar detecção de datas em eventos da programação semanal
+- [ ] Associar eventos sem data explícita ao contexto da página
+
+#### **Sistema de Logging**
+- [x] Interface visual colorida e agradável durante execução
+- [x] Payloads raw de todas as integrações são salvos
+- [x] Log centralizado debug é gerado a cada execução
+- [x] Rotação automática de logs a cada execução
+- [x] Limpeza automática de logs antigos baseada em política de retenção
+- [x] Configuração flexível de retenção de logs via JSON
+- [x] Armazenamento de logs rotacionados em diretório dedicado
+
+#### **Desempenho e Confiabilidade**
+- [x] Tratamento de erros robusto
+- [x] Timeout configurável para requisições
+- [x] Mecanismo de fallback para fontes alternativas
+
+#### **Configuração e Manutenção**
+- [x] Todas as configurações em arquivo JSON
+- [x] Fácil adição de novas fontes de dados
+- [x] Documentação completa e atualizada
 
 ---
 
