@@ -39,6 +39,14 @@ venv.bak/
 *.swo
 *~
 
+# Logs and data
+logs/
+!logs/.gitkeep
+*.log
+!docs/logs/
+logs/rotated_logs/
+logs/payloads/
+
 # macOS
 .DS_Store
 .AppleDouble

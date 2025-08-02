@@ -4,6 +4,14 @@ Este arquivo documenta todas as alterações notáveis no projeto, seguindo o [V
 
 ## [Não Lançado]
 ### Corrigido
+- **Ambiente Python**: Atualizado para Python 3.11.5
+  - Resolvido aviso de compatibilidade entre urllib3 v2+ e OpenSSL
+  - Configurado ambiente via pyenv para gerenciamento de versões
+  - Atualizadas dependências para versões compatíveis
+  - Removido arquivo de debug não mais necessário (`debug_weekend_filter.py`)
+  - Atualizado `.gitignore` para excluir arquivos de log e dados temporários
+
+### Corrigido
 - **Issue #5**: Corrigida detecção do final de semana atual na TomadaTempoSource
   - Corrigido parsing de datas brasileiras (DD/MM/YYYY vs MM/DD/YYYY)
   - Corrigida lógica de timezone para America/Sao_Paulo
