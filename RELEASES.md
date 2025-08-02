@@ -2,6 +2,30 @@
 
 Este arquivo contém um registro acumulativo de todas as versões lançadas do projeto, com notas detalhadas sobre as mudanças em cada versão.
 
+## Versão 0.1.1 (2025-08-02)
+**Correção Crítica de Filtragem de Fim de Semana**
+
+### 🐛 Correções
+- **Issue #5**: Corrigida detecção do final de semana atual na TomadaTempoSource
+  - **Problema Resolvido**: Sistema estava incluindo eventos de finais de semana futuros
+  - **Correção de Parsing**: Datas brasileiras (DD/MM/YYYY) agora interpretadas corretamente
+  - **Correção de Timezone**: Implementado suporte consistente ao timezone America/Sao_Paulo
+  - **Filtro Aprimorado**: Implementado filtro por range de datas para limitar coleta ao fim de semana vigente
+  - **Testes Adicionados**: Criados testes automatizados para validação da filtragem
+
+### 📋 Detalhes Técnicos
+- Método `parse_date_time` na BaseSource atualizado para priorizar formato brasileiro
+- Método `collect_events` na TomadaTempoSource corrigido para calcular range correto do fim de semana
+- Método `_get_next_weekend` ajustado para retornar sexta-feira do fim de semana atual
+- Script de debug criado para análise detalhada da filtragem
+
+### ✅ Critérios de Aceitação Atendidos
+- 100% dos eventos exibidos pertencem ao final de semana atual
+- Nenhum evento futuro incluído indevidamente
+- Transição de semanas funciona corretamente
+- Desempenho mantido
+- Timezone America/Sao_Paulo respeitado
+
 ## Versão 0.1.0 (2025-08-02)
 **Versão Inicial**
 

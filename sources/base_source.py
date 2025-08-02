@@ -209,10 +209,10 @@ class BaseSource(ABC):
     def parse_date_time(self, date_str: str, time_str: str = "", 
                        timezone_str: str = "America/Sao_Paulo") -> Optional[datetime]:
         """
-        Parse date and time strings into datetime object.
+        Parse date and time strings into datetime object with Brazilian format support.
         
         Args:
-            date_str: Date string
+            date_str: Date string (supports DD/MM/YYYY, DD-MM-YYYY, YYYY/MM/DD formats)
             time_str: Time string (optional)
             timezone_str: Timezone string
             
@@ -221,23 +221,49 @@ class BaseSource(ABC):
         """
         try:
             import pytz
-            from dateutil import parser
+            from datetime import datetime as dt
             
-            # Combine date and time
+            # First try to parse with explicit Brazilian formats
+            date_formats = [
+                '%d/%m/%Y',    # DD/MM/YYYY
+                '%d-%m-%Y',    # DD-MM-YYYY
+                '%d/%m/%y',    # DD/MM/YY 
+                '%d-%m-%y',    # DD-MM-YY
+                '%Y/%m/%d',    # YYYY/MM/DD
+                '%Y-%m-%d',    # YYYY-MM-DD
+            ]
+            
+            parsed_date = None
+            for fmt in date_formats:
+                try:
+                    parsed_date = dt.strptime(date_str, fmt)
+                    break
+                except ValueError:
+                    continue
+            
+            if not parsed_date:
+                # Fallback to dateutil parser with dayfirst=True for Brazilian format
+                from dateutil import parser
+                parsed_date = parser.parse(date_str, dayfirst=True)
+            
+            # Add time if provided
             if time_str:
-                datetime_str = f"{date_str} {time_str}"
-            else:
-                datetime_str = date_str
-            
-            # Parse datetime
-            parsed_dt = parser.parse(datetime_str)
+                time_formats = ['%H:%M', '%H:%M:%S']
+                parsed_time = None
+                for time_fmt in time_formats:
+                    try:
+                        time_obj = dt.strptime(time_str, time_fmt).time()
+                        parsed_date = dt.combine(parsed_date.date(), time_obj)
+                        break
+                    except ValueError:
+                        continue
             
             # Add timezone if not present
-            if parsed_dt.tzinfo is None:
+            if parsed_date.tzinfo is None:
                 tz = pytz.timezone(timezone_str)
-                parsed_dt = tz.localize(parsed_dt)
+                parsed_date = tz.localize(parsed_date)
             
-            return parsed_dt
+            return parsed_date
             
         except Exception as e:
             if self.logger:

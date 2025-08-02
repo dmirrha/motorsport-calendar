@@ -3,10 +3,19 @@
 Este arquivo documenta todas as alterações notáveis no projeto, seguindo o [Versionamento Semântico](https://semver.org/).
 
 ## [Não Lançado]
+### Corrigido
+- **Issue #5**: Corrigida detecção do final de semana atual na TomadaTempoSource
+  - Corrigido parsing de datas brasileiras (DD/MM/YYYY vs MM/DD/YYYY)
+  - Corrigida lógica de timezone para America/Sao_Paulo
+  - Implementado filtro por range de datas para incluir apenas eventos do fim de semana vigente
+  - Excluídos eventos de finais de semana futuros conforme especificado
+  - Adicionados testes automatizados para validação da filtragem
+
 ### Adicionado
 - Sistema de versionamento semântico
 - Documentação do processo de releases
 - Automação de geração de changelog
+- Script de debug para análise de filtragem de fim de semana
 
 ## [0.1.0] - 2025-08-02
 ### Adicionado

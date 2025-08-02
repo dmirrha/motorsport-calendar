@@ -47,6 +47,18 @@ class TomadaTempoSource(BaseSource):
             if not target_date:
                 target_date = self._get_next_weekend()
             
+            # Calculate current weekend range (Friday to Sunday) with proper timezone
+            import pytz
+            tz = pytz.timezone('America/Sao_Paulo')
+            
+            # Ensure target_date has timezone
+            if target_date.tzinfo is None:
+                target_date = tz.localize(target_date)
+            
+            weekend_start = target_date.replace(hour=0, minute=0, second=0, microsecond=0)
+            weekend_end = weekend_start + timedelta(days=2, hours=23, minutes=59, seconds=59)
+            target_weekend = (weekend_start, weekend_end)
+            
             # Collect from different sections
             calendar_events = self._collect_from_calendar(target_date)
             events.extend(calendar_events)
@@ -55,8 +67,8 @@ class TomadaTempoSource(BaseSource):
             category_events = self._collect_from_categories(target_date)
             events.extend(category_events)
             
-            # Filter and normalize events
-            weekend_events = self.filter_weekend_events(events)
+            # Filter events for current weekend only
+            weekend_events = self.filter_weekend_events(events, target_weekend)
             normalized_events = [self.normalize_event_data(event) for event in weekend_events]
             
             # Validate events
@@ -86,14 +98,17 @@ class TomadaTempoSource(BaseSource):
             return []
     
     def _get_next_weekend(self) -> datetime:
-        """Get the next weekend date."""
+        """Get the current weekend date (Friday of the current week)."""
         today = datetime.now()
-        days_until_friday = (4 - today.weekday()) % 7
-        if days_until_friday == 0 and today.weekday() > 4:  # If it's already weekend
-            days_until_friday = 7
-        
-        next_friday = today + timedelta(days=days_until_friday)
-        return next_friday
+        # Calculate days since last Friday
+        days_since_friday = (today.weekday() - 4) % 7
+        # If today is Friday, Saturday or Sunday, we're in the current weekend
+        if today.weekday() >= 4:  # 4=Friday, 5=Saturday, 6=Sunday
+            current_friday = today - timedelta(days=days_since_friday)
+        else:
+            # If today is Monday-Thursday, get the previous Friday
+            current_friday = today - timedelta(days=days_since_friday)
+        return current_friday
     
     def _collect_from_calendar(self, target_date: datetime) -> List[Dict[str, Any]]:
         """
@@ -262,21 +277,46 @@ class TomadaTempoSource(BaseSource):
         return ' '.join(words) if words else None
     
     def _extract_date(self, text: str) -> Optional[str]:
-        """Extract date from text."""
-        date_patterns = [
-            r'(\d{1,2})[\/\-](\d{1,2})[\/\-](\d{4})',  # DD/MM/YYYY or DD-MM-YYYY
-            r'(\d{1,2})[\/\-](\d{1,2})[\/\-](\d{2})',   # DD/MM/YY or DD-MM-YY
-            r'(\d{4})[\/\-](\d{1,2})[\/\-](\d{1,2})',   # YYYY/MM/DD or YYYY-MM-DD
-        ]
+        """Extract date from text with improved parsing."""
+        # Look for dates in DD/MM/YYYY or DD-MM-YYYY format first
+        dd_mm_yyyy_pattern = r'(\d{1,2})[\/\-](\d{1,2})[\/\-](\d{4})'
+        match = re.search(dd_mm_yyyy_pattern, text)
+        if match:
+            day, month, year = match.groups()
+            # Validate date components
+            try:
+                day_int, month_int, year_int = int(day), int(month), int(year)
+                if 1 <= day_int <= 31 and 1 <= month_int <= 12 and year_int >= 2020:
+                    return f"{day_int:02d}/{month_int:02d}/{year_int}"
+            except ValueError:
+                pass
         
-        for pattern in date_patterns:
-            match = re.search(pattern, text)
-            if match:
-                if len(match.group(3)) == 2:  # YY format
-                    year = f"20{match.group(3)}"
-                    return f"{match.group(1)}/{match.group(2)}/{year}"
-                else:
-                    return f"{match.group(1)}/{match.group(2)}/{match.group(3)}"
+        # Look for dates in DD/MM/YY or DD-MM-YY format
+        dd_mm_yy_pattern = r'(\d{1,2})[\/\-](\d{1,2})[\/\-](\d{2})'
+        match = re.search(dd_mm_yy_pattern, text)
+        if match:
+            day, month, year = match.groups()
+            # Validate date components
+            try:
+                day_int, month_int, year_int = int(day), int(month), int(year)
+                if 1 <= day_int <= 31 and 1 <= month_int <= 12:
+                    full_year = 2000 + year_int if year_int < 50 else 1900 + year_int
+                    return f"{day_int:02d}/{month_int:02d}/{full_year}"
+            except ValueError:
+                pass
+        
+        # Look for dates in YYYY/MM/DD or YYYY-MM-DD format
+        yyyy_mm_dd_pattern = r'(\d{4})[\/\-](\d{1,2})[\/\-](\d{1,2})'
+        match = re.search(yyyy_mm_dd_pattern, text)
+        if match:
+            year, month, day = match.groups()
+            # Validate date components
+            try:
+                year_int, month_int, day_int = int(year), int(month), int(day)
+                if 1 <= day_int <= 31 and 1 <= month_int <= 12 and year_int >= 2020:
+                    return f"{day_int:02d}/{month_int:02d}/{year_int}"
+            except ValueError:
+                pass
         
         return None
     
