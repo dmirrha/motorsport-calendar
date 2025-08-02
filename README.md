@@ -9,12 +9,13 @@ Um script Python avançado para coleta automática de eventos de automobilismo d
 - ✅ **Detecção inteligente** do fim de semana alvo
 - ✅ **Remoção de duplicatas** entre fontes
 - ✅ **Configuração flexível** via arquivo JSON
-- ✅ **Logging avançado** com payloads preservados
-- ✅ **Compatível com Google Calendar**
+- ✅ **Logging avançado** com rotação e limpeza automática
+- ✅ **Compatível com Google Calendar** e outros clientes iCal
 - ✅ **Detecção dinâmica** de categorias de automobilismo
 - ✅ **Processamento inteligente** de datas e horários
 - ✅ **Suporte a múltiplos fusos horários**
 - ✅ **Gerenciamento de erros** robusto e informativo
+- ✅ **Sistema de retenção** configurável para logs e payloads
 
 ## 🏎️ Categorias Suportadas
 
@@ -177,12 +178,24 @@ Este projeto está sob a licença MIT. Veja o arquivo `LICENSE` para detalhes.
 
 🚀 **Versão Estável** - Em produção
 
-### Últimas Atualizações
-- Melhoria na detecção de eventos do Tomada de Tempo
-- Correção de bugs no processamento de datas e horários
-- Aprimoramento do sistema de logging
-- Melhor tratamento de erros e recuperação
-- Otimização de performance para processamento em lote
+### 🚀 Últimas Atualizações
+
+#### Sistema de Logging Avançado
+- 🔄 **Rotação automática** de logs a cada execução
+- 🗑️ **Limpeza inteligente** de logs antigos baseada em política de retenção
+- 📊 **Armazenamento organizado** de logs rotacionados
+- ⚙️ **Configuração flexível** via arquivo JSON
+
+#### Melhorias no Processamento
+- 🔍 Detecção aprimorada de eventos do Tomada de Tempo
+- 🕒 Processamento mais preciso de datas e horários
+- 🛠️ Tratamento de erros aprimorado
+- ⚡ Otimização de performance
+
+#### Próximos Passos Imediatos
+- 🐛 **Correção crítica**: Melhorar detecção da página alvo no Tomada de Tempo
+- 📅 Aprimorar associação de eventos sem data explícita
+- 🔄 Expansão para mais fontes de dados
 
 ### Próximos Passos
 - Implementação de mais fontes de dados
