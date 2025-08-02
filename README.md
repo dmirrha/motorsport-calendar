@@ -127,6 +127,13 @@ O script exibe uma interface colorida com:
 - **Logs centralizados** com múltiplos níveis
 - **Payloads raw** preservados por fonte
 - **Rotação automática** por execução
+  - O arquivo principal de log é rotacionado a cada execução
+  - Logs antigos são armazenados em `logs/rotated_logs/`
+  - Configuração personalizável em `config.json`
+- **Limpeza automática** de logs antigos
+  - Mantém apenas os logs mais recentes (configurável)
+  - Remove automaticamente logs mais antigos que o período de retenção
+  - Configuração flexível de retenção
 - **Debug completo** para troubleshooting
 
 ## 🌐 Fontes de Dados

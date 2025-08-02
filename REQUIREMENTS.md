@@ -303,9 +303,12 @@ Lista de dependências principais:
 - [ ] **Script identifica corretamente o fim de semana alvo**
 - [ ] **Duplicatas são removidas mantendo dados da fonte prioritária**
 - [ ] **Normalização de dados funciona corretamente**
-- [ ] **Interface visual colorida e agradável durante execução**
-- [ ] **Payloads raw de todas as integrações são salvos**
-- [ ] **Log centralizado debug é gerado a cada execução**
+- [x] **Interface visual colorida e agradável durante execução**
+- [x] **Payloads raw de todas as integrações são salvos**
+- [x] **Log centralizado debug é gerado a cada execução**
+- [x] **Rotação automática de logs a cada execução**
+- [x] **Limpeza automática de logs antigos baseada em política de retenção**
+- [x] **Configuração flexível de retenção de logs via JSON**
 
 ---
 
