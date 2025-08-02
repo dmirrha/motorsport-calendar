@@ -1,103 +1,211 @@
 # Fontes de Dados - Eventos de Automobilismo
 
-## **Passo 1.1: Definir Fontes de Dados para Eventos de Automobilismo**
+## **Visão Geral das Fontes de Dados**
 
 ### **Objetivo**
-Identificar e catalogar fontes confiáveis de dados para eventos de automobilismo, incluindo APIs públicas, sites oficiais e provedores de streaming, organizados por prioridade e categoria.
+Documentar as fontes de dados atualmente integradas ao sistema, incluindo detalhes de implementação, limitações conhecidas e planos futuros de integração.
 
 ---
 
-## **📊 Fontes de Dados por Categoria**
+## **📊 Fontes de Dados Implementadas**
 
-### **🏎️ Fórmula 1 (F1)**
+### **1. Tomada de Tempo (Fonte Primária)**
+- **URL**: https://www.tomadadetempo.com.br/
+- **Tipo**: Web scraping
+- **Dados Coletados**:
+  - Programação de TV e internet
+  - Horários de transmissão
+  - Categorias de automobilismo
+  - Links para transmissões
+- **Status**: ✅ Ativa e estável
+- **Cobertura**: Excelente para categorias brasileiras e internacionais
+- **Frequência de Atualização**: Diária
+- **Limitações Conhecidas**:
+  - Necessidade de tratamento especial para datas em português
+  - Formato de programação pode variar
+- **Exemplo de Uso**:
+  ```python
+  from sources.tomada_tempo import TomadaTempoSource
+  source = TomadaTempoSource()
+  events = source.fetch_events()
+  ```
 
-#### **Fontes Prioritárias:**
-1. **Ergast API** (http://ergast.com/mrd/)
-   - *Tipo*: API REST gratuita
-   - *Dados*: Calendário, resultados, horários de sessões
-   - *Formato*: JSON/XML
-   - *Confiabilidade*: ⭐⭐⭐⭐⭐
-   - *Status*: Ativa (mas será descontinuada em 2024)
+### **2. Ergast API (F1)**
+- **URL**: http://ergast.com/mrd/
+- **Tipo**: API REST
+- **Dados Coletados**:
+  - Calendário da F1
+  - Resultados históricos
+  - Horários de sessões
+- **Status**: ⚠️ Ativa (mas será descontinuada em 2024)
+- **Formato**: JSON/XML
+- **Limitações**:
+  - Dados podem ter atraso de atualização
+  - API será descontinuada
+- **Plano de Migração**: Transição para OpenF1 API em andamento
 
-2. **Formula 1 Official API** (https://www.formula1.com/)
-   - *Tipo*: Web scraping do site oficial
-   - *Dados*: Calendário oficial, horários, circuitos
-   - *Confiabilidade*: ⭐⭐⭐⭐⭐
-   - *Streaming*: F1 TV Pro (regional)
+### **3. OpenF1 API (Futura Fonte Principal para F1)**
+- **URL**: https://openf1.org/
+- **Tipo**: API REST
+- **Status**: 🔄 Em implementação
+- **Vantagens**:
+  - Dados em tempo real
+  - Comunidade ativa
+  - Alternativa moderna ao Ergast
+- **Plano**: Tornar-se a fonte primária para dados de F1
 
-3. **OpenF1 API** (https://openf1.org/)
-   - *Tipo*: API REST gratuita (substituto do Ergast)
-   - *Dados*: Dados em tempo real, calendário, sessões
-   - *Formato*: JSON
-   - *Confiabilidade*: ⭐⭐⭐⭐
+## **📡 Provedores de Streaming**
 
-#### **Provedores de Streaming:**
-- **Brasil**: Globo/SporTV, F1 TV Pro
-- **Internacional**: F1 TV Pro, Sky Sports, ESPN
+### **Brasil**
+- **Globo/SporTV**: Cobertura de F1, Stock Car, Fórmula E
+- **Bandeirantes**: MotoGP, WSBK
+- **ESPN**: NASCAR, IndyCar
+- **F1 TV Pro**: Transmissão oficial da F1 (assinatura)
 
----
-
-### **🏍️ MotoGP**
-
-#### **Fontes Prioritárias:**
-1. **MotoGP Official Website** (https://www.motogp.com/)
-   - *Tipo*: Web scraping
-   - *Dados*: Calendário oficial, horários das sessões
-   - *Confiabilidade*: ⭐⭐⭐⭐⭐
-
-2. **MotoGP API** (não oficial)
-   - *Tipo*: API extraída do site oficial
-   - *Dados*: Resultados, calendário, pilotos
-   - *Confiabilidade*: ⭐⭐⭐⭐
-
-#### **Provedores de Streaming:**
-- **Brasil**: SporTV, ESPN
-- **Internacional**: MotoGP VideoPass
-
----
-
-### **🏁 Stock Car Brasil**
-
-#### **Fontes Prioritárias:**
-1. **Stock Car Official Website** (https://stockcar.com.br/)
-   - *Tipo*: Web scraping
-   - *Dados*: Calendário, horários, circuitos
-   - *Confiabilidade*: ⭐⭐⭐⭐⭐
-
-2. **Motorsport.com Brasil** (https://motorsport.com/br/)
-   - *Tipo*: Web scraping
-   - *Dados*: Calendários múltiplas categorias
-   - *Confiabilidade*: ⭐⭐⭐⭐
-
-#### **Provedores de Streaming:**
-- **Brasil**: SporTV, Motorsport.tv, YouTube (oficial)
+### **Internacional**
+- **F1 TV Pro**: Cobertura completa da F1
+- **MotoGP VideoPass**: Transmissões oficiais de MotoGP
+- **Motorsport.tv**: Diversas categorias
+- **YouTube**: Canais oficiais das categorias
 
 ---
 
-### **🏎️ NASCAR**
+## **🔄 Fontes em Desenvolvimento**
 
-#### **Fontes Prioritárias:**
-1. **NASCAR Official API** (https://www.nascar.com/)
-   - *Tipo*: Web scraping
-   - *Dados*: Calendário Cup Series, Xfinity, Truck
-   - *Confiabilidade*: ⭐⭐⭐⭐⭐
+### **1. MotoGP Official**
+- **URL**: https://www.motogp.com/
+- **Tipo**: Web scraping/API não oficial
+- **Status**: 🔄 Em desenvolvimento
+- **Recursos Planejados**:
+  - Calendário completo
+  - Horários de sessões
+  - Classificações
 
-2. **ESPN NASCAR** (https://www.espn.com/racing/nascar/)
-   - *Tipo*: Web scraping
-   - *Dados*: Horários, resultados
-   - *Confiabilidade*: ⭐⭐⭐⭐
-
-#### **Provedores de Streaming:**
-- **Brasil**: ESPN, Fox Sports
-- **Internacional**: NBC Sports, Fox Sports
+### **2. Motorsport.com**
+- **URL**: https://www.motorsport.com/
+- **Tipo**: Web scraping
+- **Status**: 🔄 Em desenvolvimento
+- **Objetivo**: Complementar dados de categorias menos cobertas
 
 ---
 
-### **🏍️ World Superbike (WSBK)**
+## **📅 Estrutura dos Dados**
 
-#### **Fontes Prioritárias:**
-1. **WorldSBK Official Website** (https://www.worldsbk.com/)
-   - *Tipo*: Web scraping
+### **Formato Padrão de Evento**
+```json
+{
+  "event_id": "unique_identifier",
+  "name": "Nome do Evento",
+  "category": "categoria_detectada",
+  "start_time": "ISO 8601 datetime",
+  "end_time": "ISO 8601 datetime",
+  "timezone": "America/Sao_Paulo",
+  "location": "Circuito/Local",
+  "description": "Descrição detalhada",
+  "source": "fonte_origem",
+  "broadcast_info": [
+    {
+      "provider": "Nome do Provedor",
+      "url": "https://link.transmissao",
+      "type": "live|replay|highlights"
+    }
+  ],
+  "metadata": {
+    "series": "Série/Championship",
+    "round": "Número da Rodada",
+    "session_type": "qualifying|race|practice"
+  }
+}
+```
+
+## **🔮 Roadmap de Fontes**
+
+### **Prioridade Alta**
+1. **Finalizar integração OpenF1**
+   - Substituir completamente o Ergast
+   - Adicionar suporte a dados em tempo real
+
+2. **MotoGP Official**
+   - Implementar coleta de calendário
+   - Adicionar sessões de treinos e classificações
+
+### **Prioridade Média**
+1. **NASCAR**
+   - Calendário oficial
+   - Horários de transmissão
+
+2. **IndyCar**
+   - Calendário e resultados
+   - Links para transmissões
+
+### **Prioridade Baixa**
+1. **WEC (World Endurance Championship)**
+2. **Fórmula E**
+3. **Outras categorias nacionais**
+
+---
+
+## **🔍 Detalhes Técnicos das Fontes
+
+### **Tomada de Tempo**
+- **Método de Coleta**: Web Scraping com BeautifulSoup
+- **Frequência de Atualização**: A cada execução (com cache de 1h)
+- **Tratamento Especial**:
+  - Normalização de nomes de categorias
+  - Extração de datas em português
+  - Mapeamento de canais de TV
+
+### **Ergast API**
+- **Endpoint Base**: http://ergast.com/api/f1
+- **Exemplo de Requisição**:
+  ```
+  GET /api/f1/current.json
+  ```
+- **Limite de Requisições**: 200 por hora
+- **Cache**: 24h para dados de calendário
+
+## **⚠️ Limitações e Considerações**
+
+1. **Tomada de Tempo**
+   - Depende da estrutura HTML do site
+   - Pode quebrar com atualizações no layout
+   - Necessário tratamento manual de feriados e datas especiais
+
+2. **Ergast API**
+   - Descontinuação prevista para 2024
+   - Dados podem não refletir mudanças de última hora
+
+3. **OpenF1**
+   - API em desenvolvimento ativo
+   - Pode haver mudanças na estrutura dos dados
+
+---
+
+## **🧪 Testes de Fontes**
+
+### **Testes Automatizados**
+- Testes unitários para cada fonte
+- Verificação de schema dos dados
+- Testes de conectividade
+- Validação de fusos horários
+
+### **Monitoramento**
+- Uptime das fontes
+- Taxa de sucesso das requisições
+- Tempo de resposta
+- Qualidade dos dados coletados
+
+## **📝 Notas de Atualização
+
+### **Últimas Alterações**
+- **01/08/2024**: Melhorias na extração de dados do Tomada de Tempo
+- **30/07/2024**: Adicionado suporte inicial ao OpenF1 API
+- **25/07/2024**: Correção no tratamento de fusos horários
+
+### **Próximas Atualizações**
+- Implementação completa do OpenF1
+- Adição de mais categorias
+- Melhorias na detecção automática de eventos
    - *Dados*: Calendário, horários das corridas
    - *Confiabilidade*: ⭐⭐⭐⭐⭐
 

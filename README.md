@@ -1,6 +1,6 @@
 # 🏁 Motorsport Calendar Generator
 
-Um script Python para coletar automaticamente eventos de automobilismo do fim de semana e gerar arquivos iCal para importação no Google Calendar.
+Um script Python avançado para coleta automática de eventos de automobilismo de múltiplas fontes e geração de arquivos iCal para importação no Google Calendar. Desenvolvido para entusiastas de automobilismo que desejam acompanhar todas as corridas do fim de semana em um só lugar.
 
 ## 🎯 Características
 
@@ -11,6 +11,10 @@ Um script Python para coletar automaticamente eventos de automobilismo do fim de
 - ✅ **Configuração flexível** via arquivo JSON
 - ✅ **Logging avançado** com payloads preservados
 - ✅ **Compatível com Google Calendar**
+- ✅ **Detecção dinâmica** de categorias de automobilismo
+- ✅ **Processamento inteligente** de datas e horários
+- ✅ **Suporte a múltiplos fusos horários**
+- ✅ **Gerenciamento de erros** robusto e informativo
 
 ## 🏎️ Categorias Suportadas
 
@@ -46,8 +50,9 @@ O script detecta automaticamente e coleta eventos de **qualquer categoria** enco
 ## 🔧 Requisitos
 
 - **Python 3.8+**
-- **macOS** (testado no MacBook)
-- Conexão com internet
+- **Sistema Operacional**: macOS, Linux, Windows (testado principalmente no macOS)
+- **Conexão com internet** para coleta de dados
+- **Dependências**: Verifique o arquivo `requirements.txt` para a lista completa
 
 ## 📦 Instalação
 
@@ -128,13 +133,18 @@ O script exibe uma interface colorida com:
 
 ### Fonte Primária
 - **Tomada de Tempo** (tomadadetempo.com.br) - Prioridade máxima
+  - Coleta detalhada de programação de TV e internet
+  - Suporte a múltiplas categorias de automobilismo
+  - Atualização em tempo real dos horários de transmissão
 
 ### Fontes Secundárias
-- Ergast API (F1)
-- OpenF1 API (F1)
-- Sites oficiais das categorias
-- Motorsport.com
-- Autosport
+- **Ergast API** (http://ergast.com/mrd/) - Dados históricos e atuais de F1
+- **OpenF1 API** (https://openf1.org/) - Alternativa moderna para dados de F1
+- **Sites oficiais** das categorias - Para informações diretas das fontes oficiais
+- **Motorsport.com** - Cobertura abrangente de múltiplas categorias
+- **Autosport** - Dados confiáveis sobre automobilismo mundial
+
+> ⚠️ **Nota sobre a Ergast API**: Será descontinuada em 2024. O sistema já está preparado para a transição para a OpenF1 API.
 
 ## 📅 Importação no Google Calendar
 
@@ -158,7 +168,21 @@ Este projeto está sob a licença MIT. Veja o arquivo `LICENSE` para detalhes.
 
 ## 🏁 Status do Projeto
 
-🚧 **Em Desenvolvimento** - Versão inicial em construção
+🚀 **Versão Estável** - Em produção
+
+### Últimas Atualizações
+- Melhoria na detecção de eventos do Tomada de Tempo
+- Correção de bugs no processamento de datas e horários
+- Aprimoramento do sistema de logging
+- Melhor tratamento de erros e recuperação
+- Otimização de performance para processamento em lote
+
+### Próximos Passos
+- Implementação de mais fontes de dados
+- Melhorias na detecção de categorias
+- Suporte a notificações personalizadas
+- Interface web para configuração e visualização
+- Exportação para outros formatos de calendário
 
 ---
 

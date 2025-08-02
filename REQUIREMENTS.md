@@ -1,60 +1,87 @@
-# Requerimentos Gerais - Script de Calendário de Automobilismo
+# Requisitos do Sistema - Motorsport Calendar
 
-## **Passo 1.0: Descrição dos Requerimentos Gerais**
+## **Visão Geral**
 
 ### **Objetivo do Projeto**
-Desenvolver um script Python que automatize a coleta de informações sobre eventos de automobilismo (carros e motos) que acontecerão no final de semana e gere um arquivo iCal (.ics) para importação no Google Calendar.
+Desenvolver e manter um sistema automatizado para coleta, processamento e exportação de eventos de automobilismo para calendários digitais, com foco em usabilidade e manutenibilidade.
 
-### **Requerimentos Funcionais**
+### **Status Atual**
+✅ **Versão Estável** - Em produção com suporte a múltiplas fontes de dados e categorias de automobilismo.
 
-#### **RF01 - Coleta de Dados**
-- O script deve coletar informações de eventos de automobilismo programados para o final de semana alvo
-- **Detecção automática do fim de semana**: O script deve identificar o final de semana alvo a partir da primeira data de evento encontrada nas fontes
-- **Remoção de duplicatas**: O script deve ser capaz de identificar e remover eventos duplicados encontrados em diferentes fontes
-- **Suporte dinâmico a categorias**: O script deve detectar e coletar eventos de QUALQUER categoria de esporte automotor encontrada nas fontes de dados
-- **Extensibilidade automática**: Novas categorias devem ser automaticamente suportadas sem modificação de código
-- Informações coletadas devem incluir:
-  - Nome do evento/corrida
-  - Data e horário
-  - Local/circuito
-  - Categoria (F1, MotoGP, etc.)
-  - Descrição adicional (se disponível)
+## **Requisitos Funcionais**
 
-#### **RF02 - Geração de iCal**
-- Gerar arquivo .ics compatível com padrão iCalendar (RFC 5545)
-- Incluir timezone correto (configurável via arquivo de configuração)
-- Adicionar metadados apropriados (título, descrição, localização)
-- Suporte a lembretes/alertas configuráveis
-- Parâmetros do evento iCal totalmente configuráveis (duração, categoria, prioridade, etc.)
-- Descrição do evento deve incluir link direto para transmissão quando disponível
+### **RF01 - Coleta de Dados**
+#### **Implementado** ✅
+- Coleta automatizada de eventos de múltiplas fontes
+- Detecção inteligente do fim de semana alvo
+- Remoção de duplicatas entre fontes
+- Suporte dinâmico a categorias de automobilismo
+- Coleta de metadados ricos incluindo:
+  - Nome e descrição do evento
+  - Datas e horários com timezone
+  - Localização e circuito
+  - Categoria detectada automaticamente
+  - Links de transmissão quando disponíveis
+
+#### **Em Desenvolvimento** 🚧
+- Aprimoramento da detecção de categorias
+- Expansão para mais fontes de dados
+- Suporte a notificações personalizadas
+
+### **RF02 - Geração de iCal**
+#### **Implementado** ✅
+- Geração de arquivos .ics compatíveis com RFC 5545
+- Suporte a múltiplos fusos horários
+- Metadados ricos nos eventos
+- Links de transmissão incorporados
+- Configuração flexível via JSON
+
+#### **Melhorias Planejadas** 📅
+- Suporte a lembretes personalizados
+- Opções avançadas de formatação
+- Suporte a anexos e documentos relacionados
 
 #### **RF03 - Integração com Google Calendar**
 - Arquivo .ics deve ser totalmente compatível com importação no Google Calendar
 - Eventos devem aparecer corretamente com todas as informações
 - Suporte a atualizações (evitar duplicatas)
 
-### **Requerimentos Não-Funcionais**
+## **Requisitos Não-Funcionais**
 
-#### **RNF01 - Plataforma**
-- Executável em macOS (MacBook)
-- Python 3.8+ compatível
-- Dependências mínimas e bem documentadas
+### **RNF01 - Plataforma**
+#### **Suportado** ✅
+- **Sistemas Operacionais**: macOS, Linux, Windows
+- **Python**: 3.8+
+- **Dependências**: Gerenciadas via `requirements.txt`
+- **Arquitetura**: Modular e extensível
 
-#### **RNF02 - Usabilidade**
-- Script simples de executar via linha de comando
-- **Interface visual colorida**: Exibição passo a passo da execução com cores e elementos visuais agradáveis
-- **Progresso em tempo real**: Indicadores visuais de progresso para cada etapa
-- Mensagens de log claras e informativas
-- Tratamento de erros robusto
+### **RNF02 - Usabilidade**
+#### **Implementado** ✅
+- Interface de linha de comando intuitiva
+- Saída colorida e formatada
+- Barras de progresso em tempo real
+- Mensagens de status claras
+- Documentação abrangente
 
-#### **RNF03 - Confiabilidade**
-- Validação de dados coletados
-- Fallback em caso de falha de uma fonte de dados
-- **Sistema de logging avançado**:
-  - Log centralizado em modo debug para toda execução
-  - Gravação de payloads raw de todas as integrações em arquivos separados
-  - Logs detalhados com timestamps e níveis de severidade
-  - Rotação automática de logs por execução
+#### **Melhorias Planejadas** 📅
+- Interface web para configuração
+- Dashboard de status
+- Notificações por e-mail/telegram
+
+### **RNF03 - Confiabilidade**
+#### **Implementado** ✅
+- Validação rigorosa de dados
+- Mecanismo de fallback para fontes alternativas
+- Sistema de logging abrangente:
+  - Múltiplos níveis de log (DEBUG, INFO, WARNING, ERROR)
+  - Armazenamento de payloads brutos
+  - Rotação e retenção configurável
+  - Timestamps precisos
+
+#### **Melhorias Planejadas** 📅
+- Monitoramento em tempo real
+- Alertas automáticos para falhas
+- Métricas de desempenho
 
 #### **RNF04 - Manutenibilidade**
 - Código bem estruturado e documentado
@@ -73,31 +100,114 @@ Desenvolver um script Python que automatize a coleta de informações sobre even
 - **Lista de exclusão de fontes e categorias**
 - **Coleta de links de transmissão quando disponíveis**
 
-#### **RD02 - Qualidade dos Dados**
-- Validação de formato de datas/horários
-- Verificação de consistência das informações
-- Tratamento de dados faltantes ou incorretos
-- **Algoritmo de detecção de duplicatas**: Comparação por nome do evento, data, horário e categoria
-- **Priorização de fontes**: Em caso de duplicatas, manter dados da fonte com maior prioridade
-- **Normalização de dados**: Padronização de nomes de eventos e categorias para facilitar detecção de duplicatas
+## **Qualidade dos Dados**
 
-### **Estrutura do Arquivo de Configuração**
+### **Validação**
+- **Datas e Horários**:
+  - Verificação de fusos horários
+  - Detecção de conflitos
+  - Validação de formato ISO 8601
 
-O arquivo `config.json` deve conter as seguintes seções:
+- **Consistência**:
+  - Verificação de campos obrigatórios
+  - Valores padrão para dados opcionais
+  - Normalização de textos
 
-#### **Configurações Gerais**
-- Timezone padrão
-- Idioma das mensagens
-- Nível de log (DEBUG, INFO, WARNING, ERROR)
-- Diretório de saída
-- **Configurações de interface visual** (cores, ícones, progress bars)
-- **Configurações de logging avançado** (formato, rotação, retenção)
+### **Processamento**
+- **Deduplicação**:
+  - Comparação por múltiplos atributos
+  - Pontuação de similaridade
+  - Manutenção da fonte com maior prioridade
 
-#### **Fontes de Dados**
-- Lista prioritária de fontes (ordem de preferência)
-- Lista de exclusão de fontes específicas
-- Configurações de timeout e retry para cada fonte
-- Headers HTTP personalizados se necessário
+- **Enriquecimento**:
+  - Adição de metadados
+  - Links para mais informações
+  - Dados contextuais
+
+### **Monitoramento**
+- Métricas de qualidade
+- Alertas para anomalias
+- Histórico de mudanças
+- Logs de processamento
+
+## **Arquitetura e Configuração**
+
+### **Estrutura do Projeto**
+```
+motorsport-calendar/
+├── config.json               # Configuração principal
+├── src/                      # Código fonte
+├── sources/                  # Módulos de fontes
+├── output/                   # Arquivos gerados
+└── logs/                     # Logs e dados brutos
+```
+
+### **Arquivo de Configuração (config.json)**
+```json
+{
+  "general": {
+    "timezone": "America/Sao_Paulo",
+    "log_level": "INFO",
+    "output_dir": "./output",
+    "ui": {
+      "colors_enabled": true,
+      "show_progress": true
+    }
+  },
+  "sources": {
+    "enabled": ["tomada_tempo", "ergast"],
+    "tomada_tempo": {
+      "enabled": true,
+      "priority": 1,
+      "timeout": 30
+    },
+    "ergast": {
+      "enabled": true,
+      "priority": 2,
+      "timeout": 15
+    }
+  },
+  "ical": {
+    "filename": "motorsport_events",
+    "timezone": "UTC",
+    "reminder_minutes": 15
+  }
+}
+```
+
+## **Roadmap**
+
+### **Próximas Versões**
+
+#### **v1.1 - Melhorias na Detecção**
+- Aprimorar detecção automática de categorias
+- Adicionar suporte a mais fontes de dados
+- Melhorar tratamento de fusos horários
+
+#### **v1.2 - Interface Web**
+- Dashboard de configuração
+- Visualização de eventos
+- Gerenciamento de fontes
+
+#### **v1.3 - Notificações**
+- Alertas por e-mail
+- Integração com Telegram
+- Lembretes personalizados
+
+## **Manutenção**
+
+### **Dependências**
+Lista de dependências principais:
+- `requests`: Requisições HTTP
+- `beautifulsoup4`: Web scraping
+- `icalendar`: Geração de arquivos iCal
+- `python-dateutil`: Manipulação de datas
+- `colorama`: Formatação colorida no terminal
+
+### **Atualizações**
+- Verificar regularmente por atualizações de segurança
+- Manter documentação atualizada
+- Monitorar mudanças nas APIs e sites de origem
 
 #### **Filtros de Eventos**
 - **Detecção dinâmica de categorias**: Sistema que identifica automaticamente todas as categorias disponíveis nas fontes
@@ -106,6 +216,45 @@ O arquivo `config.json` deve conter as seguintes seções:
 - **Filtros por país/região**: Configurável por localização
 - **Filtros por tipo de evento**: Corrida, treino, classificação, etc.
 - **Mapeamento inteligente**: Sistema que reconhece variações de nomes de categorias
+
+## **Filtros e Personalização**
+
+### **Categorias**
+- **Inclusão/Exclusão**:
+  ```json
+  {
+    "categories": {
+      "include": ["*"],  // Todas as categorias
+      "exclude": ["kart"]  // Exceto kart
+    }
+  }
+  ```
+- **Mapeamento de Sinônimos**:
+  ```json
+  {
+    "category_mapping": {
+      "F1": ["Formula 1", "Fórmula 1", "F1"],
+      "MotoGP": ["MotoGP", "Moto GP"]
+    }
+  }
+  ```
+
+### **Filtros Avançados**
+- **Por Região**:
+  ```json
+  {
+    "filters": {
+      "regions": ["BR", "US"],
+      "event_types": ["race", "qualifying"]
+    }
+  }
+  ```
+
+### **Personalização de Saída**
+- Formatação de datas
+- Idiomas suportados
+- Estilos visuais
+- Campos personalizados
 
 #### **Parâmetros iCal**
 - Nome do calendário

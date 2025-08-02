@@ -1,9 +1,9 @@
 # Estrutura do Projeto - Motorsport Calendar
 
-## **Passo 2.1: Estrutura Básica do Projeto**
+## **Visão Geral da Arquitetura**
 
 ### **Objetivo**
-Definir a arquitetura de pastas, módulos principais e organização do código para o script de calendário de automobilismo.
+Documentar a arquitetura atual do sistema de geração de calendário de automobilismo, incluindo módulos, responsabilidades e fluxo de dados.
 
 ---
 
@@ -11,50 +11,57 @@ Definir a arquitetura de pastas, módulos principais e organização do código 
 
 ```
 Race Calendar/
-├── motorsport_calendar.py          # Script principal executável
-├── config.json                     # Arquivo de configuração principal
+├── motorsport_calendar.py          # Ponto de entrada principal
+├── config.json                     # Configuração principal
 ├── config.example.json             # Exemplo de configuração
 ├── requirements.txt                # Dependências Python
-├── README.md                       # Documentação de uso
-├── .gitignore                      # Arquivos ignorados pelo Git
-├── 
+├── README.md                       # Documentação principal
+├── PROJECT_STRUCTURE.md            # Esta documentação
+├── DATA_SOURCES.md                 # Documentação das fontes de dados
+├── REQUIREMENTS.md                 # Requisitos detalhados
+├── .gitignore                      # Configuração do Git
+│
 ├── src/                            # Código fonte modular
 │   ├── __init__.py
-│   ├── data_collector.py           # Módulo de coleta de dados
-│   ├── event_processor.py          # Processamento e deduplicação
-│   ├── ical_generator.py           # Geração de arquivos iCal
-│   ├── config_manager.py           # Gerenciamento de configurações
-│   ├── logger.py                   # Sistema de logging avançado
-│   ├── ui_manager.py               # Interface visual colorida
-│   ├── category_detector.py        # Detecção dinâmica de categorias
-│   └── utils.py                    # Utilitários e helpers
+│   ├── data_collector.py           # Coordena a coleta de dados
+│   ├── event_processor.py          # Processa e filtra eventos
+│   ├── ical_generator.py           # Gera arquivos iCal
+│   ├── config_manager.py           # Gerencia configurações
+│   ├── logger.py                   # Sistema de logging
+│   ├── ui_manager.py               # Interface do usuário
+│   ├── category_detector.py        # Detecta categorias
+│   └── utils.py                    # Funções utilitárias
 ├── 
-├── sources/                        # Módulos específicos por fonte
+├── sources/                        # Implementações de fontes
 │   ├── __init__.py
-│   ├── tomada_tempo.py             # Scraper para Tomada de Tempo
-│   ├── ergast_api.py               # Cliente para Ergast API
-│   ├── motorsport_com.py           # Scraper para Motorsport.com
-│   └── base_source.py              # Classe base para fontes
+│   ├── tomada_tempo.py             # Fonte principal: Tomada de Tempo
+│   ├── ergast_api.py               # Integração com Ergast API (F1)
+│   ├── motorsport_com.py           # Integração com Motorsport.com
+│   └── base_source.py              # Classe base abstrata
 ├── 
-├── output/                         # Arquivos gerados
-│   └── motorsport_events.ics       # Arquivo iCal gerado
+├── output/                         # Saídas geradas
+│   └── motorsport_events_YYYYMMDD_HHMMSS.ics  # Arquivo iCal com timestamp
+│   └── latest.ics                  # Link simbólico para o mais recente
 ├── 
-├── logs/                           # Logs de execução
-│   ├── debug/                      # Logs debug detalhados por execução
-│   │   ├── 2024-08-01_16-30-15.log # Log debug com timestamp
-│   │   └── latest.log              # Symlink para último log
-│   ├── payloads/                   # Payloads raw das integrações
-│   │   ├── tomada_tempo_20240801.json
-│   │   ├── ergast_api_20240801.json
-│   │   └── motorsport_com_20240801.json
-│   └── motorsport_calendar.log     # Log principal
+├── logs/                           # Sistema de logs
+│   ├── debug/                      # Logs detalhados
+│   │   ├── YYYY-MM-DD_HH-MM-SS.log # Logs por execução
+│   │   └── latest.log              # Último log
+│   ├── payloads/                   # Dados brutos
+│   │   ├── source_timestamp.json   # Payloads de resposta
+│   │   └── processed/              # Dados processados
+│   └── app.log                     # Log principal
 ├── 
-└── tests/                          # Testes unitários
+└── tests/                          # Testes automatizados
     ├── __init__.py
-    ├── test_data_collector.py
-    ├── test_event_processor.py
-    ├── test_ical_generator.py
-    └── test_sources.py
+    ├── unit/                       # Testes unitários
+    │   ├── test_data_collector.py
+    │   ├── test_event_processor.py
+    │   └── test_ical_generator.py
+    ├── integration/                # Testes de integração
+    │   └── test_sources.py
+    └── fixtures/                   # Dados de teste
+        └── sample_events.json
 ```
 
 ---
@@ -70,34 +77,44 @@ Race Calendar/
   - Tratamento de erros globais
 
 ### **2. src/config_manager.py** (Gerenciador de Configuração)
-- **Função**: Carregamento e validação das configurações
+- **Função**: Gerenciamento centralizado de configurações
 - **Responsabilidades**:
-  - Leitura do arquivo config.json
-  - Validação de configurações obrigatórias
-  - Merge com configurações padrão
-  - Acesso thread-safe às configurações
+  - Carregamento e validação do `config.json`
+  - Validação de esquema com mensagens claras de erro
+  - Fornecimento de valores padrão
+  - Suporte a herança de configurações
+  - Validação de tipos e valores
+  - Criação de configuração inicial se não existir
 
 ### **3. src/data_collector.py** (Coletor de Dados)
-- **Função**: Coordenação da coleta de dados
+- **Função**: Orquestração da coleta de eventos
 - **Responsabilidades**:
-  - Instanciação das fontes de dados
-  - Execução paralela das coletas
-  - Agregação dos resultados
-  - Tratamento de falhas por fonte
+  - Carregamento dinâmico de fontes
+  - Execução concorrente segura
+  - Timeout e retry automáticos
+  - Coleta de métricas de desempenho
+  - Cache inteligente de respostas
+  - Normalização inicial dos dados
 
 ### **4. src/event_processor.py** (Processador de Eventos)
-- **Função**: Processamento e limpeza dos dados
+- **Função**: Processamento avançado de eventos
 - **Responsabilidades**:
-  - Detecção automática do fim de semana
-  - Normalização de dados
-  - Detecção e remoção de duplicatas
-  - Validação de dados coletados
+  - Filtragem por data/horário
+  - Detecção de eventos recorrentes
+  - Consolidação de metadados
+  - Aplicação de regras de negócio
+  - Geração de IDs únicos
+  - Validação de consistência
 
 ### **5. src/ical_generator.py** (Gerador iCal)
-- **Função**: Criação do arquivo iCal
+- **Função**: Geração de calendários no formato iCalendar
 - **Responsabilidades**:
-  - Conversão de eventos para formato iCal
-  - Aplicação de configurações de calendário
+  - Serialização de eventos para iCal
+  - Suporte a múltiplos fusos horários
+  - Geração de UIDs estáveis
+  - Inclusão de metadados ricos
+  - Suporte a anexos e alertas
+  - Otimização de tamanho de arquivo
   - Adição de metadados e lembretes
   - Validação do arquivo gerado
 
@@ -117,11 +134,15 @@ Race Calendar/
   - Formatação colorida de mensagens
   - Ícones e elementos visuais agradáveis
 
-### **8. src/category_detector.py** (Detecção Dinâmica de Categorias)
-- **Função**: Sistema inteligente de reconhecimento de categorias
+### **8. src/category_detector.py** (Detecção de Categorias)
+- **Função**: Identificação e classificação de eventos
 - **Responsabilidades**:
-  - Detecção automática de novas categorias de motorsport
-  - Mapeamento e normalização de variações de nomes
+  - Análise de texto para identificação
+  - Mapeamento de sinônimos
+  - Classificação hierárquica
+  - Aprendizado de novas categorias
+  - Cache de resultados
+  - Métricas de confiança
   - Classificação por tipo (carros, motos, outros)
   - Aprendizado e expansão da base de conhecimento
   - Score de confiança para cada categoria detectada
