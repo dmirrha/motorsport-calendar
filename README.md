@@ -48,6 +48,108 @@ O script detecta automaticamente e coleta eventos de **qualquer categoria** enco
 
 > 💡 **Flexibilidade Total:** O sistema se adapta automaticamente a novas categorias que apareçam nas fontes de dados, sem necessidade de atualizações no código.
 
+## 👥 Como Contribuir
+
+Agradecemos seu interesse em contribuir para o Motorsport Calendar! Aqui está como você pode ajudar:
+
+### 📝 Reportando Problemas
+
+1. **Verifique se já existe uma issue** relacionada ao problema
+2. Se não existir, cite uma nova issue seguindo nosso modelo
+3. Use o template apropriado (bug report ou feature request)
+4. Inclua informações detalhadas para reproduzir o problema
+
+### 🛠️ Fluxo de Trabalho para Issues
+
+#### 1. Criando uma Nova Issue
+
+1. **Crie os arquivos necessários** no diretório `.github/import_issues/open/`:
+   ```bash
+   # Usando os templates
+   cp .github/import_issues/templates/issue_template.json open/NNN-descricao-curta.json
+   cp .github/import_issues/templates/issue_template.md open/NNN-descricao-curta.md
+   ```
+   - `NNN` deve ser o próximo número sequencial disponível (ex: 001, 002, etc.)
+   - Use nomes descritivos em minúsculas com hífens
+
+2. **Preencha os templates** com as informações da issue:
+   - No arquivo `.json`: Defina título, labels, assignees, etc.
+   - No arquivo `.md`: Descreva detalhadamente a issue usando Markdown
+
+#### 2. Importando a Issue para o GitHub
+
+1. **Execute o script de importação**:
+   ```bash
+   cd .github/import_issues/
+   python3 import_issues.py dmirrha/motorsport-calendar
+   ```
+   - O script irá solicitar confirmação antes de cada importação
+   - Os arquivos serão movidos para a pasta `imported/` com timestamp
+   - Um link para a issue será exibido após a importação
+
+2. **Verifique a issue** no GitHub para garantir que foi criada corretamente
+
+#### 3. Após a Aprovação do Pull Request
+
+1. **Mova os arquivos** para a pasta `closed/`:
+   ```bash
+   mv .github/import_issues/imported/NNN-* .github/import_issues/closed/
+   ```
+   - Isso mantém o histórico organizado e evita duplicação
+
+2. **Atualize o CHANGELOG.md** com as alterações relacionadas
+   - Inclua uma breve descrição da correção ou melhoria
+   - Referencie o número da issue (ex: `#123`)
+
+#### 4. Boas Práticas
+
+- **Nomenclatura de Arquivos**:
+  - Use sempre 3 dígitos (ex: `001-`, `010-`, `100-`)
+  - Mantenha consistência entre os nomes dos arquivos .json e .md
+  - Exemplos: 
+    - `001-bug-logger-fix.json`
+    - `010-feature-new-workflow.json`
+
+- **Conteúdo das Issues**:
+  - Seja claro e objetivo no título
+  - Inclua todos os detalhes necessários para reproduzir o problema
+  - Adicione screenshots ou exemplos quando relevante
+  - Use formatação Markdown para melhor legibilidade
+
+- **Fluxo de Trabalho**:
+  - Sempre crie a issue antes de começar a trabalhar nela
+  - Use branches descritivas baseadas no número da issue
+  - Referencie a issue nos commits (ex: `fix: corrige problema #123`)
+
+### 🏗️ Desenvolvendo Novas Funcionalidades
+
+1. Crie uma branch a partir de `main`
+   ```bash
+   git checkout -b feature/nome-da-feature
+   ```
+
+2. Faça commit das suas alterações
+   ```bash
+   git commit -m "feat: adiciona nova funcionalidade"
+   ```
+
+3. Envie as alterações
+   ```bash
+   git push origin feature/nome-da-feature
+   ```
+
+4. Abra um Pull Request
+   - Descreva as alterações propostas
+   - Referencie as issues relacionadas
+   - Atualize a documentação conforme necessário
+
+### 📚 Padrões de Código
+
+- Siga o estilo de código existente
+- Inclua testes para novas funcionalidades
+- Atualize a documentação relevante
+- Mantenha os commits atômicos e bem descritos
+
 ## 🔧 Requisitos
 
 - **Python 3.8+**

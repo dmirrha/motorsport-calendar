@@ -2,6 +2,39 @@
 
 Este arquivo contém um registro acumulativo de todas as versões lançadas do projeto, com notas detalhadas sobre as mudanças em cada versão.
 
+## Versão 0.2.0 (2025-08-02)
+**Workflow Unificado de Gestão de Issues**
+
+### ✨ Novas Funcionalidades
+- **Sistema de Importação de Issues**
+  - Script `import_issues.py` para criação automática de issues no GitHub
+  - Suporte a formatação Markdown completa nos corpos das issues
+  - Importação em lote de múltiplas issues
+  - Rastreamento de issues importadas
+
+- **Estrutura de Diretórios Padronizada**
+  - `open/`: Issues a serem processadas
+  - `imported/`: Issues já importadas (com timestamp)
+  - `closed/`: Issues resolvidas e fechadas
+  - `templates/`: Modelos para novas issues
+
+- **Templates de Issues**
+  - Modelo para relatórios de bugs
+  - Modelo para solicitações de funcionalidades
+  - Documentação detalhada para cada tipo de issue
+
+### 📚 Documentação
+- Atualizado `README.md` com instruções detalhadas
+- Adicionada seção de boas práticas
+- Documentado fluxo completo de trabalho
+- Incluídos exemplos de uso
+
+### 🔧 Melhorias Técnicas
+- Validação de dados nas issues
+- Tratamento de erros aprimorado
+- Suporte a metadados avançados
+- Rastreamento de issues relacionadas
+
 ## Versão 0.1.3 (2025-08-02)
 **Melhorias no Sistema de Logs e Configuração**
 
