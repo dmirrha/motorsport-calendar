@@ -33,8 +33,10 @@ Desenvolver e manter um sistema automatizado para coleta, processamento e export
 - Geração de arquivos .ics compatíveis com RFC 5545
 - Suporte a múltiplos fusos horários
 - Metadados ricos nos eventos
-- Links de transmissão incorporados
+- Links de transmissão incorporados com suporte a múltiplos formatos
+- Validação e deduplicação de URLs de streaming
 - Configuração flexível via JSON
+- Sistema de arquivamento automático de arquivos antigos
 
 #### **Melhorias Planejadas** 📅
 - Suporte a lembretes personalizados
@@ -62,6 +64,7 @@ Desenvolver e manter um sistema automatizado para coleta, processamento e export
 - Barras de progresso em tempo real
 - Mensagens de status claras
 - Documentação abrangente
+- Gerenciamento automático de arquivos antigos (histórico)
 
 #### **Melhorias Planejadas** 📅
 - Interface web para configuração
@@ -77,6 +80,8 @@ Desenvolver e manter um sistema automatizado para coleta, processamento e export
   - Armazenamento de payloads brutos
   - Rotação e retenção configurável
   - Timestamps precisos
+- Processamento robusto de links de transmissão
+- Validação de URLs de streaming
 
 #### **Melhorias Planejadas** 📅
 - Monitoramento em tempo real

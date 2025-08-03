@@ -16,6 +16,8 @@ Um script Python avançado para coleta automática de eventos de automobilismo d
 - ✅ **Suporte a múltiplos fusos horários**
 - ✅ **Gerenciamento de erros** robusto e informativo
 - ✅ **Sistema de retenção** configurável para logs e payloads
+- ✅ **Links de transmissão** incluídos nos eventos do calendário
+- ✅ **Arquivos iCal** com histórico automático e limpeza
 
 ## 🏎️ Categorias Suportadas
 

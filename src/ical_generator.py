@@ -7,8 +7,11 @@ with configurable parameters and Google Calendar compatibility.
 
 import os
 import uuid
+import shutil
+import glob
 from datetime import datetime, timedelta
 from typing import List, Dict, Any, Optional
+from pathlib import Path
 from icalendar import Calendar, Event, vText
 import pytz
 
@@ -143,6 +146,9 @@ class ICalGenerator:
         
         # Ensure output directory exists
         os.makedirs(self.output_directory, exist_ok=True)
+        
+        # Archive old iCal files before generating new one
+        self._archive_old_ical_files()
         
         # Write calendar to file
         output_path = os.path.join(self.output_directory, output_filename)
@@ -430,21 +436,67 @@ class ICalGenerator:
             
             ical_event.add_component(alarm)
     
+    def _archive_old_ical_files(self) -> None:
+        """Archive old iCal files to history subfolder."""
+        if not os.path.exists(self.output_directory):
+            return
+        
+        # Create history directory
+        history_dir = os.path.join(self.output_directory, 'history')
+        os.makedirs(history_dir, exist_ok=True)
+        
+        # Find all .ics files in output directory (excluding history folder)
+        ics_pattern = os.path.join(self.output_directory, '*.ics')
+        existing_files = glob.glob(ics_pattern)
+        
+        if not existing_files:
+            return
+        
+        # Sort files by modification time (newest first)
+        existing_files.sort(key=lambda x: os.path.getmtime(x), reverse=True)
+        
+        # Move all files to history folder with timestamp
+        timestamp = datetime.now().strftime('%Y%m%d_%H%M%S')
+        moved_count = 0
+        
+        for file_path in existing_files:
+            try:
+                filename = os.path.basename(file_path)
+                # Add timestamp to filename to avoid conflicts
+                name, ext = os.path.splitext(filename)
+                archived_filename = f"{name}_{timestamp}{ext}"
+                archived_path = os.path.join(history_dir, archived_filename)
+                
+                # Move file to history
+                shutil.move(file_path, archived_path)
+                moved_count += 1
+                
+                if self.logger:
+                    self.logger.debug(f"📦 Archived old iCal: {filename} → history/{archived_filename}")
+                    
+            except Exception as e:
+                if self.logger:
+                    self.logger.debug(f"⚠️ Failed to archive {filename}: {e}")
+        
+        if moved_count > 0 and self.logger:
+            self.logger.debug(f"📦 Archived {moved_count} old iCal file(s) to history/")
+    
     def _generate_filename(self, events: List[Dict[str, Any]]) -> str:
         """Generate output filename based on events."""
-        if not events:
-            date_str = datetime.now().strftime('%Y%m%d')
-        else:
-            # Use date of first event
+        # Use the first event's date for filename
+        if events:
             first_event = events[0]
-            event_datetime = first_event.get('datetime')
-            if event_datetime:
-                date_str = event_datetime.strftime('%Y%m%d')
-            else:
-                date_str = datetime.now().strftime('%Y%m%d')
+            event_date = first_event.get('date', datetime.now().strftime('%Y%m%d'))
+            
+            # Convert date format if needed
+            if isinstance(event_date, str) and '-' in event_date:
+                event_date = event_date.replace('-', '')
+                
+            return self.filename_template.format(date=event_date)
         
-        return self.filename_template.format(date=date_str)
-    
+        # Fallback to current date
+        return self.filename_template.format(date=datetime.now().strftime('%Y%m%d'))
+        
     def generate_multiple_calendars(self, events: List[Dict[str, Any]], 
                                   group_by: str = 'category') -> List[str]:
         """
