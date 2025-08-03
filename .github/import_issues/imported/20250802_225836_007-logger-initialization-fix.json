@@ -1,0 +1,10 @@
+{
+  "title": "🐛 Correção na Inicialização do Logger",
+  "body": "## 📋 Descrição\nFoi identificado um problema na inicialização da classe `Logger` que impedia a execução correta do script principal. O erro ocorria devido ao uso incorreto do atributo `self.logger` antes de sua inicialização adequada.\n\n## 🐞 Comportamento Atual\n- Erro ao executar o script: `'Logger' object has no attribute 'logger'`\n- O script não iniciava corretamente\n- Logs não eram gerados\n\n## ✅ Comportamento Esperado\n- O script deve iniciar sem erros\n- Os logs devem ser registrados corretamente\n- O sistema de rotação de logs deve funcionar conforme configurado\n\n## 🔍 Análise Técnica\nO problema ocorria porque a classe `Logger` tentava usar `self.logger` antes que ele fosse devidamente inicializado. A correção envolveu:\n1. Substituir chamadas para `self.logger` por `self.get_logger('debug')`\n2. Adicionar tratamento de erros mais robusto\n3. Garantir que os diretórios de log sejam criados antes de qualquer tentativa de escrita\n\n## 📝 Mudanças Realizadas\n- Atualizado o método `_cleanup_rotated_logs` para usar `self.get_logger('debug')`\n- Melhorado o tratamento de erros durante a limpeza de logs antigos\n- Adicionadas mensagens de log mais descritivas\n\n## 🧪 Testes Realizados\n- [x] Execução do script principal\n- [x] Verificação da geração de logs\n- [x] Confirmação de que a rotação de logs está funcionando\n- [x] Teste de limpeza de logs antigos\n\n## 📋 Critérios de Aceitação\n- [ ] O script inicia sem erros\n- [ ] Os logs são gerados corretamente\n- [ ] A rotação de logs funciona conforme configurado\n- [ ] A limpeza de logs antigos é executada corretamente",
+  "labels": ["bug", "high-priority", "logging"],
+  "assignees": [],
+  "milestone": null,
+  "state": "open",
+  "created_at": "2025-08-02T22:49:49-03:00",
+  "updated_at": "2025-08-02T22:49:49-03:00"
+}
