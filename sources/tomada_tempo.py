@@ -123,70 +123,152 @@ class TomadaTempoSource(BaseSource):
         events = []
         
         try:
-            # Try different calendar URL patterns
-            calendar_urls = [
-                f"{self.get_base_url()}/calendario",
-                f"{self.get_base_url()}/programacao",
-                f"{self.get_base_url()}/agenda",
-                self.get_base_url()  # Main page
-            ]
-            
-            for url in calendar_urls:
-                response = self.make_request(url)
-                if response:
-                    page_events = self._parse_calendar_page(response.text, target_date)
-                    events.extend(page_events)
-                    if page_events:  # If we found events, no need to try other URLs
-                        break
-            
+            # Make request to calendar page
+            response = self.make_request(self.get_base_url())
+            if response:
+                events = self._parse_calendar_page(response.text, target_date, response.url)
+                
         except Exception as e:
+            error_msg = f"Failed to collect from calendar: {e}"
             if self.logger:
                 self.logger.debug(f"⚠️ Error collecting from calendar: {e}")
         
         return events
     
-    def _parse_calendar_page(self, html_content: str, target_date: datetime) -> List[Dict[str, Any]]:
+    def _parse_calendar_page(self, html_content: str, target_date: datetime, page_url: str = None) -> List[Dict[str, Any]]:
         """
         Parse calendar page HTML to extract events.
         
         Args:
             html_content: HTML content of the page
             target_date: Target date for filtering
+            page_url: URL of the page being parsed
             
         Returns:
             List of event dictionaries
         """
         events = []
-        soup = BeautifulSoup(html_content, 'html.parser')
         
-        # Look for common event patterns
-        event_selectors = [
-            '.evento',
-            '.event',
-            '.calendar-event',
-            '.programacao-item',
-            '.agenda-item',
-            'article',
-            '.post',
-            '.entry'
-        ]
-        
-        for selector in event_selectors:
-            event_elements = soup.select(selector)
-            if event_elements:
-                for element in event_elements:
-                    event = self._extract_event_from_element(element, target_date)
-                    if event:
-                        events.append(event)
-                break  # Use first successful selector
-        
-        # If no structured events found, try text parsing
-        if not events:
-            events = self._parse_text_content(html_content, target_date)
+        try:
+            soup = BeautifulSoup(html_content, 'html.parser')
+            
+            # Extract programming context (weekend dates) from page title or URL
+            programming_context = self._extract_programming_context(soup, page_url)
+            
+            # Look for common event patterns
+            event_selectors = [
+                '.evento',
+                '.event',
+                '.calendar-event',
+                '.programacao-item',
+                '.agenda-item',
+                'article',
+                '.post',
+                '.entry'
+            ]
+            
+            for selector in event_selectors:
+                event_elements = soup.select(selector)
+                if event_elements:
+                    for element in event_elements:
+                        event = self._extract_event_from_element(element, target_date, programming_context)
+                        if event:
+                            events.append(event)
+                    break  # Use first successful selector
+            
+            # If no structured events found, try text parsing
+            if not events:
+                events = self._parse_text_content(html_content, target_date, programming_context)
+                
+        except Exception as e:
+            if self.logger:
+                self.logger.debug(f"⚠️ Error parsing calendar page: {e}")
         
         return events
     
-    def _extract_event_from_element(self, element, target_date: datetime) -> Optional[Dict[str, Any]]:
+    def _extract_programming_context(self, soup, page_url: str = None) -> Dict[str, Any]:
+        """
+        Extract programming context (weekend dates and period) from page title or URL.
+        
+        Args:
+            soup: BeautifulSoup object of the page
+            page_url: URL of the page being parsed
+            
+        Returns:
+            Dictionary with programming context (start_date, end_date, weekend_dates)
+        """
+        context = {
+            'start_date': None,
+            'end_date': None,
+            'weekend_dates': [],
+            'programming_title': None
+        }
+        
+        try:
+            # Extract from page title
+            title_element = soup.find('title')
+            if title_element:
+                title = title_element.get_text(strip=True)
+                context['programming_title'] = title
+                
+                # Look for date patterns in title (e.g., "01 a 03-08-2025" or "01-03/08/2025")
+                date_range_patterns = [
+                    r'(\d{1,2})\s*a\s*(\d{1,2})[\/\-](\d{1,2})[\/\-](\d{2,4})',  # "01 a 03/08/2025"
+                    r'(\d{1,2})[\/\-](\d{1,2})[\/\-](\d{2,4})\s*a\s*(\d{1,2})[\/\-](\d{1,2})[\/\-](\d{2,4})',  # "01/08/2025 a 03/08/2025"
+                    r'final[\s\-]*de[\s\-]*semana[\s\-]*de[\s\-]*(\d{1,2})\s*a\s*(\d{1,2})[\/\-](\d{1,2})[\/\-](\d{2,4})'  # "final de semana de 01 a 03/08/2025"
+                ]
+                
+                for pattern in date_range_patterns:
+                    match = re.search(pattern, title, re.IGNORECASE)
+                    if match:
+                        groups = match.groups()
+                        if len(groups) == 4:  # Pattern like "01 a 03/08/2025"
+                            start_day, end_day, month, year = groups
+                            try:
+                                year_int = int(year) if len(year) == 4 else (2000 + int(year) if int(year) < 50 else 1900 + int(year))
+                                context['start_date'] = f"{int(start_day):02d}/{int(month):02d}/{year_int}"
+                                context['end_date'] = f"{int(end_day):02d}/{int(month):02d}/{year_int}"
+                                
+                                # Generate weekend dates list
+                                start_dt = self.parse_date_time(context['start_date'])
+                                end_dt = self.parse_date_time(context['end_date'])
+                                if start_dt and end_dt:
+                                    current_dt = start_dt
+                                    while current_dt <= end_dt:
+                                        context['weekend_dates'].append(current_dt.strftime("%d/%m/%Y"))
+                                        current_dt += timedelta(days=1)
+                                break
+                            except ValueError:
+                                continue
+            
+            # Extract from URL if available
+            if page_url and not context['start_date']:
+                url_date_pattern = r'(\d{4})[\/\-](\d{1,2})[\/\-](\d{1,2})'
+                match = re.search(url_date_pattern, page_url)
+                if match:
+                    year, month, day = match.groups()
+                    try:
+                        context['start_date'] = f"{int(day):02d}/{int(month):02d}/{int(year)}"
+                        # Assume 3-day weekend (Friday to Sunday)
+                        start_dt = self.parse_date_time(context['start_date'])
+                        if start_dt:
+                            end_dt = start_dt + timedelta(days=2)
+                            context['end_date'] = end_dt.strftime("%d/%m/%Y")
+                            context['weekend_dates'] = [
+                                start_dt.strftime("%d/%m/%Y"),
+                                (start_dt + timedelta(days=1)).strftime("%d/%m/%Y"),
+                                end_dt.strftime("%d/%m/%Y")
+                            ]
+                    except ValueError:
+                        pass
+        
+        except Exception as e:
+            if self.logger:
+                self.logger.debug(f"⚠️ Error extracting programming context: {e}")
+        
+        return context
+    
+    def _extract_event_from_element(self, element, target_date: datetime, programming_context: Dict[str, Any] = None) -> Optional[Dict[str, Any]]:
         """
         Extract event information from HTML element.
         
@@ -228,13 +310,23 @@ class TomadaTempoSource(BaseSource):
             category = self._extract_category(text_content)
             location = self._extract_location(text_content)
             
+            # If no date found but we have programming context, try to associate event to context
+            if not event_date and programming_context and programming_context.get('weekend_dates'):
+                # If event has time or category, it's likely part of the weekend programming
+                if event_time or category:
+                    # Use the first date from weekend context as default
+                    event_date = programming_context['weekend_dates'][0]
+                    if self.logger:
+                        self.logger.debug(f"📅 Associated event '{event_name}' to programming context date: {event_date}")
+            
             # Look for streaming links
             streaming_links = self._extract_streaming_links(element)
             
             # Get official URL if available
             official_url = self._extract_official_url(element)
             
-            if event_name and event_date:
+            # Accept event if it has name and either explicit date or was associated to context
+            if event_name and (event_date or (programming_context and category)):
                 return {
                     'name': event_name,
                     'category': category or 'Unknown',
@@ -245,7 +337,8 @@ class TomadaTempoSource(BaseSource):
                     'session_type': self._extract_session_type(text_content),
                     'streaming_links': streaming_links,
                     'official_url': official_url,
-                    'raw_text': text_content
+                    'raw_text': text_content,
+                    'from_context': not bool(self._extract_date(text_content))  # Flag to indicate if date came from context
                 }
             
         except Exception as e:
@@ -278,6 +371,24 @@ class TomadaTempoSource(BaseSource):
     
     def _extract_date(self, text: str) -> Optional[str]:
         """Extract date from text with improved parsing."""
+        # Look for weekday + date patterns (e.g., "SÁBADO – 02/08/2025")
+        weekday_date_pattern = r'(?:segunda|terça|quarta|quinta|sexta|sábado|domingo|monday|tuesday|wednesday|thursday|friday|saturday|sunday)\s*[–\-]?\s*(\d{1,2}[\/\-]\d{1,2}[\/\-]\d{2,4})'
+        match = re.search(weekday_date_pattern, text, re.IGNORECASE)
+        if match:
+            date_part = match.group(1)
+            # Process the date part
+            date_match = re.search(r'(\d{1,2})[\/\-](\d{1,2})[\/\-](\d{2,4})', date_part)
+            if date_match:
+                day, month, year = date_match.groups()
+                try:
+                    day_int, month_int, year_int = int(day), int(month), int(year)
+                    if len(year) == 2:
+                        year_int = 2000 + year_int if year_int < 50 else 1900 + year_int
+                    if 1 <= day_int <= 31 and 1 <= month_int <= 12 and year_int >= 2020:
+                        return f"{day_int:02d}/{month_int:02d}/{year_int}"
+                except ValueError:
+                    pass
+        
         # Look for dates in DD/MM/YYYY or DD-MM-YYYY format first
         dd_mm_yyyy_pattern = r'(\d{1,2})[\/\-](\d{1,2})[\/\-](\d{4})'
         match = re.search(dd_mm_yyyy_pattern, text)
@@ -321,18 +432,24 @@ class TomadaTempoSource(BaseSource):
         return None
     
     def _extract_time(self, text: str) -> Optional[str]:
-        """Extract time from text."""
+        """Extract time from text with improved format support."""
         time_patterns = [
-            r'(\d{1,2}):(\d{2})\s*(?:h|hrs?|horas?)?',
-            r'(\d{1,2})h(\d{2})',
-            r'(\d{1,2}):(\d{2})'
+            r'(\d{1,2}):(\d{2})\s*(?:h|hrs?|horas?)?',  # 14:30, 14:30h
+            r'(\d{1,2})h(\d{2})',  # 14h30
+            r'(\d{1,2})h\s*(\d{2})',  # 14h 30
+            r'(\d{1,2}):(\d{2})',  # 14:30
+            r'(\d{1,2})\s*h\s*(\d{2})',  # 14 h 30
+            r'(\d{1,2})\s*[h:]\s*(\d{2})',  # 14 h 30 or 14:30
+            r'às\s*(\d{1,2})[h:]?(\d{2})?',  # às 14h30, às 14:30, às 14
+            r'(\d{1,2})\s*horas?\s*(?:e\s*)?(\d{2})?',  # 14 horas, 14 horas e 30
         ]
         
         for pattern in time_patterns:
-            match = re.search(pattern, text)
+            match = re.search(pattern, text, re.IGNORECASE)
             if match:
                 hour = int(match.group(1))
-                minute = int(match.group(2))
+                minute_group = match.group(2) if len(match.groups()) > 1 and match.group(2) else '00'
+                minute = int(minute_group) if minute_group else 0
                 if 0 <= hour <= 23 and 0 <= minute <= 59:
                     return f"{hour:02d}:{minute:02d}"
         
@@ -486,7 +603,7 @@ class TomadaTempoSource(BaseSource):
         
         return events
     
-    def _parse_text_content(self, html_content: str, target_date: datetime) -> List[Dict[str, Any]]:
+    def _parse_text_content(self, html_content: str, target_date: datetime, programming_context: Dict[str, Any] = None) -> List[Dict[str, Any]]:
         """
         Parse text content when structured parsing fails.
         
@@ -521,13 +638,13 @@ class TomadaTempoSource(BaseSource):
             
             if any(keyword in line.lower() for keyword in motorsport_keywords):
                 # Try to extract event from this line
-                event = self._extract_event_from_text_line(line)
+                event = self._extract_event_from_text_line(line, programming_context)
                 if event:
                     events.append(event)
         
         return events
     
-    def _extract_event_from_text_line(self, line: str) -> Optional[Dict[str, Any]]:
+    def _extract_event_from_text_line(self, line: str, programming_context: Dict[str, Any] = None) -> Optional[Dict[str, Any]]:
         """Extract event from a single text line."""
         try:
             event_name = self._extract_event_name(line)
@@ -536,7 +653,17 @@ class TomadaTempoSource(BaseSource):
             category = self._extract_category(line)
             location = self._extract_location(line)
             
-            if event_name and (event_date or category):
+            # If no date found but we have programming context, try to associate event to context
+            if not event_date and programming_context and programming_context.get('weekend_dates'):
+                # If event has time or category, it's likely part of the weekend programming
+                if event_time or category:
+                    # Use the first date from weekend context as default
+                    event_date = programming_context['weekend_dates'][0]
+                    if self.logger:
+                        self.logger.debug(f"📅 Associated text event '{event_name}' to programming context date: {event_date}")
+            
+            # Accept event if it has name and either explicit date or was associated to context
+            if event_name and (event_date or (programming_context and category)):
                 return {
                     'name': event_name,
                     'category': category or 'Unknown',
@@ -547,7 +674,8 @@ class TomadaTempoSource(BaseSource):
                     'session_type': self._extract_session_type(line),
                     'streaming_links': [],
                     'official_url': '',
-                    'raw_text': line
+                    'raw_text': line,
+                    'from_context': not bool(self._extract_date(line))  # Flag to indicate if date came from context
                 }
         except Exception as e:
             if self.logger:
