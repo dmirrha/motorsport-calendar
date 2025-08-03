@@ -1,8 +1,21 @@
-# Histórico de Mudanças
+# Changelog
 
-Este arquivo documenta todas as alterações notáveis no projeto, seguindo o [Versionamento Semântico](https://semver.org/).
+Todas as mudanças notáveis neste projeto serão documentadas neste arquivo.
+
+O formato é baseado em [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
+e este projeto adere ao [Versionamento Semântico](https://semver.org/spec/v2.0.0.html).
 
 ## [Não Lançado]
+### Corrigido
+- **Issue #3**: Corrigida detecção de eventos sem data explícita na fonte Tomada de Tempo
+  - Implementado suporte ao formato de data "SÁBADO – 02/08/2025"
+  - Adicionada extração do contexto da programação do título/URL da página
+  - Implementada associação de eventos sem data explícita ao contexto da programação
+  - Melhorado suporte a formatos variados de horário (14h30, às 14:30, 14 horas e 30, etc.)
+  - Adicionado campo `from_context` para rastreabilidade da origem da data
+  - Criado script de teste automatizado para validação das correções
+  - Todos os critérios de aceitação da issue atendidos com 100% dos testes passando
+
 ### Corrigido
 - **Ambiente Python**: Atualizado para Python 3.11.5
   - Resolvido aviso de compatibilidade entre urllib3 v2+ e OpenSSL
