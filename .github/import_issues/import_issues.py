@@ -116,10 +116,20 @@ def import_issue(repo, issue_file):
         print(f"\nImportando: {issue_file}")
         print(f"Título: {issue_data.get('title')}")
         
+        # Lê o conteúdo do arquivo markdown se especificado
+        body_content = issue_data['body']
+        if isinstance(body_content, str) and body_content.endswith('.md'):
+            md_file = issue_file.parent / body_content
+            if md_file.exists():
+                with open(md_file, 'r', encoding='utf-8') as f:
+                    body_content = f.read()
+            else:
+                print(f"⚠️ Arquivo markdown não encontrado: {md_file}")
+        
         # Cria a issue no GitHub
         issue = repo.create_issue(
             title=issue_data['title'],
-            body=issue_data['body'],
+            body=body_content,
             labels=issue_data.get('labels', []),
             assignees=issue_data.get('assignees', [])
         )
@@ -140,18 +150,29 @@ def import_issue(repo, issue_file):
 def move_to_imported(issue_file):
     """Move o arquivo da issue para a pasta de importados."""
     try:
-        imported_dir = Path(__file__).parent / 'imported'
+        # Cria o diretório de importados se não existir
+        imported_dir = Path('imported')
         imported_dir.mkdir(exist_ok=True)
         
-        # Adiciona timestamp ao nome do arquivo para evitar colisões
+        # Gera um nome de arquivo com timestamp
         timestamp = datetime.now().strftime('%Y%m%d_%H%M%S')
-        dest_file = imported_dir / f"{timestamp}_{Path(issue_file).name}"
+        dest_file = imported_dir / f"{timestamp}_{issue_file.name}"
         
+        # Move o arquivo
         shutil.move(issue_file, dest_file)
-        print(f"Arquivo movido para: {dest_file}")
+        
+        # Move também o arquivo .md correspondente se existir
+        md_file = issue_file.with_suffix('.md')
+        if md_file.exists():
+            dest_md_file = imported_dir / f"{timestamp}_{md_file.name}"
+            shutil.move(md_file, dest_md_file)
+            print(f"Arquivos movidos para: {dest_file} e {dest_md_file}")
+        else:
+            print(f"Arquivo movido para: {dest_file}")
+            
         return True
     except Exception as e:
-        print(f"❌ Erro ao mover o arquivo {issue_file}: {str(e)}")
+        print(f"❌ Erro ao mover o(s) arquivo(s) {issue_file}: {str(e)}")
         return False
 
 def main():
@@ -173,11 +194,12 @@ def main():
         print(f"❌ Erro ao acessar o repositório {owner}/{repo_name}: {e.data.get('message', str(e))}")
         sys.exit(1)
     
-    # Encontra todos os arquivos JSON de issues no diretório atual
-    issue_files = list(Path('.').glob('*.json'))
+    # Encontra todos os arquivos JSON de issues no diretório open
+    issue_files = list(Path('open').glob('*.json'))
     
     if not issue_files:
-        print("Nenhum arquivo de issue encontrado no diretório atual.")
+        print("Nenhum arquivo de issue encontrado no diretório 'open'.")
+        print("Por favor, coloque os arquivos de issue em .github/import_issues/open/")
         return
     
     print(f"\nEncontrados {len(issue_files)} arquivos de issue para importar:")

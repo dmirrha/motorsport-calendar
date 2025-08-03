@@ -6,6 +6,16 @@ O formato é baseado em [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)
 e este projeto adere ao [Versionamento Semântico](https://semver.org/spec/v2.0.0.html).
 
 ## [Não Lançado]
+### Adicionado
+- **Workflow de Issues**: Novo sistema unificado para gerenciamento de issues
+  - Estrutura de diretórios padronizada (open/imported/closed/templates)
+  - Script de importação automática com suporte a Markdown
+  - Templates padronizados para issues
+  - Documentação completa do fluxo de trabalho
+  - Suporte a metadados e rastreamento de issues relacionadas
+  - Processo automatizado para fechamento de issues
+  - Integração com o CHANGELOG.md
+
 ### Corrigido
 - **Issue #3**: Corrigida detecção de eventos sem data explícita na fonte Tomada de Tempo
   - Implementado suporte ao formato de data "SÁBADO – 02/08/2025"

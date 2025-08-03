@@ -1,0 +1,15 @@
+{
+  "title": "✨ Melhorar o workflow de gerenciamento de issues",
+  "body": "008-improve-issue-workflow.md",
+  "labels": ["enhancement", "documentation", "workflow"],
+  "assignees": [],
+  "milestone": null,
+  "state": "open",
+  "metadata": {
+    "created_at": "2025-08-02T23:12:01-03:00",
+    "priority": "high",
+    "type": "enhancement",
+    "components": ["workflow", "documentation"],
+    "related_issues": []
+  }
+}
