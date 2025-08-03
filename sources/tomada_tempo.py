@@ -59,13 +59,25 @@ class TomadaTempoSource(BaseSource):
             weekend_end = weekend_start + timedelta(days=2, hours=23, minutes=59, seconds=59)
             target_weekend = (weekend_start, weekend_end)
             
-            # Collect from different sections
-            calendar_events = self._collect_from_calendar(target_date)
-            events.extend(calendar_events)
+            # NEW APPROACH: Find and access the specific weekend programming link
+            weekend_programming_events = self._collect_from_weekend_programming(target_date)
+            events.extend(weekend_programming_events)
             
-            # Collect from specific category pages
-            category_events = self._collect_from_categories(target_date)
-            events.extend(category_events)
+            # Only use fallback methods if we didn't find the weekend programming page
+            if not events:
+                if self.logger:
+                    self.logger.debug("🔍 Weekend programming link not found, falling back to alternative methods")
+                
+                # Collect from main calendar page
+                calendar_events = self._collect_from_calendar(target_date)
+                events.extend(calendar_events)
+                
+                # Only use category pages as last resort
+                if not events:
+                    if self.logger:
+                        self.logger.debug("📋 Using category pages as last resort")
+                    category_events = self._collect_from_categories(target_date)
+                    events.extend(category_events)
             
             # Filter events for current weekend only
             weekend_events = self.filter_weekend_events(events, target_weekend)
@@ -110,6 +122,104 @@ class TomadaTempoSource(BaseSource):
             current_friday = today - timedelta(days=days_since_friday)
         return current_friday
     
+    def _collect_from_weekend_programming(self, target_date: datetime) -> List[Dict[str, Any]]:
+        """
+        Find and collect events from the specific weekend programming page.
+        
+        Args:
+            target_date: Target date for collection
+            
+        Returns:
+            List of raw event dictionaries from the weekend programming page
+        """
+        events = []
+        
+        try:
+            # Get the main page first
+            response = self.make_request(self.get_base_url())
+            if not response:
+                if self.logger:
+                    self.logger.debug("⚠️ Failed to load main page for weekend programming link search")
+                return events
+            
+            soup = BeautifulSoup(response.text, 'html.parser')
+            
+            # Format target date for link matching
+            weekend_date_formats = [
+                target_date.strftime("%d/%m/%Y"),  # 01/08/2025
+                target_date.strftime("%d/%m"),     # 01/08
+                target_date.strftime("%d de %B"),  # 01 de agosto
+                target_date.strftime("%d-%m-%Y"),  # 01-08-2025
+            ]
+            
+            # Look for links containing "PROGRAMAÇÃO DA TV E INTERNET" and weekend date
+            programming_link = None
+            programming_text = None
+            
+            # Search in all links on the page
+            all_links = soup.find_all('a', href=True)
+            
+            for link in all_links:
+                link_text = link.get_text(strip=True)
+                link_href = link.get('href', '')
+                
+                # Check if link contains the programming text
+                if "PROGRAMAÇÃO DA TV E INTERNET" in link_text.upper():
+                    # Check if it contains any of the weekend date formats
+                    for date_format in weekend_date_formats:
+                        if date_format in link_text:
+                            programming_link = urljoin(self.get_base_url(), link_href)
+                            programming_text = link_text
+                            if self.logger:
+                                self.logger.debug(f"🎯 Found weekend programming link: {programming_text} -> {programming_link}")
+                            break
+                    
+                    if programming_link:
+                        break
+            
+            # If no exact date match, look for any "PROGRAMAÇÃO DA TV E INTERNET" link
+            if not programming_link:
+                for link in all_links:
+                    link_text = link.get_text(strip=True)
+                    link_href = link.get('href', '')
+                    
+                    if "PROGRAMAÇÃO DA TV E INTERNET" in link_text.upper():
+                        programming_link = urljoin(self.get_base_url(), link_href)
+                        programming_text = link_text
+                        if self.logger:
+                            self.logger.debug(f"📺 Found general programming link: {programming_text} -> {programming_link}")
+                        break
+            
+            # Access the programming page if found
+            if programming_link:
+                if self.logger:
+                    self.logger.debug(f"🌐 Accessing weekend programming page: {programming_link}")
+                
+                programming_response = self.make_request(programming_link)
+                if programming_response:
+                    # Parse the programming page
+                    programming_events = self._parse_calendar_page(
+                        programming_response.text, 
+                        target_date, 
+                        programming_response.url
+                    )
+                    events.extend(programming_events)
+                    
+                    if self.logger:
+                        self.logger.debug(f"✅ Extracted {len(programming_events)} events from weekend programming page")
+                else:
+                    if self.logger:
+                        self.logger.debug("⚠️ Failed to load weekend programming page")
+            else:
+                if self.logger:
+                    self.logger.debug("🔍 No weekend programming link found on main page")
+                    
+        except Exception as e:
+            if self.logger:
+                self.logger.debug(f"⚠️ Error collecting from weekend programming: {e}")
+        
+        return events
+
     def _collect_from_calendar(self, target_date: datetime) -> List[Dict[str, Any]]:
         """
         Collect events from the main calendar page.
@@ -155,28 +265,36 @@ class TomadaTempoSource(BaseSource):
             # Extract programming context (weekend dates) from page title or URL
             programming_context = self._extract_programming_context(soup, page_url)
             
-            # Look for common event patterns
-            event_selectors = [
-                '.evento',
-                '.event',
-                '.calendar-event',
-                '.programacao-item',
-                '.agenda-item',
-                'article',
-                '.post',
-                '.entry'
-            ]
+            # FIRST: Try to parse the specific weekend programming structure
+            weekend_events = self._parse_weekend_programming_structure(soup, target_date, programming_context)
+            if weekend_events:
+                events.extend(weekend_events)
+                if self.logger:
+                    self.logger.debug(f"✅ Extracted {len(weekend_events)} events from weekend programming structure")
             
-            for selector in event_selectors:
-                event_elements = soup.select(selector)
-                if event_elements:
-                    for element in event_elements:
-                        event = self._extract_event_from_element(element, target_date, programming_context)
-                        if event:
-                            events.append(event)
-                    break  # Use first successful selector
+            # FALLBACK: If no weekend programming found, try common selectors
+            if not events:
+                event_selectors = [
+                    '.evento',
+                    '.event',
+                    '.calendar-event',
+                    '.programacao-item',
+                    '.agenda-item',
+                    'article',
+                    '.post',
+                    '.entry'
+                ]
+                
+                for selector in event_selectors:
+                    event_elements = soup.select(selector)
+                    if event_elements:
+                        for element in event_elements:
+                            event = self._extract_event_from_element(element, target_date, programming_context)
+                            if event:
+                                events.append(event)
+                        break  # Use first successful selector
             
-            # If no structured events found, try text parsing
+            # LAST RESORT: If no structured events found, try text parsing
             if not events:
                 events = self._parse_text_content(html_content, target_date, programming_context)
                 
@@ -186,6 +304,199 @@ class TomadaTempoSource(BaseSource):
         
         return events
     
+    def _parse_weekend_programming_structure(self, soup, target_date: datetime, programming_context: Dict[str, Any] = None) -> List[Dict[str, Any]]:
+        """
+        Parse the specific weekend programming structure with h5 headers and ul/li lists.
+        
+        Args:
+            soup: BeautifulSoup object of the page
+            target_date: Target date for filtering
+            programming_context: Programming context information
+            
+        Returns:
+            List of event dictionaries
+        """
+        events = []
+        
+        try:
+            # Look for the programming section header
+            programming_header = soup.find('h5', string=lambda text: text and 'HORÁRIOS, PROGRAMAÇÃO E ONDE ASSISTIR' in text.upper())
+            
+            if not programming_header:
+                # Try alternative header patterns
+                programming_header = soup.find('h5', string=lambda text: text and 'PROGRAMAÇÃO' in text.upper())
+            
+            if programming_header:
+                if self.logger:
+                    self.logger.debug(f"📅 Found programming header: {programming_header.get_text()}")
+                
+                # Find all content after the header until next major section
+                current_element = programming_header.next_sibling
+                current_date = None
+                
+                while current_element:
+                    if hasattr(current_element, 'name'):
+                        # Check for date headers (like "SEXTA-FEIRA – 01/08/2025")
+                        if current_element.name in ['p', 'h6', 'strong'] and current_element.get_text():
+                            text = current_element.get_text(strip=True)
+                            
+                            # Look for date patterns
+                            date_patterns = [
+                                r'(SEXTA-FEIRA|SÁBADO|DOMINGO)\s*[–-]\s*(\d{2}/\d{2}/\d{4})',
+                                r'(SEXTA|SÁBADO|DOMINGO)\s*[–-]\s*(\d{2}/\d{2}/\d{4})',
+                                r'(\d{2}/\d{2}/\d{4})'
+                            ]
+                            
+                            for pattern in date_patterns:
+                                match = re.search(pattern, text)
+                                if match:
+                                    try:
+                                        if len(match.groups()) >= 2:
+                                            date_str = match.group(2)
+                                        else:
+                                            date_str = match.group(1)
+                                        
+                                        current_date = datetime.strptime(date_str, '%d/%m/%Y').date()
+                                        if self.logger:
+                                            self.logger.debug(f"📅 Found date section: {current_date}")
+                                        break
+                                    except ValueError:
+                                        continue
+                        
+                        # Parse event lists (ul elements)
+                        elif current_element.name == 'ul':
+                            if current_date:
+                                list_events = self._parse_event_list(current_element, current_date, programming_context)
+                                events.extend(list_events)
+                                
+                                if self.logger and list_events:
+                                    self.logger.debug(f"🎯 Extracted {len(list_events)} events from {current_date}")
+                        
+                        # Stop at next major section
+                        elif current_element.name in ['h1', 'h2', 'h3', 'h4', 'h5'] and current_element != programming_header:
+                            break
+                    
+                    current_element = current_element.next_sibling
+            
+            else:
+                if self.logger:
+                    self.logger.debug("📅 No weekend programming header found")
+            
+        except Exception as e:
+            if self.logger:
+                self.logger.debug(f"⚠️ Error parsing weekend programming structure: {e}")
+        
+        return events
+
+    def _parse_event_list(self, ul_element, event_date, programming_context: Dict[str, Any] = None) -> List[Dict[str, Any]]:
+        """
+        Parse a ul element containing motorsport events.
+        
+        Args:
+            ul_element: BeautifulSoup ul element
+            event_date: Date for the events in this list
+            programming_context: Programming context information
+            
+        Returns:
+            List of event dictionaries
+        """
+        events = []
+        
+        try:
+            for li in ul_element.find_all('li'):
+                li_text = li.get_text(strip=True)
+                
+                if li_text and len(li_text) > 10:
+                    event = self._parse_event_from_li(li, li_text, event_date, programming_context)
+                    if event:
+                        events.append(event)
+        
+        except Exception as e:
+            if self.logger:
+                self.logger.debug(f"⚠️ Error parsing event list: {e}")
+        
+        return events
+
+    def _parse_event_from_li(self, li_element, li_text: str, event_date, programming_context: Dict[str, Any] = None) -> Optional[Dict[str, Any]]:
+        """
+        Parse a single li element to extract event information.
+        
+        Args:
+            li_element: BeautifulSoup li element
+            li_text: Text content of the li element
+            event_date: Date for this event
+            programming_context: Programming context information
+            
+        Returns:
+            Event dictionary or None
+        """
+        try:
+            # Extract time (e.g., "04:55", "08:30")
+            time_match = re.search(r'(\d{1,2}[:\.]\d{2})', li_text)
+            event_time = time_match.group(1).replace('.', ':') if time_match else None
+            
+            # Extract category/name (e.g., "FÓRMULA 1", "NASCAR CUP")
+            category_match = re.search(r'(\d{1,2}[:\.]\d{2})\s*[–-]?\s*([^–-]+?)(?:\s*[–-]|$)', li_text)
+            if category_match:
+                event_name = category_match.group(2).strip()
+            else:
+                # Fallback: try to extract from strong tags
+                strong_tags = li_element.find_all('strong')
+                if strong_tags:
+                    event_name = strong_tags[0].get_text(strip=True)
+                    # Remove time from the beginning if present
+                    event_name = re.sub(r'^\d{1,2}[:\.]\d{2}\s*[–-]?\s*', '', event_name)
+                else:
+                    return None
+            
+            # Clean up event name
+            event_name = event_name.strip(' –-')
+            if not event_name:
+                return None
+            
+            # Extract location (e.g., "GP da Hungria", "Curvelo/MG")
+            location_match = re.search(r'[–-]\s*([^–-]+?)\s*[–-]', li_text)
+            location = location_match.group(1).strip() if location_match else None
+            
+            # Extract category from event name
+            category = self._extract_category(event_name)
+            
+            # Extract streaming links
+            streaming_links = []
+            for link in li_element.find_all('a', href=True):
+                link_text = link.get_text(strip=True)
+                link_url = link.get('href')
+                if link_url and link_text:
+                    streaming_links.append({
+                        'name': link_text,
+                        'url': link_url
+                    })
+            
+            # Create event dictionary
+            event = {
+                'name': event_name,
+                'category': category or 'Unknown',
+                'date': event_date.strftime('%Y-%m-%d') if event_date else None,
+                'time': event_time,
+                'location': location,
+                'country': 'Brasil',
+                'session_type': self._extract_session_type(li_text),
+                'streaming_links': streaming_links,
+                'official_url': '',
+                'raw_text': li_text,
+                'from_weekend_programming': True
+            }
+            
+            if self.logger:
+                self.logger.debug(f"🎯 Parsed event: {event_name} at {event_time} on {event_date}")
+            
+            return event
+            
+        except Exception as e:
+            if self.logger:
+                self.logger.debug(f"⚠️ Error parsing event from li: {e}")
+            return None
+
     def _extract_programming_context(self, soup, page_url: str = None) -> Dict[str, Any]:
         """
         Extract programming context (weekend dates and period) from page title or URL.
