@@ -170,9 +170,9 @@ class Logger:
                 for log_file in logs_to_remove:
                     try:
                         log_file.unlink()
-                        self.logger.debug(f"Removido log rotacionado (limite de {max_logs} arquivos): {log_file.name}")
+                        self.get_logger('debug').debug(f"Removido log rotacionado (limite de {max_logs} arquivos): {log_file.name}")
                     except Exception as e:
-                        self.logger.warning(f"Falha ao remover {log_file.name}: {e}")
+                        self.get_logger('debug').warning(f"Falha ao remover {log_file.name}: {e}")
             
             # Aplicar limite de idade dos logs
             if max_age_days > 0:
@@ -181,12 +181,14 @@ class Logger:
                     try:
                         if log_file.stat().st_mtime < cutoff_time:
                             log_file.unlink()
-                            self.logger.debug(f"Removido log rotacionado (mais antigo que {max_age_days}d): {log_file.name}")
+                            self.get_logger('debug').debug(f"Removido log rotacionado (mais antigo que {max_age_days}d): {log_file.name}")
                     except Exception as e:
-                        self.logger.warning(f"Falha ao verificar/remover {log_file.name}: {e}")
+                        self.get_logger('debug').warning(f"Falha ao verificar/remover {log_file.name}: {e}")
                             
         except Exception as e:
-            self.logger.error(f"Erro ao limpar logs rotacionados: {e}", exc_info=True)
+            print(f"Erro ao limpar logs rotacionados: {e}")
+            import traceback
+            traceback.print_exc()
     
     def _cleanup_old_files(self, directory: str, pattern: str, max_age_days: int) -> None:
         """
