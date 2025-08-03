@@ -1,0 +1,12 @@
+{
+  "title": "🐛 Links de transmissão não estão sendo incluídos nos eventos iCal",
+  "labels": ["bug", "high priority", "ical", "streaming"],
+  "assignees": ["dmirrha"],
+  "milestone": "v0.3.0",
+  "body": "011-streaming-links-not-included.md",
+  "related_issues": ["#3", "#5"],
+  "priority": "high",
+  "type": "bug",
+  "component": "ical-generator",
+  "severity": "major"
+}

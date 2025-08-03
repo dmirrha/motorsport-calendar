@@ -7,6 +7,11 @@ e este projeto adere ao [Versionamento Semântico](https://semver.org/spec/v2.0.
 
 ## [Não Lançado]
 ### Adicionado
+- **Gerenciamento de Arquivos iCal**
+  - Implementado sistema de arquivamento automático de arquivos iCal antigos
+  - Arquivos antigos são movidos para a subpasta `output/history/`
+  - Mantido apenas o arquivo mais recente na pasta raiz de saída
+  - Adicionada documentação sobre o sistema de arquivamento
 - **Workflow de Issues**: Novo sistema unificado para gerenciamento de issues
   - Estrutura de diretórios padronizada (open/imported/closed/templates)
   - Script de importação automática com suporte a Markdown
@@ -17,6 +22,13 @@ e este projeto adere ao [Versionamento Semântico](https://semver.org/spec/v2.0.
   - Integração com o CHANGELOG.md
 
 ### Corrigido
+- **Issue #20**: Corrigida perda de links de transmissão durante o processamento
+  - Implementado tratamento adequado para diferentes formatos de links de streaming
+  - Adicionada validação de URLs de streaming
+  - Melhorada a formatação de links no arquivo iCal final
+  - Adicionada verificação de duplicação de links de streaming
+  - Melhor tratamento de erros durante o processamento de links
+
 - **Issue #3**: Corrigida detecção de eventos sem data explícita na fonte Tomada de Tempo
   - Implementado suporte ao formato de data "SÁBADO – 02/08/2025"
   - Adicionada extração do contexto da programação do título/URL da página

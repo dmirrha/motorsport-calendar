@@ -2,6 +2,28 @@
 
 Este arquivo contém um registro acumulativo de todas as versões lançadas do projeto, com notas detalhadas sobre as mudanças em cada versão.
 
+## Versão 0.3.0 (2025-08-03)
+**Correção de Links de Transmissão e Arquivos iCal**
+
+### 🐛 Correções
+- **Links de Transmissão**
+  - Corrigida a perda de links de transmissão durante o processamento de eventos
+  - Implementado tratamento adequado para diferentes formatos de links de streaming
+  - Adicionada validação de URLs de streaming
+  - Melhorada a formatação de links no arquivo iCal final
+
+- **Arquivos iCal**
+  - Implementada rotação automática de arquivos iCal antigos
+  - Arquivos antigos são movidos para a subpasta `output/history/`
+  - Mantido apenas o arquivo mais recente na pasta raiz de saída
+  - Adicionada documentação sobre o sistema de arquivamento
+
+### 🔧 Melhorias Técnicas
+- Aprimorado o método `_normalize_streaming_links` para suportar múltiplos formatos de entrada
+- Adicionada verificação de duplicação de links de streaming
+- Melhor tratamento de erros durante o processamento de links
+- Otimização no armazenamento de metadados dos eventos
+
 ## Versão 0.2.0 (2025-08-02)
 **Workflow Unificado de Gestão de Issues**
 

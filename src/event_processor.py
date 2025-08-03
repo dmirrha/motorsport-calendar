@@ -429,17 +429,37 @@ class EventProcessor:
         
         return session_map.get(session_type, session_type)
     
-    def _normalize_streaming_links(self, links: List[str]) -> List[str]:
-        """Normalize streaming links."""
+    def _normalize_streaming_links(self, links: List[Any]) -> List[str]:
+        """Normalize streaming links from various formats.
+        
+        Accepts both dictionary format ({'name': 'X', 'url': 'Y'}) 
+        and string format ('http://...').
+        
+        Args:
+            links: List of streaming links in various formats
+            
+        Returns:
+            List of normalized URL strings
+        """
         if not links:
             return []
         
         normalized_links = []
         for link in links:
-            if isinstance(link, str) and link.strip():
-                link = link.strip()
-                if link.startswith('http'):
-                    normalized_links.append(link)
+            url = None
+            
+            # Handle dictionary format: {'name': 'SITE BAND', 'url': 'http://...'}
+            if isinstance(link, dict):
+                url = link.get('url', '')
+            # Handle string format: 'http://...'
+            elif isinstance(link, str):
+                url = link.strip()
+            
+            # Validate and add URL
+            if url and isinstance(url, str) and url.strip():
+                url = url.strip()
+                if url.startswith('http'):
+                    normalized_links.append(url)
         
         return normalized_links
     
