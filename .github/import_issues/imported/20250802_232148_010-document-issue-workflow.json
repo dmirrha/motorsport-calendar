@@ -1,0 +1,15 @@
+{
+  "title": "📚 Documentar Novo Workflow de Gestão de Issues",
+  "body": "010-document-issue-workflow.md",
+  "labels": ["documentation", "enhancement", "workflow"],
+  "assignees": [],
+  "milestone": null,
+  "state": "open",
+  "metadata": {
+    "created_at": "2025-08-02T23:19:47-03:00",
+    "priority": "high",
+    "type": "documentation",
+    "components": ["workflow", "documentation"],
+    "related_issues": ["#14", "#16"]
+  }
+}
