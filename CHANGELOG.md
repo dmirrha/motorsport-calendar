@@ -7,6 +7,12 @@ e este projeto adere ao [Versionamento Semântico](https://semver.org/spec/v2.0.
 
 ## [Não Lançado]
 ### Adicionado
+- **Testes de Regressão**
+  - Implementada suíte abrangente de testes de regressão
+  - Adicionado `pytest.ini` com configurações de cobertura e relatórios
+  - Criado workflow do GitHub Actions para execução automática dos testes
+  - Adicionados testes para validação de configuração, coleta de eventos e geração de iCal
+
 - **Documentação de Configuração**
   - Criado `CONFIGURATION_GUIDE.md` com documentação detalhada de todas as opções de configuração
   - Adicionadas descrições detalhadas para cada parâmetro do arquivo de configuração
