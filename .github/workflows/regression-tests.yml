@@ -53,11 +53,23 @@ jobs:
 
     - name: Run tests
       run: |
-        # Ensure test results directory exists
+        # Ensure test results directory exists with proper permissions
         mkdir -p test_results
+        chmod -R 777 test_results
         
-        # Run pytest with configuration from pytest.ini
-        python -m pytest
+        # Show current directory structure for debugging
+        echo "Current directory structure:"
+        ls -la
+        
+        # Install package in development mode to ensure imports work
+        pip install -e .
+        
+        # Run pytest with full verbosity and show traceback for debugging
+        python -m pytest -v --tb=short
+        
+        # Verify test results were generated
+        echo "Test results directory contents:"
+        ls -la test_results/
         
       env:
         PYTHONPATH: ${{ github.workspace }}
