@@ -231,8 +231,9 @@ source venv/bin/activate
 pip install -r requirements.txt
 
 # Configure o arquivo de configuração
-cp config.example.json config.json
-# Edite config.json conforme necessário
+mkdir -p config
+cp config/config.example.json config/config.json
+# Edite config/config.json conforme necessário
 ```
 
 ## 🚀 Uso
@@ -262,8 +263,9 @@ motorsport-calendar/
 │       ├── import_issues.py  # Script de importação
 │       └── README.md         # Documentação
 ├── motorsport_calendar.py    # Script principal
-├── config.json               # Configuração principal
-├── config.example.json       # Exemplo de configuração
+├── config/                   # Configurações
+│   ├── config.json           # Configuração principal
+│   └── config.example.json   # Exemplo de configuração
 ├── requirements.txt          # Dependências
 ├── src/                      # Código fonte modular
 ├── sources/                  # Módulos de coleta por fonte
@@ -274,7 +276,7 @@ motorsport-calendar/
 
 ## ⚙️ Configuração
 
-O arquivo `config.json` permite personalizar:
+O arquivo `config/config.json` permite personalizar. Consulte o [Guia de Configuração](docs/CONFIGURATION_GUIDE.md) para uma referência detalhada de todas as opções disponíveis.
 
 - **Fontes de dados** e prioridades
 - **Categorias** incluídas/excluídas
@@ -296,11 +298,140 @@ O sistema de logs avançado oferece monitoramento detalhado e solução de probl
 
 - **Logs centralizados** com múltiplos níveis (DEBUG, INFO, WARNING, ERROR, CRITICAL)
 - **Payloads raw** preservados por fonte para análise detalhada
-- **Rotação automática** por execução
+## 📊 Logging Avançado
+
+O sistema de logging foi aprimorado com recursos profissionais para facilitar a depuração e monitoramento:
+
+### 🎯 Recursos Principais
+
+- **Mensagens de Erro Estruturadas**
+  - Códigos de erro únicos para cada tipo de problema
+  - Mensagens claras e acionáveis
+  - Sugestões de correção baseadas no contexto
+
+- **Rotação Automática**
   - O arquivo principal de log é rotacionado a cada execução
   - Logs antigos são armazenados em `logs/rotated_logs/`
-  - Configuração personalizável em `config.json`
-- **Limpeza automática** de logs antigos
+  - Níveis de log configuráveis por saída (console/arquivo)
+  - Formatação personalizável para diferentes destinos
+
+- **Limpeza Inteligente**
+  - Remoção automática de logs antigos baseada em idade e quantidade
+  - Limpeza seletiva por tipo de log (debug, payloads, etc.)
+  - Configuração flexível de retenção
+
+### ⚙️ Configuração de Logging
+
+No arquivo `config.json`, você pode personalizar o comportamento do logging:
+
+```json
+"logging": {
+  "file_structure": {
+    "main_log": "logs/app.log",
+    "debug_directory": "logs/debug",
+    "payload_directory": "logs/payloads"
+  },
+  "retention": {
+    "enabled": true,
+    "max_logs_to_keep": 10,
+    "max_payloads_to_keep": 20,
+    "delete_older_than_days": 30
+  },
+  "levels": {
+    "console": "INFO",
+    "file": "DEBUG",
+    "debug_file": "DEBUG"
+  },
+  "format": {
+    "console": "%(message)s",
+    "file": "%(asctime)s - %(levelname)s - %(name)s - %(message)s"
+  },
+  "rotation": {
+    "enabled": true,
+    "max_size_mb": 10,
+    "backup_count": 5
+  },
+  "payload_settings": {
+    "save_raw": true,
+    "pretty_print": true,
+    "include_headers": true,
+    "separate_by_source": true,
+    "max_files_per_source": 50,
+    "max_age_days": 30
+  }
+}
+```
+
+### 🔍 Códigos de Erro
+
+O sistema utiliza códigos de erro estruturados para facilitar a identificação de problemas:
+
+- **1xx**: Erros de Configuração
+  - `100`: Configuração ausente
+  - `101`: Configuração inválida
+  - `102`: Erro de validação
+
+- **2xx**: Erros de Rede
+  - `200`: Falha na requisição HTTP
+  - `201**: Timeout de conexão
+  - `202`: Erro de autenticação
+
+- **3xx**: Erros de Processamento
+  - `300`: Falha no processamento de dados
+  - `301`: Formato de dados inválido
+  - `302`: Falha na normalização
+
+### 📦 Gerenciamento de Payloads
+
+O sistema agora gerencia automaticamente os arquivos de payload:
+
+- **Rotação por quantidade**
+  - Mantém apenas os N arquivos mais recentes por fonte
+  - Configurável via `max_files_per_source`
+  - Remove automaticamente os arquivos mais antigos
+
+- **Limpeza por idade**
+  - Remove arquivos mais antigos que X dias
+  - Configurável via `max_age_days`
+  - Aplicável a logs e payloads
+
+- **Organização**
+  - Separação por fonte de dados
+  - Nomenclatura consistente de arquivos
+  - Metadados incluídos nos nomes dos arquivos
+
+### 🛠️ Validação de Configuração
+
+A validação de configuração foi aprimorada com:
+
+- Verificação de tipos e valores
+- Valores padrão sensatos
+- Mensagens de erro detalhadas
+- Sugestões de correção
+- Validação de caminhos e permissões
+
+### 🔄 Períodos de Silêncio
+
+Configure períodos de silêncio para reduzir notificações em horários específicos:
+
+```json
+"silent_periods": [
+  {
+    "name": "Noite",
+    "start_time": "22:00",
+    "end_time": "07:00",
+    "days_of_week": ["monday", "tuesday", "wednesday", "thursday", "sunday"],
+    "enabled": true
+  },
+  {
+    "name": "Fim de Semana",
+    "start_time": "00:00",
+    "end_time": "08:00",
+    "days_of_week": ["friday", "saturday", "sunday"],
+    "enabled": true
+  }
+]
+```
   - Mantém apenas os logs mais recentes (configurável)
   - Remove automaticamente logs mais antigos que o período de retenção
   - Configuração flexível de retenção

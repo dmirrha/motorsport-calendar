@@ -12,8 +12,9 @@ Documentar a arquitetura atual do sistema de geração de calendário de automob
 ```
 Race Calendar/
 ├── motorsport_calendar.py          # Ponto de entrada principal
-├── config.json                     # Configuração principal
-├── config.example.json             # Exemplo de configuração
+├── config/                         # Configurações
+│   ├── config.json                 # Configuração principal
+│   └── config.example.json         # Exemplo de configuração
 ├── requirements.txt                # Dependências Python
 ├── README.md                       # Documentação principal
 ├── PROJECT_STRUCTURE.md            # Esta documentação

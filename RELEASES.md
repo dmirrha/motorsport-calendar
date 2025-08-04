@@ -2,6 +2,40 @@
 
 Este arquivo contém um registro acumulativo de todas as versões lançadas do projeto, com notas detalhadas sobre as mudanças em cada versão.
 
+## Versão 0.5.0 (2025-08-04)
+**Melhorias no Sistema de Logging e Configuração**
+
+### 🚀 Novas Funcionalidades
+
+- **Sistema de Logging Aprimorado**
+  - Implementados códigos de erro estruturados para melhor rastreamento
+  - Adicionado suporte a mensagens de erro com sugestões de correção
+  - Melhorada a rotação e limpeza automática de logs
+  - Níveis de log configuráveis por saída (console/arquivo)
+
+- **Gerenciamento de Payloads**
+  - Rotação automática baseada em quantidade e idade
+  - Organização por fonte de dados
+  - Configuração flexível de retenção
+  - Limpeza inteligente de arquivos antigos
+
+- **Validação de Configuração**
+  - Módulo `config_validator.py` para validação centralizada
+  - Validação de tipos e valores
+  - Mensagens de erro detalhadas
+  - Valores padrão sensatos
+
+- **Períodos de Silêncio**
+  - Validação robusta de configurações
+  - Suporte a múltiplos períodos
+  - Configuração flexível de dias e horários
+
+- **Documentação**
+  - Exemplos detalhados de configuração
+  - Guia de códigos de erro
+  - Referência completa das opções
+  - Melhores práticas
+
 ## Versão 0.4.1 (2025-08-04)
 **Correções de Bugs**
 

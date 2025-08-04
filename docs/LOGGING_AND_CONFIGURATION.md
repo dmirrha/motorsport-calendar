@@ -13,7 +13,7 @@ O sistema de logs do Motorsport Calendar foi projetado para fornecer informaçõ
 
 ## Configuração de Logs
 
-As configurações de log são definidas no arquivo `config.json` na seção `logging`:
+As configurações de log são definidas no arquivo `config/config.json` na seção `logging`. Consulte o [Guia de Configuração](../CONFIGURATION_GUIDE.md) para uma referência detalhada de todas as opções disponíveis:
 
 ```json
 "logging": {

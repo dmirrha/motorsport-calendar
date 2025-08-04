@@ -1,0 +1,182 @@
+{
+  "general": {
+    "timezone": "America/Sao_Paulo",
+    "language": "pt-BR",
+    "log_level": "DEBUG",
+    "output_directory": "./output",
+    "visual_interface": {
+      "enabled": true,
+      "colors": true,
+      "progress_bars": true,
+      "icons": true
+    },
+    "advanced_logging": {
+      "debug_logs": true,
+      "payload_storage": true,
+      "log_rotation": true,
+      "retention_days": 30
+    }
+  },
+  
+  "data_sources": {
+    "priority_order": [
+      "tomada_tempo",
+      "ergast_api",
+      "openf1_api",
+      "motorsport_com",
+      "autosport"
+    ],
+    "excluded_sources": [],
+    "timeout_seconds": 10,
+    "retry_attempts": 3,
+    "rate_limit_delay": 1.0,
+    "user_agents": [
+      "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36",
+      "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36"
+    ]
+  },
+  
+  "event_filters": {
+    "category_detection": {
+      "enabled": true,
+      "learning_mode": true,
+      "confidence_threshold": 0.7
+    },
+    "included_categories": ["*"],
+    "excluded_categories": [],
+    "included_countries": [],
+    "excluded_countries": [],
+    "event_types": {
+      "race": true,
+      "qualifying": true,
+      "practice": false,
+      "sprint": true,
+      "other": false
+    },
+    "weekend_detection": {
+      "algorithm": "first_event_based",
+      "days_range": ["friday", "saturday", "sunday"],
+      "extend_to_thursday": false,
+      "extend_to_monday": false
+    }
+  },
+  
+  "ical_parameters": {
+    "calendar_name": "Motorsport Events",
+    "calendar_description": "Weekend motorsport events automatically collected",
+    "timezone": "America/Sao_Paulo",
+    "default_duration_minutes": 120,
+    "reminders": [
+      {"minutes": 60, "method": "popup"},
+      {"minutes": 15, "method": "popup"}
+    ],
+    "event_category": "SPORTS",
+    "event_priority": "NORMAL",
+    "event_status": "CONFIRMED",
+    "include_streaming_links": true,
+    "include_location": true,
+    "include_description": true
+  },
+  
+  "streaming_providers": {
+    "region": "BR",
+    "mappings": {
+      "F1": {
+        "BR": ["SporTV", "F1 TV Pro"],
+        "US": ["ESPN", "F1 TV Pro"],
+        "UK": ["Sky Sports F1", "F1 TV Pro"]
+      },
+      "MotoGP": {
+        "BR": ["SporTV", "ESPN"],
+        "US": ["NBC Sports"],
+        "UK": ["BT Sport"]
+      },
+      "StockCar": {
+        "BR": ["SporTV", "YouTube - Stock Car Brasil"]
+      },
+      "NASCAR": {
+        "BR": ["ESPN", "Fox Sports"],
+        "US": ["NBC Sports", "Fox Sports"]
+      },
+      "WSBK": {
+        "BR": ["SporTV"],
+        "US": ["MotoAmerica Live"],
+        "UK": ["Eurosport"]
+      }
+    },
+    "fallback_providers": {
+      "BR": ["Motorsport.tv", "YouTube"],
+      "global": ["Official Website", "Motorsport.com"]
+    }
+  },
+  
+  "deduplication": {
+    "algorithm": "fuzzy_matching",
+    "name_similarity_threshold": 0.85,
+    "time_tolerance_minutes": 30,
+    "location_matching": true,
+    "category_matching": true,
+    "source_priority_resolution": true
+  },
+  
+  "category_mapping": {
+    "learning_enabled": true,
+    "custom_mappings": {
+      "F1": ["Formula 1", "Fórmula 1", "Formula One", "Grand Prix", "GP", "F-1"],
+      "F2": ["Formula 2", "Fórmula 2", "F-2"],
+      "F3": ["Formula 3", "Fórmula 3", "F-3"],
+      "MotoGP": ["Moto GP", "MotoGrandPrix", "World Championship", "Premier Class"],
+      "Moto2": ["Moto 2", "Intermediate Class"],
+      "Moto3": ["Moto 3", "Lightweight Class"],
+      "StockCar": ["Stock Car Brasil", "Stock Car", "SCB"],
+      "NASCAR": ["NASCAR Cup", "NASCAR Xfinity", "NASCAR Truck"],
+      "IndyCar": ["Indy Car", "IndyCar Series", "Indy 500"],
+      "WEC": ["World Endurance", "Endurance Championship", "Le Mans", "WEC"],
+      "WSBK": ["World Superbike", "Superbike World Championship", "SBK"],
+      "IMSA": ["IMSA SportsCar", "WeatherTech SportsCar"],
+      "DTM": ["Deutsche Tourenwagen Masters", "German Touring Car"],
+      "WRC": ["World Rally Championship", "Rally Championship"],
+      "FormulaE": ["Formula E", "Fórmula E", "FE", "Electric Formula"]
+    },
+    "type_classification": {
+      "cars": ["F1", "F2", "F3", "NASCAR", "IndyCar", "WEC", "DTM", "StockCar", "FormulaE"],
+      "motorcycles": ["MotoGP", "Moto2", "Moto3", "WSBK", "MotoE"],
+      "mixed": ["WRC", "Rallycross"],
+      "other": ["Karting", "Drift", "Autocross"]
+    }
+  },
+  
+  "logging": {
+    "file_structure": {
+      "main_log": "logs/motorsport_calendar.log",
+      "debug_directory": "logs/debug",
+      "payload_directory": "logs/payloads"
+    },
+    "retention": {
+      "enabled": true,
+      "max_logs_to_keep": 10,
+      "max_payloads_to_keep": 20,
+      "delete_older_than_days": 30
+    },
+    "levels": {
+      "console": "DEBUG",
+      "file": "DEBUG",
+      "debug_file": "DEBUG"
+    },
+    "format": {
+      "console": "%(asctime)s - %(name)s - %(levelname)s - %(message)s",
+      "file": "%(asctime)s - %(name)s - %(levelname)s - %(funcName)s:%(lineno)d - %(message)s"
+    },
+    "rotation": {
+      "enabled": true,
+      "max_size_mb": 10,
+      "backup_count": 5
+    },
+    "payload_settings": {
+      "save_raw": true,
+      "pretty_print": true,
+      "include_headers": true,
+      "separate_by_source": true
+    }
+  }
+}

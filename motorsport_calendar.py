@@ -40,7 +40,7 @@ from ical_generator import ICalGenerator
 class MotorsportCalendarGenerator:
     """Main application class for motorsport calendar generation."""
     
-    def __init__(self, config_path: str = "config.json", output_dir: str = None):
+    def __init__(self, config_path: str = "config/config.json", output_dir: str = None):
         """
         Initialize the calendar generator.
         
@@ -298,8 +298,8 @@ Examples:
     
     parser.add_argument(
         '--config', '-c',
-        default='config.json',
-        help='Configuration file path (default: config.json)'
+        default='config/config.json',
+        help='Configuration file path (default: config/config.json)'
     )
     
     parser.add_argument(
