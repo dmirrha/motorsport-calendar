@@ -10,21 +10,17 @@ Um script Python avançado para coleta automática de eventos de automobilismo d
 - ✅ **Remoção de duplicatas** entre fontes
 - ✅ **Configuração flexível** via arquivo JSON
 - ✅ **Logging avançado** com rotação e limpeza automática
-- ✅ **Compatível com Google Calendar** e outros clientes iCal
-- ✅ **Detecção dinâmica** de categorias de automobilismo
-- ✅ **Processamento inteligente** de datas e horários
-- ✅ **Suporte a múltiplos fusos horários**
-- ✅ **Gerenciamento de erros** robusto e informativo
-- ✅ **Sistema de retenção** configurável para logs e payloads
 - ✅ **Links de transmissão** incluídos nos eventos do calendário
-- ✅ **Arquivos iCal** com histórico automático e limpeza
+- ✅ **Arquivamento automático** de arquivos iCal antigos
+- ✅ **Períodos de silêncio** configuráveis para filtrar eventos por horário
 
-## 🏎️ Categorias Suportadas
+## Categorias Suportadas
 
-**✨ Suporte Dinâmico a TODAS as Categorias de Esporte Automotor**
+**Suporte Dinâmico a TODAS as Categorias de Esporte Automotor**
 
 O script detecta automaticamente e coleta eventos de **qualquer categoria** encontrada nas fontes de dados, incluindo mas não limitado a:
 
+### Carros:
 ### **🏎️ Carros:**
 - Fórmula 1, F2, F3, F4
 - Stock Car Brasil, NASCAR
@@ -49,6 +45,67 @@ O script detecta automaticamente e coleta eventos de **qualquer categoria** enco
 - **E muito mais!**
 
 > 💡 **Flexibilidade Total:** O sistema se adapta automaticamente a novas categorias que apareçam nas fontes de dados, sem necessidade de atualizações no código.
+
+## 🔇 Períodos de Silêncio
+
+Os períodos de silêncio permitem configurar intervalos de tempo durante os quais os eventos não serão incluídos no arquivo iCal de saída, mas ainda serão exibidos nos logs para fins de monitoramento.
+
+### Configuração
+
+Adicione a seção `silent_periods` no arquivo de configuração:
+
+```json
+{
+  "general": {
+    "silent_periods": [
+      {
+        "enabled": true,
+        "name": "Noite",
+        "start_time": "22:00",
+        "end_time": "06:00",
+        "days_of_week": ["monday", "tuesday", "wednesday", "thursday", "sunday"]
+      },
+      {
+        "enabled": true,
+        "name": "Fim de Semana",
+        "start_time": "00:00",
+        "end_time": "23:59",
+        "days_of_week": ["saturday", "sunday"]
+      }
+    ]
+  }
+}
+```
+
+### Parâmetros
+
+- **`enabled`**: Ativa ou desativa o período de silêncio
+- **`name`**: Nome descritivo do período
+- **`start_time`**: Horário de início no formato HH:MM
+- **`end_time`**: Horário de fim no formato HH:MM
+- **`days_of_week`**: Lista de dias da semana (monday, tuesday, etc.)
+
+### Comportamento
+
+- Eventos que ocorrem durante períodos de silêncio são **filtrados** do arquivo iCal
+- Os eventos filtrados são **registrados nos logs** com nível INFO
+- Um **resumo dos eventos filtrados** é exibido na saída do terminal
+- O sistema lida corretamente com períodos que **cruzam a meia-noite**
+
+### Exemplo de Uso
+
+```bash
+# Executar com períodos de silêncio configurados
+python3 motorsport_calendar.py --verbose
+```
+
+Os logs mostrarão:
+```
+🔇 Event filtered by silent period 'Noite': F1 Practice at 2025-08-03 23:30
+🔇 Silent periods filtered 3 events:
+  • Noite: 2 events
+  • Fim de Semana: 1 events
+```
 
 ## 👥 Como Contribuir
 

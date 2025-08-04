@@ -20,6 +20,12 @@ e este projeto adere ao [Versionamento Semântico](https://semver.org/spec/v2.0.
   - Suporte a metadados e rastreamento de issues relacionadas
   - Processo automatizado para fechamento de issues
   - Integração com o CHANGELOG.md
+- **Períodos de Silêncio**: Funcionalidade para filtrar eventos por horário configurável (Issue #22)
+  - Classe `SilentPeriod` para gerenciar períodos individuais de silêncio
+  - Classe `SilentPeriodManager` para gerenciar múltiplos períodos e filtragem de eventos
+  - Configuração flexível de períodos de silêncio via arquivo JSON
+  - Suporte a períodos que cruzam a meia-noite
+  - Logs detalhados de eventos filtrados por período de silêncio
 
 ### Corrigido
 - **Issue #20**: Corrigida perda de links de transmissão durante o processamento
@@ -28,7 +34,9 @@ e este projeto adere ao [Versionamento Semântico](https://semver.org/spec/v2.0.
   - Melhorada a formatação de links no arquivo iCal final
   - Adicionada verificação de duplicação de links de streaming
   - Melhor tratamento de erros durante o processamento de links
-
+- Correção na preservação de links de transmissão durante o processamento de eventos (Issue #20)
+- Melhoria na normalização de links de streaming para suportar diferentes formatos
+- Validação e deduplicação de URLs de streaming
 - **Issue #3**: Corrigida detecção de eventos sem data explícita na fonte Tomada de Tempo
   - Implementado suporte ao formato de data "SÁBADO – 02/08/2025"
   - Adicionada extração do contexto da programação do título/URL da página
