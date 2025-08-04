@@ -15,7 +15,23 @@
       "payload_storage": true,
       "log_rotation": true,
       "retention_days": 30
-    }
+    },
+    "silent_periods": [
+      {
+        "enabled": false,
+        "name": "Noite",
+        "start_time": "22:00",
+        "end_time": "06:00",
+        "days_of_week": ["monday", "tuesday", "wednesday", "thursday", "sunday"]
+      },
+      {
+        "enabled": false,
+        "name": "Fim de Semana",
+        "start_time": "00:00",
+        "end_time": "23:59",
+        "days_of_week": ["saturday", "sunday"]
+      }
+    ]
   },
   
   "data_sources": {

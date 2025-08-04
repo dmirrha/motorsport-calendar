@@ -12,6 +12,7 @@ from collections import defaultdict
 import hashlib
 from fuzzywuzzy import fuzz
 from unidecode import unidecode
+from silent_period import SilentPeriodManager
 
 
 class EventProcessor:
@@ -31,6 +32,9 @@ class EventProcessor:
         self.logger = logger
         self.ui = ui_manager
         self.category_detector = category_detector
+        
+        # Initialize silent period manager
+        self.silent_period_manager = SilentPeriodManager(config_manager, logger)
         
         # Deduplication settings
         self.similarity_threshold = 85
@@ -129,13 +133,22 @@ class EventProcessor:
         validated_events = self._validate_events(deduplicated_events)
         self.processing_stats['events_validated'] = len(validated_events)
         
+        # Step 6: Apply silent period filtering
+        final_events, filtered_events = self.silent_period_manager.filter_events(validated_events)
+        self.processing_stats['events_silent_filtered'] = len(filtered_events)
+        self.processing_stats['events_final'] = len(final_events)
+        
+        # Log silent period filtering summary
+        if filtered_events:
+            self.silent_period_manager.log_filtering_summary(filtered_events)
+        
         # Update final statistics
         self.processing_stats['processing_end_time'] = datetime.now().isoformat()
         
         # Log processing summary
         self._log_processing_summary()
         
-        return validated_events
+        return final_events
     
     def _normalize_events(self, raw_events: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
         """
@@ -801,12 +814,22 @@ class EventProcessor:
         
         stats = self.processing_stats
         
-        self.logger.log_step(
+        # Include silent period filtering in summary
+        final_count = stats.get('events_final', stats['events_validated'])
+        silent_filtered = stats.get('events_silent_filtered', 0)
+        
+        summary_msg = (
             f"📊 Processing Summary: "
-            f"{stats['events_input']} → {stats['events_validated']} events "
-            f"({stats['duplicates_removed']} duplicates removed, "
-            f"{stats['categories_detected']} categories detected)"
+            f"{stats['events_input']} → {final_count} events "
+            f"({stats['duplicates_removed']} duplicates removed"
         )
+        
+        if silent_filtered > 0:
+            summary_msg += f", {silent_filtered} silent period filtered"
+        
+        summary_msg += f", {stats['categories_detected']} categories detected)"
+        
+        self.logger.log_step(summary_msg)
         
         # Calculate processing time
         if stats['processing_start_time'] and stats['processing_end_time']:

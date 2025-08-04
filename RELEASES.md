@@ -2,6 +2,53 @@
 
 Este arquivo contém um registro acumulativo de todas as versões lançadas do projeto, com notas detalhadas sobre as mudanças em cada versão.
 
+## Versão 0.4.0 (2025-08-03)
+**Períodos de Silêncio**
+
+### 🔇 Períodos de Silêncio
+
+**Nova Funcionalidade Principal**: Implementação de períodos de silêncio configuráveis para filtrar eventos por horário.
+
+#### Funcionalidades Adicionadas
+- **Classe SilentPeriod**: Gerenciamento individual de períodos de silêncio
+- **Classe SilentPeriodManager**: Gerenciamento de múltiplos períodos e filtragem de eventos
+- **Configuração Flexível**: Períodos configuráveis via arquivo JSON
+- **Suporte a Meia-Noite**: Períodos que cruzam a meia-noite (ex: 22:00-06:00)
+- **Logs Detalhados**: Registro completo de eventos filtrados
+- **Estatísticas**: Contadores de eventos filtrados nas estatísticas de processamento
+
+#### Configuração
+```json
+{
+  "general": {
+    "silent_periods": [
+      {
+        "enabled": true,
+        "name": "Noite",
+        "start_time": "22:00",
+        "end_time": "06:00",
+        "days_of_week": ["monday", "tuesday", "wednesday", "thursday", "sunday"]
+      }
+    ]
+  }
+}
+```
+
+#### Comportamento
+- Eventos durante períodos de silêncio são filtrados do arquivo iCal
+- Eventos filtrados são registrados nos logs para auditoria
+- Resumo de eventos filtrados exibido no terminal
+- Não afeta a coleta ou processamento inicial dos eventos
+
+#### Melhorias Técnicas
+- Testes unitários completos (15 casos de teste)
+- Validação robusta de configuração
+- Tratamento de erros e casos extremos
+- Integração transparente com o pipeline de processamento existente
+
+#### Issue Relacionada
+- **Issue #22**: ✨ Adicionar suporte a período de silêncio para eventos
+
 ## Versão 0.3.0 (2025-08-03)
 **Correção de Links de Transmissão e Arquivos iCal**
 

@@ -37,6 +37,10 @@ Desenvolver e manter um sistema automatizado para coleta, processamento e export
 - Validação e deduplicação de URLs de streaming
 - Configuração flexível via JSON
 - Sistema de arquivamento automático de arquivos antigos
+- **Períodos de silêncio configuráveis** para filtrar eventos por horário
+- Suporte a múltiplos períodos de silêncio simultâneos
+- Filtragem inteligente com períodos que cruzam a meia-noite
+- Logs detalhados de eventos filtrados para auditoria
 
 #### **Melhorias Planejadas** 📅
 - Suporte a lembretes personalizados

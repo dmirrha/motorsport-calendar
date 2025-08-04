@@ -1,0 +1,41 @@
+BEGIN:VCALENDAR
+VERSION:2.0
+PRODID:-//Motorsport Calendar Generator//EN
+CALSCALE:GREGORIAN
+METHOD:PUBLISH
+X-WR-CALDESC:Weekend motorsport events automatically collected
+X-WR-CALNAME:Motorsport Events
+X-APPLE-CALENDAR-COLOR:#FF6B35
+X-WR-TIMEZONE:America/Sao_Paulo
+BEGIN:VEVENT
+SUMMARY:F1 - em Curvelo (Qualifying)
+DTSTART;TZID=America/Sao_Paulo:20250802T045500
+DTEND;TZID=America/Sao_Paulo:20250802T055500
+DTSTAMP:20250803T010933Z
+UID:790a1fa1bb602b9f@motorsport-calendar
+CATEGORIES:F1,Qualifying
+CREATED:20250803T010933Z
+DESCRIPTION:🏁 F1 Qualifying\n📍 Brasília - Brazil\n\n🔴 Streaming:
+ \n• https://f1tv.formula1.com/\n• https://www.youtube.com/@cba_kart\n
+ • https://f1tv.formula1.com/\n\n🔗 More info: https://www.tomadadetemp
+ o.com.br/\n\n📊 Source: Tomada de Tempo
+LAST-MODIFIED:20250803T010933Z
+LOCATION:Brasília\, Brazil
+PRIORITY:1
+STATUS:CONFIRMED
+TRANSP:OPAQUE
+X-MOTORSPORT-CATEGORY:F1
+X-MOTORSPORT-SESSION:Qualifying
+X-MOTORSPORT-SOURCE:tomadatempo
+BEGIN:VALARM
+ACTION:DISPLAY
+DESCRIPTION:Motorsport Event Reminder
+TRIGGER:-PT1H
+END:VALARM
+BEGIN:VALARM
+ACTION:DISPLAY
+DESCRIPTION:Motorsport Event Reminder
+TRIGGER:-PT15M
+END:VALARM
+END:VEVENT
+END:VCALENDAR
