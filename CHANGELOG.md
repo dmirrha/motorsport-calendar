@@ -6,6 +6,17 @@ O formato é baseado em [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)
 e este projeto adere ao [Versionamento Semântico](https://semver.org/spec/v2.0.0.html).
 
 ## [Não Lançado]
+### Corrigido
+- **Issue #23**: Corrigido bug na filtragem de períodos de silêncio
+  - Corrigida lógica de filtragem que estava removendo todos os eventos
+  - Melhorada a verificação de períodos de silêncio ativos
+  - Adicionada validação adicional para garantir que eventos sem data não sejam filtrados incorretamente
+  - Atualizada a documentação dos métodos relacionados
+- Corrigida chamada incorreta para `show_warning` no UIManager
+  - Atualizado para usar o método correto `show_warning_message`
+  - Adicionada verificação de existência do método para evitar erros
+  - Melhorada a mensagem de aviso exibida ao usuário
+
 ### Adicionado
 - **Gerenciamento de Arquivos iCal**
   - Implementado sistema de arquivamento automático de arquivos iCal antigos
