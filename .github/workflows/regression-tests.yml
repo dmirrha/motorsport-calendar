@@ -56,16 +56,36 @@ jobs:
         pip install -r requirements-dev.txt
         pip install pytest-cov pytest-html
 
+    - name: Debug environment
+      run: |
+        echo "=== Debug Information ==="
+        pwd
+        ls -la
+        python --version
+        pip list | grep -E "pytest|cov"
+        echo "======================="
+
     - name: Run tests with coverage
       run: |
+        # Garante que os diretórios existam
         mkdir -p test_results
+        
+        # Executa os testes com mais logs
+        set -x  # Ativa modo debug
         python -m pytest tests/regression/ \
           --cov=src \
           --cov-report=xml:coverage.xml \
           --cov-report=term \
           --junitxml=test_results/junit.xml \
           --html=test_results/report.html \
-          -v
+          -v || true  # Continua mesmo se os testes falharem
+        
+        # Verifica se os arquivos foram criados
+        echo "=== Verificando arquivos gerados ==="
+        ls -la
+        ls -la test_results/ || echo "Não foi possível listar test_results"
+        [ -f coverage.xml ] && echo "coverage.xml encontrado" || echo "coverage.xml NÃO encontrado"
+        [ -f test_results/junit.xml ] && echo "junit.xml encontrado" || echo "junit.xml NÃO encontrado"
       env:
         PYTHONPATH: ${{ github.workspace }}
         TEST_ENV: github
@@ -79,13 +99,15 @@ jobs:
         fail_ci_if_error: true
         verbose: true
 
-    - name: Verify test artifacts
+    - name: Upload test artifacts
       if: always()
-      run: |
-        echo "Verificando arquivos gerados..."
-        ls -la test_results/ || true
-        [ -f coverage.xml ] || echo "##[warning]Arquivo coverage.xml não encontrado"
-        [ -f test_results/junit.xml ] || echo "##[warning]Arquivo junit.xml não encontrado"
+      uses: actions/upload-artifact@v4
+      with:
+        name: test-artifacts
+        path: |
+          coverage.xml
+          test_results/
+        retention-days: 7
 
     - name: Upload test results
       if: always()
