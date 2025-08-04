@@ -12,8 +12,8 @@ import sys
 sys.path.insert(0, str(Path(__file__).parent.parent.parent))
 
 # Import application components
-from src.config_manager import ConfigManager
-from src.logger import Logger
+from src.motorsport_calendar.config_manager import ConfigManager
+from src.motorsport_calendar.logger import Logger
 
 @pytest.fixture(scope="session")
 def test_data_dir():

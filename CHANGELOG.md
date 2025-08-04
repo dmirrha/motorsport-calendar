@@ -7,6 +7,12 @@ e este projeto adere ao [Versionamento Semântico](https://semver.org/spec/v2.0.
 
 ## [Não Lançado]
 ### Adicionado
+- **Refatoração da Estrutura do Projeto**
+  - Reorganização do código fonte para seguir a estrutura de pacotes Python
+  - Movidos módulos para o pacote `motorsport_calendar`
+  - Atualizada configuração do `setup.py` e `setup.cfg`
+  - Adicionado suporte a instalação em modo desenvolvimento
+
 - **Testes de Regressão**
   - Implementada suíte abrangente de testes de regressão
   - Adicionado `pytest.ini` com configurações de cobertura e relatórios

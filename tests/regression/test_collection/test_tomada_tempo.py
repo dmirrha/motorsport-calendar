@@ -7,7 +7,7 @@ from datetime import datetime, timedelta
 from pathlib import Path
 
 # Import the module to test
-from src.sources.tomada_tempo import TomadaTempoSource
+from sources.tomada_tempo import TomadaTempoSource
 
 class TestTomadaTempoSource:
     """Test cases for TomadaTempoSource."""
@@ -17,7 +17,7 @@ class TestTomadaTempoSource:
         """Create a TomadaTempoSource instance with test config."""
         return TomadaTempoSource(test_config)
     
-    @patch('src.sources.tomada_tempo.requests.get')
+    @patch('sources.tomada_tempo.requests.get')
     def test_fetch_events_success(self, mock_get, tomada_source, test_data_dir):
         """Test successful event fetching from Tomada de Tempo."""
         # Mock the response
@@ -35,7 +35,7 @@ class TestTomadaTempoSource:
         assert len(events) > 0
         assert all('title' in event and 'start_time' in event for event in events)
     
-    @patch('src.sources.tomada_tempo.requests.get')
+    @patch('sources.tomada_tempo.requests.get')
     def test_fetch_events_http_error(self, mock_get, tomada_source):
         """Test handling of HTTP errors during event fetching."""
         # Mock HTTP error
@@ -76,7 +76,7 @@ class TestTomadaTempoSource:
         assert "start_time" in event
         assert "end_time" in event
 
-    @patch('src.sources.tomada_tempo.requests.get')
+    @patch('sources.tomada_tempo.requests.get')
     def test_retry_mechanism(self, mock_get, tomada_source):
         """Test retry mechanism on temporary failures."""
         # Mock first request to fail, second to succeed

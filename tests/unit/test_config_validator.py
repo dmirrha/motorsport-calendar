@@ -11,13 +11,13 @@ from unittest.mock import patch, MagicMock
 # Adiciona o diretório raiz ao path para permitir imports absolutos
 sys.path.insert(0, str(Path(__file__).parent.parent.parent))
 
-from src.utils.config_validator import (
+from utils.config_validator import (
     validate_logging_config,
     validate_payload_settings,
     validate_silent_periods,
     ConfigValidationError
 )
-from src.utils.error_codes import ErrorCode
+from utils.error_codes import ErrorCode
 
 
 class TestConfigValidator(unittest.TestCase):

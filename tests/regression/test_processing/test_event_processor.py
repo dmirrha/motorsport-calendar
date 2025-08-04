@@ -6,7 +6,7 @@ from datetime import datetime, timedelta
 from freezegun import freeze_time
 
 # Import the module to test
-from src.event_processor import EventProcessor
+from src.motorsport_calendar.event_processor import EventProcessor
 
 class TestEventProcessor:
     """Test cases for EventProcessor."""

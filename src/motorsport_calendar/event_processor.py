@@ -12,7 +12,7 @@ from collections import defaultdict
 import hashlib
 from fuzzywuzzy import fuzz
 from unidecode import unidecode
-from src.silent_period import SilentPeriodManager
+from .silent_period import SilentPeriodManager
 
 
 class EventProcessor:

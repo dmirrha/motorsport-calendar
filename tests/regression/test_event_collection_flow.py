@@ -48,7 +48,7 @@ class TestEventCollectionFlow:
     
     def test_event_collection_process(self):
         """Testa o processo completo de coleta de eventos."""
-        from src.motorsport_calendar import MotorsportCalendar
+        from motorsport_calendar import MotorsportCalendar
         
         # Inicializa o coletor com a configuração de teste
         calendar = MotorsportCalendar(config_path=str(self.temp_config_path))
@@ -133,7 +133,7 @@ class TestEventCollectionFlow:
     @pytest.mark.parametrize("days_ahead", [1, 7, 30])
     def test_event_filtering_by_date_range(self, days_ahead):
         """Testa a filtragem de eventos por intervalo de datas."""
-        from src.motorsport_calendar import MotorsportCalendar
+        from motorsport_calendar import MotorsportCalendar
         
         # Configura datas para teste
         start_date = datetime.now()
