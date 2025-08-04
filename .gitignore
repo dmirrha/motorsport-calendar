@@ -18,6 +18,23 @@ parts/
 sdist/
 var/
 wheels/
+
+# Output directories
+output/history/
+test_results/
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+.DS_Store
+
+# Test artifacts
+.coverage
+htmlcov/
+.pytest_cache/
+.mypy_cache/
 pip-wheel-metadata/
 share/python-wheels/
 *.egg-info/
