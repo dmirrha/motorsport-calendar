@@ -51,13 +51,20 @@ jobs:
         mkdir -p logs
         mkdir -p output
 
+    - name: Install test dependencies
+      run: |
+        pip install -r requirements-dev.txt
+        pip install pytest-cov pytest-html
+
     - name: Run tests with coverage
       run: |
+        mkdir -p test_results
         python -m pytest tests/regression/ \
           --cov=src \
-          --cov-report=xml \
+          --cov-report=xml:coverage.xml \
           --cov-report=term \
           --junitxml=test_results/junit.xml \
+          --html=test_results/report.html \
           -v
       env:
         PYTHONPATH: ${{ github.workspace }}
@@ -72,6 +79,14 @@ jobs:
         fail_ci_if_error: true
         verbose: true
 
+    - name: Verify test artifacts
+      if: always()
+      run: |
+        echo "Verificando arquivos gerados..."
+        ls -la test_results/ || true
+        [ -f coverage.xml ] || echo "##[warning]Arquivo coverage.xml não encontrado"
+        [ -f test_results/junit.xml ] || echo "##[warning]Arquivo junit.xml não encontrado"
+
     - name: Upload test results
       if: always()
       uses: actions/upload-artifact@v4
@@ -80,7 +95,6 @@ jobs:
         path: |
           test_results/
           coverage.xml
-          .coverage*
         retention-days: 7
 
     - name: Check test results
