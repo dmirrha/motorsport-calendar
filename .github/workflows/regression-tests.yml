@@ -43,7 +43,12 @@ jobs:
     - name: Install dependencies
       run: |
         python -m pip install --upgrade pip
-        pip install -r requirements-dev.txt
+        # Instala as dependências principais
+        pip install -r requirements.txt
+        # Instala explicitamente as dependências de teste
+        pip install pytest pytest-cov pytest-html pytest-xdist
+        # Instala o pacote em modo desenvolvimento para garantir que todos os módulos estejam disponíveis
+        pip install -e .
 
     - name: Create test directories
       run: |
@@ -59,17 +64,46 @@ jobs:
         
         # Show current directory structure for debugging
         echo "Current directory structure:"
+        pwd
         ls -la
         
         # Install package in development mode to ensure imports work
         pip install -e .
         
         # Run pytest with full verbosity and show traceback for debugging
-        python -m pytest -v --tb=short
+        # Explicitly specify the output directory for test results
+        python -m pytest -v --tb=short \
+          --junitxml=test_results/junit.xml \
+          --cov=src \
+          --cov=sources \
+          --cov-report=xml:test_results/coverage.xml \
+          --cov-report=term-missing \
+          --html=test_results/report.html \
+          --self-contained-html
         
         # Verify test results were generated
         echo "Test results directory contents:"
         ls -la test_results/
+        
+        # Verify the contents of the test results directory
+        echo "Contents of test_results/:"
+        find test_results/ -type f -exec ls -la {} \;
+        
+        # Verify if coverage.xml exists and has content
+        if [ -f "test_results/coverage.xml" ]; then
+          echo "coverage.xml exists and has $(wc -l < test_results/coverage.xml) lines"
+        else
+          echo "ERROR: coverage.xml not found in test_results/"
+          exit 1
+        fi
+        
+        # Verify if junit.xml exists and has content
+        if [ -f "test_results/junit.xml" ]; then
+          echo "junit.xml exists and has $(wc -l < test_results/junit.xml) lines"
+        else
+          echo "ERROR: junit.xml not found in test_results/"
+          exit 1
+        fi
         
       env:
         PYTHONPATH: ${{ github.workspace }}
@@ -91,21 +125,58 @@ jobs:
       with:
         name: test-results
         path: |
-          test_results/
-          coverage.xml
-          .coverage*
+          test_results/**/*
+          !test_results/.gitkeep
         retention-days: 7
+        compression-level: 0  # Desativa a compressão para acelerar o upload
 
     - name: Check test results
       if: always()
       run: |
-        # Verifica se houve falhas nos testes
-        if [ -f test_results/junit.xml ]; then
-          if grep -q 'failures="[1-9]' test_results/junit.xml; then
-            echo "::error::Alguns testes falharam. Verifique os logs para mais detalhes."
-            exit 1
-          fi
-        else
-          echo "::error::Arquivo de resultados de teste não encontrado."
+        # Mostra o conteúdo do diretório de resultados para depuração
+        echo "Conteúdo do diretório de trabalho:"
+        pwd
+        ls -la
+        
+        # Verifica se o diretório de resultados existe
+        if [ ! -d "test_results" ]; then
+          echo "::error::Diretório test_results não encontrado."
           exit 1
+        fi
+        
+        # Verifica se o arquivo de resultados JUnit existe
+        if [ ! -f "test_results/junit.xml" ]; then
+          echo "::error::Arquivo de resultados JUnit (junit.xml) não encontrado em test_results/"
+          echo "Conteúdo de test_results/:"
+          ls -la test_results/
+          exit 1
+        fi
+        
+        # Verifica se houve falhas nos testes
+        echo "Verificando falhas em test_results/junit.xml..."
+        if grep -q 'failures="[1-9]' test_results/junit.xml; then
+          echo "::error::Alguns testes falharam. Verifique os logs para mais detalhes."
+          # Mostra um resumo das falhas, se disponível
+          if command -v xmllint &> /dev/null; then
+            echo "Resumo das falhas:"
+            xmllint --xpath '//testcase[failure]' test_results/junit.xml || true
+          fi
+          exit 1
+        elif grep -q 'errors="[1-9]' test_results/junit.xml; then
+          echo "::error::Erros encontrados durante a execução dos testes. Verifique os logs para mais detalhes."
+          # Mostra um resumo dos erros, se disponível
+          if command -v xmllint &> /dev/null; then
+            echo "Resumo dos erros:"
+            xmllint --xpath '//testcase[error]' test_results/junit.xml || true
+          fi
+          exit 1
+        else
+          echo "Todos os testes passaram com sucesso!"
+        fi
+        
+        # Verifica se o relatório de cobertura foi gerado
+        if [ ! -f "test_results/coverage.xml" ]; then
+          echo "::warning::Relatório de cobertura (coverage.xml) não encontrado em test_results/"
+        else
+          echo "Relatório de cobertura gerado com sucesso."
         fi
