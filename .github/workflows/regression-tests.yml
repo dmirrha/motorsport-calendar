@@ -51,17 +51,18 @@ jobs:
         mkdir -p logs
         mkdir -p output
 
-    - name: Run tests with coverage
+    - name: Run tests
       run: |
-        python -m pytest tests/regression/ \
-          --cov=src \
-          --cov-report=xml \
-          --cov-report=term \
-          --junitxml=test_results/junit.xml \
-          -v
+        # Ensure test results directory exists
+        mkdir -p test_results
+        
+        # Run pytest with configuration from pytest.ini
+        python -m pytest
+        
       env:
         PYTHONPATH: ${{ github.workspace }}
         TEST_ENV: github
+        PYTHONUNBUFFERED: 1
 
     - name: Upload coverage to Codecov
       if: always()
