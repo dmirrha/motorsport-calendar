@@ -6,6 +6,30 @@ O formato é baseado em [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)
 e este projeto adere ao [Versionamento Semântico](https://semver.org/spec/v2.0.0.html).
 
 ## [Não Lançado]
+### Adicionado
+- **Documentação de Configuração**
+  - Criado `CONFIGURATION_GUIDE.md` com documentação detalhada de todas as opções de configuração
+  - Adicionadas descrições detalhadas para cada parâmetro do arquivo de configuração
+  - Incluídos exemplos e valores padrão para todas as configurações
+  - Adicionada seção de solução de problemas para configurações comuns
+
+- **Reestruturação do Projeto**
+  - Movido arquivo `config.json` para a pasta `config/`
+  - Atualizadas referências ao arquivo de configuração no código-fonte
+  - Atualizada documentação para refletir a nova estrutura de diretórios
+  - Adicionado suporte a caminhos relativos para o arquivo de configuração
+- **Melhorias no Sistema de Logging e Configuração**
+  - Implementados códigos de erro estruturados para melhor rastreamento de problemas
+  - Adicionado sistema de rotação e limpeza automática de payloads
+  - Criado módulo `config_validator.py` para validação centralizada de configurações
+  - Adicionada função `validate_silent_periods` para validação de períodos de silêncio
+  - Implementados testes unitários abrangentes para validação de configuração
+  - Atualizada documentação com exemplos detalhados de configuração
+  - Adicionado suporte a mensagens de erro estruturadas com sugestões de correção
+  - Melhorado o gerenciamento de arquivos de log e payloads com retenção configurável
+  - Adicionada validação de tipos e valores nas configurações
+  - Implementada documentação detalhada para todas as opções de configuração
+
 ### Corrigido
 - **Issue #23**: Corrigido bug na filtragem de períodos de silêncio
   - Corrigida lógica de filtragem que estava removendo todos os eventos

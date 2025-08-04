@@ -16,6 +16,16 @@ Desenvolver e manter um sistema automatizado para coleta, processamento e export
 - Detecção inteligente do fim de semana alvo
 - Remoção de duplicatas entre fontes
 - Suporte dinâmico a categorias de automobilismo
+- Sistema avançado de logging com:
+  - Códigos de erro estruturados
+  - Rastreamento detalhado de operações
+  - Rotação e limpeza automática
+  - Diferentes níveis de verbosidade
+- Gerenciamento de configuração robusto:
+  - Validação de esquema
+  - Valores padrão sensíveis
+  - Documentação embutida
+  - Tratamento de erros detalhado
 - Coleta de metadados ricos incluindo:
   - Nome e descrição do evento
   - Datas e horários com timezone
@@ -28,161 +38,101 @@ Desenvolver e manter um sistema automatizado para coleta, processamento e export
 - Expansão para mais fontes de dados
 - Suporte a notificações personalizadas
 
-### **RF02 - Geração de iCal**
+### **RF02 - Processamento de Dados**
 #### **Implementado** ✅
-- Geração de arquivos .ics compatíveis com RFC 5545
-- Suporte a múltiplos fusos horários
+- Normalização de dados de diferentes fontes
+- Validação de eventos coletados
+- Filtragem por período de silêncio configurável
+- Validação de configuração em tempo de execução
+- Processamento em lote com tratamento de erros
+- Suporte a operações assíncronas
+- Cache inteligente de dados processados semana alvo
+- Remoção de duplicatas entre fontes
+- Suporte dinâmico a categorias de automobilismo
+- Sistema avançado de logging com:
+  - Códigos de erro estruturados
+  - Rastreamento detalhado de operações
+
+#### **Em Desenvolvimento** 🚧
+- Aprimoramento da detecção de categorias
+- Expansão para mais fontes de dados
+- Suporte a notificações personalizadas
+
+### **RF03 - Gerenciamento de Logs e Dados**
+#### **Implementado** ✅
+- Sistema de logging unificado
+- Rastreamento de operações com IDs únicos
+- Armazenamento estruturado de logs
+- Rotação e limpeza automática
+- Níveis de log configuráveis
+- Formatação personalizável
+- Suporte a múltiplos destinos (arquivo, console, syslog)
+
+### **RF04 - Geração de Saída**
+#### **Implementado** ✅
+- Geração de arquivos iCal (.ics)
+- Formatação personalizável de eventos
+- Suporte a múltiplos formatos de saída
+- Validação de esquema de saída
+- Tratamento de erros robusto
+- Suporte a internacionalização
 - Metadados ricos nos eventos
 - Links de transmissão incorporados com suporte a múltiplos formatos
 - Validação e deduplicação de URLs de streaming
 - Configuração flexível via JSON
 - Sistema de arquivamento automático de arquivos antigos
-- **Períodos de silêncio configuráveis** para filtrar eventos por horário
-- Suporte a múltiplos períodos de silêncio simultâneos
-- Filtragem inteligente com períodos que cruzam a meia-noite
-- Logs detalhados de eventos filtrados para auditoria
-
-#### **Melhorias Planejadas** 📅
-- Suporte a lembretes personalizados
-- Opções avançadas de formatação
-- Suporte a anexos e documentos relacionados
-
-#### **RF03 - Integração com Google Calendar**
-- Arquivo .ics deve ser totalmente compatível com importação no Google Calendar
-- Eventos devem aparecer corretamente com todas as informações
-- Suporte a atualizações (evitar duplicatas)
 
 ## **Requisitos Não-Funcionais**
 
-### **RNF01 - Plataforma**
-#### **Suportado** ✅
-- **Sistemas Operacionais**: macOS, Linux, Windows
-- **Python**: 3.8+
-- **Dependências**: Gerenciadas via `requirements.txt`
-- **Arquitetura**: Modular e extensível
+### **RNF01 - Desempenho**
+- Tempo de resposta aceitável (< 2s para operações comuns)
+- Baixo consumo de recursos (CPU < 5%, Memória < 100MB)
+- Processamento eficiente em lote
+- Cache inteligente para operações repetitivas
+- Paralelização de tarefas independentes
+- Otimização de consultas a fontes remotas
+- Compressão de dados em trânsito
 
-### **RNF02 - Usabilidade**
-#### **Implementado** ✅
-- Interface de linha de comando intuitiva
-- Saída colorida e formatada
-- Barras de progresso em tempo real
-- Mensagens de status claras
-- Documentação abrangente
-- Gerenciamento automático de arquivos antigos (histórico)
+### **RNF02 - Segurança**
+- Tratamento seguro de credenciais (armazenamento criptografado)
+- Validação rigorosa de entrada/saída
+- Proteção contra injeção e XSS
+- Auditoria de operações sensíveis
+- Controle de acesso baseado em funções
+- Criptografia de dados em repouso
+- Proteção contra vazamento de informações
 
-#### **Melhorias Planejadas** 📅
-- Interface web para configuração
-- Dashboard de status
-- Notificações por e-mail/telegram
+### **RNF03 - Manutenibilidade**
+- Cobertura de testes > 80%
+- Documentação técnica abrangente
+- Código auto-documentado e padronizado
+- Estrutura modular e desacoplada
+- Logs detalhados para diagnóstico
+- Métricas de qualidade de código
+- Integração contínua e entrega contínua
 
-### **RNF03 - Confiabilidade**
-#### **Implementado** ✅
-- Validação rigorosa de dados
-- Mecanismo de fallback para fontes alternativas
-- Sistema de logging abrangente:
-  - Múltiplos níveis de log (DEBUG, INFO, WARNING, ERROR)
-  - Armazenamento de payloads brutos
-  - Rotação e retenção configurável
-  - Timestamps precisos
-- Processamento robusto de links de transmissão
-- Validação de URLs de streaming
+## **Manutenção**
 
-#### **Melhorias Planejadas** 📅
-- Monitoramento em tempo real
-- Alertas automáticos para falhas
-- Métricas de desempenho
+### **Dependências**
+- `requests` - Requisições HTTP
+- `beautifulsoup4` - Parsing HTML
+- `icalendar` - Geração de arquivos .ics
+- `python-dateutil` - Manipulação de datas
+- `colorama` - Cores no terminal
+- `tqdm` - Barras de progresso
+- `pydantic` - Validação de dados
+- `loguru` - Logging avançado
+- `pyyaml` - Suporte a YAML
+- `jsonschema` - Validação de JSON Schema
+- `pytest` - Framework de testes
+- `coverage` - Cobertura de testes
+- `mypy` - Checagem estática de tipos
+- `black` - Formatação de código
 
-#### **RNF04 - Manutenibilidade**
-- Código bem estruturado e documentado
-- **Todas as configurações externalizadas em arquivo de configuração**
-- Fácil adição de novas fontes de dados
-- Sistema de priorização e exclusão de fontes configurável
-- Parâmetros iCal configuráveis sem alteração de código
-
-### **Requerimentos de Dados**
-
-#### **RD01 - Fontes de Dados**
-- APIs públicas quando disponíveis
-- Web scraping responsável como alternativa
-- Múltiplas fontes para redundância
-- **Sistema de priorização de fontes configurável**
-- **Lista de exclusão de fontes e categorias**
-- **Coleta de links de transmissão quando disponíveis**
-
-## **Qualidade dos Dados**
-
-### **Validação**
-- **Datas e Horários**:
-  - Verificação de fusos horários
-  - Detecção de conflitos
-  - Validação de formato ISO 8601
-
-- **Consistência**:
-  - Verificação de campos obrigatórios
-  - Valores padrão para dados opcionais
-  - Normalização de textos
-
-### **Processamento**
-- **Deduplicação**:
-  - Comparação por múltiplos atributos
-  - Pontuação de similaridade
-  - Manutenção da fonte com maior prioridade
-
-- **Enriquecimento**:
-  - Adição de metadados
-  - Links para mais informações
-  - Dados contextuais
-
-### **Monitoramento**
-- Métricas de qualidade
-- Alertas para anomalias
-- Histórico de mudanças
-- Logs de processamento
-
-## **Arquitetura e Configuração**
-
-### **Estrutura do Projeto**
-```
-motorsport-calendar/
-├── config.json               # Configuração principal
-├── src/                      # Código fonte
-├── sources/                  # Módulos de fontes
-├── output/                   # Arquivos gerados
-└── logs/                     # Logs e dados brutos
-```
-
-### **Arquivo de Configuração (config.json)**
-```json
-{
-  "general": {
-    "timezone": "America/Sao_Paulo",
-    "log_level": "INFO",
-    "output_dir": "./output",
-    "ui": {
-      "colors_enabled": true,
-      "show_progress": true
-    }
-  },
-  "sources": {
-    "enabled": ["tomada_tempo", "ergast"],
-    "tomada_tempo": {
-      "enabled": true,
-      "priority": 1,
-      "timeout": 30
-    },
-    "ergast": {
-      "enabled": true,
-      "priority": 2,
-      "timeout": 15
-    }
-  },
-  "ical": {
-    "filename": "motorsport_events",
-    "timezone": "UTC",
-    "reminder_minutes": 15
-  }
-}
-```
+### **Atualizações**
+- Verificar regularmente por atualizações de segurança
+- Manter documentação atualizada
+- Monitorar mudanças nas APIs e sites de origem
 
 ## **Roadmap**
 
@@ -203,21 +153,7 @@ motorsport-calendar/
 - Integração com Telegram
 - Lembretes personalizados
 
-## **Manutenção**
-
-### **Dependências**
-Lista de dependências principais:
-- `requests`: Requisições HTTP
-- `beautifulsoup4`: Web scraping
-- `icalendar`: Geração de arquivos iCal
-- `python-dateutil`: Manipulação de datas
-- `colorama`: Formatação colorida no terminal
-
-### **Atualizações**
-- Verificar regularmente por atualizações de segurança
-- Manter documentação atualizada
-- Monitorar mudanças nas APIs e sites de origem
-
+## **Entregáveis**
 #### **Filtros de Eventos**
 - **Detecção dinâmica de categorias**: Sistema que identifica automaticamente todas as categorias disponíveis nas fontes
 - **Lista de inclusão configurável**: Permite especificar categorias específicas ou usar "*" para todas
