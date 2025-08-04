@@ -2,6 +2,22 @@
 
 Este arquivo contém um registro acumulativo de todas as versões lançadas do projeto, com notas detalhadas sobre as mudanças em cada versão.
 
+## Versão 0.4.1 (2025-08-04)
+**Correções de Bugs**
+
+### 🐛 Correções de Bugs
+
+- **Correção na Filtragem de Períodos de Silêncio**
+  - Corrigido problema que causava a remoção de todos os eventos durante a filtragem
+  - Melhorada a lógica de verificação de períodos ativos
+  - Adicionada validação para eventos sem data
+  - Melhorada a documentação dos métodos de filtragem
+
+- **Correção no UIManager**
+  - Atualizada chamada incorreta de `show_warning` para `show_warning_message`
+  - Adicionada verificação de existência do método
+  - Melhorada a mensagem de aviso exibida ao usuário
+
 ## Versão 0.4.0 (2025-08-03)
 **Períodos de Silêncio**
 

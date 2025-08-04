@@ -162,7 +162,7 @@ class MotorsportCalendarGenerator:
             
             if not processed_events:
                 self.logger.log_warning("⚠️ No events remaining after processing")
-                self.ui.show_warning("No valid events found after processing")
+                self.ui.show_warning_message("No valid events found after processing")
                 return False
             
             self.logger.log_success(f"🔄 Processed {len(processed_events)} valid events")

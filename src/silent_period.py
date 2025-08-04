@@ -245,16 +245,25 @@ class SilentPeriodManager:
                 continue
             
             # Check if event is in any silent period
-            is_filtered = False
+            is_allowed = True
             matching_period = None
             
-            for period in self.silent_periods:
-                if period.is_event_in_silent_period(event_datetime):
-                    is_filtered = True
-                    matching_period = period
-                    break
+            # Only filter if there are active silent periods
+            if any(p.enabled for p in self.silent_periods):
+                # Default to allowing the event
+                is_allowed = True
+                
+                # Check against all active silent periods
+                for period in self.silent_periods:
+                    if not period.enabled:
+                        continue
+                        
+                    if period.is_event_in_silent_period(event_datetime):
+                        is_allowed = False
+                        matching_period = period
+                        break
             
-            if is_filtered:
+            if not is_allowed and matching_period:
                 # Add metadata about why it was filtered
                 filtered_event = event.copy()
                 filtered_event['silent_period'] = matching_period.name
