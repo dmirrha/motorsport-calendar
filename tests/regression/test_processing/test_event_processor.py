@@ -84,8 +84,13 @@ class TestEventProcessor:
         # Convert to UTC
         converted = processor.apply_timezone(sample_events, "UTC")
         
-        # Check that times were converted correctly (-3h from São Paulo to UTC)
-        assert converted[0]["start_time"].endswith("13:30:00+00:00")  # 10:30-03:00 -> 13:30Z
+        # Convert the expected time to a timezone-aware datetime for comparison
+        from datetime import datetime, timezone
+        import pytz
+        
+        # Expected time in UTC: 10:30-03:00 -> 13:30Z
+        expected_utc = datetime(2025, 11, 15, 13, 30, 0, tzinfo=timezone.utc)
+        assert converted[0]["start_time"] == expected_utc
         
         # Check that original timezone is preserved in metadata
         assert converted[0]["metadata"]["original_timezone"] == "America/Sao_Paulo"
