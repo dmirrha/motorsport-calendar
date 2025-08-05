@@ -50,11 +50,28 @@ jobs:
         # Instala o pacote em modo desenvolvimento para garantir que todos os módulos estejam disponíveis
         pip install -e .
 
-    - name: Create test directories
+    - name: Create required directories
       run: |
+        # Create required directories
         mkdir -p test_results
         mkdir -p logs
         mkdir -p output
+        mkdir -p config
+        
+        # Copy test config file if it doesn't exist
+        if [ ! -f "config/config.json" ]; then
+          echo "Creating config/config.json from test config..."
+          cp tests/config/test_config.json config/config.json
+          # Verify the file was created
+          if [ -f "config/config.json" ]; then
+            echo "Successfully created config/config.json"
+          else
+            echo "Failed to create config/config.json"
+            exit 1
+          fi
+        else
+          echo "config/config.json already exists, skipping creation"
+        fi
 
     - name: Run tests
       run: |
