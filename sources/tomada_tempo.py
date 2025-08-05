@@ -6,9 +6,12 @@ Brazilian motorsport calendar website with complete schedules and streaming info
 """
 
 import re
+import time
+import random
+import requests
 from datetime import datetime, timedelta
-from typing import List, Dict, Any, Optional
-from bs4 import BeautifulSoup
+from typing import List, Dict, Any, Optional, Tuple, Union
+from bs4 import BeautifulSoup, Tag
 from urllib.parse import urljoin, urlparse
 from .base_source import BaseSource
 
@@ -23,6 +26,105 @@ class TomadaTempoSource(BaseSource):
     def get_base_url(self) -> str:
         """Get base URL for Tomada de Tempo."""
         return "https://www.tomadadetempo.com.br"
+        
+    def _make_request_with_retry(self, url: str, method: str = 'GET', **kwargs) -> Optional[requests.Response]:
+        """
+        Make an HTTP request with retry logic.
+        
+        Args:
+            url: URL to request
+            method: HTTP method (GET, POST, etc.)
+            **kwargs: Additional arguments for requests.request()
+            
+        Returns:
+            Response object or None if all retries fail
+        """
+        max_retries = self.retry_attempts or 3
+        retry_delays = [1, 3, 5]  # seconds
+        
+        for attempt in range(max_retries):
+            try:
+                # Add random user agent
+                headers = kwargs.get('headers', {})
+                if 'User-Agent' not in headers:
+                    headers['User-Agent'] = random.choice(self.user_agents)
+                kwargs['headers'] = headers
+                
+                # Make the request
+                response = requests.request(method, url, timeout=self.timeout, **kwargs)
+                response.raise_for_status()
+                return response
+                
+            except (requests.RequestException, ConnectionError) as e:
+                if attempt == max_retries - 1:  # Last attempt
+                    if self.logger:
+                        self.logger.error(f"Request failed after {max_retries} attempts: {str(e)}")
+                    return None
+                
+                # Calculate delay with exponential backoff
+                delay = retry_delays[attempt] if attempt < len(retry_delays) else retry_delays[-1]
+                if self.logger:
+                    self.logger.warning(
+                        f"Request failed (attempt {attempt + 1}/{max_retries}). "
+                        f"Retrying in {delay}s... Error: {str(e)}"
+                    )
+                
+                time.sleep(delay + random.uniform(0, 1))  # Add jitter
+        
+        return None
+        
+    def _parse_event_date(self, date_str: str, reference_date: Optional[datetime] = None) -> Optional[datetime]:
+        """
+        Parse date string from Tomada de Tempo format to datetime.
+        
+        Args:
+            date_str: Date string in formats like "Sáb, 15/11 - 14:00" or "14:30"
+            reference_date: Reference date to use when only time is provided
+            
+        Returns:
+            datetime object or None if parsing fails
+        """
+        if not date_str or not date_str.strip():
+            return None
+            
+        date_str = date_str.strip()
+        
+        # Try to parse full format: "Sáb, 15/11 - 14:00"
+        try:
+            # Remove day of week if present
+            if ',' in date_str:
+                date_str = date_str.split(',', 1)[1].strip()
+            
+            # Split date and time
+            if '-' in date_str:
+                date_part, time_part = date_str.split('-', 1)
+                date_part = date_part.strip()
+                time_part = time_part.strip()
+                
+                # Parse date (assuming current year if not specified)
+                day, month = map(int, date_part.split('/'))
+                hour, minute = map(int, time_part.split(':'))
+                
+                # Use reference date or current date
+                ref_date = reference_date or datetime.now()
+                year = ref_date.year
+                
+                # Handle year transition (e.g., if it's December and we're parsing January)
+                if month == 1 and ref_date.month == 12:
+                    year += 1
+                
+                return datetime(year, month, day, hour, minute)
+                
+            # Try to parse time only format: "14:30"
+            elif ':' in date_str and reference_date is not None:
+                hour, minute = map(int, date_str.split(':'))
+                return reference_date.replace(hour=hour, minute=minute, second=0, microsecond=0)
+                
+        except (ValueError, IndexError) as e:
+            if self.logger:
+                self.logger.warning(f"Failed to parse date string '{date_str}': {str(e)}")
+            
+        return None
     
     def collect_events(self, target_date: Optional[datetime] = None) -> List[Dict[str, Any]]:
         """
