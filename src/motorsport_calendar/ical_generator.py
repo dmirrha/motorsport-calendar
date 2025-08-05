@@ -120,8 +120,7 @@ class ICalGenerator:
             
         return output_path
         
-    def generate_calendar(self, events: List[Dict[str, Any]], 
-                         output_filename: Optional[str] = None) -> str:
+    def generate_ical(self, events: List[Dict[str, Any]], output_filename: Optional[str] = None) -> str:
         """
         Generate iCal file from events.
         
@@ -130,7 +129,7 @@ class ICalGenerator:
             output_filename: Optional custom output filename
             
         Returns:
-            Path to generated iCal file
+            Path to generated iCal file or empty string if no events
         """
         if self.logger:
             self.logger.log_info(f"Generating calendar with {len(events)} events")
@@ -746,19 +745,22 @@ class ICalGenerator:
         
         return priority_map.get(category_lower, 5)  # Default priority
     
-    def _add_reminders(self, ical_event: Event) -> None:
-        """Add reminder alarms to event."""
+    def _add_reminders(self, ical_event: Event, event_data: Dict[str, Any]) -> None:
+        """
+        Add reminders to an iCal event.
+        
+        Args:
+            ical_event: iCal event to add reminders to
+            event_data: Event data containing reminder information
+        """
         if not self.reminder_minutes:
             return
-        
-        from icalendar import Alarm
-        
+            
         for minutes in self.reminder_minutes:
             alarm = Alarm()
             alarm.add('action', 'DISPLAY')
-            alarm.add('description', 'Motorsport Event Reminder')
             alarm.add('trigger', timedelta(minutes=-minutes))
-            
+            alarm.add('description', f"Reminder: {event_data.get('title', 'Event')}")
             ical_event.add_component(alarm)
     
     def _archive_old_ical_files(self) -> None:

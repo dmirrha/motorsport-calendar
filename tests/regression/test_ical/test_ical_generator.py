@@ -175,8 +175,8 @@ class TestICalGenerator:
         # Check that timezone information is preserved
         event = [comp for comp in cal.walk() if comp.name == 'VEVENT'][0]
         dt_start = event.get('dtstart')
-        assert dtstart.dt.hour == 10  # Should be 10:30 AM in São Paulo time
-        assert "America/Sao_Paulo" in str(dtstart.params.get('TZID'))
+        assert dt_start.dt.hour == 10  # Should be 10:30 AM in São Paulo time
+        assert "America/Sao_Paulo" in str(dt_start.params.get('TZID'))
     
     def test_reminders(self, ical_generator, sample_events, temp_output_dir):
         """Test that reminders are correctly added to events."""

@@ -26,10 +26,37 @@
   
   "logging": {
     "level": "INFO",
-    "file": "test_logs/test.log",
-    "max_size_mb": 10,
-    "backup_count": 5,
-    "format": "%(asctime)s - %(name)s - %(levelname)s - %(message)s"
+    "file_structure": {
+      "main_log": "test_logs/test.log",
+      "debug_directory": "test_logs/debug",
+      "payload_directory": "test_logs/payloads"
+    },
+    "retention": {
+      "enabled": true,
+      "max_logs_to_keep": 3,
+      "max_payloads_to_keep": 5,
+      "delete_older_than_days": 1
+    },
+    "levels": {
+      "console": "INFO",
+      "file": "DEBUG",
+      "debug_file": "DEBUG"
+    },
+    "format": {
+      "console": "%(asctime)s - %(name)s - %(levelname)s - %(message)s",
+      "file": "%(asctime)s - %(name)s - %(levelname)s - %(funcName)s:%(lineno)d - %(message)s"
+    },
+    "rotation": {
+      "enabled": true,
+      "max_size_mb": 1,
+      "backup_count": 2
+    },
+    "payload_settings": {
+      "save_raw": true,
+      "pretty_print": false,
+      "include_headers": false,
+      "separate_by_source": true
+    }
   },
   
   "retry": {
@@ -71,12 +98,26 @@
     "timezone_handling": "convert_to_utc",
     "duplicate_detection": {
       "enabled": true,
-      "similarity_threshold": 0.8,
-      "time_window_minutes": 30
+      "window_minutes": 30,
+      "check_title_similarity": true,
+      "check_datetime_proximity": true,
+      "similarity_threshold": 0.8
     },
     "date_parsing": {
-      "prefer_locale_dates": true,
+      "formats": [
+        "%Y-%m-%dT%H:%M:%S%z",
+        "%Y-%m-%d %H:%M:%S",
+        "%d/%m/%Y %H:%M",
+        "%d/%m/%Y %Hh%M"
+      ],
+      "default_timezone": "UTC",
+      "prefer_locale": true,
       "fallback_timezone": "America/Sao_Paulo"
+    },
+    "category_detection": {
+      "enabled": true,
+      "confidence_threshold": 0.7,
+      "fallback_category": "other"
     }
   },
   
@@ -135,65 +176,7 @@
     "include_streaming_links": true
   },
   
-  "logging": {
-    "level": "INFO",
-    "file_structure": {
-      "main_log": "test_logs/test.log",
-      "debug_directory": "test_logs/debug",
-      "payload_directory": "test_logs/payloads"
-    },
-    "retention": {
-      "enabled": true,
-      "max_logs_to_keep": 3,
-      "max_payloads_to_keep": 5,
-      "delete_older_than_days": 1
-    },
-    "levels": {
-      "console": "INFO",
-      "file": "DEBUG",
-      "debug_file": "DEBUG"
-    },
-    "format": {
-      "console": "%(asctime)s - %(name)s - %(levelname)s - %(message)s",
-      "file": "%(asctime)s - %(name)s - %(levelname)s - %(funcName)s:%(lineno)d - %(message)s"
-    },
-    "rotation": {
-      "enabled": true,
-      "max_size_mb": 1,
-      "backup_count": 2
-    },
-    "payload_settings": {
-      "save_raw": true,
-      "pretty_print": false,
-      "include_headers": false,
-      "separate_by_source": true
-    }
-  },
-  
-  "event_processing": {
-    "timezone_handling": "convert_to_utc",
-    "duplicate_detection": {
-      "enabled": true,
-      "window_minutes": 30,
-      "check_title_similarity": true,
-      "check_datetime_proximity": true
-    },
-    "date_parsing": {
-      "formats": [
-        "%Y-%m-%dT%H:%M:%S%z",
-        "%Y-%m-%d %H:%M:%S",
-        "%d/%m/%Y %H:%M",
-        "%d/%m/%Y %Hh%M"
-      ],
-      "default_timezone": "UTC",
-      "prefer_locale": false
-    },
-    "category_detection": {
-      "enabled": true,
-      "confidence_threshold": 0.7,
-      "fallback_category": "other"
-    }
-  },
+
   
   "advanced": {
     "enable_debug_endpoints": false,

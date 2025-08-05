@@ -1,8 +1,10 @@
 """
 Regression tests for Tomada de Tempo event collection.
 """
+import logging
 import pytest
-from unittest.mock import patch, MagicMock
+import requests
+from unittest.mock import patch, MagicMock, call
 from datetime import datetime, timedelta
 from pathlib import Path
 
@@ -92,19 +94,64 @@ class TestTomadaTempoSource:
         # end_time should be set either explicitly or calculated from start_time
         assert "end_time" in event
 
-    def test_retry_mechanism(self, tomada_source):
+    @patch('sources.base_source.requests.Session')
+    def test_retry_mechanism(self, mock_session_class, test_config, caplog):
         """Test retry mechanism on temporary failures."""
-        # Mock the session's request method
-        with patch.object(tomada_source, '_make_request_with_retry') as mock_request:
-            # Mock first request to fail, second to succeed
-            mock_request.side_effect = [
-                Exception("Temporary failure"),
-                MagicMock(status_code=200, text="<html></html>")
-            ]
-            
-            # The method should raise an exception after all retries
-            with pytest.raises(Exception):
-                tomada_source.collect_events()
-            
-            # Verify retry was attempted
-            assert mock_request.call_count > 1
+        # Create a mock session instance
+        mock_session = MagicMock()
+        mock_session_class.return_value = mock_session
+        
+        # Create a mock response that will raise an exception
+        mock_response = MagicMock()
+        mock_response.raise_for_status.side_effect = requests.RequestException("Test connection error")
+        mock_session.request.return_value = mock_response
+        
+        # Create a new instance of TomadaTempoSource with the mocked session
+        from sources.tomada_tempo import TomadaTempoSource
+        source = TomadaTempoSource(test_config)
+        
+        # Clear any existing log handlers
+        if source.logger and hasattr(source.logger, 'handlers'):
+            source.logger.handlers.clear()
+        
+        # Add a test handler to capture logs
+        test_handler = logging.StreamHandler()
+        test_handler.setLevel(logging.DEBUG)
+        formatter = logging.Formatter('%(levelname)s - %(message)s')
+        test_handler.setFormatter(formatter)
+        
+        if source.logger:
+            source.logger.addHandler(test_handler)
+        
+        # Run the method that should trigger the retry logic
+        with caplog.at_level(logging.DEBUG):
+            result = source.collect_events()
+        
+        # Verify the result is an empty list (since all requests failed)
+        assert result == []
+        
+        # Verify the request was made multiple times (retry attempts)
+        # We expect 4 calls (2 for weekend programming + 2 for general calendar)
+        # Each with 1 initial attempt + 1 retry (2 retry_attempts - 1)
+        assert mock_session.request.call_count == 4, \
+            f"Expected exactly 4 requests (2 attempts for each of 2 URLs), got {mock_session.request.call_count}"
+        
+        # Get all log messages for debugging
+        all_logs = [f"{record.levelname}: {record.message}" for record in caplog.records]
+        
+        # Check for error messages in debug logs (since that's where they're being logged)
+        debug_logs = [record.message for record in caplog.records if record.levelno == logging.DEBUG]
+        
+        # Verify we have the expected error messages in debug logs
+        assert any("Error collecting from weekend programming" in msg for msg in debug_logs), \
+            "Missing error log for weekend programming"
+        assert any("Error collecting from calendar" in msg for msg in debug_logs), \
+            "Missing error log for calendar"
+        
+        # Check for retry-related log messages
+        assert any("attempt 1/2" in msg for msg in debug_logs), "Missing attempt 1 log"
+        assert any("attempt 2/2" in msg for msg in debug_logs), "Missing attempt 2 log"
+        
+        # Verify the number of retry attempts was logged
+        assert any("Request failed (attempt 2/2)" in msg for msg in debug_logs), \
+            "Missing final retry attempt log"
