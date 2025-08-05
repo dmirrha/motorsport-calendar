@@ -36,11 +36,11 @@ class EventProcessor:
         # Initialize silent period manager
         self.silent_period_manager = SilentPeriodManager(config_manager, logger)
         
-        # Deduplication settings
-        self.similarity_threshold = 85
-        self.time_tolerance_minutes = 30
-        self.location_similarity_threshold = 80
-        self.category_similarity_threshold = 90
+        # Deduplication settings - using stricter thresholds to prevent over-deduplication
+        self.similarity_threshold = 90  # Increased from 85 - requires higher name similarity
+        self.time_tolerance_minutes = 15  # Reduced from 30 - tighter time window for duplicates
+        self.location_similarity_threshold = 90  # Increased from 80 - requires more similar locations
+        self.category_similarity_threshold = 95  # Increased from 90 - requires nearly identical categories
         
         # Weekend detection settings
         self.weekend_start_day = 4  # Friday = 4
@@ -214,12 +214,20 @@ class EventProcessor:
             # Split the event around silent periods
             current_start = event_start
             
-            for period_start, period_end, reason in overlapping_periods:
+            for i, (period_start, period_end, reason) in enumerate(overlapping_periods):
                 # Add event part before silent period
                 if current_start < period_start:
                     new_event = event.copy()
                     new_event['start_time'] = current_start.isoformat()
                     new_event['end_time'] = period_start.isoformat()
+                    # Add silent period metadata to the split event
+                    if 'metadata' not in new_event:
+                        new_event['metadata'] = {}
+                    new_event['metadata']['silent_period'] = {
+                        'adjacent_to': True,
+                        'reason': reason,
+                        'position': 'before' if i == 0 else 'between'
+                    }
                     processed_events.append(new_event)
                 
                 # Add silent period as a special event
@@ -243,22 +251,17 @@ class EventProcessor:
                 new_event = event.copy()
                 new_event['start_time'] = current_start.isoformat()
                 new_event['end_time'] = event_end.isoformat()
+                # Add silent period metadata to the split event
+                if 'metadata' not in new_event:
+                    new_event['metadata'] = {}
+                new_event['metadata']['silent_period'] = {
+                    'adjacent_to': True,
+                    'reason': overlapping_periods[-1][2] if overlapping_periods else 'Silent period',
+                    'position': 'after'
+                }
                 processed_events.append(new_event)
         
         return processed_events
-        
-    def _parse_datetime(self, dt_value: Any) -> Optional[datetime]:
-        """Parse a datetime value from string or return as is if already a datetime."""
-        if isinstance(dt_value, datetime):
-            return dt_value
-            
-        if isinstance(dt_value, str):
-            try:
-                return datetime.fromisoformat(dt_value)
-            except (ValueError, TypeError):
-                return None
-                
-        return None
     
     def _load_config(self) -> None:
         """Load event processing configuration."""
@@ -907,42 +910,81 @@ class EventProcessor:
         return groups
     
     def _are_events_similar(self, event1: Dict[str, Any], event2: Dict[str, Any]) -> bool:
-        """Check if two events are similar (duplicates)."""
-        # Check name similarity
-        name1 = unidecode(event1.get('name', '')).lower()
-        name2 = unidecode(event2.get('name', '')).lower()
-        name_similarity = fuzz.ratio(name1, name2)
+        """Check if two events are similar enough to be considered duplicates.
         
-        if name_similarity < self.similarity_threshold:
+        Args:
+            event1: First event dictionary
+            event2: Second event dictionary
+            
+        Returns:
+            bool: True if events are similar enough to be considered duplicates
+        """
+        # Check if either event is missing required fields
+        if not all(k in event1 and k in event2 for k in ['title', 'start_time']):
+            return False
+            
+        # Get titles and normalize them
+        title1 = unidecode(event1.get('title', '')).lower().strip()
+        title2 = unidecode(event2.get('title', '')).lower().strip()
+        
+        # Check if titles are exactly the same
+        if title1 == title2:
+            # If titles match exactly, check if start times are the same or very close
+            from dateutil.parser import parse as parse_date
+            
+            def get_datetime(time_str_or_dt):
+                if time_str_or_dt is None:
+                    return None
+                if isinstance(time_str_or_dt, str):
+                    try:
+                        return parse_date(time_str_or_dt)
+                    except (ValueError, TypeError):
+                        return None
+                return time_str_or_dt
+                
+            time1 = get_datetime(event1.get('start_time') or event1.get('datetime'))
+            time2 = get_datetime(event2.get('start_time') or event2.get('datetime'))
+            
+            if time1 and time2:
+                time_diff = abs((time1 - time2).total_seconds()) / 60  # minutes
+                if time_diff <= self.time_tolerance_minutes:
+                    return True
+            
+        # Otherwise, calculate similarity using token sort ratio for better matching of reordered words
+        title_similarity = fuzz.token_sort_ratio(title1, title2)
+        
+        # If titles aren't similar enough, they're not duplicates
+        if title_similarity < self.similarity_threshold:
             return False
         
-        # Check datetime similarity
-        dt1 = event1.get('datetime')
-        dt2 = event2.get('datetime')
+        # Check datetime similarity - events must be close in time to be duplicates
+        time1 = event1.get('start_time') or event1.get('datetime')
+        time2 = event2.get('start_time') or event2.get('datetime')
         
-        if dt1 and dt2:
-            time_diff = abs((dt1 - dt2).total_seconds()) / 60  # minutes
+        if time1 and time2:
+            time_diff = abs((time1 - time2).total_seconds()) / 60  # minutes
             if time_diff > self.time_tolerance_minutes:
                 return False
         
-        # Check category similarity
-        cat1 = event1.get('detected_category', '').lower()
-        cat2 = event2.get('detected_category', '').lower()
+        # Check category similarity - must be very similar
+        cat1 = (event1.get('category') or event1.get('detected_category', '')).lower().strip()
+        cat2 = (event2.get('category') or event2.get('detected_category', '')).lower().strip()
         
-        if cat1 and cat2:
+        if cat1 and cat2 and cat1 != 'other' and cat2 != 'other':
             cat_similarity = fuzz.ratio(cat1, cat2)
             if cat_similarity < self.category_similarity_threshold:
                 return False
         
-        # Check location similarity (if available)
-        loc1 = event1.get('location', '').lower()
-        loc2 = event2.get('location', '').lower()
+        # Check location similarity - must be very similar if both have locations
+        loc1 = (event1.get('location') or event1.get('circuit', '')).lower().strip()
+        loc2 = (event2.get('location') or event2.get('circuit', '')).lower().strip()
         
-        if loc1 and loc2:
-            loc_similarity = fuzz.ratio(loc1, loc2)
+        if loc1 and loc2 and loc1 != loc2:  # Only check if both have locations and they're not identical
+            loc_similarity = fuzz.token_sort_ratio(loc1, loc2)
             if loc_similarity < self.location_similarity_threshold:
                 return False
         
+        # If we've made it this far, the events are similar enough to be considered duplicates
         return True
     
     def _select_best_event(self, event_group: List[Dict[str, Any]]) -> Dict[str, Any]:
