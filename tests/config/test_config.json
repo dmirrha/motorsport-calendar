@@ -1,0 +1,145 @@
+{
+  "sources": [
+    {
+      "name": "tomada_tempo",
+      "enabled": true,
+      "base_url": "https://www.tomadatempo.com.br",
+      "endpoints": {
+        "programacao": "/programacao",
+        "evento": "/evento",
+        "categorias": "/categorias"
+      },
+      "timeout": 5,
+      "retry_attempts": 2,
+      "headers": {
+        "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36"
+      }
+    }
+  ],
+  
+  "general": {
+    "timezone": "UTC",
+    "language": "en-US",
+    "log_level": "INFO",
+    "output_directory": "./test_output",
+    "visual_interface": {
+      "enabled": true,
+      "colors": true,
+      "progress_bars": true,
+      "icons": true
+    },
+    "advanced_logging": {
+      "debug_logs": true,
+      "payload_storage": true,
+      "log_rotation": true,
+      "retention_days": 7
+    },
+    "silent_periods": []
+  },
+  
+  "event_filters": {
+    "included_categories": ["*"],
+    "excluded_categories": [],
+    "included_countries": [],
+    "excluded_countries": [],
+    "event_types": {
+      "race": true,
+      "qualifying": true,
+      "practice": true,
+      "sprint": true,
+      "other": false
+    },
+    "min_duration_minutes": 30,
+    "max_duration_days": 7
+  },
+  
+  "ical_parameters": {
+    "calendar_name": "Test Motorsport Calendar",
+    "calendar_description": "Test calendar for motorsport events",
+    "timezone": "UTC",
+    "default_duration_minutes": 120,
+    "reminders": [
+      {
+        "minutes": 60,
+        "method": "popup"
+      },
+      {
+        "minutes": 15,
+        "method": "popup"
+      }
+    ],
+    "description_template": "{title}\\n\\nLocal: {location}\\nCategoria: {category}\\n\\n{description}",
+    "include_streaming_links": true
+  },
+  
+  "logging": {
+    "level": "INFO",
+    "file_structure": {
+      "main_log": "test_logs/test.log",
+      "debug_directory": "test_logs/debug",
+      "payload_directory": "test_logs/payloads"
+    },
+    "retention": {
+      "enabled": true,
+      "max_logs_to_keep": 3,
+      "max_payloads_to_keep": 5,
+      "delete_older_than_days": 1
+    },
+    "levels": {
+      "console": "INFO",
+      "file": "DEBUG",
+      "debug_file": "DEBUG"
+    },
+    "format": {
+      "console": "%(asctime)s - %(name)s - %(levelname)s - %(message)s",
+      "file": "%(asctime)s - %(name)s - %(levelname)s - %(funcName)s:%(lineno)d - %(message)s"
+    },
+    "rotation": {
+      "enabled": true,
+      "max_size_mb": 1,
+      "backup_count": 2
+    },
+    "payload_settings": {
+      "save_raw": true,
+      "pretty_print": false,
+      "include_headers": false,
+      "separate_by_source": true
+    }
+  },
+  
+  "event_processing": {
+    "timezone_handling": "convert_to_utc",
+    "duplicate_detection": {
+      "enabled": true,
+      "window_minutes": 30,
+      "check_title_similarity": true,
+      "check_datetime_proximity": true
+    },
+    "date_parsing": {
+      "formats": [
+        "%Y-%m-%dT%H:%M:%S%z",
+        "%Y-%m-%d %H:%M:%S",
+        "%d/%m/%Y %H:%M",
+        "%d/%m/%Y %Hh%M"
+      ],
+      "default_timezone": "UTC",
+      "prefer_locale": false
+    },
+    "category_detection": {
+      "enabled": true,
+      "confidence_threshold": 0.7,
+      "fallback_category": "other"
+    }
+  },
+  
+  "advanced": {
+    "enable_debug_endpoints": false,
+    "log_payloads": false,
+    "cache_ttl_seconds": 3600,
+    "validate_responses": true,
+    "max_events_per_request": 1000
+  },
+  
+  "version": "1.0.0",
+  "environment": "test"
+}

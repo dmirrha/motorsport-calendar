@@ -63,6 +63,203 @@ class EventProcessor:
         # Load configuration
         self._load_config()
     
+    def filter_events_by_category(self, events: List[Dict[str, Any]], categories: List[str]) -> List[Dict[str, Any]]:
+        """
+        Filter events by category.
+        
+        Args:
+            events: List of events to filter
+            categories: List of category names to include
+            
+        Returns:
+            List of filtered events
+        """
+        if not categories or categories == ['*']:
+            return events
+            
+        filtered_events = []
+        for event in events:
+            event_category = event.get('category', '').lower()
+            if any(cat.lower() == event_category for cat in categories):
+                filtered_events.append(event)
+                
+        return filtered_events
+        
+    def filter_weekend_events(self, events: List[Dict[str, Any]], 
+                            target_weekend: Optional[Tuple[datetime, datetime]] = None) -> List[Dict[str, Any]]:
+        """
+        Filter events to only include those in the target weekend.
+        
+        Args:
+            events: List of events to filter
+            target_weekend: Optional target weekend tuple (start, end)
+            
+        Returns:
+            List of weekend events
+        """
+        if not target_weekend:
+            target_weekend = self._detect_target_weekend(events)
+            
+        return self._filter_weekend_events(events, target_weekend)
+        
+    def apply_timezone(self, events: List[Dict[str, Any]], timezone_str: str) -> List[Dict[str, Any]]:
+        """
+        Apply timezone conversion to events.
+        
+        Args:
+            events: List of events to convert
+            timezone_str: Target timezone string (e.g., 'UTC', 'America/Sao_Paulo')
+            
+        Returns:
+            List of events with converted timezones
+        """
+        import pytz
+        from dateutil import tz
+        
+        target_tz = pytz.timezone(timezone_str)
+        
+        for event in events:
+            if 'start_time' in event:
+                try:
+                    # Parse the datetime string if it's a string
+                    if isinstance(event['start_time'], str):
+                        dt = datetime.fromisoformat(event['start_time'])
+                    else:
+                        dt = event['start_time']
+                        
+                    # Convert timezone
+                    if dt.tzinfo is None:
+                        # If no timezone info, assume it's in the original timezone
+                        original_tz = pytz.timezone(event.get('timezone', 'UTC'))
+                        dt = original_tz.localize(dt)
+                        
+                    # Store original timezone in metadata if not present
+                    if 'original_timezone' not in event.get('metadata', {}):
+                        if 'metadata' not in event:
+                            event['metadata'] = {}
+                        event['metadata']['original_timezone'] = str(dt.tzinfo)
+                        
+                    # Convert to target timezone
+                    event['start_time'] = dt.astimezone(target_tz)
+                    
+                except Exception as e:
+                    if self.logger:
+                        self.logger.debug(f"⚠️ Failed to convert timezone for event {event.get('name')}: {e}")
+        
+        return events
+        
+    def deduplicate_events(self, events: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
+        """
+        Remove duplicate events (public wrapper for _deduplicate_events).
+        
+        Args:
+            events: List of events to deduplicate
+            
+        Returns:
+            List of deduplicated events
+        """
+        return self._deduplicate_events(events)
+        
+    def apply_silent_periods(self, events: List[Dict[str, Any]], 
+                           silent_periods: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
+        """
+        Apply silent periods to events, splitting events that overlap with silent periods.
+        
+        Args:
+            events: List of events to process
+            silent_periods: List of silent periods with 'start', 'end', and 'reason'
+            
+        Returns:
+            List of events with silent periods applied
+        """
+        if not silent_periods:
+            return events
+            
+        processed_events = []
+        
+        for event in events:
+            if 'start_time' not in event or 'end_time' not in event:
+                processed_events.append(event)
+                continue
+                
+            # Parse event times if they're strings
+            event_start = self._parse_datetime(event['start_time'])
+            event_end = self._parse_datetime(event['end_time'])
+            
+            if not event_start or not event_end:
+                processed_events.append(event)
+                continue
+                
+            # Find all silent periods that overlap with this event
+            overlapping_periods = []
+            
+            for period in silent_periods:
+                period_start = self._parse_datetime(period['start'])
+                period_end = self._parse_datetime(period['end'])
+                
+                if not period_start or not period_end:
+                    continue
+                    
+                # Check for overlap
+                if (event_start < period_end and event_end > period_start):
+                    overlapping_periods.append((period_start, period_end, period.get('reason', 'Silent period')))
+            
+            if not overlapping_periods:
+                processed_events.append(event)
+                continue
+                
+            # Sort periods by start time
+            overlapping_periods.sort()
+            
+            # Split the event around silent periods
+            current_start = event_start
+            
+            for period_start, period_end, reason in overlapping_periods:
+                # Add event part before silent period
+                if current_start < period_start:
+                    new_event = event.copy()
+                    new_event['start_time'] = current_start.isoformat()
+                    new_event['end_time'] = period_start.isoformat()
+                    processed_events.append(new_event)
+                
+                # Add silent period as a special event
+                silent_event = {
+                    'title': f"{event.get('title', 'Event')} - {reason}",
+                    'start_time': period_start.isoformat(),
+                    'end_time': period_end.isoformat(),
+                    'category': event.get('category', ''),
+                    'metadata': {
+                        'is_silent_period': True,
+                        'reason': reason,
+                        'original_event': event.get('title', '')
+                    }
+                }
+                processed_events.append(silent_event)
+                
+                current_start = period_end
+            
+            # Add remaining part of event after last silent period
+            if current_start < event_end:
+                new_event = event.copy()
+                new_event['start_time'] = current_start.isoformat()
+                new_event['end_time'] = event_end.isoformat()
+                processed_events.append(new_event)
+        
+        return processed_events
+        
+    def _parse_datetime(self, dt_value: Any) -> Optional[datetime]:
+        """Parse a datetime value from string or return as is if already a datetime."""
+        if isinstance(dt_value, datetime):
+            return dt_value
+            
+        if isinstance(dt_value, str):
+            try:
+                return datetime.fromisoformat(dt_value)
+            except (ValueError, TypeError):
+                return None
+                
+        return None
+    
     def _load_config(self) -> None:
         """Load event processing configuration."""
         if not self.config:
@@ -582,6 +779,43 @@ class EventProcessor:
         
         return weekend_start, weekend_end
     
+    def _is_likely_weekend_event(self, event: Dict[str, Any], weekend_start: datetime, 
+                               weekend_end: datetime) -> bool:
+        """
+        Determine if an event without explicit date is likely part of the weekend.
+        
+        Args:
+            event: Event dictionary
+            weekend_start: Start of target weekend
+            weekend_end: End of target weekend
+            
+        Returns:
+            True if event is likely part of the weekend, False otherwise
+        """
+        # If event has no datetime, check other indicators
+        if 'datetime' not in event:
+            # Check if event has a day of week that matches the weekend
+            day_names = ['segunda', 'terça', 'terca', 'quarta', 'quinta', 'sexta', 'sábado', 'sabado', 'domingo']
+            weekend_days = [day_names[weekend_start.weekday()], day_names[weekend_end.weekday()]]
+            
+            # Check event name and description for day indicators
+            event_text = f"{event.get('name', '').lower()} {event.get('description', '').lower()}"
+            
+            # Look for day names in the event text
+            for day in weekend_days:
+                if day in event_text:
+                    return True
+                    
+            # Check if event has a session type that typically happens on weekends
+            session_type = event.get('session_type', '').lower()
+            if any(st in session_type for st in ['race', 'qualifying', 'sprint', 'treino']):
+                return True
+                
+            # If we can't determine, include it to be safe
+            return True
+            
+        return False
+    
     def _filter_weekend_events(self, events: List[Dict[str, Any]], 
                               target_weekend: Tuple[datetime, datetime]) -> List[Dict[str, Any]]:
         """
@@ -602,7 +836,12 @@ class EventProcessor:
         
         for event in events:
             event_datetime = event.get('datetime')
+            
+            # If event has a datetime, check if it's within the weekend
             if event_datetime and weekend_start <= event_datetime <= weekend_end:
+                weekend_events.append(event)
+            # If no datetime, use heuristics to determine if it's a weekend event
+            elif self._is_likely_weekend_event(event, weekend_start, weekend_end):
                 weekend_events.append(event)
         
         if self.logger:
