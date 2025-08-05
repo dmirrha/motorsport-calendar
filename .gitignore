@@ -23,6 +23,11 @@ wheels/
 output/history/
 test_results/
 
+# GitHub Actions
+.github_actions_errors.txt
+.github_actions_log.txt
+.github/workflows/*.log
+
 # IDE
 .idea/
 .vscode/
