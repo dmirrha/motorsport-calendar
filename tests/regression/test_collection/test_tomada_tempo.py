@@ -76,15 +76,16 @@ class TestTomadaTempoSource:
         assert "start_time" in event
         assert "end_time" in event
 
-    @patch('sources.tomada_tempo.requests.get')
-    def test_retry_mechanism(self, mock_get, tomada_source):
+    def test_retry_mechanism(self, tomada_source):
         """Test retry mechanism on temporary failures."""
-        # Mock first request to fail, second to succeed
-        mock_get.side_effect = [
-            Exception("Temporary failure"),
-            MagicMock(status_code=200, text="<html></html>")
-        ]
-        
-        events = tomada_source.fetch_events()
-        assert mock_get.call_count == 2
-        assert events == []  # Empty because our mock returns no events
+        # Mock the session's request method
+        with patch.object(tomada_source.session, 'request') as mock_request:
+            # Mock first request to fail, second to succeed
+            mock_request.side_effect = [
+                Exception("Temporary failure"),
+                MagicMock(status_code=200, text="<html></html>")
+            ]
+            
+            events = tomada_source.fetch_events()
+            assert mock_request.call_count == 2
+            assert events == []  # Empty because our mock returns no events
