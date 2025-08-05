@@ -17,6 +17,69 @@
     }
   ],
   
+  "output": {
+    "directory": "./test_output",
+    "filename_format": "events_{date}.ics",
+    "date_format": "%Y%m%d",
+    "overwrite_existing": true
+  },
+  
+  "logging": {
+    "level": "INFO",
+    "file": "test_logs/test.log",
+    "max_size_mb": 10,
+    "backup_count": 5,
+    "format": "%(asctime)s - %(name)s - %(levelname)s - %(message)s"
+  },
+  
+  "retry": {
+    "max_attempts": 3,
+    "backoff_factor": 1,
+    "status_forcelist": [500, 502, 503, 504]
+  },
+  
+  "ui": {
+    "enabled": true,
+    "theme": "dark",
+    "refresh_interval_seconds": 300,
+    "show_progress_bars": true
+  },
+  
+  "calendar": {
+    "timezone": "UTC",
+    "default_duration_minutes": 120,
+    "reminders": [
+      {
+        "minutes": 60,
+        "method": "popup"
+      },
+      {
+        "minutes": 15,
+        "method": "popup"
+      }
+    ]
+  },
+  
+  "filters": {
+    "include_categories": ["formula1", "formula2", "formula3", "nascar", "wec", "indycar", "motogp"],
+    "exclude_categories": [],
+    "min_duration_minutes": 30,
+    "max_duration_hours": 6
+  },
+  
+  "event_processing": {
+    "timezone_handling": "convert_to_utc",
+    "duplicate_detection": {
+      "enabled": true,
+      "similarity_threshold": 0.8,
+      "time_window_minutes": 30
+    },
+    "date_parsing": {
+      "prefer_locale_dates": true,
+      "fallback_timezone": "America/Sao_Paulo"
+    }
+  },
+  
   "general": {
     "timezone": "UTC",
     "language": "en-US",
