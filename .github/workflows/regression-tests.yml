@@ -71,29 +71,30 @@ jobs:
         pip install -e .
         
         # Run pytest with full verbosity and show traceback for debugging
-        # Explicitly specify the output directory for test results
+        # Generate coverage.xml in the root directory for Codecov
         python -m pytest -v --tb=short \
           --junitxml=test_results/junit.xml \
           --cov=src \
           --cov=sources \
-          --cov-report=xml:test_results/coverage.xml \
+          --cov-report=xml:coverage.xml \
           --cov-report=term-missing \
           --html=test_results/report.html \
           --self-contained-html
         
         # Verify test results were generated
+        echo "Root directory contents:"
+        ls -la
+        
         echo "Test results directory contents:"
         ls -la test_results/
         
-        # Verify the contents of the test results directory
-        echo "Contents of test_results/:"
-        find test_results/ -type f -exec ls -la {} \;
-        
         # Verify if coverage.xml exists and has content
-        if [ -f "test_results/coverage.xml" ]; then
-          echo "coverage.xml exists and has $(wc -l < test_results/coverage.xml) lines"
+        if [ -f "coverage.xml" ]; then
+          echo "coverage.xml exists and has $(wc -l < coverage.xml) lines"
+          # Copy coverage.xml to test_results for archiving
+          cp coverage.xml test_results/
         else
-          echo "ERROR: coverage.xml not found in test_results/"
+          echo "ERROR: coverage.xml not found in root directory"
           exit 1
         fi
         
@@ -115,8 +116,6 @@ jobs:
       uses: codecov/codecov-action@v3
       with:
         token: ${{ secrets.CODECOV_TOKEN }}
-        file: test_results/coverage.xml
-        directory: test_results/
         fail_ci_if_error: true
         verbose: true
 
@@ -176,8 +175,8 @@ jobs:
         fi
         
         # Verifica se o relatório de cobertura foi gerado
-        if [ ! -f "test_results/coverage.xml" ]; then
-          echo "::warning::Relatório de cobertura (coverage.xml) não encontrado em test_results/"
+        if [ ! -f "coverage.xml" ] && [ ! -f "test_results/coverage.xml" ]; then
+          echo "::warning::Relatório de cobertura (coverage.xml) não encontrado no diretório raiz nem em test_results/"
         else
           echo "Relatório de cobertura gerado com sucesso."
         fi
