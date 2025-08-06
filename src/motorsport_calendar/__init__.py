@@ -22,11 +22,15 @@ class MotorsportCalendar:
     """Main application class for Motorsport Calendar."""
     
     def __init__(self, config_path=None):
-        """Initialize the application with optional config path."""
-        self.config_manager = ConfigManager()
-        if config_path:
-            self.config_manager.load_config(config_path)
+        """
+        Initialize the application with optional config path.
         
+        Args:
+            config_path: Path to the configuration file. If provided, it will be loaded.
+        """
+        self.config_manager = ConfigManager(config_path=config_path)
+        
+        # Initialize components
         self.logger = Logger(self.config_manager)
         self.ui_manager = UIManager(self.config_manager, self.logger)
         self.category_detector = CategoryDetector(self.config_manager, self.logger)

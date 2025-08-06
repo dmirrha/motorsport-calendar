@@ -7,13 +7,9 @@ import pytest
 from datetime import datetime, timedelta
 from pathlib import Path
 
-# Add project root to Python path
-import sys
-sys.path.insert(0, str(Path(__file__).parent.parent.parent))
-
 # Import application components
-from src.motorsport_calendar.config_manager import ConfigManager
-from src.motorsport_calendar.logger import Logger
+from motorsport_calendar.config_manager import ConfigManager
+from motorsport_calendar.logger import Logger
 
 @pytest.fixture(scope="session")
 def test_data_dir():

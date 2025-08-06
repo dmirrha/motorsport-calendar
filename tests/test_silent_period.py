@@ -8,12 +8,6 @@ proper filtering of events during configured silent periods.
 import unittest
 from datetime import datetime, time
 from unittest.mock import Mock, MagicMock
-import sys
-import os
-
-# Add src directory to path for imports
-sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..', 'src'))
-
 from motorsport_calendar.silent_period import SilentPeriod, SilentPeriodManager
 
 

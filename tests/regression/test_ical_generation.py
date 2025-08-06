@@ -10,6 +10,7 @@ import pytest
 import icalendar
 from pathlib import Path
 from datetime import datetime, timedelta
+from motorsport_calendar.utils.ical_generator import generate_ical
 
 # Configuração para os testes
 TEST_CONFIG_DIR = Path(__file__).parent.parent.parent / "config"
@@ -47,7 +48,6 @@ class TestICalGeneration:
     def test_ical_file_generation(self):
         """Testa a geração do arquivo iCal a partir dos eventos coletados."""
         from motorsport_calendar import MotorsportCalendar
-        from motorsport_calendar.utils import generate_ical
         
         # Cria eventos de teste
         test_events = [
@@ -119,7 +119,6 @@ class TestICalGeneration:
     
     def test_ical_generation_with_missing_fields(self):
         """Testa a geração de iCal com eventos que possuem campos opcionais ausentes."""
-        from utils.ical_generator import generate_ical
         
         # Evento com campos mínimos
         minimal_event = {
@@ -151,7 +150,6 @@ class TestICalGeneration:
     
     def test_ical_generation_with_recurring_events(self):
         """Testa a geração de iCal com eventos recorrentes."""
-        from utils.ical_generator import generate_ical
         
         # Cria um evento recorrente (a cada semana por 4 semanas)
         start_date = datetime.now().replace(hour=10, minute=0, second=0, microsecond=0)
