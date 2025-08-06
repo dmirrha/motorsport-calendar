@@ -204,13 +204,17 @@ class TomadaTempoSource(BaseSource):
                 'location': None,
                 'session_type': None,
                 'source': 'tomada_tempo',
-                'streaming_links': []
+                'streaming_links': [],
+                'url': ''  # Required field, can be empty
             }
             
             # Extract time
             time_elem = soup.find(class_='event-time')
             if time_elem:
                 time_text = time_elem.get_text(strip=True)
+                if self.logger:
+                    self.logger.debug(f"⏰ Found time string: '{time_text}'")
+                    
                 if ' - ' in time_text:
                     # Handle time range (e.g., "14:00 - 15:00")
                     start_time, end_time = self._parse_event_time_range(time_text, base_date or datetime.now())
@@ -224,6 +228,9 @@ class TomadaTempoSource(BaseSource):
                         event['start_time'] = event_time
                         event['end_time'] = event_time + timedelta(hours=1)
                         event['datetime'] = event_time  # For backward compatibility
+                        
+                if self.logger and event.get('start_time'):
+                    self.logger.debug(f"📅 Parsed start time: {event['start_time']}")
             
             # Extract title
             title_elem = soup.find(class_='event-title')
@@ -231,6 +238,8 @@ class TomadaTempoSource(BaseSource):
                 title = title_elem.get_text(strip=True)
                 event['name'] = title
                 event['title'] = title  # Ensure title is set for tests
+                if self.logger:
+                    self.logger.debug(f"📌 Found title: '{title}'")
             
             # Extract category
             category_elem = soup.find(class_='event-category')
@@ -254,20 +263,28 @@ class TomadaTempoSource(BaseSource):
                         category = 'stockcar'
                     
                     event['category'] = category
+                    if self.logger:
+                        self.logger.debug(f"🏷️  Extracted category: {category} from '{category_text}'")
             
             # Extract circuit
             circuit_elem = soup.find(class_='event-circuit')
             if circuit_elem:
                 event['circuit'] = circuit_elem.get_text(strip=True)
+                if self.logger:
+                    self.logger.debug(f"🏁 Found circuit: {event['circuit']}")
             
             # Extract location
             location_elem = soup.find(class_='event-location')
             if location_elem:
                 event['location'] = location_elem.get_text(strip=True)
+                if self.logger:
+                    self.logger.debug(f"📍 Found location: {event['location']}")
             
             # Extract session type from title
             if event.get('title'):
                 event['session_type'] = self._extract_session_type(event['title'])
+                if self.logger and event['session_type']:
+                    self.logger.debug(f"🎯 Detected session type: {event['session_type']}")
             
             # Extract streaming links
             streaming_div = soup.find(class_='event-streaming')
@@ -277,7 +294,11 @@ class TomadaTempoSource(BaseSource):
                         event['streaming_links'].append(link['href'])
                     else:
                         # Convert relative URLs to absolute
-                        event['streaming_links'].append(urljoin(self.get_base_url(), link['href']))
+                        full_url = urljoin(self.get_base_url(), link['href'])
+                        event['streaming_links'].append(full_url)
+                
+                if self.logger and event['streaming_links']:
+                    self.logger.debug(f"📺 Found {len(event['streaming_links'])} streaming links")
             
             # Ensure required fields are present
             if not event.get('title') and event.get('name'):
@@ -285,24 +306,26 @@ class TomadaTempoSource(BaseSource):
             elif not event.get('name') and event.get('title'):
                 event['name'] = event['title']
             
-            # Ensure datetime is set for backward compatibility
-            if 'start_time' in event and 'datetime' not in event:
-                event['datetime'] = event['start_time']
-            
-            # Ensure end_time is set (default to 1 hour after start_time if not set)
-            if event.get('start_time') and not event.get('end_time'):
-                event['end_time'] = event['start_time'] + timedelta(hours=1)
-            
             # Set default category if not set
             if not event.get('category'):
                 event['category'] = 'other'
             
             # Log successful extraction
-            if self.logger:
-                self.logger.info(f"✅ Successfully extracted event: {event.get('title')} at {event.get('start_time')}")
-            
-            return event if (event.get('title') or event.get('name')) and event.get('start_time') else None
-            
+            if event.get('title') and event.get('start_time'):
+                if self.logger:
+                    self.logger.info(f"✅ Successfully extracted event: {event['title']} at {event['start_time']}")
+                return event
+            else:
+                missing_fields = []
+                if not event.get('title') and not event.get('name'):
+                    missing_fields.append('title/name')
+                if not event.get('start_time'):
+                    missing_fields.append('start_time')
+                
+                if self.logger:
+                    self.logger.warning(f"⚠️ Missing required fields in event: {', '.join(missing_fields)}")
+                return None
+                
         except Exception as e:
             if self.logger:
                 self.logger.error(f"❌ Error extracting event info: {str(e)}", exc_info=True)
@@ -426,7 +449,8 @@ class TomadaTempoSource(BaseSource):
                 time_obj = datetime.strptime(time_part.strip(), '%H:%M').time()
                 
                 # Use reference year or current year
-                year = reference_date.year if reference_date else datetime.now().year
+                base_date = reference_date if reference_date else datetime.now()
+                year = base_date.year
                 
                 # Create datetime object
                 result = datetime(year, month, day, time_obj.hour, time_obj.minute)
@@ -445,12 +469,12 @@ class TomadaTempoSource(BaseSource):
                 return result
                 
             # Handle time only (e.g., "14:00")
-            elif ':' in date_str:
+            elif ':' in date_str and len(date_str) <= 5:  # Ensure it's just a time (HH:MM)
                 time_obj = datetime.strptime(date_str.strip(), '%H:%M').time()
-                base_date = reference_date.date() if reference_date else datetime.now().date()
-                result = datetime.combine(base_date, time_obj)
+                base_date = reference_date if reference_date else datetime.now()
+                result = datetime.combine(base_date.date(), time_obj)
                 if self.logger:
-                    self.logger.debug(f"✅ Parsed time '{date_str}' as {result} (using date: {base_date})")
+                    self.logger.debug(f"✅ Parsed time '{date_str}' as {result} (using date: {base_date.date()})")
                 return result
                 
         except Exception as e:
@@ -903,44 +927,98 @@ class TomadaTempoSource(BaseSource):
         Args:
             li_element: BeautifulSoup li element
             li_text: Text content of the li element
-            event_date: Date for this event
+            event_date: Date for this event (fallback if not found in text)
             programming_context: Programming context information
             
         Returns:
-            Event dictionary or None
+            Event dictionary or None if parsing fails
+            
+        The returned dictionary will have these fields:
+            - name: Event name/title
+            - category: Normalized category (e.g., 'formula1', 'motogp')
+            - date: Date in YYYY-MM-DD format (from text or fallback)
+            - time: Time in HH:MM format or None
+            - location: Location/circuit name or None
+            - country: Default 'Brasil'
+            - session_type: Type of session (qualifying, race, etc.)
+            - streaming_links: List of dicts with 'name' and 'url'
+            - official_url: Empty string or official URL
+            - raw_text: Original text for debugging
+            - from_weekend_programming: Always True for this method
+            - metadata: Additional parsing metadata
         """
         try:
-            # Extract time (e.g., "04:55", "08:30")
-            time_match = re.search(r'(\d{1,2}[:\.]\d{2})', li_text)
-            event_time = time_match.group(1).replace('.', ':') if time_match else None
+            if self.logger:
+                self.logger.debug(f"🔍 Parsing event from li: {li_text}")
             
-            # Extract category/name (e.g., "FÓRMULA 1", "NASCAR CUP")
-            category_match = re.search(r'(\d{1,2}[:\.]\d{2})\s*[–-]?\s*([^–-]+?)(?:\s*[–-]|$)', li_text)
-            if category_match:
-                event_name = category_match.group(2).strip()
-            else:
-                # Fallback: try to extract from strong tags
+            # 1. Extract date from text (preferred over provided event_date)
+            extracted_date = self._extract_date(li_text)
+            if extracted_date:
+                try:
+                    # Convert DD/MM/YYYY to datetime for consistent handling
+                    parsed_date = datetime.strptime(extracted_date, '%d/%m/%Y')
+                    event_date = parsed_date
+                    if self.logger:
+                        self.logger.debug(f"📅 Found date in text: {extracted_date}")
+                except (ValueError, AttributeError) as e:
+                    if self.logger:
+                        self.logger.debug(f"⚠️ Error parsing extracted date '{extracted_date}': {e}")
+            
+            # 2. Extract time
+            event_time = self._extract_time(li_text)
+            
+            # 3. Extract and clean event name
+            event_name = None
+            
+            # Try to extract from common patterns first
+            time_pattern = r'\d{1,2}[:.]\d{2}'
+            
+            # Pattern 1: Time - Name - Location
+            pattern1 = f'({time_pattern})\s*[–-]\s*([^–]+?)(?:\s*[–-]\s*([^–]+))?'
+            match = re.search(pattern1, li_text)
+            if match:
+                event_name = match.group(2).strip()
+                if not location and match.group(3):
+                    location = match.group(3).strip()
+            
+            # Pattern 2: Just name after time
+            if not event_name:
+                pattern2 = f'({time_pattern})\s+(.+)'
+                match = re.search(pattern2, li_text)
+                if match:
+                    event_name = match.group(2).strip()
+            
+            # Fallback: try to extract from strong tags
+            if not event_name:
                 strong_tags = li_element.find_all('strong')
                 if strong_tags:
                     event_name = strong_tags[0].get_text(strip=True)
                     # Remove time from the beginning if present
-                    event_name = re.sub(r'^\d{1,2}[:\.]\d{2}\s*[–-]?\s*', '', event_name)
-                else:
-                    return None
+                    event_name = re.sub(f'^{time_pattern}\s*[–-]?\s*', '', event_name)
             
-            # Clean up event name
-            event_name = event_name.strip(' –-')
+            # Final cleanup of event name
+            if event_name:
+                event_name = event_name.strip(' –-,')
+                # Remove any remaining time patterns
+                event_name = re.sub(f'\s*{time_pattern}\s*', ' ', event_name).strip()
+            
             if not event_name:
+                if self.logger:
+                    self.logger.debug("⚠️ Could not extract event name")
                 return None
             
-            # Extract location (e.g., "GP da Hungria", "Curvelo/MG")
-            location_match = re.search(r'[–-]\s*([^–-]+?)\s*[–-]', li_text)
-            location = location_match.group(1).strip() if location_match else None
+            # 4. Extract location if not already found
+            if not location:
+                location = self._extract_location(li_text)
             
-            # Extract category from event name
-            category = self._extract_category(event_name)
+            # 5. Extract category (and clean name if category was part of it)
+            category = self._extract_category(li_text) or self._extract_category(event_name)
             
-            # Extract streaming links
+            # If category was part of the name, remove it for cleaner display
+            if category and category.lower() in event_name.lower():
+                event_name = re.sub(re.escape(category), '', event_name, flags=re.IGNORECASE).strip(' –-,')
+            
+            # 6. Extract streaming links
             streaming_links = []
             for link in li_element.find_all('a', href=True):
                 link_text = link.get_text(strip=True)
@@ -951,7 +1029,7 @@ class TomadaTempoSource(BaseSource):
                         'url': link_url
                     })
             
-            # Create event dictionary
+            # 7. Create event dictionary
             event = {
                 'name': event_name,
                 'category': category or 'Unknown',
@@ -959,21 +1037,26 @@ class TomadaTempoSource(BaseSource):
                 'time': event_time,
                 'location': location,
                 'country': 'Brasil',
-                'session_type': self._extract_session_type(li_text),
+                'session_type': self._extract_session_type(li_text) or self._extract_session_type(event_name),
                 'streaming_links': streaming_links,
-                'official_url': '',
+                'official_url': self._extract_official_url(li_element) or '',
                 'raw_text': li_text,
-                'from_weekend_programming': True
+                'from_weekend_programming': True,
+                'metadata': {
+                    'date_source': 'extracted' if extracted_date else 'context',
+                    'parsed_at': datetime.now().isoformat()
+                }
             }
             
             if self.logger:
-                self.logger.debug(f"🎯 Parsed event: {event_name} at {event_time} on {event_date}")
+                self.logger.debug(f"✅ Parsed event: {event_name} at {event_time} on {event_date}")
+                self.logger.debug(f"   Category: {category}, Location: {location}")
             
             return event
             
         except Exception as e:
             if self.logger:
-                self.logger.debug(f"⚠️ Error parsing event from li: {e}")
+                self.logger.error(f"❌ Error parsing event from li: {e}", exc_info=True)
             return None
 
     def _extract_programming_context(self, soup, page_url: str = None) -> Dict[str, Any]:
@@ -1160,63 +1243,121 @@ class TomadaTempoSource(BaseSource):
         return ' '.join(words) if words else None
     
     def _extract_date(self, text: str) -> Optional[str]:
-        """Extract date from text with improved parsing."""
-        # Look for weekday + date patterns (e.g., "SÁBADO – 02/08/2025")
-        weekday_date_pattern = r'(?:segunda|terça|quarta|quinta|sexta|sábado|domingo|monday|tuesday|wednesday|thursday|friday|saturday|sunday)\s*[–\-]?\s*(\d{1,2}[\/\-]\d{1,2}[\/\-]\d{2,4})'
-        match = re.search(weekday_date_pattern, text, re.IGNORECASE)
-        if match:
-            date_part = match.group(1)
-            # Process the date part
-            date_match = re.search(r'(\d{1,2})[\/\-](\d{1,2})[\/\-](\d{2,4})', date_part)
-            if date_match:
-                day, month, year = date_match.groups()
+        """
+        Extract date from text with improved parsing.
+        
+        Supports multiple date formats:
+        - Weekday + date (e.g., "SÁBADO – 02/08/2025")
+        - DD/MM/YYYY or DD-MM-YYYY
+        - DD/MM/YY or DD-MM-YY
+        - YYYY/MM/DD or YYYY-MM-DD
+        - Month names (e.g., "15 de agosto de 2025")
+        
+        Args:
+            text: Text to extract date from
+            
+        Returns:
+            str: Date in DD/MM/YYYY format or None if no valid date found
+        """
+        if not text or not isinstance(text, str):
+            return None
+            
+        # Normalize text: remove extra spaces, convert to lowercase, normalize hyphens
+        normalized_text = ' '.join(text.lower().split())
+        normalized_text = normalized_text.replace('–', '-').replace('—', '-')
+        
+        # 1. Try weekday + date patterns (e.g., "SÁBADO – 02/08/2025")
+        weekday_date_patterns = [
+            # Format: "SÁBADO – 02/08/2025"
+            r'(?:segunda|ter[cç]a|quarta|quinta|sexta|s[aá]bado|domingo|monday|tuesday|wednesday|thursday|friday|saturday|sunday)[\s\-]+(\d{1,2})[\/\-](\d{1,2})(?:[\/\-](\d{2,4}))?',
+            # Format: "Sáb, 15/11 - 14:00"
+            r'(?:seg|ter|qua|qui|sex|s[aá]b|dom)[,\s]+(\d{1,2})[\/\-](\d{1,2})(?:[\/\-](\d{2,4}))?',
+        ]
+        
+        for pattern in weekday_date_patterns:
+            match = re.search(pattern, normalized_text, re.IGNORECASE)
+            if match:
+                groups = match.groups()
+                day = groups[0]
+                month = groups[1]
+                year = groups[2] if len(groups) > 2 and groups[2] else str(datetime.now().year)
+                
                 try:
-                    day_int, month_int, year_int = int(day), int(month), int(year)
+                    day_int, month_int = int(day), int(month)
+                    year_int = int(year)
+                    
+                    # Handle 2-digit years
                     if len(year) == 2:
                         year_int = 2000 + year_int if year_int < 50 else 1900 + year_int
+                    
+                    # Validate date components
                     if 1 <= day_int <= 31 and 1 <= month_int <= 12 and year_int >= 2020:
                         return f"{day_int:02d}/{month_int:02d}/{year_int}"
-                except ValueError:
-                    pass
+                except (ValueError, IndexError):
+                    continue
         
-        # Look for dates in DD/MM/YYYY or DD-MM-YYYY format first
-        dd_mm_yyyy_pattern = r'(\d{1,2})[\/\-](\d{1,2})[\/\-](\d{4})'
-        match = re.search(dd_mm_yyyy_pattern, text)
+        # 2. Try DD/MM/YYYY or DD-MM-YYYY format
+        dd_mm_yyyy_patterns = [
+            r'(\d{1,2})[\/\-](\d{1,2})[\/\-](\d{4})',  # DD/MM/YYYY or DD-MM-YYYY
+            r'(\d{1,2})[\/\-](\d{1,2})[\/\-](\d{2})',  # DD/MM/YY or DD-MM-YY
+            r'(\d{4})[\/\-](\d{1,2})[\/\-](\d{1,2})',  # YYYY/MM/DD or YYYY-MM-DD
+        ]
+        
+        for pattern in dd_mm_yyyy_patterns:
+            match = re.search(pattern, normalized_text)
+            if match:
+                groups = match.groups()
+                
+                # Handle different group orders based on the pattern
+                if '\d{4}-\d{1,2}-\d{1,2}' in pattern:  # YYYY-MM-DD
+                    year, month, day = groups[0], groups[1], groups[2]
+                else:  # DD-MM-YYYY or DD-MM-YY
+                    day, month, year = groups[0], groups[1], groups[2] if len(groups) > 2 else str(datetime.now().year)
+                
+                try:
+                    day_int, month_int = int(day), int(month)
+                    year_int = int(year)
+                    
+                    # Handle 2-digit years
+                    if len(year) == 2:
+                        year_int = 2000 + year_int if year_int < 50 else 1900 + year_int
+                    
+                    # Validate date components
+                    if 1 <= day_int <= 31 and 1 <= month_int <= 12 and year_int >= 2020:
+                        return f"{day_int:02d}/{month_int:02d}/{year_int}"
+                except (ValueError, IndexError):
+                    continue
+        
+        # 3. Try month names (e.g., "15 de agosto de 2025")
+        month_names = {
+            'janeiro': 1, 'fevereiro': 2, 'março': 3, 'abril': 4, 'maio': 5, 'junho': 6,
+            'julho': 7, 'agosto': 8, 'setembro': 9, 'outubro': 10, 'novembro': 11, 'dezembro': 12,
+            'jan': 1, 'fev': 2, 'mar': 3, 'abr': 4, 'mai': 5, 'jun': 6,
+            'jul': 7, 'ago': 8, 'set': 9, 'out': 10, 'nov': 11, 'dez': 12
+        }
+        
+        month_pattern = '|'.join(month_names.keys())
+        date_pattern = fr'(\d{{1,2}})\s+(?:de\s+)?({month_pattern})(?:\s+de\s+(\d{{2,4}}))?'
+        
+        match = re.search(date_pattern, normalized_text, re.IGNORECASE)
         if match:
-            day, month, year = match.groups()
-            # Validate date components
+            day = match.group(1)
+            month_name = match.group(2).lower()
+            year = match.group(3) if match.group(3) else str(datetime.now().year)
+            
             try:
-                day_int, month_int, year_int = int(day), int(month), int(year)
-                if 1 <= day_int <= 31 and 1 <= month_int <= 12 and year_int >= 2020:
+                day_int = int(day)
+                month_int = month_names.get(month_name)
+                year_int = int(year)
+                
+                # Handle 2-digit years
+                if len(year) == 2:
+                    year_int = 2000 + year_int if year_int < 50 else 1900 + year_int
+                
+                # Validate date components
+                if day_int >= 1 and day_int <= 31 and month_int and year_int >= 2020:
                     return f"{day_int:02d}/{month_int:02d}/{year_int}"
-            except ValueError:
-                pass
-        
-        # Look for dates in DD/MM/YY or DD-MM-YY format
-        dd_mm_yy_pattern = r'(\d{1,2})[\/\-](\d{1,2})[\/\-](\d{2})'
-        match = re.search(dd_mm_yy_pattern, text)
-        if match:
-            day, month, year = match.groups()
-            # Validate date components
-            try:
-                day_int, month_int, year_int = int(day), int(month), int(year)
-                if 1 <= day_int <= 31 and 1 <= month_int <= 12:
-                    full_year = 2000 + year_int if year_int < 50 else 1900 + year_int
-                    return f"{day_int:02d}/{month_int:02d}/{full_year}"
-            except ValueError:
-                pass
-        
-        # Look for dates in YYYY/MM/DD or YYYY-MM-DD format
-        yyyy_mm_dd_pattern = r'(\d{4})[\/\-](\d{1,2})[\/\-](\d{1,2})'
-        match = re.search(yyyy_mm_dd_pattern, text)
-        if match:
-            year, month, day = match.groups()
-            # Validate date components
-            try:
-                year_int, month_int, day_int = int(year), int(month), int(day)
-                if 1 <= day_int <= 31 and 1 <= month_int <= 12 and year_int >= 2020:
-                    return f"{day_int:02d}/{month_int:02d}/{year_int}"
-            except ValueError:
+            except (ValueError, AttributeError):
                 pass
         
         return None
