@@ -590,7 +590,7 @@ class ICalGenerator:
             ical_event.add('transp', 'OPAQUE')
             
             # Add reminders
-            self._add_reminders(ical_event)
+            self._add_reminders(ical_event, event)
             
             # Custom properties
             ical_event.add('x-motorsport-category', category)
@@ -701,24 +701,20 @@ class ICalGenerator:
         """Create event location string.
         
         Priority order for location:
-        1. Circuit name (if available)
+        1. Circuit name (if available) - returns only the circuit name
         2. Location from event
         3. Country from event
         """
-        # First try to get circuit name
+        # Return only the circuit name if available
         if event.get('circuit'):
-            return event['circuit']
+            return str(event['circuit']).strip()
             
-        # Fall back to location
-        location = event.get('location')
-        country = event.get('country')
+        # Fall back to location or country (for backward compatibility)
+        location = str(event.get('location', '')).strip()
+        country = str(event.get('country', '')).strip()
         
-        # If we have both location and country, combine them
-        if location and country and location != country:
-            return f"{location}, {country}"
-            
-        # Return whichever one we have (or None if neither exists)
-        return location or country
+        # Return the first non-empty value
+        return location or country or None
     
     def _get_event_priority(self, category: str) -> int:
         """Get event priority based on category (1=highest, 9=lowest)."""
@@ -756,12 +752,29 @@ class ICalGenerator:
         if not self.reminder_minutes:
             return
             
-        for minutes in self.reminder_minutes:
-            alarm = Alarm()
-            alarm.add('action', 'DISPLAY')
-            alarm.add('trigger', timedelta(minutes=-minutes))
-            alarm.add('description', f"Reminder: {event_data.get('title', 'Event')}")
-            ical_event.add_component(alarm)
+        # Get reminder minutes from event data if available, otherwise use default
+        reminder_minutes = event_data.get('reminder_minutes', self.reminder_minutes)
+        
+        if not isinstance(reminder_minutes, list):
+            reminder_minutes = [reminder_minutes]
+            
+        if self.logger:
+            self.logger.log_debug(f"🔔 Adding {len(reminder_minutes)} reminder(s) to event: {event_data.get('title')}")
+            
+        for minutes in reminder_minutes:
+            try:
+                alarm = Alarm()
+                alarm.add('action', 'DISPLAY')
+                alarm.add('trigger', timedelta(minutes=-int(minutes)))
+                alarm.add('description', f"Lembrete: {event_data.get('title', 'Evento')} em {minutes} minutos")
+                ical_event.add_component(alarm)
+                
+                if self.logger:
+                    self.logger.log_debug(f"   ✓ Adicionado lembrete para {minutes} minutos antes")
+                    
+            except (ValueError, TypeError) as e:
+                if self.logger:
+                    self.logger.log_warning(f"⚠️ Falha ao adicionar lembrete de {minutes} minutos: {e}")
     
     def _archive_old_ical_files(self) -> None:
         """Archive old iCal files to history subfolder."""

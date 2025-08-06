@@ -164,6 +164,7 @@ class TomadaTempoSource(BaseSource):
         from bs4 import BeautifulSoup
         
         try:
+            # Parse the HTML content
             soup = BeautifulSoup(html_content, 'html.parser')
             
             # Check if this is a full schedule page
@@ -177,40 +178,67 @@ class TomadaTempoSource(BaseSource):
             # Try to extract from a single event element
             event_element = soup.find(class_='event')
             if event_element:
-                return self._extract_event_from_div(event_element, base_date or datetime.now())
-            # Extract event time
+                event = self._extract_event_from_div(event_element, base_date or datetime.now())
+                # Ensure required fields are present
+                if event:
+                    if not event.get('title') and event.get('name'):
+                        event['title'] = event['name']
+                    elif not event.get('name') and event.get('title'):
+                        event['name'] = event['title']
+                    # Ensure datetime is set for backward compatibility
+                    if 'start_time' in event and 'datetime' not in event:
+                        event['datetime'] = event['start_time']
+                    # Ensure end_time is set
+                    if event.get('start_time') and not event.get('end_time'):
+                        event['end_time'] = event['start_time'] + timedelta(hours=1)
+                return event if (event and (event.get('title') or event.get('name')) and event.get('start_time')) else None
+            
+            # If no event element found, try to extract directly from the HTML structure
+            event = {
+                'name': None,
+                'title': None,
+                'start_time': None,
+                'end_time': None,
+                'category': None,
+                'circuit': None,
+                'location': None,
+                'session_type': None,
+                'source': 'tomada_tempo',
+                'streaming_links': []
+            }
+            
+            # Extract time
             time_elem = soup.find(class_='event-time')
             if time_elem:
-                time_str = time_elem.get_text(strip=True)
-                
-                # Handle time range format (e.g., "14:00 - 16:00")
-                if ' - ' in time_str and base_date:
-                    start_dt, end_dt = self._parse_event_time_range(time_str, base_date)
-                    event['start_time'] = start_dt
-                    event['end_time'] = end_dt
-                    event['datetime'] = start_dt  # For backward compatibility
+                time_text = time_elem.get_text(strip=True)
+                if ' - ' in time_text:
+                    # Handle time range (e.g., "14:00 - 15:00")
+                    start_time, end_time = self._parse_event_time_range(time_text, base_date or datetime.now())
+                    event['start_time'] = start_time
+                    event['end_time'] = end_time
+                    event['datetime'] = start_time  # For backward compatibility
                 else:
                     # Fall back to original parsing
-                    event['datetime'] = self._parse_event_date(time_str, base_date)
-                    event['start_time'] = event['datetime']
-                    
-                    # Set end_time to 2 hours after start_time if not specified
-                    if isinstance(event['start_time'], datetime):
-                        event['end_time'] = event['start_time'] + timedelta(hours=2)
-                    else:
-                        event['end_time'] = None
+                    event_time = self._parse_event_date(time_text, base_date or datetime.now())
+                    if event_time:
+                        event['start_time'] = event_time
+                        event['end_time'] = event_time + timedelta(hours=1)
+                        event['datetime'] = event_time  # For backward compatibility
             
-            # Extract event title and ensure both name and title are set
+            # Extract title
             title_elem = soup.find(class_='event-title')
             if title_elem:
-                title_text = title_elem.get_text(strip=True)
-                event['name'] = title_text
-                event['title'] = title_text  # Ensure title is set for tests
-                
-                # Extract and normalize category from title
-                category = self._extract_category(title_text)
-                if category and isinstance(category, str):
-                    # Normalize category to match test expectations
+                title = title_elem.get_text(strip=True)
+                event['name'] = title
+                event['title'] = title  # Ensure title is set for tests
+            
+            # Extract category
+            category_elem = soup.find(class_='event-category')
+            if category_elem:
+                category_text = category_elem.get_text(strip=True)
+                category = self._extract_category(category_text)
+                if category:
+                    # Normalize category name
                     category = category.lower().replace(' ', '').replace('-', '')
                     if 'f1' in category or 'formula1' in category:
                         category = 'formula1'  # Test expects 'formula1' not 'F1'
@@ -218,63 +246,68 @@ class TomadaTempoSource(BaseSource):
                         category = 'formula2'
                     elif 'f3' in category or 'formula3' in category:
                         category = 'formula3'
-                    elif 'nascar' in category.lower():
+                    elif 'fe' in category or 'formulae' in category:
+                        category = 'formulae'
+                    elif 'nascar' in category:
                         category = 'nascar'
-                    elif 'stock' in category.lower() and 'car' in category.lower():
+                    elif 'stock' in category and 'car' in category:
                         category = 'stockcar'
-                event['category'] = category
-                
-                # Try to extract session type from title
-                event['session_type'] = self._extract_session_type(event['name'])
+                    
+                    event['category'] = category
             
-            # Extract category if not found in title
-            if not event['category']:
-                category_elem = soup.find(class_='event-category')
-                if category_elem:
-                    event['category'] = category_elem.get_text(strip=True)
-            
-            # Extract circuit/location
+            # Extract circuit
             circuit_elem = soup.find(class_='event-circuit')
             if circuit_elem:
                 event['circuit'] = circuit_elem.get_text(strip=True)
             
+            # Extract location
             location_elem = soup.find(class_='event-location')
             if location_elem:
                 event['location'] = location_elem.get_text(strip=True)
             
-            # Extract streaming links (if any)
-            streaming_links = []
+            # Extract session type from title
+            if event.get('title'):
+                event['session_type'] = self._extract_session_type(event['title'])
+            
+            # Extract streaming links
             streaming_div = soup.find(class_='event-streaming')
             if streaming_div:
                 for link in streaming_div.find_all('a', href=True):
-                    streaming_links.append(link['href'])
-            event['streaming_links'] = streaming_links
+                    if link['href'].startswith('http'):
+                        event['streaming_links'].append(link['href'])
+                    else:
+                        # Convert relative URLs to absolute
+                        event['streaming_links'].append(urljoin(self.get_base_url(), link['href']))
             
-            # Extract circuit if available
-            circuit_elem = soup.find(class_='event-circuit')
-            if circuit_elem:
-                event['circuit'] = circuit_elem.get_text(strip=True)
-                
-            # Extract location if available
-            location_elem = soup.find(class_='event-location')
-            if location_elem:
-                event['location'] = location_elem.get_text(strip=True)
-            
-            # Generate a unique ID for the event
-            event['id'] = self._generate_event_id(event)
-            
-            # Ensure required fields are set
+            # Ensure required fields are present
             if not event.get('title') and event.get('name'):
                 event['title'] = event['name']
             elif not event.get('name') and event.get('title'):
                 event['name'] = event['title']
-                
-            return event
+            
+            # Ensure datetime is set for backward compatibility
+            if 'start_time' in event and 'datetime' not in event:
+                event['datetime'] = event['start_time']
+            
+            # Ensure end_time is set (default to 1 hour after start_time if not set)
+            if event.get('start_time') and not event.get('end_time'):
+                event['end_time'] = event['start_time'] + timedelta(hours=1)
+            
+            # Set default category if not set
+            if not event.get('category'):
+                event['category'] = 'other'
+            
+            # Log successful extraction
+            if self.logger:
+                self.logger.info(f"✅ Successfully extracted event: {event.get('title')} at {event.get('start_time')}")
+            
+            return event if (event.get('title') or event.get('name')) and event.get('start_time') else None
             
         except Exception as e:
             if self.logger:
-                self.logger.error(f"Error extracting event info: {str(e)}", exc_info=True)
+                self.logger.error(f"❌ Error extracting event info: {str(e)}", exc_info=True)
             return None
+
     
     def _make_request_with_retry(self, url: str, method: str = 'GET', **kwargs) -> requests.Response:
         """
@@ -356,7 +389,7 @@ class TomadaTempoSource(BaseSource):
         """Parse date string from Tomada de Tempo format to datetime.
         
         Args:
-            date_str: Date string in formats like "Sáb, 15/11 - 14:00" or "14:30"
+            date_str: Date string in formats like "Sáb, 15/11 - 14:00" or "14:30" or "15/11/2025 14:00"
             reference_date: Reference date to use when only time is provided
             
         Returns:
@@ -365,50 +398,68 @@ class TomadaTempoSource(BaseSource):
         Test cases:
             ("Sáb, 15/11 - 14:00", datetime(2025, 11, 15, 14, 0))
             ("Dom, 16/11 - 15:30", datetime(2025, 11, 16, 15, 30))
-            ("14:00", None)  # Missing date part
+            ("15/11/2025 14:00", datetime(2025, 11, 15, 14, 0))
+            ("14:00", datetime(2025, 1, 1, 14, 0))  # Uses reference_date or today
             ("", None)       # Empty string
             (None, None)      # None input
         """
-        if not date_str:
+        if not date_str or not isinstance(date_str, str):
+            if self.logger:
+                self.logger.debug("⚠️ Date string is empty or not a string")
             return None
             
+        date_str = date_str.strip()
+        
+        # Try to parse full date with time (e.g., "Sáb, 15/11 - 14:00" or "15/11/2025 14:00")
         try:
-            # Try to parse full date and time format (e.g., "Sáb, 15/11 - 14:00")
-            if ' - ' in date_str:
-                date_part = date_str.split(' - ')[0].strip()
-                time_part = date_str.split(' - ')[1].strip()
-                
-                # Extract day and month (e.g., "Sáb, 15/11" -> "15/11")
+            # Handle format: "Sáb, 15/11 - 14:00"
+            if ' - ' in date_str and '/' in date_str:
+                date_part, time_part = date_str.split(' - ', 1)
+                # Remove day of week if present
                 if ',' in date_part:
                     date_part = date_part.split(',', 1)[1].strip()
                 
-                # Parse day and month (e.g., "15/11")
+                # Parse day and month
                 day, month = map(int, date_part.split('/'))
                 
-                # Parse time (e.g., "14:00")
-                hour, minute = map(int, time_part.split(':'))
+                # Parse time
+                time_obj = datetime.strptime(time_part.strip(), '%H:%M').time()
                 
-                # Use reference year or current year if not provided
+                # Use reference year or current year
                 year = reference_date.year if reference_date else datetime.now().year
                 
-                return datetime(year, month, day, hour, minute)
+                # Create datetime object
+                result = datetime(year, month, day, time_obj.hour, time_obj.minute)
+                if self.logger:
+                    self.logger.debug(f"✅ Parsed date '{date_str}' as {result}")
+                return result
                 
-            # Try to parse time only (e.g., "14:00")
+            # Handle format: "15/11/2025 14:00"
+            elif '/' in date_str and ' ' in date_str:
+                date_part, time_part = date_str.split(' ', 1)
+                day, month, year = map(int, date_part.split('/'))
+                time_obj = datetime.strptime(time_part.strip(), '%H:%M').time()
+                result = datetime(year, month, day, time_obj.hour, time_obj.minute)
+                if self.logger:
+                    self.logger.debug(f"✅ Parsed date '{date_str}' as {result}")
+                return result
+                
+            # Handle time only (e.g., "14:00")
             elif ':' in date_str:
-                # For test compatibility, return None when only time is provided
-                # unless we have a reference date
-                if not reference_date:
-                    return None
-                    
-                hour, minute = map(int, date_str.split(':'))
-                return reference_date.replace(hour=hour, minute=minute, second=0, microsecond=0)
+                time_obj = datetime.strptime(date_str.strip(), '%H:%M').time()
+                base_date = reference_date.date() if reference_date else datetime.now().date()
+                result = datetime.combine(base_date, time_obj)
+                if self.logger:
+                    self.logger.debug(f"✅ Parsed time '{date_str}' as {result} (using date: {base_date})")
+                return result
                 
-            return None
-            
-        except (ValueError, IndexError, AttributeError) as e:
+        except Exception as e:
             if self.logger:
-                self.logger.warning(f"Error parsing date '{date_str}': {str(e)}")
-            return None
+                self.logger.warning(f"⚠️ Failed to parse date string '{date_str}': {str(e)}", exc_info=True)
+        
+        if self.logger:
+            self.logger.warning(f"⚠️ Could not parse date string: '{date_str}'")
+        return None
     
     def _get_next_weekend(self) -> datetime:
         """Get the current weekend date (Friday of the current week)."""
@@ -1397,6 +1448,9 @@ class TomadaTempoSource(BaseSource):
         }
         """
         try:
+            if self.logger:
+                self.logger.debug(f"🔍 Processing event element: {str(element)[:200]}...")
+            
             event = {
                 'name': None,
                 'title': None,  # Required by tests
@@ -1408,18 +1462,30 @@ class TomadaTempoSource(BaseSource):
                 'circuit': None,
                 'session_type': None,
                 'streaming_links': [],
-                'official_url': None
+                'official_url': None,
+                'source': 'tomada_tempo',
+                'description': ''
             }
             
             # Extract time
             time_elem = element.find(class_='event-time')
             if time_elem:
                 time_str = time_elem.get_text(strip=True)
+                if self.logger:
+                    self.logger.debug(f"⏰ Found time string: '{time_str}'")
+                
                 if ' - ' in time_str:
                     start_dt, end_dt = self._parse_event_time_range(time_str, base_date)
-                    event['start_time'] = start_dt
-                    event['end_time'] = end_dt
-                    event['datetime'] = start_dt  # For backward compatibility
+                    if start_dt and end_dt:
+                        event['start_time'] = start_dt
+                        event['end_time'] = end_dt
+                        event['datetime'] = start_dt  # For backward compatibility
+                        
+                        if self.logger:
+                            self.logger.debug(f"✅ Parsed time range: {start_dt} to {end_dt}")
+                    else:
+                        if self.logger:
+                            self.logger.warning(f"⚠️ Failed to parse time range: '{time_str}'")
             
             # Extract title (required field for tests)
             title_elem = element.find(class_='event-title')
@@ -1427,40 +1493,64 @@ class TomadaTempoSource(BaseSource):
                 title = title_elem.get_text(strip=True)
                 event['name'] = title
                 event['title'] = title  # Ensure title is set for tests
+                
+                if self.logger:
+                    self.logger.debug(f"📌 Found title: '{title}'")
             else:
                 # Title is required, skip if not found
+                if self.logger:
+                    self.logger.warning("⚠️ Skipping event: No title found")
                 return None
             
             # Extract and normalize category
             category_elem = element.find(class_='event-category')
             if category_elem:
-                category = self._extract_category(category_elem.get_text(strip=True))
+                category_text = category_elem.get_text(strip=True)
+                category = self._extract_category(category_text)
+                
                 if category:
                     event['category'] = category.lower().replace(' ', '').replace('-', '')
                     # Normalize to 'formula1' for tests if it's an F1 event
                     if 'f1' in event['category'] or 'formula1' in event['category']:
                         event['category'] = 'formula1'
+                    
+                    if self.logger:
+                        self.logger.debug(f"🏷️  Extracted category: {event['category']} from '{category_text}'")
             
             # Extract session type from title if not already set
             if not event.get('session_type'):
-                event['session_type'] = self._extract_session_type(title)
+                event['session_type'] = self._extract_session_type(event['title'])
+                if self.logger and event['session_type']:
+                    self.logger.debug(f"🎯 Detected session type: {event['session_type']}")
             
             # Extract circuit
             circuit_elem = element.find(class_='event-circuit')
             if circuit_elem:
                 event['circuit'] = circuit_elem.get_text(strip=True)
+                if self.logger:
+                    self.logger.debug(f"🏁 Found circuit: {event['circuit']}")
             
             # Extract location
             location_elem = element.find(class_='event-location')
             if location_elem:
                 event['location'] = location_elem.get_text(strip=True)
+                if self.logger:
+                    self.logger.debug(f"📍 Found location: {event['location']}")
             
             # Extract streaming links
             streaming_links = []
             streaming_div = element.find(class_='event-streaming')
             if streaming_div:
                 for link in streaming_div.find_all('a', href=True):
-                    streaming_links.append(link['href'])
+                    if link['href'].startswith('http'):
+                        streaming_links.append(link['href'])
+                    else:
+                        # Convert relative URLs to absolute
+                        streaming_links.append(urljoin(self.get_base_url(), link['href']))
+                
+                if streaming_links and self.logger:
+                    self.logger.debug(f"📺 Found {len(streaming_links)} streaming links")
+            
             event['streaming_links'] = streaming_links
             
             # Generate a unique ID for the event
@@ -1476,11 +1566,21 @@ class TomadaTempoSource(BaseSource):
             if 'start_time' in event and 'datetime' not in event:
                 event['datetime'] = event['start_time']
             
+            # Ensure end_time is set (default to 2 hours after start_time if not set)
+            if event.get('start_time') and not event.get('end_time'):
+                event['end_time'] = event['start_time'] + timedelta(hours=2)
+                if self.logger:
+                    self.logger.debug(f"⏱️  Set default end_time: {event['end_time']}")
+            
+            # Log successful extraction
+            if self.logger:
+                self.logger.info(f"✅ Successfully extracted event: {event.get('title')} at {event.get('start_time')}")
+            
             return event
             
         except Exception as e:
             if self.logger:
-                self.logger.warning(f"Error extracting event from element: {str(e)}")
+                self.logger.error(f"❌ Error extracting event from element: {str(e)}", exc_info=True)
             return None
         
         return 'race'  # Default to race

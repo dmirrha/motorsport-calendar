@@ -47,7 +47,7 @@ class TestICalGeneration:
     def test_ical_file_generation(self):
         """Testa a geração do arquivo iCal a partir dos eventos coletados."""
         from motorsport_calendar import MotorsportCalendar
-        from utils.ical_generator import generate_ical
+        from motorsport_calendar.utils import generate_ical
         
         # Cria eventos de teste
         test_events = [

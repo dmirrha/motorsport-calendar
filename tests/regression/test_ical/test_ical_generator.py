@@ -8,7 +8,7 @@ import pytest
 from icalendar import Calendar
 
 # Import the module to test
-from src.motorsport_calendar.ical_generator import ICalGenerator
+from motorsport_calendar.ical_generator import ICalGenerator
 
 class TestICalGenerator:
     """Test cases for ICalGenerator."""
@@ -17,8 +17,8 @@ class TestICalGenerator:
     def ical_generator(self, test_config, tmp_path):
         """Create an ICalGenerator instance with test config and debug logging."""
         # Enable debug logging for tests
-        from src.motorsport_calendar.logger import Logger
-        from src.motorsport_calendar.config_manager import ConfigManager
+        from motorsport_calendar.logger import Logger
+        from motorsport_calendar.config_manager import ConfigManager
         
         # Create a minimal config for the logger
         logger_config = {
