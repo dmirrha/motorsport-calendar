@@ -2,6 +2,10 @@
 
 Um script Python avançado para coleta automática de eventos de automobilismo de múltiplas fontes e geração de arquivos iCal para importação no Google Calendar. Desenvolvido para entusiastas de automobilismo que desejam acompanhar todas as corridas do fim de semana em um só lugar.
 
+> Nota pós-rollback (0.5.1)
+>
+> A branch `main` foi revertida para o snapshot do commit `9362503` (PR #34). Algumas seções abaixo podem descrever funcionalidades que serão reintroduzidas em PRs futuros. O workflow de testes/CI não foi reativado neste momento. Consulte `RELEASES.md` para detalhes.
+
 ## 🎯 Características
 
 - ✅ **Coleta automática** de eventos de múltiplas fontes

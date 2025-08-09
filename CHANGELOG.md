@@ -5,6 +5,12 @@ Todas as mudanças notáveis neste projeto serão documentadas neste arquivo.
 O formato é baseado em [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 e este projeto adere ao [Versionamento Semântico](https://semver.org/spec/v2.0.0.html).
 
+## [0.5.1] - 2025-08-09
+### Manutenção
+- Rollback técnico da branch `main` para o snapshot do commit `9362503` (PR #34), preservando histórico.
+- Reaplicação do `.gitignore` para ignorar artefatos de testes e diretórios locais (`tests/regression/test_data/output/`, `test_results/`, `test_results_github/`, `pytest.log`, `junit.xml`, `report.html`).
+- CI/Workflow de testes não reintroduzido neste release.
+
 ## [Não Lançado]
 ### Adicionado
 - **Documentação de Configuração**

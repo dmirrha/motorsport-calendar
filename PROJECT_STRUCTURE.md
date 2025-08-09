@@ -1,4 +1,21 @@
+---
+
+## Pastas ignoradas (.gitignore)
+
+- `output/` (mantém `output/.gitkeep`)
+- `logs/`, `logs/rotated_logs/`, `logs/payloads/` (mantém `.gitkeep`)
+- `tests/regression/test_data/output/`
+- `test_results/`, `test_results_github/`, `tests/**/test_results/`
+- `.pytest_cache/`, `__pycache__/`, `.cache/`
+- `htmlcov/`, `.coverage*`, `coverage.xml`, `*.cover`, `pytest.log`, `junit.xml`, `report.html`
+- `.venv/`, `venv/`, `env/`, `ENV/`
+- `.vscode/`, `.idea/`
+- `.DS_Store` e demais arquivos de sistema do macOS
 # Estrutura do Projeto - Motorsport Calendar
+
+> Nota pós-rollback (0.5.1)
+>
+> O projeto foi revertido para o snapshot do commit `9362503`. Algumas seções podem descrever funcionalidades planejadas que ainda serão reintroduzidas em PRs futuros.
 
 ## **Visão Geral da Arquitetura**
 

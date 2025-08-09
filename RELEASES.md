@@ -2,6 +2,22 @@
 
 Este arquivo contém um registro acumulativo de todas as versões lançadas do projeto, com notas detalhadas sobre as mudanças em cada versão.
 
+## Versão 0.5.1 (2025-08-09)
+Rollback técnico da branch main para o snapshot exato do commit `9362503`.
+
+### 🔄 Contexto
+- PR #34: rollback seguro aplicando restauração completa da árvore para `9362503` em um único commit (histórico preservado).
+- Tag de backup criada anteriormente: `backup/pre-rollback-9362503-20250808-222821`.
+
+### 📌 O que mudou
+- Revertidas mudanças introduzidas após `9362503` (algumas funcionalidades avançadas de logging, períodos de silêncio, workflow de issues e arquivamento iCal podem não estar disponíveis temporariamente).
+- Reaplicado `.gitignore` para evitar versionamento de artefatos de teste e diretórios locais.
+- CI/regression-tests não reintroduzido neste release (será revisitado futuramente).
+
+### ✅ Impactos práticos
+- O código volta a um estado estável anterior; documentação contém notas de pós-rollback para sinalizar possíveis divergências temporárias.
+- Nenhuma migração de dados é necessária.
+
 ## Versão 0.5.0 (2025-08-04)
 **Melhorias no Sistema de Logging e Configuração**
 

@@ -1,5 +1,9 @@
 # Requisitos do Sistema - Motorsport Calendar
 
+> Nota pós-rollback (0.5.1)
+>
+> A branch `main` foi revertida para o snapshot do commit `9362503` (PR #34). Alguns itens abaixo descrevem funcionalidades que serão reintroduzidas em versões futuras. Consulte `RELEASES.md`.
+
 ## **Visão Geral**
 
 ### **Objetivo do Projeto**

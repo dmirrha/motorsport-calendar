@@ -1,5 +1,9 @@
 # Fontes de Dados - Eventos de Automobilismo
 
+> Nota pós-rollback (0.5.1)
+>
+> A branch `main` foi revertida para o snapshot do commit `9362503` (PR #34). Algumas referências a integrações futuras (ex.: OpenF1) podem ainda não estar disponíveis nesta versão. Consulte `RELEASES.md` para detalhes.
+
 ## **Visão Geral das Fontes de Dados**
 
 ### **Objetivo**
