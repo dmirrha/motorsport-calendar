@@ -22,6 +22,22 @@ Estabelecer uma estratégia simples e efetiva para implementar e evoluir testes 
 - Artefatos: `test_results/`, `junit.xml`, `htmlcov/` (gerados)
 - CI: `.github/workflows/` (atualmente sem workflow de testes)
 
+## Diretrizes de Documentação e Rastreamento
+Objetivo: Garantir documentação padrão, simples e completa para explicar a estratégia de testes e permitir rastreabilidade fina das atividades, conforme `.windsurf/rules/tester.md` e políticas do projeto.
+
+## Checklist — Documentação Padrão
+- [ ] Criar/atualizar visão geral de testes em `docs/tests/overview.md` (estratégia, escopo, como rodar local/CI, estrutura de pastas)
+- [ ] Criar índice de cenários em `docs/tests/scenarios/SCENARIOS_INDEX.md` (links para cenários por fase)
+- [ ] Criar/atualizar mapeamento de cenários por fase:
+  - [ ] `docs/tests/scenarios/phase0_scenarios.md` (inventário e decisões de limpeza)
+  - [ ] `docs/tests/scenarios/phase1_scenarios.md` (parsers/validação/utils)
+  - [ ] `docs/tests/scenarios/phase2_scenarios.md` (fluxos de integração e iCal)
+- [ ] Atualizar documentações obrigatórias a cada mudança testada:
+  - [ ] `CHANGELOG.md`, `CONTRIBUTING.md`, `DATA_SOURCES.md`, `PROJECT_STRUCTURE.md`, `README.md`, `RELEASES.md`, `REQUIREMENTS.md`, `CONFIGURATION_GUIDE.md`, `docs/TEST_AUTOMATION_PLAN.md`
+- [ ] Processo de tracking
+  - [ ] Toda descoberta/melhoria gera itens no plano em formato checklist, e issues quando aplicável (via GH)
+  - [ ] Registrar no(s) arquivo(s) de cenários o status (ToDo/Doing/Done) e referência a PRs/Issues
+
 # Fase 0 — Limpeza do Repositório
 Objetivo: Remover legados e padronizar a base de testes antes de iniciar as fases seguintes, seguindo a simplicidade descrita em `.windsurf/rules/tester.md`.
 
@@ -51,6 +67,9 @@ Objetivo: Remover legados e padronizar a base de testes antes de iniciar as fase
 - [ ] Validação pós-limpeza
   - [ ] Executar `pytest -q` para confirmar descoberta apenas em `tests/`
   - [ ] Documentar no `CHANGELOG.md` e atualizar `README.md`/`REQUIREMENTS.md` se aplicável
+- [ ] Documentação e rastreabilidade (Fase 0)
+  - [ ] Criar/atualizar `docs/tests/scenarios/phase0_scenarios.md` com inventário, decisões e itens derivados
+  - [ ] Adicionar itens derivados como checklist nesta seção do plano (`docs/TEST_AUTOMATION_PLAN.md`)
 
 # Fase 1 — Testes Unitários
 Objetivo: Cobrir funções críticas de parsing/transformação/validação com testes rápidos, determinísticos e independentes de rede/FS.
@@ -80,6 +99,9 @@ Objetivo: Cobrir funções críticas de parsing/transformação/validação com 
   - [ ] Matrizes de casos para horários: 24h, AM/PM, sem minutos, overnight, naive vs aware
   - [ ] Cenários de categoria: conhecidas vs fallback `Unknown`
   - [ ] Casos iCal: PRODID, DTSTART/DTEND com TZ, URL, CATEGORIES, RRULE com `recurrence`
+- [ ] Documentação e rastreabilidade (Fase 1)
+  - [ ] Criar/atualizar `docs/tests/scenarios/phase1_scenarios.md` (matriz de casos, mapeamentos, status e links para testes)
+  - [ ] Adicionar itens derivados como checklist nesta seção do plano
 
 6) Execução e relatórios (local)
 - Instalação: `pip install -r requirements.txt && pip install pytest pytest-cov`
@@ -117,6 +139,9 @@ Objetivo: Validar fluxos entre componentes (coleta → processamento → iCal), 
   - [ ] Contagem de eventos processados
   - [ ] VEVENT: SUMMARY, DTSTART/DTEND, UID, URL, CATEGORIES, RRULE (quando aplicável)
   - [ ] Consistência de timezone (naive → localized conforme config)
+- [ ] Documentação e rastreabilidade (Fase 2)
+  - [ ] Criar/atualizar `docs/tests/scenarios/phase2_scenarios.md` (fluxos, casos, status e links)
+  - [ ] Adicionar itens derivados como checklist nesta seção do plano
 
 5) Execução e relatórios (local)
 - `pytest -m integration --cov=src --cov=sources --cov-append \
