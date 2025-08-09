@@ -144,3 +144,8 @@ e este projeto adere ao [Versionamento Semântico](https://semver.org/spec/v2.0.
 
 ---
 Nota: Este arquivo é gerado automaticamente. Para adicionar uma nova entrada, use o formato convencional de commit.
+
+## Fix - timezone-aware weekend boundaries (2025-08-09)
+- Ajuste em `src/event_processor.py`: normalização e localização de `target_weekend` (datetime/tupla) para timezone da configuração.
+- `_detect_target_weekend()` usando `datetime.now(tz)`.
+- Pipeline validado; iCal gerado sem erros de timezone.

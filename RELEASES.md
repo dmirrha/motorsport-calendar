@@ -262,3 +262,10 @@ Rollback técnico da branch main para o snapshot exato do commit `9362503`.
 
 ### 📝 Notas de Atualização
 Esta é a versão inicial do projeto, contendo toda a funcionalidade básica para coleta e exportação de eventos de automobilismo.
+
+## Release (2025-08-09)
+- Tipo: Fix
+- Descrição: Corrige comparações naive/aware ao filtrar eventos por fim de semana.
+- Impacto: Geração de iCal sem erros; 75 eventos processados.
+- Arquivo: `output/motorsport_events_20250808.ics`
+- Notas: Garantir timezone na configuração do projeto.
