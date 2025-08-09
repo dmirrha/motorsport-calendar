@@ -286,3 +286,5 @@ Desenvolver e manter um sistema automatizado para coleta, processamento e export
 
 **VALIDAÇÃO NECESSÁRIA:**
 Estes requerimentos estão alinhados com suas expectativas? Há algo que gostaria de adicionar, modificar ou remover antes de prosseguirmos para o próximo passo?
+
+- pytz (manuseio de timezones)

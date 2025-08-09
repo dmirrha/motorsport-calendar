@@ -253,3 +253,8 @@ Consulte `config/config.example.json` para um exemplo completo de configuração
 - **Configuração inválida**: Verifique a sintaxe JSON e os valores aceitos
 - **Permissões**: Certifique-se de que a aplicação tem permissão para escrever nos diretórios especificados
 - **Logs**: Consulte o arquivo de log principal para mensagens de erro detalhadas
+
+## Timezone e Comparações de Datas
+- Todas as comparações de datas/horas são realizadas com objetos timezone-aware.
+- Configure a timezone via `ConfigManager.get_timezone()` (padrão: America/Sao_Paulo).
+- `EventProcessor.process_events()` normaliza `target_weekend` (datetime/tupla) para a timezone configurada antes do filtro do fim de semana.

@@ -118,6 +118,51 @@ class EventProcessor:
         categorized_events = self._detect_categories(normalized_events)
         
         # Step 3: Filter weekend events
+        # Normalize target_weekend: accept either a weekend tuple or a single datetime
+        if isinstance(target_weekend, datetime):
+            # Convert provided date into the configured weekend window
+            dt = target_weekend
+            # Localize/convert to configured timezone if needed
+            try:
+                import pytz
+                tz_name = self.config.get_timezone() if self.config else 'America/Sao_Paulo'
+                tz = pytz.timezone(tz_name)
+                if dt.tzinfo is None:
+                    dt = tz.localize(dt)
+                else:
+                    dt = dt.astimezone(tz)
+            except Exception:
+                # Fallback: keep original dt if timezone handling fails
+                pass
+            
+            event_weekday = dt.weekday()
+            if event_weekday >= self.weekend_start_day:
+                days_to_start = event_weekday - self.weekend_start_day
+                weekend_start = dt - timedelta(days=days_to_start)
+            else:
+                days_until_start = self.weekend_start_day - event_weekday
+                weekend_start = dt + timedelta(days=days_until_start)
+            weekend_end = weekend_start + timedelta(days=self.weekend_end_day - self.weekend_start_day)
+            # Extend boundaries with configured hours
+            weekend_start = weekend_start - timedelta(hours=self.extend_weekend_hours)
+            weekend_end = weekend_end + timedelta(hours=self.extend_weekend_hours)
+            target_weekend = (weekend_start, weekend_end)
+        elif isinstance(target_weekend, tuple) and len(target_weekend) == 2:
+            # Ensure weekend tuple datetimes are timezone-aware
+            start, end = target_weekend
+            try:
+                import pytz
+                tz_name = self.config.get_timezone() if self.config else 'America/Sao_Paulo'
+                tz = pytz.timezone(tz_name)
+                if isinstance(start, datetime) and start.tzinfo is None:
+                    start = tz.localize(start)
+                if isinstance(end, datetime) and end.tzinfo is None:
+                    end = tz.localize(end)
+                target_weekend = (start, end)
+            except Exception:
+                # If localization fails, proceed as-is
+                pass
+
         if not target_weekend:
             target_weekend = self._detect_target_weekend(categorized_events)
         
@@ -534,8 +579,11 @@ class EventProcessor:
             Tuple of (weekend_start, weekend_end)
         """
         if not events:
-            # Default to next weekend
-            today = datetime.now()
+            # Default to next weekend (timezone-aware)
+            import pytz
+            tz_name = self.config.get_timezone() if self.config else 'America/Sao_Paulo'
+            tz = pytz.timezone(tz_name)
+            today = datetime.now(tz)
             days_until_friday = (self.weekend_start_day - today.weekday()) % 7
             if days_until_friday == 0 and today.weekday() > self.weekend_end_day:
                 days_until_friday = 7
