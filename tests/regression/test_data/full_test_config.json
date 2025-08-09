@@ -1,0 +1,99 @@
+{
+  "sources": [
+    {
+      "name": "tomada_tempo",
+      "enabled": true,
+      "base_url": "https://www.tomadatempo.com.br",
+      "endpoints": {
+        "programacao": "/programacao",
+        "evento": "/evento",
+        "categorias": "/categorias"
+      },
+      "timeout": 30,
+      "retry_attempts": 3,
+      "headers": {
+        "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36"
+      }
+    }
+  ],
+  "output": {
+    "directory": "./test_output",
+    "filename_format": "events_{date}.ics",
+    "date_format": "%Y%m%d",
+    "overwrite_existing": true
+  },
+  "logging": {
+    "level": "INFO",
+    "file": "test_logs/test.log",
+    "max_size_mb": 10,
+    "backup_count": 5,
+    "format": "%(asctime)s - %(name)s - %(levelname)s - %(message)s"
+  },
+  "retry": {
+    "max_attempts": 3,
+    "backoff_factor": 1,
+    "status_forcelist": [500, 502, 503, 504]
+  },
+  "ui": {
+    "enabled": true,
+    "theme": "dark",
+    "refresh_interval_seconds": 300,
+    "show_progress_bars": true
+  },
+  "calendar": {
+    "timezone": "UTC",
+    "default_duration_minutes": 120,
+    "reminders": [
+      {
+        "minutes": 60,
+        "method": "popup"
+      },
+      {
+        "minutes": 15,
+        "method": "popup"
+      }
+    ],
+    "description_template": "{title}\n\nLocal: {location}\nCategoria: {category}\n\n{description}",
+    "include_streaming_links": true
+  },
+  "filters": {
+    "included_categories": ["*"],
+    "excluded_categories": [],
+    "min_duration_minutes": 30,
+    "max_duration_days": 7,
+    "require_confirmation": false
+  },
+  "event_processing": {
+    "timezone_handling": "convert_to_utc",
+    "duplicate_detection": {
+      "enabled": true,
+      "window_minutes": 30,
+      "check_title_similarity": true,
+      "check_datetime_proximity": true
+    },
+    "date_parsing": {
+      "formats": [
+        "%Y-%m-%dT%H:%M:%S%z",
+        "%Y-%m-%d %H:%M:%S",
+        "%d/%m/%Y %H:%M",
+        "%d/%m/%Y %Hh%M"
+      ],
+      "default_timezone": "America/Sao_Paulo",
+      "prefer_locale": true
+    },
+    "category_detection": {
+      "enabled": true,
+      "confidence_threshold": 0.7,
+      "fallback_category": "other"
+    }
+  },
+  "advanced": {
+    "enable_debug_endpoints": false,
+    "log_payloads": false,
+    "cache_ttl_seconds": 3600,
+    "validate_responses": true,
+    "max_events_per_request": 1000
+  },
+  "version": "1.0.0",
+  "environment": "test"
+}

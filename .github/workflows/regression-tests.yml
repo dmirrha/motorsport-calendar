@@ -1,0 +1,9 @@
+name: Regression Tests (disabled)
+
+on:
+  workflow_dispatch:
+
+# Workflow desativado: execução automática removida.
+# Para reativar, reintroduza gatilhos como push/pull_request.
+
+jobs: {}

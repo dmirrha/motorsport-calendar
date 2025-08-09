@@ -5,13 +5,20 @@ Todas as mudanças notáveis neste projeto serão documentadas neste arquivo.
 O formato é baseado em [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 e este projeto adere ao [Versionamento Semântico](https://semver.org/spec/v2.0.0.html).
 
-## [1.0.1] - 2025-08-08
-### Corrigido
-- Testes: Tornado determinístico `tests/test_tomada_tempo.py::test_filter_weekend_events` ao ancorar o intervalo do fim de semana na data do evento (01/08/2025), eliminando flakiness dependente de `datetime.now()`.
-- Validação: Suíte completa passando localmente (37 testes) após a correção na branch `fix/logger-initialization`.
-
 ## [Não Lançado]
 ### Adicionado
+- **Refatoração da Estrutura do Projeto**
+  - Reorganização do código fonte para seguir a estrutura de pacotes Python
+  - Movidos módulos para o pacote `motorsport_calendar`
+  - Atualizada configuração do `setup.py` e `setup.cfg`
+  - Adicionado suporte a instalação em modo desenvolvimento
+
+- **Testes de Regressão**
+  - Implementada suíte abrangente de testes de regressão
+  - Adicionado `pytest.ini` com configurações de cobertura e relatórios
+  - Criado workflow do GitHub Actions para execução automática dos testes
+  - Adicionados testes para validação de configuração, coleta de eventos e geração de iCal
+
 - **Documentação de Configuração**
   - Criado `CONFIGURATION_GUIDE.md` com documentação detalhada de todas as opções de configuração
   - Adicionadas descrições detalhadas para cada parâmetro do arquivo de configuração

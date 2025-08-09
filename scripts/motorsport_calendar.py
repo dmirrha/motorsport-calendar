@@ -28,13 +28,13 @@ src_dir = os.path.join(project_root, 'src')
 if src_dir not in sys.path:
     sys.path.insert(0, src_dir)
 
-from config_manager import ConfigManager
-from logger import Logger
-from ui_manager import UIManager
-from category_detector import CategoryDetector
-from data_collector import DataCollector
-from event_processor import EventProcessor
-from ical_generator import ICalGenerator
+from motorsport_calendar.config_manager import ConfigManager
+from motorsport_calendar.logger import Logger
+from motorsport_calendar.ui_manager import UIManager
+from motorsport_calendar.category_detector import CategoryDetector
+from motorsport_calendar.data_collector import DataCollector
+from motorsport_calendar.event_processor import EventProcessor
+from motorsport_calendar.ical_generator import ICalGenerator
 
 
 class MotorsportCalendarGenerator:

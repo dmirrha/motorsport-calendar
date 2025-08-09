@@ -2,22 +2,18 @@
 Testes unitários para o módulo config_validator.
 """
 import os
-import sys
 import tempfile
 import unittest
 from pathlib import Path
 from unittest.mock import patch, MagicMock
 
-# Adiciona o diretório raiz ao path para permitir imports absolutos
-sys.path.insert(0, str(Path(__file__).parent.parent.parent))
-
-from src.utils.config_validator import (
+from motorsport_calendar.utils.config_validator import (
     validate_logging_config,
     validate_payload_settings,
     validate_silent_periods,
     ConfigValidationError
 )
-from src.utils.error_codes import ErrorCode
+from motorsport_calendar.utils.error_codes import ErrorCode
 
 
 class TestConfigValidator(unittest.TestCase):
