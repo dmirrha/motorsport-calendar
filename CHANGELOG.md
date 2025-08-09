@@ -36,6 +36,16 @@ e este projeto adere ao [Versionamento Semântico](https://semver.org/spec/v2.0.
   - Adicionada validação de tipos e valores nas configurações
   - Implementada documentação detalhada para todas as opções de configuração
 
+### Manutenção — Testes/Automação
+ - Fase 0: revisão do ambiente de testes conforme plano
+   - Python 3.11.5 e pip verificados
+   - `pytest` 8.4.1 e `pytest-cov` 6.2.1 instalados e presentes em `requirements.txt`
+   - Criado `pytest.ini` com `testpaths = tests` e `addopts = --cov=src --cov-report=term-missing`
+   - Padronização confirmada: apenas `tests/` como diretório canônico
+   - Limpeza: remoção do índice de artefatos gerados (`.pytest_cache/`, `test_results/`, `junit.xml`, `coverage.xml`, `.coverage*`) mantendo arquivos locais
+   - Documentados cenários em `docs/tests/scenarios/phase0_scenarios.md`
+   - Scripts adicionados: `scripts/tests_phase0_inventory.sh`, `scripts/tests_phase0_move_outside_tests.sh`, `scripts/tests_phase0_cleanup.sh`
+
 ### Corrigido
 - **Issue #23**: Corrigido bug na filtragem de períodos de silêncio
   - Corrigida lógica de filtragem que estava removendo todos os eventos
