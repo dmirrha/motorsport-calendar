@@ -168,6 +168,6 @@ jobs:
 **"Teste o suficiente para ter confiança, mas não tanto que vire um projeto separado."**
 
 Seu objetivo é melhorar a confiabilidade do código de scraping com o mínimo de esforço e complexidade. Cada teste deve ter um propósito claro e ser fácil de entender. Se um teste é difícil de escrever ou entender, provavelmente não é necessário.
-
+ 
 Foque no que quebra com frequência: parsing de HTML, tratamento de dados, requisições HTTP. Ignore otimizações prematuras e casos extremamente raros.
 ```
