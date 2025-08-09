@@ -31,6 +31,7 @@ env/
 ENV/
 env.bak/
 venv.bak/
+.venv/
 
 # IDE
 .vscode/
@@ -67,7 +68,7 @@ config.json
 *.local.json
 
 # Generated files
-output/*.ics
+output/
 !output/.gitkeep
 
 # Logs and payloads (keep structure, ignore content)
@@ -96,6 +97,15 @@ htmlcov/
 coverage.xml
 *.cover
 .hypothesis/
+pytest.log
+report.html
+junit.xml
+
+# Test artifacts and results
+tests/regression/test_data/output/
+test_results/
+test_results_github/
+tests/**/test_results/
 
 # Environment variables
 .env

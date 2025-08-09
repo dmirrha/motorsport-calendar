@@ -1,5 +1,9 @@
 # Guia de Contribuição
 
+> Nota pós-rollback (0.5.1)
+>
+> A branch `main` foi revertida para o snapshot do commit `9362503` (PR #34). Garanta que toda mudança venha acompanhada de atualização de documentação e changelog. O workflow de testes/CI permanece desativado por enquanto.
+
 ## Fluxo de Trabalho para Commits
 
 ### 1. Antes de Fazer um Commit

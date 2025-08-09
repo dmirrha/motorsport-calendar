@@ -1,6 +1,19 @@
+---
+
+## Diretórios de saída e artefatos
+
+- `output/`: diretório onde os arquivos `.ics` são gerados (mantém `output/.gitkeep`).
+- `logs/`: diretório para logs e payloads (`logs/rotated_logs/`, `logs/payloads/`).
+- `tests/regression/test_data/output/`: artefatos gerados por testes de regressão (ignorado pelo Git).
+
+Esses caminhos não exigem configuração específica, mas podem ser ajustados via parâmetros em `config.json` (ex.: `general.output_directory`, opções em `logging.file_structure`).
 # Guia de Configuração do Motorsport Calendar Generator
 
 Este documento descreve todas as opções de configuração disponíveis no arquivo `config.json` do Motorsport Calendar Generator.
+
+> Nota pós-rollback (0.5.1)
+>
+> O projeto foi revertido para o snapshot do commit `9362503`. Algumas opções documentadas podem se referir a funcionalidades que serão reintroduzidas em PRs futuros. Consulte `RELEASES.md` para detalhes.
 
 ## Visão Geral
 
