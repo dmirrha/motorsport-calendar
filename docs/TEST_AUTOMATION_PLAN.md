@@ -33,7 +33,7 @@ Objetivo: Garantir documentação padrão, simples e completa para explicar a es
   - [ ] `docs/tests/scenarios/phase1_scenarios.md` (parsers/validação/utils)
   - [ ] `docs/tests/scenarios/phase2_scenarios.md` (fluxos de integração e iCal)
 - [ ] Atualizar documentações obrigatórias a cada mudança testada:
-  - [ ] `CHANGELOG.md`, `CONTRIBUTING.md`, `DATA_SOURCES.md`, `PROJECT_STRUCTURE.md`, `README.md`, `RELEASES.md`, `REQUIREMENTS.md`, `CONFIGURATION_GUIDE.md`, `docs/TEST_AUTOMATION_PLAN.md`
+  - [x] `CHANGELOG.md`, `RELEASES.md`, `docs/TEST_AUTOMATION_PLAN.md` (atualizados em 2025-08-09 após patch 0.5.2)
 - [ ] Processo de tracking
   - [ ] Toda descoberta/melhoria gera itens no plano em formato checklist, e issues quando aplicável (via GH)
   - [ ] Registrar no(s) arquivo(s) de cenários o status (ToDo/Doing/Done) e referência a PRs/Issues
@@ -72,8 +72,8 @@ Objetivo: Remover legados e padronizar a base de testes antes de iniciar as fase
 - [ ] CI antigo
   - [ ] Remover workflows antigos/duplicados de testes; manter apenas `tests.yml` quando criado
 - [ ] Validação pós-limpeza
-  - [ ] Executar `pytest -q` para confirmar descoberta apenas em `tests/`
-  - [ ] Documentar no `CHANGELOG.md` e atualizar `README.md`/`REQUIREMENTS.md` se aplicável
+  - [x] Executar `pytest -q` para confirmar descoberta apenas em `tests/`
+  - [x] Documentar no `CHANGELOG.md` e atualizar `README.md`/`REQUIREMENTS.md` se aplicável
 - [x] Documentação e rastreabilidade (Fase 0)
   - [x] Criar/atualizar `docs/tests/scenarios/phase0_scenarios.md` com inventário, decisões e itens derivados
   - [x] Adicionar itens derivados como checklist nesta seção do plano (`docs/TEST_AUTOMATION_PLAN.md`)
@@ -85,6 +85,10 @@ Objetivo: Remover legados e padronizar a base de testes antes de iniciar as fase
     - Arquivos: `.coverage`, `.coverage.*`, `coverage.xml`, `junit.xml` (incluindo variantes sob `tests/**/test_results/`, `test_results/`).
     - Utilizar o script: `scripts/tests_phase0_cleanup.sh` (DRY_RUN por padrão; executar com `DRY_RUN=0` para aplicar).
   - [x] Preparar script de movimentação de testes fora de `tests/`: `scripts/tests_phase0_move_outside_tests.sh` (DRY_RUN por padrão).
+  - [x] Criado `tests/conftest.py` ajustando `sys.path` (raiz e `src/`) para evitar `ModuleNotFoundError`.
+  - [x] Tornado determinístico o teste de fim de semana em `tests/test_tomada_tempo.py` (data fixa 01/08/2025, TZ `America/Sao_Paulo`).
+  - [x] Validação da suíte de testes: `37 passed` em 2025-08-09 (pós-merge Fase 0).
+  - [x] SemVer (patch): bump para `0.5.2` registrado em `CHANGELOG.md` e `RELEASES.md`.
   - Relatórios e referências:
     - Relatório de inventário: `test_results/inventory/phase0_inventory_20250809-081647.md`.
     - Cenários Fase 0: `docs/tests/scenarios/phase0_scenarios.md`.

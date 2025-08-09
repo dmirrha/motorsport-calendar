@@ -87,7 +87,9 @@ class TestTomadaTempoSource(unittest.TestCase):
         from datetime import timedelta
         
         tz = pytz.timezone('America/Sao_Paulo')
-        target_date = self.source._get_next_weekend()
+        # Use fixed Friday (01/08/2025) to make the test deterministic
+        from datetime import datetime as _dt
+        target_date = tz.localize(_dt.strptime('01/08/2025', '%d/%m/%Y'))
         
         # Ensure target_date has timezone
         if target_date.tzinfo is None:

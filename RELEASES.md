@@ -2,6 +2,13 @@
 
 Este arquivo contém um registro acumulativo de todas as versões lançadas do projeto, com notas detalhadas sobre as mudanças em cada versão.
 
+## Versão 0.5.2 (2025-08-09)
+Manutenção — Testes/Automação
+
+- Ajustado ambiente de testes para evitar `ModuleNotFoundError` por imports de `sources` via `tests/conftest.py` (inclusão de caminhos da raiz e `src/`).
+- Tornado determinístico o teste de filtragem de fim de semana em `tests/test_tomada_tempo.py` usando data fixa 01/08/2025 com timezone `America/Sao_Paulo`.
+- Suíte validada localmente: 37 testes passando.
+
 ## Versão 0.5.1 (2025-08-09)
 Rollback técnico da branch main para o snapshot exato do commit `9362503`.
 
