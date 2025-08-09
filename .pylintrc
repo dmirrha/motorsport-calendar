@@ -1,0 +1,122 @@
+[MAIN]
+# Adiciona o diretório raiz ao path do Python
+init-hook='import sys; sys.path.append("."); sys.path.append("./src"); sys.path.append("./tests")'
+
+# Plugins adicionais
+load-plugins=
+    pylint.extensions.mccabe,
+    pylint.extensions.docparams,
+    pylint.extensions.docstyle,
+    pylint.extensions.typing,
+    pylint.extensions.mypy
+
+[REPORTS]
+# Formato de saída
+output-format=colorized
+
+# Mostrar mensagens por categoria
+reports=yes
+
+# Mostrar pontuação
+evaluation=10.0 - ((float(5 * error + warning + refactor + convention) / statement) * 10)
+
+# Limite de linhas por módulo
+max-module-lines=1000
+
+[FORMAT]
+# Comprimento máximo de linha
+max-line-length=120
+
+# Nomes de variáveis
+# - Nomes de classe em CamelCase
+# - Nomes de função em snake_case
+# - Nomes de constantes em UPPER_CASE
+# - Nomes de métodos em snake_case
+# - Nomes de atributos em snake_case
+method-rgx=^[_\l][\l\d_]*$
+attr-rgx=^[_\l][\l\d_]*$
+function-rgx=^[_\l][\l\d_]*$
+variable-rgx=^[_\l][\l\d_]*$
+class-attribute-rgx=^[_\l][\l\d_]*$
+class-rgx=^[A-Z\_][a-zA-Z0-9]+$
+const-rgx=^(_?[A-Z][A-Z0-9_]*|__[a-z0-9_]+_[a-z0-9_]+__|_?[a-z][a-z0-9_]*)$
+
+[MESSAGES CONTROL]
+# Desabilitar mensagens específicas
+disable=
+    # Mensagens de aviso comuns
+    raw-checker-failed,
+    bad-inline-option,
+    locally-disabled,
+    file-ignored,
+    suppressed-message,
+    deprecated-pragma,
+    use-symbolic-message-instead,
+    # Mensagens específicas para desabilitar
+    too-few-public-methods,
+    too-many-arguments,
+    too-many-instance-attributes,
+    too-many-locals,
+    too-many-branches,
+    too-many-statements,
+    too-many-public-methods,
+    duplicate-code,
+    # Mensagens de tipagem (tratadas pelo mypy)
+    no-member,
+    not-callable,
+    assignment-from-no-return,
+    no-value-for-parameter,
+    unexpected-keyword-arg,
+    no-name-in-module,
+    import-error,
+    # Mensagens de documentação
+    missing-module-docstring,
+    missing-class-docstring,
+    missing-function-docstring
+
+# Habilitar mensagens úteis
+enable=
+    # Mensagens de estilo
+    bad-whitespace,
+    mixed-line-endings,
+    trailing-whitespace,
+    # Mensagens de código
+    unused-import,
+    unused-argument,
+    unused-variable,
+    redefined-outer-name,
+    redefined-builtin,
+    # Mensagens de boas práticas
+    global-statement,
+    eval-used,
+    exec-used,
+    # Mensagens de design
+    duplicate-code,
+    # Mensagens de exceções
+    broad-except,
+    try-except-raise,
+    # Mensagens de formatação
+    bad-continuation,
+    # Mensagens de variáveis
+    unused-private-member
+
+# Limite de instâncias por módulo
+max-attributes=15
+
+# Limite de argumentos por função/método
+max-args=8
+
+# Limite de métodos públicos por classe
+max-public-methods=20
+
+# Limite de linhas por função/método
+max-locals=25
+
+# Limite de retornos por função/método
+max-returns=6
+
+# Limite de branches por função/método
+max-branches=15
+
+# Limite de statements por função/método
+max-statements=50

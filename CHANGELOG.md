@@ -5,6 +5,11 @@ Todas as mudanças notáveis neste projeto serão documentadas neste arquivo.
 O formato é baseado em [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 e este projeto adere ao [Versionamento Semântico](https://semver.org/spec/v2.0.0.html).
 
+## [1.0.1] - 2025-08-08
+### Corrigido
+- Testes: Tornado determinístico `tests/test_tomada_tempo.py::test_filter_weekend_events` ao ancorar o intervalo do fim de semana na data do evento (01/08/2025), eliminando flakiness dependente de `datetime.now()`.
+- Validação: Suíte completa passando localmente (37 testes) após a correção na branch `fix/logger-initialization`.
+
 ## [Não Lançado]
 ### Adicionado
 - **Refatoração da Estrutura do Projeto**
