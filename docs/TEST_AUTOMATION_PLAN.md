@@ -64,14 +64,14 @@ Objetivo: Remover legados e padronizar a base de testes antes de iniciar as fase
 - [x] Normalização de nomes/estrutura
   - [x] Garantir padrão de arquivo `test_*.py`
   - [x] Remover `__init__.py` em `tests/` (a menos que necessário)
-- [ ] Limpeza de artefatos gerados
-  - [ ] Excluir `.pytest_cache/`, `htmlcov/`, `.coverage*`, `coverage.xml`, `junit.xml`, `test_results/`
+- [x] Limpeza de artefatos gerados (não versionados; exclusão local é opcional)
+  - [x] (N/A) Exclusão local opcional; diretórios/arquivos já ignorados pelo git: `.pytest_cache/`, `htmlcov/`, `.coverage*`, `coverage.xml`, `junit.xml`, `test_results/`
   - [x] Atualizar `.gitignore` para garantir ignorados consistentes
-- [ ] Scripts temporários e dispersos
-  - [ ] Revisar `scripts/` e remover scripts temporários relacionados a testes que não serão usados
-- [ ] CI antigo
-  - [ ] Remover workflows antigos/duplicados de testes; manter apenas `tests.yml` quando criado
-- [ ] Validação pós-limpeza
+- [x] Scripts temporários e dispersos (N/A — sem scripts temporários; utilitários mantidos)
+  - [x] Revisão realizada: manter `scripts/tests_phase0_*` e `scripts/create_patch_0_5_2_pr.sh`; nenhum `tmp_*` encontrado
+- [x] CI antigo (N/A — apenas `release-drafter.yml` presente)
+  - [x] Nenhum workflow antigo/duplicado encontrado; manteremos `tests.yml` quando criado na Fase 1
+- [x] Validação pós-limpeza
   - [x] Executar `pytest -q` para confirmar descoberta apenas em `tests/`
   - [x] Documentar no `CHANGELOG.md` e atualizar `README.md`/`REQUIREMENTS.md` se aplicável
 - [x] Documentação e rastreabilidade (Fase 0)
