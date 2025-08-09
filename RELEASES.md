@@ -2,6 +2,17 @@
 
 Este arquivo contém um registro acumulativo de todas as versões lançadas do projeto, com notas detalhadas sobre as mudanças em cada versão.
 
+## Versão 1.0.1 (2025-08-08)
+**Correções de Testes**
+
+### 🐛 Correções
+- Tornado determinístico o teste `tests/test_tomada_tempo.py::test_filter_weekend_events` ao ancorar o intervalo de fim de semana na data do evento (01/08/2025), eliminando flakiness dependente de `datetime.now()`.
+- Suíte de testes completa passando localmente após a correção (37 testes).
+
+### 📈 Impacto
+- Redução de falhas intermitentes no CI.
+- Maior estabilidade na validação de regressão e cobertura.
+
 ## Versão 0.5.0 (2025-08-04)
 **Melhorias no Sistema de Logging e Configuração**
 
