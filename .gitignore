@@ -22,6 +22,8 @@ wheels/
 # Output directories
 output/history/
 test_results/
+test_results_github/
+tests/regression/test_data/output/
 
 # GitHub Actions
 .github_actions_errors.txt
@@ -46,9 +48,13 @@ share/python-wheels/
 .installed.cfg
 *.egg
 MANIFEST
+pytest.log
+junit.xml
+report.html
 
 # Virtual Environment
 venv/
+.venv/
 env/
 ENV/
 env.bak/
