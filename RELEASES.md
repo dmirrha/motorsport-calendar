@@ -2,29 +2,7 @@
 
 Este arquivo contém um registro acumulativo de todas as versões lançadas do projeto, com notas detalhadas sobre as mudanças em cada versão.
 
-## Versão 0.7.0 (2025-08-04)
-**Refatoração da Estrutura do Projeto**
-
-### 🚀 Novas Funcionalidades
-
-- **Estrutura de Pacotes Python**
-  - Reorganização do código em um pacote `motorsport_calendar`
-  - Configuração de instalação via `setup.py` e `setup.cfg`
-  - Suporte a instalação em modo de desenvolvimento
-  - Estrutura de diretórios mais organizada e padronizada
-
-- **Testes de Regressão Automatizados**
-  - Suíte abrangente de testes de regressão para validação de configuração
-  - Testes de integração para o fluxo completo de coleta de eventos
-  - Validação da geração de arquivos iCal com diferentes cenários
-  - Integração contínua via GitHub Actions
-
-- **Cobertura de Testes**
-  - Configuração de relatórios de cobertura detalhados
-  - Análise estática de código como parte do pipeline
-  - Integração com Codecov para monitoramento contínuo
-
-## Versão 0.5.0 (2025-08-03)
+## Versão 0.5.0 (2025-08-04)
 **Melhorias no Sistema de Logging e Configuração**
 
 ### 🚀 Novas Funcionalidades

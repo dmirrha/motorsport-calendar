@@ -18,43 +18,15 @@ parts/
 sdist/
 var/
 wheels/
-
-# Output directories
-output/history/
-test_results/
-test_results_github/
-tests/regression/test_data/output/
-
-# GitHub Actions
-.github_actions_errors.txt
-.github_actions_log.txt
-.github/workflows/*.log
-
-# IDE
-.idea/
-.vscode/
-*.swp
-*.swo
-.DS_Store
-
-# Test artifacts
-.coverage
-htmlcov/
-.pytest_cache/
-.mypy_cache/
 pip-wheel-metadata/
 share/python-wheels/
 *.egg-info/
 .installed.cfg
 *.egg
 MANIFEST
-pytest.log
-junit.xml
-report.html
 
 # Virtual Environment
 venv/
-.venv/
 env/
 ENV/
 env.bak/

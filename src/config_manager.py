@@ -236,15 +236,6 @@ class ConfigManager:
             self.logger.error(f"Error saving config to {save_path}: {e}")
             raise
     
-    def load_config(self) -> None:
-        """
-        Load configuration from file.
-        
-        This is a public wrapper around the private _load_config method.
-        It can be called to reload the configuration if the file changes.
-        """
-        self._load_config()
-    
     def validate_config(self) -> List[str]:
         """
         Validate configuration and return list of issues.
