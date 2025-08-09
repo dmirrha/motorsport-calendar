@@ -86,8 +86,12 @@ class TestTomadaTempoSource(unittest.TestCase):
         import pytz
         from datetime import timedelta
         
-        # Ancorar o fim de semana na data dos eventos para tornar o teste determinístico
-        target_date = self.source.parse_date_time('01/08/2025', timezone_str='America/Sao_Paulo')
+        tz = pytz.timezone('America/Sao_Paulo')
+        target_date = self.source._get_next_weekend()
+        
+        # Ensure target_date has timezone
+        if target_date.tzinfo is None:
+            target_date = tz.localize(target_date)
         
         weekend_start = target_date.replace(hour=0, minute=0, second=0, microsecond=0)
         weekend_end = weekend_start + timedelta(days=2, hours=23, minutes=59, seconds=59)
