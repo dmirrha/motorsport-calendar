@@ -42,9 +42,9 @@ Objetivo: Garantir documentação padrão, simples e completa para explicar a es
 Objetivo: Remover legados e padronizar a base de testes antes de iniciar as fases seguintes, seguindo a simplicidade descrita em `.windsurf/rules/tester.md`.
 
 ## Checklist — Fase 0 (ordem sequencial)
-- [ ] Inventário de pastas/arquivos de teste
-  - [ ] Mapear tudo fora de `tests/` (padrões: `test_*.py`, `*_test.py`, `tests*/`, `.pytest_cache`, `htmlcov`, `junit.xml`, `coverage.xml`, `.coverage*`)
-  - [ ] Identificar scripts temporários em `scripts/` (ex.: `tmp_*tester*.sh`, `tmp_*tests*.sh`)
+- [x] Inventário de pastas/arquivos de teste
+  - [x] Mapear tudo fora de `tests/` (padrões: `test_*.py`, `*_test.py`, `tests*/`, `.pytest_cache`, `htmlcov`, `junit.xml`, `coverage.xml`, `.coverage*`)
+  - [x] Identificar scripts temporários em `scripts/` (ex.: `tmp_*tester*.sh`, `tmp_*tests*.sh`)
 - [ ] Definir padrão canônico
   - [ ] Manter apenas `tests/` como pasta oficial de testes
   - [ ] Mover para `tests/` arquivos válidos encontrados fora do padrão; excluir duplicatas
@@ -68,8 +68,19 @@ Objetivo: Remover legados e padronizar a base de testes antes de iniciar as fase
   - [ ] Executar `pytest -q` para confirmar descoberta apenas em `tests/`
   - [ ] Documentar no `CHANGELOG.md` e atualizar `README.md`/`REQUIREMENTS.md` se aplicável
 - [ ] Documentação e rastreabilidade (Fase 0)
-  - [ ] Criar/atualizar `docs/tests/scenarios/phase0_scenarios.md` com inventário, decisões e itens derivados
-  - [ ] Adicionar itens derivados como checklist nesta seção do plano (`docs/TEST_AUTOMATION_PLAN.md`)
+  - [x] Criar/atualizar `docs/tests/scenarios/phase0_scenarios.md` com inventário, decisões e itens derivados
+  - [x] Adicionar itens derivados como checklist nesta seção do plano (`docs/TEST_AUTOMATION_PLAN.md`)
+
+  Itens derivados (Fase 0):
+  - [ ] Mover `./test_issue_3_fixes.py` para `tests/` e padronizar nome (padrão `test_*.py`).
+  - [ ] Limpeza de artefatos versionados do índice do Git (manter arquivos locais; `.gitignore` já cobre):
+    - Diretórios: `.pytest_cache/`, `tests/**/test_results/`, `test_results/`, `test_results_github/`.
+    - Arquivos: `.coverage`, `.coverage.*`, `coverage.xml`, `junit.xml` (incluindo variantes sob `tests/**/test_results/`, `test_results/`).
+    - Utilizar o script: `scripts/tests_phase0_cleanup.sh` (DRY_RUN por padrão; executar com `DRY_RUN=0` para aplicar).
+  - [x] Preparar script de movimentação de testes fora de `tests/`: `scripts/tests_phase0_move_outside_tests.sh` (DRY_RUN por padrão).
+  - Relatórios e referências:
+    - Relatório de inventário: `test_results/inventory/phase0_inventory_20250809-081647.md`.
+    - Cenários Fase 0: `docs/tests/scenarios/phase0_scenarios.md`.
 
 # Fase 1 — Testes Unitários
 Objetivo: Cobrir funções críticas de parsing/transformação/validação com testes rápidos, determinísticos e independentes de rede/FS.
