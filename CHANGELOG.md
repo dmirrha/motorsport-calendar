@@ -5,6 +5,12 @@ Todas as mudanças notáveis neste projeto serão documentadas neste arquivo.
 O formato é baseado em [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 e este projeto adere ao [Versionamento Semântico](https://semver.org/spec/v2.0.0.html).
 
+## [0.5.2] - 2025-08-09
+### Manutenção — Testes/Automação
+- Ajustado ambiente de testes para evitar `ModuleNotFoundError` via `tests/conftest.py` (inclusão de caminhos da raiz e `src/`).
+- Tornado determinístico o teste de filtragem de fim de semana em `tests/test_tomada_tempo.py` (data fixa 01/08/2025 com timezone America/Sao_Paulo).
+- Suíte validada: `37 passed`.
+
 ## [0.5.1] - 2025-08-09
 ### Manutenção
 - Rollback técnico da branch `main` para o snapshot do commit `9362503` (PR #34), preservando histórico.
