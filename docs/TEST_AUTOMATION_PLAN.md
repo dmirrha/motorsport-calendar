@@ -42,24 +42,31 @@ Objetivo: Garantir documentação padrão, simples e completa para explicar a es
 Objetivo: Remover legados e padronizar a base de testes antes de iniciar as fases seguintes, seguindo a simplicidade descrita em `.windsurf/rules/tester.md`.
 
 ## Checklist — Fase 0 (ordem sequencial)
-- [ ] Inventário de pastas/arquivos de teste
-  - [ ] Mapear tudo fora de `tests/` (padrões: `test_*.py`, `*_test.py`, `tests*/`, `.pytest_cache`, `htmlcov`, `junit.xml`, `coverage.xml`, `.coverage*`)
-  - [ ] Identificar scripts temporários em `scripts/` (ex.: `tmp_*tester*.sh`, `tmp_*tests*.sh`)
-- [ ] Definir padrão canônico
-  - [ ] Manter apenas `tests/` como pasta oficial de testes
-  - [ ] Mover para `tests/` arquivos válidos encontrados fora do padrão; excluir duplicatas
-- [ ] Backup antes de remover
-  - [ ] Criar branch `chore/tests-cleanup-YYYYMMDD` e tag `backup/tests-cleanup-YYYYMMDD`
-  - [ ] Opcional: arquivar em `docs/archive/tests/YYYYMMDD/` itens potencialmente úteis
-- [ ] Remover frameworks/arquivos obsoletos
-  - [ ] Excluir `nose.cfg`, `tox.ini` e configs antigas não utilizadas
-  - [ ] Unificar configuração em único `pytest.ini` (sem `setup.cfg`/`pyproject.toml` para testes)
-- [ ] Normalização de nomes/estrutura
-  - [ ] Garantir padrão de arquivo `test_*.py`
-  - [ ] Remover `__init__.py` em `tests/` (a menos que necessário)
+- [x] Inventário de pastas/arquivos de teste
+  - [x] Mapear tudo fora de `tests/` (padrões: `test_*.py`, `*_test.py`, `tests*/`, `.pytest_cache`, `htmlcov`, `junit.xml`, `coverage.xml`, `.coverage*`)
+  - [x] Identificar scripts temporários em `scripts/` (ex.: `tmp_*tester*.sh`, `tmp_*tests*.sh`)
+- [x] Definir padrão canônico
+  - [x] Manter apenas `tests/` como pasta oficial de testes
+  - [x] Mover para `tests/` arquivos válidos encontrados fora do padrão; excluir duplicatas
+- [x] Limpeza do repositório (artefatos gerados)
+  - [x] Remover do índice do Git artefatos gerados (manter local), conforme `.gitignore`
+  - [x] Garantir `.gitkeep` em pastas vazias necessárias (ex.: `tests/test_results/`)
+- [x] Revisão das ferramentas e ambiente de teste (não executar testes ainda)
+  - [x] Verificar Python/pip: `python3 --version`, `pip --version`
+  - [x] Verificar instalação e versões: `pip show pytest pytest-cov` e `pytest --version` (somente versão)
+  - [x] Conferir `requirements.txt`/`requirements-dev.txt` e incluir `pytest`, `pytest-cov` se ausentes
+  - [x] Ajustar/confirmar `pytest.ini` básico (`testpaths = tests`, `addopts = --cov=src --cov-report=term-missing`)
+  - [x] Validar PATH/ambiente: `which pytest` e conflitos de múltiplas versões
+  - [x] Documentar alterações em `CHANGELOG.md` e `REQUIREMENTS.md` (SemVer)
+- [x] Remover frameworks/arquivos obsoletos
+  - [x] Excluir `nose.cfg`, `tox.ini` e configs antigas não utilizadas (N/A — não encontrados)
+  - [x] Unificar configuração em único `pytest.ini` (sem `setup.cfg`/`pyproject.toml` para testes)
+- [x] Normalização de nomes/estrutura
+  - [x] Garantir padrão de arquivo `test_*.py`
+  - [x] Remover `__init__.py` em `tests/` (a menos que necessário)
 - [ ] Limpeza de artefatos gerados
   - [ ] Excluir `.pytest_cache/`, `htmlcov/`, `.coverage*`, `coverage.xml`, `junit.xml`, `test_results/`
-  - [ ] Atualizar `.gitignore` para garantir ignorados consistentes
+  - [x] Atualizar `.gitignore` para garantir ignorados consistentes
 - [ ] Scripts temporários e dispersos
   - [ ] Revisar `scripts/` e remover scripts temporários relacionados a testes que não serão usados
 - [ ] CI antigo
@@ -67,9 +74,20 @@ Objetivo: Remover legados e padronizar a base de testes antes de iniciar as fase
 - [ ] Validação pós-limpeza
   - [ ] Executar `pytest -q` para confirmar descoberta apenas em `tests/`
   - [ ] Documentar no `CHANGELOG.md` e atualizar `README.md`/`REQUIREMENTS.md` se aplicável
-- [ ] Documentação e rastreabilidade (Fase 0)
-  - [ ] Criar/atualizar `docs/tests/scenarios/phase0_scenarios.md` com inventário, decisões e itens derivados
-  - [ ] Adicionar itens derivados como checklist nesta seção do plano (`docs/TEST_AUTOMATION_PLAN.md`)
+- [x] Documentação e rastreabilidade (Fase 0)
+  - [x] Criar/atualizar `docs/tests/scenarios/phase0_scenarios.md` com inventário, decisões e itens derivados
+  - [x] Adicionar itens derivados como checklist nesta seção do plano (`docs/TEST_AUTOMATION_PLAN.md`)
+
+  Itens derivados (Fase 0):
+  - [x] Mover `./test_issue_3_fixes.py` para `tests/` e padronizar nome (padrão `test_*.py`).
+  - [x] Limpeza de artefatos versionados do índice do Git (manter arquivos locais; `.gitignore` já cobre):
+    - Diretórios: `.pytest_cache/`, `tests/**/test_results/`, `test_results/`, `test_results_github/`.
+    - Arquivos: `.coverage`, `.coverage.*`, `coverage.xml`, `junit.xml` (incluindo variantes sob `tests/**/test_results/`, `test_results/`).
+    - Utilizar o script: `scripts/tests_phase0_cleanup.sh` (DRY_RUN por padrão; executar com `DRY_RUN=0` para aplicar).
+  - [x] Preparar script de movimentação de testes fora de `tests/`: `scripts/tests_phase0_move_outside_tests.sh` (DRY_RUN por padrão).
+  - Relatórios e referências:
+    - Relatório de inventário: `test_results/inventory/phase0_inventory_20250809-081647.md`.
+    - Cenários Fase 0: `docs/tests/scenarios/phase0_scenarios.md`.
 
 # Fase 1 — Testes Unitários
 Objetivo: Cobrir funções críticas de parsing/transformação/validação com testes rápidos, determinísticos e independentes de rede/FS.

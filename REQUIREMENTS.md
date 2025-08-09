@@ -129,6 +129,7 @@ Desenvolver e manter um sistema automatizado para coleta, processamento e export
 - `pyyaml` - Suporte a YAML
 - `jsonschema` - Validação de JSON Schema
 - `pytest` - Framework de testes
+- `pytest-cov` - Plugin do pytest para cobertura (usa `coverage`)
 - `coverage` - Cobertura de testes
 - `mypy` - Checagem estática de tipos
 - `black` - Formatação de código
@@ -137,6 +138,12 @@ Desenvolver e manter um sistema automatizado para coleta, processamento e export
 - Verificar regularmente por atualizações de segurança
 - Manter documentação atualizada
 - Monitorar mudanças nas APIs e sites de origem
+
+## **Configuração de Testes**
+
+- Arquivo `pytest.ini` na raiz do projeto define:
+  - `testpaths = tests`
+  - `addopts = --cov=src --cov-report=term-missing`
 
 ## **Roadmap**
 
