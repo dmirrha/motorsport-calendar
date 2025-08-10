@@ -122,7 +122,7 @@ Objetivo: Cobrir funções críticas de parsing/transformação/validação com 
   - [x] Processadores/validadores de eventos em `src/event_processor.py`
   - [x] Utilitário iCal `src/ical_generator.py` (generate_calendar/validate_calendar)
   - [x] Lógica de filtro de fim de semana em `src/silent_period.py` e resumo `SilentPeriodManager.log_filtering_summary`
-  - [x] PR (draft) do plano aberta para aprovação — PR #56; rastreabilidade: `docs/issues/open/issue-49.md`
+  - [x] PR #56 mergeada; rastreabilidade: `docs/issues/closed/issue-49.md`
   - [x] Validação (prioritários): Suíte estável: `79 passed`; cobertura total: 37.00% (2025-08-10)
 - [ ] Geração de cenários (unit)
   - [ ] Criar diretório `tests/fixtures/` (se necessário)
