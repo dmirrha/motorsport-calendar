@@ -556,6 +556,7 @@ open htmlcov/index.html  # macOS
 Notas:
 - Gate de cobertura inicial: 40% (`--cov-fail-under=40`).
 - Timezone padrão dos testes: `America/Sao_Paulo` (fixture autouse em `tests/conftest.py`).
+- Convenções e estrutura da suíte de testes: consulte `tests/README.md`.
 
 ## 📝 Licença
 

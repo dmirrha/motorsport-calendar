@@ -70,16 +70,19 @@ Race Calendar/
 │   │   └── processed/              # Dados processados
 │   └── app.log                     # Log principal
 ├── 
-└── tests/                          # Testes automatizados
-    ├── __init__.py
-    ├── unit/                       # Testes unitários
-    │   ├── test_data_collector.py
-    │   ├── test_event_processor.py
-    │   └── test_ical_generator.py
+└── tests/                          # Testes automatizados (descoberta restrita pelo pytest.ini)
+    ├── unit/                       # Testes unitários (organizados por domínio/componente)
+    │   ├── sources/
+    │   │   └── tomada_tempo/
+    │   │       └── test_tomada_tempo.py
+    │   ├── silent_period/
+    │   │   └── test_silent_period.py
+    │   └── utils/
+    │       └── test_config_validator.py
     ├── integration/                # Testes de integração
-    │   └── test_sources.py
-    └── fixtures/                   # Dados de teste
-        └── sample_events.json
+    └── regression/                 # Testes de regressão e scripts específicos
+        └── test_processing/
+            └── test_issue_3_fixes.py
 ```
 
 ---

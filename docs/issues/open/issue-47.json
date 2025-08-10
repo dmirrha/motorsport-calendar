@@ -1,0 +1,24 @@
+{
+  "id": 3306754749,
+  "number": 47,
+  "state": "open",
+  "title": "Fase 1 — Organização de testes",
+  "milestone": {
+    "number": 2,
+    "title": "Automação de testes - Fase 1"
+  },
+  "epic": 45,
+  "url": "https://github.com/dmirrha/motorsport-calendar/issues/47",
+  "created_at": "2025-08-09T19:36:17Z",
+  "updated_at": "2025-08-10T01:49:20Z",
+  "tasks": [
+    {"item": "Estruturar tests/unit por domínio/componente", "done": true},
+    {"item": "Garantir nome test_*.py e ausência de __init__.py onde não necessário", "done": true},
+    {"item": "Consolidar utilitários/fixtures compartilhadas", "done": true},
+    {"item": "Verificar descoberta apenas em tests/", "done": true}
+  ],
+  "acceptance": [
+    "Hierarquia estável em tests/ documentada no plano",
+    "Coleta consistente no local e no CI"
+  ]
+}
