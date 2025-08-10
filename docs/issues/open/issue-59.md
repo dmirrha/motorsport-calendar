@@ -20,8 +20,8 @@ Elevar cobertura de `sources/tomada_tempo.py` para ≥55% com testes paramétric
 - PR inicia em draft até validação deste plano.
 
 ## Progresso
-- [ ] Branch criada
-- [ ] PR (draft) aberta
+- [x] Branch criada
+- [x] PR (draft) aberta
 - [ ] Testes implementados e passando
 - [ ] Documentação sincronizada
 
