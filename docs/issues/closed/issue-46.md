@@ -5,7 +5,8 @@ epic: 45
 milestone: 2
 branch: chore/pytest-min-config-46-20250809
 created_at: 2025-08-09T20:10:15Z
-status: "concluída (aguardando PR)"
+status: "concluída (fechada)"
+closed_at: 2025-08-10T01:49:20Z
 ---
 
 # Issue #46 — Plano de Resolução
