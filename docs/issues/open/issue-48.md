@@ -39,6 +39,15 @@ Garantir determinismo e isolamento em testes unitários por meio de mocks básic
 - [ ] `tests/README.md` atualizado (seção de mocks)
 - [ ] Validação: `pytest` estável sem dependências externas
 
+## Checklist — Mocks essenciais
+- [ ] Definir padrões de patch (compatíveis com shims):
+  - [ ] `sources.tomada_tempo.requests.get`
+  - [ ] `sources.base_source.requests.Session`
+- [ ] Tempo e aleatoriedade: fixture TZ-aware (America/Sao_Paulo) e `random.seed(0)` com restauração
+- [ ] Isolamento de filesystem: uso de `tmp_path`/`tmp_path_factory`
+- [ ] Variáveis de ambiente: `monkeypatch.setenv`/`delenv`
+- [ ] Simular cenários: sucesso, timeout, HTTPError, HTML malformado
+
 ## Critérios de Aceite
 - Testes não dependem de rede/tempo/FS real
 - Execução repetível e estável

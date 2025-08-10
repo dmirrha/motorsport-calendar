@@ -112,6 +112,9 @@ Objetivo: Cobrir funções críticas de parsing/transformação/validação com 
     - [ ] `sources.tomada_tempo.requests.get`
     - [ ] `sources.base_source.requests.Session`
   - [ ] Simular cenários: sucesso, timeout, HTTPError, HTML malformado
+  - [ ] Tempo e aleatoriedade: fixture TZ-aware (America/Sao_Paulo) e `random.seed(0)` com restauração
+  - [ ] Isolamento de filesystem: uso de `tmp_path`/`tmp_path_factory` em testes que tocam disco
+  - [ ] Variáveis de ambiente: `monkeypatch.setenv`/`delenv` para configurar/limpar `os.environ`
 - [ ] Alvos prioritários (unit)
   - [ ] Parsers de data/hora e categorias em `sources/tomada_tempo.py`
   - [ ] Normalização/validação no `src/motorsport_calendar/event_processor.py`
