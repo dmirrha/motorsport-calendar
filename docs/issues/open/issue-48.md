@@ -37,7 +37,10 @@ Garantir determinismo e isolamento em testes unitários por meio de mocks básic
 - [x] Isolamento de FS aplicado com `tmp_path`
 - [x] Fixtures de env aplicadas
 - [x] `tests/README.md` atualizado (seção de mocks)
-- [x] Validação: `pytest` estável sem dependências externas
+ - [x] Validação: `45 passed`; cobertura total: 28.75%
+ - [x] Documentação atualizada com mocks essenciais e gate 25%: `CHANGELOG.md` (Não Lançado), `RELEASES.md` (Próximo), `README.md` (🧪 Testes), `tests/README.md`. Gate configurado em `pytest.ini` (`--cov-fail-under=25`).
+ - [x] Plano sincronizado: `docs/TEST_AUTOMATION_PLAN.md` com validação “45 passed; 28.75%” (2025-08-10)
+ - [x] PR #55 atualizada: resumo com suíte estável, gate 25%, documentos sincronizados e checklists alinhados
 
 ## Checklist — Mocks essenciais
 - [x] Definir padrões de patch (compatíveis com shims):
