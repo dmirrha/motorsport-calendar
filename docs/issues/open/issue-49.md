@@ -20,7 +20,7 @@ Iniciar cobertura nos componentes críticos (parsers/validadores/processadores) 
 ## Progresso
 - [x] Branch criada: `chore/tests-priority-targets-49-20250810`
 - [x] Checklists sincronizadas com `docs/TEST_AUTOMATION_PLAN.md` (seção “Alvos prioritários (unit)”).
-- [ ] Abrir PR (draft) referenciando `#49` e solicitar aprovação do plano (PARE).
+- [x] PR (draft) aberta: #56 — https://github.com/dmirrha/motorsport-calendar/pull/56
 
 ## Notas
 - Seguir mocks essenciais já padronizados: rede (requests/Session), tempo/TZ, `tmp_path` e `os.environ`.
