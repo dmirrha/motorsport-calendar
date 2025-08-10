@@ -75,6 +75,10 @@ e este projeto adere ao [Versionamento Semântico](https://semver.org/spec/v2.0.
     - `tests/README.md` — seção de mocks essenciais
     - `README.md` — seção “🧪 Testes” com gate 25% e exemplos
     - `RELEASES.md` — nota de próximo patch (não lançado)
+ - Fase 1 — Alvos prioritários (issue #49, PR #56)
+   - Testes unitários para parsers de data/hora em `sources/tomada_tempo.py` e validações em `sources/base_source.py`
+   - Ajuste de casos de borda para refletir precedência atual dos padrões de data
+   - Validação: suíte estável `60 passed`; cobertura total 29.31% (2025-08-10)
 
 ### Corrigido
 - **Issue #23**: Corrigido bug na filtragem de períodos de silêncio

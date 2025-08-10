@@ -117,11 +117,12 @@ Objetivo: Cobrir funções críticas de parsing/transformação/validação com 
   - [x] Variáveis de ambiente: `monkeypatch.setenv`/`delenv` para configurar/limpar `os.environ` — ver `tests/unit/test_env_vars.py`
   - [x] Validação: Suíte estável: `45 passed`; cobertura total: 28.75% (2025-08-10)
 - [ ] Alvos prioritários (unit)
-  - [ ] Parsers de data/hora e timezone em `sources/tomada_tempo.py`
+  - [x] Parsers de data/hora e timezone em `sources/tomada_tempo.py`
   - [ ] Processadores/validadores de eventos em `src/event_processor.py`
   - [ ] Utilitário iCal `src/ical_generator.py` (`generate_ical`)
   - [ ] Lógica de filtro de fim de semana em `src/silent_period.py`
   - [x] PR (draft) do plano aberta para aprovação — PR #56; rastreabilidade: `docs/issues/open/issue-49.md`
+- [x] Validação (prioritários): Suíte estável: `60 passed`; cobertura total: 29.31% (2025-08-10)
 - [ ] Geração de cenários (unit)
   - [ ] Criar diretório `tests/fixtures/` (se necessário)
   - [ ] HTMLs mínimos para parsing (datas/horas, categorias, campos faltantes)

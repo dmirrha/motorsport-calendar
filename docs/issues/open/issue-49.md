@@ -9,7 +9,7 @@ Referências:
 Iniciar cobertura nos componentes críticos (parsers/validadores/processadores) com testes unitários simples e efetivos, seguindo `.windsurf/rules/tester.md`.
 
 ## Plano de Execução (Checklist)
-- [ ] Parsers de data/hora e timezone em `sources/tomada_tempo.py`
+- [x] Parsers de data/hora e timezone em `sources/tomada_tempo.py`
 - [ ] Processadores/validadores de eventos em `src/event_processor.py`
 - [ ] Utilitário iCal `src/ical_generator.py` (`generate_ical`)
 - [ ] Lógica de filtro de fim de semana em `src/silent_period.py`
@@ -21,6 +21,7 @@ Iniciar cobertura nos componentes críticos (parsers/validadores/processadores) 
 - [x] Branch criada: `chore/tests-priority-targets-49-20250810`
 - [x] Checklists sincronizadas com `docs/TEST_AUTOMATION_PLAN.md` (seção “Alvos prioritários (unit)”).
 - [x] PR (draft) aberta: #56 — https://github.com/dmirrha/motorsport-calendar/pull/56
+ - [x] Validação: suíte estável `60 passed`; cobertura total 29.31% (2025-08-10)
 
 ## Notas
 - Seguir mocks essenciais já padronizados: rede (requests/Session), tempo/TZ, `tmp_path` e `os.environ`.
