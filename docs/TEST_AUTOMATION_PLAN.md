@@ -27,7 +27,7 @@ Objetivo: Garantir documentação padrão, simples e completa para explicar a es
 
 ## Checklist — Documentação Padrão
 - [ ] Criar/atualizar visão geral de testes em `docs/tests/overview.md` (estratégia, escopo, como rodar local/CI, estrutura de pastas)
-- [ ] Criar índice de cenários em `docs/tests/scenarios/SCENARIOS_INDEX.md` (links para cenários por fase)
+- [x] Criar índice de cenários em `docs/tests/scenarios/SCENARIOS_INDEX.md` (links para cenários por fase)
 - [ ] Criar/atualizar mapeamento de cenários por fase:
   - [ ] `docs/tests/scenarios/phase0_scenarios.md` (inventário e decisões de limpeza)
   - [ ] `docs/tests/scenarios/phase1_scenarios.md` (parsers/validação/utils)
@@ -127,14 +127,23 @@ Objetivo: Cobrir funções críticas de parsing/transformação/validação com 
  
  Status (Fase 1 — issue #50): PR #57 em draft; rastreabilidade sincronizada em `docs/issues/open/issue-50.{md,json}`.
 - [ ] Geração de cenários (unit)
-  - [ ] Criar diretório `tests/fixtures/` (se necessário)
-  - [ ] HTMLs mínimos para parsing (datas/horas, categorias, campos faltantes)
+  - [x] Criar diretório `tests/fixtures/` (se necessário)
+  - [x] HTMLs mínimos para parsing (datas/horas, categorias, campos faltantes)
   - [ ] Matrizes de casos para horários: 24h, AM/PM, sem minutos, overnight, naive vs aware
+    - Progresso: AM/PM amostrado via `tests/fixtures/html/tomada_tempo_weekend_edge_cases.html` (padrão `08:00 AM` e `09.15`).
+    - Progresso: Sem minutos amostrado via `tests/fixtures/html/tomada_tempo_weekend_no_minutes.html` ("8h", "14 horas", "21", "às 10").
+    - Progresso: Overnight amostrado via `tests/fixtures/html/tomada_tempo_weekend_overnight.html` (23:50 → 00:10 em dias distintos).
   - [ ] Cenários de categoria: conhecidas vs fallback `Unknown`
+    - Progresso: assert mínimo de `Unknown` adicionado no teste paramétrico para o fixture de edge cases.
   - [ ] Casos iCal: PRODID, DTSTART/DTEND com TZ, URL, CATEGORIES, RRULE com `recurrence`
 - [ ] Documentação e rastreabilidade (Fase 1)
-  - [ ] Criar/atualizar `docs/tests/scenarios/phase1_scenarios.md` (matriz de casos, mapeamentos, status e links para testes)
+  - [x] Criar/atualizar `docs/tests/scenarios/phase1_scenarios.md` (matriz de casos, mapeamentos, status e links para testes)
   - [ ] Adicionar itens derivados como checklist nesta seção do plano
+    - [x] Criar fixture de edge cases (AM/PM, separador com ponto, categoria desconhecida)
+    - [x] Atualizar teste paramétrico para incluir fixture de edge cases e assert de `Unknown`
+    - [x] Atualizar `CHANGELOG.md` e `RELEASES.md` com os novos fixtures/testes
+    - [x] Criar fixture de sem minutos (8h/14 horas/21/às 10) e adicionar ao teste paramétrico
+    - [x] Criar fixture de overnight (23:50→00:10) e adicionar ao teste paramétrico
   - [x] Abrir PR de rascunho do plano de mocks essenciais (#48) — PR #55; rastreabilidade: `docs/issues/open/issue-48.md`
 
 6) Execução e relatórios (local)

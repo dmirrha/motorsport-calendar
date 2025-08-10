@@ -10,15 +10,22 @@
   "epic": 45,
   "url": "https://github.com/dmirrha/motorsport-calendar/issues/50",
   "created_at": "2025-08-09T19:36:19Z",
-  "updated_at": "2025-08-10T15:22:20-03:00",
+  "updated_at": "2025-08-10T18:45:00-03:00",
   "tasks": [
-    {"item": "Criar diretório tests/fixtures/ (se necessário)", "done": false},
-    {"item": "HTMLs mínimos para parsing (datas/horas, categorias, campos faltantes)", "done": false},
+    {"item": "Criar diretório tests/fixtures/ (se necessário)", "done": true},
+    {"item": "HTMLs mínimos para parsing (datas/horas, categorias, campos faltantes)", "done": true},
     {"item": "Matrizes de casos para horários: 24h, AM/PM, sem minutos, overnight, naive vs aware", "done": false},
     {"item": "Cenários de categoria: conhecidas vs fallback Unknown", "done": false},
     {"item": "Casos iCal: PRODID, DTSTART/DTEND com TZ, URL, CATEGORIES, RRULE com recurrence", "done": false},
-    {"item": "Criar/atualizar docs/tests/scenarios/phase1_scenarios.md (matriz de casos, mapeamentos, status e links para testes)", "done": false},
+    {"item": "Criar/atualizar docs/tests/scenarios/phase1_scenarios.md (matriz de casos, mapeamentos, status e links para testes)", "done": true},
     {"item": "Adicionar itens derivados como checklist na seção do plano (docs/TEST_AUTOMATION_PLAN.md)", "done": false}
+  ],
+  "notes": [
+    "Fixture edge cases criado: tests/fixtures/html/tomada_tempo_weekend_edge_cases.html (AM/PM, ponto como separador, categoria Unknown)",
+    "Teste paramétrico atualizado com assert mínimo de Unknown para edge cases: tests/unit/sources/tomada_tempo/test_parse_calendar_page_fixtures.py",
+    "Documentação atualizada: docs/tests/scenarios/phase1_scenarios.md e CHANGELOG.md (Não Lançado); RELEASES.md adicionado",
+    "Fixture sem minutos criado: tests/fixtures/html/tomada_tempo_weekend_no_minutes.html (8h/14 horas/21/às 10) e adicionado ao teste paramétrico",
+    "Fixture overnight criado: tests/fixtures/html/tomada_tempo_weekend_overnight.html (23:50→00:10) e adicionado ao teste paramétrico"
   ],
   "acceptance": [
     "Reuso de fixtures entre testes",

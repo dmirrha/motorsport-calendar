@@ -9,14 +9,14 @@ Referências:
 Criar fixtures/cenários reutilizáveis para testes unitários, com dados minimamente realistas, cobrindo parsers, validadores e utilitários, e documentar os cenários para reuso em fases seguintes.
 
 ## Plano de Execução (Checklist)
-- [ ] Criar diretório `tests/fixtures/` (se necessário)
-- [ ] HTMLs mínimos para parsing (datas/horas, categorias, campos faltantes)
+- [x] Criar diretório `tests/fixtures/` (se necessário)
+- [x] HTMLs mínimos para parsing (datas/horas, categorias, campos faltantes)
 - [ ] Matrizes de casos para horários: 24h, AM/PM, sem minutos, overnight, naive vs aware
 - [ ] Cenários de categoria: conhecidas vs fallback `Unknown`
 - [ ] Casos iCal: PRODID, DTSTART/DTEND com TZ, URL, CATEGORIES, RRULE com `recurrence`
 
 ### Documentação e rastreabilidade (Fase 1)
-- [ ] Criar/atualizar `docs/tests/scenarios/phase1_scenarios.md` (matriz de casos, mapeamentos, status e links para testes)
+- [x] Criar/atualizar `docs/tests/scenarios/phase1_scenarios.md` (matriz de casos, mapeamentos, status e links para testes)
 - [ ] Adicionar itens derivados como checklist nesta seção do plano (`docs/TEST_AUTOMATION_PLAN.md`)
 
 ## PARE — Autorização
@@ -26,6 +26,12 @@ Criar fixtures/cenários reutilizáveis para testes unitários, com dados minima
 - [x] Branch criada: `chore/tests-scenarios-unit-50-20250810`
 - [x] Checklists sincronizadas com `docs/TEST_AUTOMATION_PLAN.md` (seção “Geração de cenários (unit)”).
  - [x] PR (draft) aberta: #57 — https://github.com/dmirrha/motorsport-calendar/pull/57
+ - [x] Fixture de edge cases criado: `tests/fixtures/html/tomada_tempo_weekend_edge_cases.html` (AM/PM, ponto como separador, categoria `Unknown`)
+ - [x] Teste paramétrico atualizado com assert mínimo de `Unknown` para o fixture de edge cases: `tests/unit/sources/tomada_tempo/test_parse_calendar_page_fixtures.py`
+ - [x] Documentação atualizada: `docs/tests/scenarios/phase1_scenarios.md` e `CHANGELOG.md` (Não Lançado)
+ - [x] Fixture "sem minutos" criado: `tests/fixtures/html/tomada_tempo_weekend_no_minutes.html` ("8h", "14 horas", "21", "às 10")
+ - [x] Fixture "overnight" criado: `tests/fixtures/html/tomada_tempo_weekend_overnight.html` (23:50 → 00:10 com datas distintas)
+ - [x] Teste paramétrico atualizado para incluir `no_minutes` e `overnight`: `tests/unit/sources/tomada_tempo/test_parse_calendar_page_fixtures.py`
 
 ## Notas
 - Reutilizar mocks essenciais: rede (requests/Session), tempo/TZ, `tmp_path`, `os.environ`.

@@ -17,6 +17,21 @@ Manutenção — Testes/Automação (issue #48, PR #55)
   - `CHANGELOG.md` — registro em “Não Lançado”.
   - Suíte estável: `79 passed`; cobertura total: 37.00%
 
+Fase 1 — Cenários (issue #50, PR #57 draft)
+
+- Fixtures HTML adicionados para o parser `TomadaTempoSource`:
+  - `tests/fixtures/html/tomada_tempo_weekend_minimal.html`
+  - `tests/fixtures/html/tomada_tempo_weekend_alt_header.html`
+  - `tests/fixtures/html/tomada_tempo_weekend_edge_cases.html` (AM/PM, ponto como separador, categoria `Unknown`)
+  - `tests/fixtures/html/tomada_tempo_weekend_no_minutes.html` ("8h", "14 horas", "21", "às 10")
+  - `tests/fixtures/html/tomada_tempo_weekend_overnight.html` (23:50 → 00:10 em dias distintos)
+- Teste paramétrico atualizado consumindo os fixtures:
+  - `tests/unit/sources/tomada_tempo/test_parse_calendar_page_fixtures.py`
+  - Inclui assert de presença mínima de categoria `Unknown` para o fixture de edge cases
+- Documentação atualizada:
+  - `docs/tests/scenarios/SCENARIOS_INDEX.md`
+  - `docs/tests/scenarios/phase1_scenarios.md`
+
 Prioritários Fase 1 (issue #49, PR #56)
 
 - Testes unitários focados em parsers de data/hora e timezone em `sources/tomada_tempo.py` e validações em `sources/base_source.py`.
