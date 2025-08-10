@@ -11,13 +11,18 @@ Criar fixtures/cenários reutilizáveis para testes unitários, com dados minima
 ## Plano de Execução (Checklist)
 - [x] Criar diretório `tests/fixtures/` (se necessário)
 - [x] HTMLs mínimos para parsing (datas/horas, categorias, campos faltantes)
-- [ ] Matrizes de casos para horários: 24h, AM/PM, sem minutos, overnight, naive vs aware
+ - [x] Matrizes de casos para horários
+   - [x] 24h (ex.: `08:00`) — coberto por `tomada_tempo_weekend_minimal.html`
+   - [x] AM/PM — coberto por `tomada_tempo_weekend_edge_cases.html`
+   - [x] Sem minutos — coberto por `tomada_tempo_weekend_no_minutes.html`
+   - [x] Overnight — coberto por `tomada_tempo_weekend_overnight.html`
+   - [ ] Naive vs Aware (TZ `America/Sao_Paulo`)
 - [ ] Cenários de categoria: conhecidas vs fallback `Unknown`
 - [ ] Casos iCal: PRODID, DTSTART/DTEND com TZ, URL, CATEGORIES, RRULE com `recurrence`
 
 ### Documentação e rastreabilidade (Fase 1)
 - [x] Criar/atualizar `docs/tests/scenarios/phase1_scenarios.md` (matriz de casos, mapeamentos, status e links para testes)
-- [ ] Adicionar itens derivados como checklist nesta seção do plano (`docs/TEST_AUTOMATION_PLAN.md`)
+ - [x] Adicionar itens derivados como checklist nesta seção do plano (`docs/TEST_AUTOMATION_PLAN.md`)
 
 ## PARE — Autorização
 - Implementação requer confirmação. A PR será aberta como draft com este gate indicado apenas no corpo/labels/estado (título limpo e objetivo).

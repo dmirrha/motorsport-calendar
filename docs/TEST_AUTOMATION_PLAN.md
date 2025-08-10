@@ -129,16 +129,18 @@ Objetivo: Cobrir funções críticas de parsing/transformação/validação com 
 - [ ] Geração de cenários (unit)
   - [x] Criar diretório `tests/fixtures/` (se necessário)
   - [x] HTMLs mínimos para parsing (datas/horas, categorias, campos faltantes)
-  - [ ] Matrizes de casos para horários: 24h, AM/PM, sem minutos, overnight, naive vs aware
-    - Progresso: AM/PM amostrado via `tests/fixtures/html/tomada_tempo_weekend_edge_cases.html` (padrão `08:00 AM` e `09.15`).
-    - Progresso: Sem minutos amostrado via `tests/fixtures/html/tomada_tempo_weekend_no_minutes.html` ("8h", "14 horas", "21", "às 10").
-    - Progresso: Overnight amostrado via `tests/fixtures/html/tomada_tempo_weekend_overnight.html` (23:50 → 00:10 em dias distintos).
+  - [ ] Matrizes de casos para horários
+    - [x] 24h (ex.: `08:00`) — coberto por `tomada_tempo_weekend_minimal.html`
+    - [x] AM/PM — coberto por `tomada_tempo_weekend_edge_cases.html`
+    - [x] Sem minutos — coberto por `tomada_tempo_weekend_no_minutes.html`
+    - [x] Overnight — coberto por `tomada_tempo_weekend_overnight.html`
+    - [ ] Naive vs Aware (TZ `America/Sao_Paulo`) — planejar na Fase 1.1
   - [ ] Cenários de categoria: conhecidas vs fallback `Unknown`
     - Progresso: assert mínimo de `Unknown` adicionado no teste paramétrico para o fixture de edge cases.
   - [ ] Casos iCal: PRODID, DTSTART/DTEND com TZ, URL, CATEGORIES, RRULE com `recurrence`
 - [ ] Documentação e rastreabilidade (Fase 1)
   - [x] Criar/atualizar `docs/tests/scenarios/phase1_scenarios.md` (matriz de casos, mapeamentos, status e links para testes)
-  - [ ] Adicionar itens derivados como checklist nesta seção do plano
+  - [x] Adicionar itens derivados como checklist nesta seção do plano
     - [x] Criar fixture de edge cases (AM/PM, separador com ponto, categoria desconhecida)
     - [x] Atualizar teste paramétrico para incluir fixture de edge cases e assert de `Unknown`
     - [x] Atualizar `CHANGELOG.md` e `RELEASES.md` com os novos fixtures/testes
@@ -158,6 +160,31 @@ Objetivo: Cobrir funções críticas de parsing/transformação/validação com 
 - Relatórios HTML/ XML gerados e versionados apenas como artefatos (não no repo).
 
 ---
+
+## Fase 1.1 — Expansão para 80% (Unit)
+Objetivo: elevar a cobertura unitária para ≥ 80%, ampliando a matriz de casos e cobrindo ramos não exercitados.
+
+### Checklist — Fase 1.1
+- [ ] Matrizes de horários avançadas
+  - [ ] Naive vs Aware (TZ `America/Sao_Paulo`) — validação de parsing e normalização
+  - [ ] Bordas de fuso/virada de dia (00:00/23:59) e variações sazonais
+  - [ ] Horários atípicos e formatos incompletos (ex.: `10`, `10h`, `10h0`)
+- [ ] Categorias e locais
+  - [ ] Categorias conhecidas vs `Unknown` (matriz mais ampla)
+  - [ ] Eventos sem local/país e locais ambíguos
+- [ ] Robustez/erros
+  - [ ] HTML malformado e campos ausentes adicionais (variações realistas)
+  - [ ] Ambiguidades de parsing (decisões documentadas)
+- [ ] Cobertura por ramos
+  - [ ] Identificar trechos não cobertos via `htmlcov/index.html` e adicionar testes direcionados
+- [ ] Integração de cobertura amigável
+  - [ ] Codecov: upload de `coverage.xml` no CI, status check e badge no `README.md`
+- [ ] Automação local
+  - [ ] Script/Makefile com alvos `test:unit`, `test:integration`, `coverage`, `report`
+- [ ] GitHub Actions (CI)
+  - [ ] Workflow para unit/integration com `pytest` + `pytest-cov`
+  - [ ] Upload de artefatos (HTML/ XML) e envio ao Codecov
+  - [ ] Gatilhos em PRs e pushes, gate por status de cobertura
 
 # Fase 2 — Testes Integrados
 Objetivo: Validar fluxos entre componentes (coleta → processamento → iCal), sem dependência externa real (rede) sempre que possível.
