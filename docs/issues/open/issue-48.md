@@ -31,7 +31,7 @@ Garantir determinismo e isolamento em testes unitários por meio de mocks básic
 
 ## Progresso
 - [x] Branch criada: `chore/tests-mocks-essenciais-48-20250810`
-- [ ] PR de rascunho aberto com este plano (referenciando #48 e épico #45)
+- [x] PR de rascunho aberto com este plano (referenciando #48 e épico #45)
 - [ ] Fixtures de tempo e random criadas
 - [ ] Mocks de rede definidos
 - [ ] Isolamento de FS aplicado com `tmp_path`
