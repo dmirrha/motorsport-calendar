@@ -166,15 +166,10 @@ Objetivo: elevar a cobertura unitária para ≥ 80%, ampliando a matriz de casos
 
 ### Checklist — Fase 1.1
 *Sincronismo automático: esta checklist espelha as issues #59–#64 no GitHub (corpo e docs/issues/open/issue-<n>.{md,json}).*
-- [ ] #59 — Cobertura de `sources/tomada_tempo.py` ≥ 55%
-  - [ ] Matrizes de horários avançadas
-    - [ ] Naive vs Aware (TZ `America/Sao_Paulo`) — validação de parsing e normalização
-    - [ ] Bordas de fuso/virada de dia (00:00/23:59) e variações sazonais
-    - [ ] Horários atípicos e formatos incompletos (ex.: `10`, `10h`, `10h0`)
-  - [ ] Categorias e locais
-    - [ ] Categorias conhecidas vs `Unknown` (matriz mais ampla)
-  - [ ] Robustez/erros
-    - [ ] Ambiguidades de parsing (decisões documentadas)
+*Importação de bugs: será realizada em lote ao final da Fase 1.1; manter arquivos no importador em `.github/import_issues/open/` até lá.*
+- [x] #59 — Cobertura de `sources/tomada_tempo.py` ≥ 55% (progresso: 63% em 2025-08-10; 101 passed; cobertura global 40.64%; PR #66 draft; bug de precedência ISO vs BR documentado)
+  - [x] Escopo entregue: cobertura 63%, 101 passed, global 40.64% (2025-08-10)
+  - [x] Subtarefas avançadas replanejadas para #60–#64 (detalhamento nas respectivas issues)
 - [ ] #60 — Cobertura de `sources/base_source.py` ≥ 60%
   - [ ] Robustez/erros
     - [ ] HTML malformado e campos ausentes adicionais (variações realistas)

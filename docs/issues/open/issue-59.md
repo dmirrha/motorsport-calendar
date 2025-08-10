@@ -20,10 +20,21 @@ Elevar cobertura de `sources/tomada_tempo.py` para ≥55% com testes paramétric
 - PR inicia em draft até validação deste plano.
 
 ## Progresso
-- [ ] Branch criada
-- [ ] PR (draft) aberta
-- [ ] Testes implementados e passando
-- [ ] Documentação sincronizada
+- [x] Branch criada
+- [x] PR (draft) aberta
+- [x] Testes implementados e passando
+- [x] Documentação sincronizada
+
+## Métricas
+- Cobertura global (unit): 40.64% (gate 25% atendido)
+- Cobertura do arquivo `sources/tomada_tempo.py`: 63%
+- Execução (unit): 101 passed, ~8.19s
+
+## Escopo entregue e replanejamento
+- Escopo concluído em #59: cobertura 63% em `sources/tomada_tempo.py`, 101 passed, cobertura global 40.64% (2025-08-10).
+- Subtarefas avançadas replanejadas para #60–#64: matrizes de horários avançadas, categorias/locais ampliados, robustez/erros e ambiguidades documentadas serão tratadas nas issues subsequentes.
+- Bug de precedência ISO vs BR em `_extract_date()` documentado para importação em lote ao final da Fase 1.1: `.github/import_issues/open/025-tomadatemposource-extract-date-parsing-precedence.{json,md}`.
 
 ## Notas
 - Usar fixtures existentes em `tests/fixtures/html/` e adicionar novas conforme necessário.
+- Bug de follow-up documentado: precedência ISO vs BR em `_extract_date()` — arquivos criados no importador: `.github/import_issues/open/025-tomadatemposource-extract-date-parsing-precedence.{json,md}`; importação para o GitHub pendente.

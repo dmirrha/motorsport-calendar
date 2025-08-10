@@ -7,15 +7,15 @@
   "epic": 58,
   "url": "https://github.com/dmirrha/motorsport-calendar/issues/59",
   "created_at": "2025-08-10T21:03:01Z",
-  "updated_at": "2025-08-10T21:07:17Z",
+  "updated_at": "2025-08-10T22:56:49Z",
   "tasks": [
-    {"item": "Ampliar testes paramétricos com novos fixtures", "done": false},
-    {"item": "Exercitar ramificações de parsing", "done": false},
-    {"item": "Garantir mocks de rede e TZ fixa", "done": false},
-    {"item": "Validar determinismo e registrar tempo", "done": false},
-    {"item": "Atualizar cenários e índices", "done": false},
-    {"item": "Atualizar tests/README.md", "done": false},
-    {"item": "Atualizar plano e CHANGELOG/RELEASES", "done": false}
+    {"item": "Ampliar testes paramétricos com novos fixtures", "done": true},
+    {"item": "Exercitar ramificações de parsing", "done": true},
+    {"item": "Garantir mocks de rede e TZ fixa", "done": true},
+    {"item": "Validar determinismo e registrar tempo", "done": true},
+    {"item": "Atualizar cenários e índices", "done": true},
+    {"item": "Atualizar tests/README.md", "done": true},
+    {"item": "Atualizar plano e CHANGELOG/RELEASES", "done": true}
   ],
   "acceptance": [
     "Cobertura de sources/tomada_tempo.py ≥55%",

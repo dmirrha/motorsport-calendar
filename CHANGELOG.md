@@ -75,7 +75,10 @@ e este projeto adere ao [Versionamento Semântico](https://semver.org/spec/v2.0.
     - `tests/README.md` — seção de mocks essenciais
     - `README.md` — seção “🧪 Testes” com gate 25% e exemplos
     - `RELEASES.md` — nota de próximo patch (não lançado)
-  - Fase 1.1 — checklist reorganizada por issues (#59–#64) com sincronismo automático entre plano e issues (docs/issues/open/issue-<n>.{md,json}); rastreabilidade 58–64 adicionada.
+   - Fase 1.1 — checklist reorganizada por issues (#59–#64) com sincronismo automático entre plano e issues (docs/issues/open/issue-<n>.{md,json}); rastreabilidade 58–64 adicionada.
+   - Issue #59 (PR #66 — draft): testes unitários adicionais para `sources/tomada_tempo.py`; cobertura atual do arquivo: 63%; suíte: 101 passed; cobertura global: 40.64%; documentação sincronizada (`docs/TEST_AUTOMATION_PLAN.md`, `docs/issues/open/issue-59.{md,json}`).
+     - Nota: subtarefas avançadas originalmente listadas para #59 foram replanejadas para as issues #60–#64.
+     - Nota: bug de precedência ISO vs BR em `_extract_date()` documentado para importação em lote ao final da Fase 1.1; arquivos mantidos em `.github/import_issues/open/025-tomadatemposource-extract-date-parsing-precedence.{json,md}`.
   - Fase 1 — Cenários (issue #50, PR #57 draft)
     - Criados fixtures HTML compatíveis com o parser `TomadaTempoSource`:
       - `tests/fixtures/html/tomada_tempo_weekend_minimal.html`
