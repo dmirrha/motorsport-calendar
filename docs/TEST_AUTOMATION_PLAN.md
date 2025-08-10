@@ -27,7 +27,7 @@ Objetivo: Garantir documentação padrão, simples e completa para explicar a es
 
 ## Checklist — Documentação Padrão
 - [ ] Criar/atualizar visão geral de testes em `docs/tests/overview.md` (estratégia, escopo, como rodar local/CI, estrutura de pastas)
-- [ ] Criar índice de cenários em `docs/tests/scenarios/SCENARIOS_INDEX.md` (links para cenários por fase)
+- [x] Criar índice de cenários em `docs/tests/scenarios/SCENARIOS_INDEX.md` (links para cenários por fase)
 - [ ] Criar/atualizar mapeamento de cenários por fase:
   - [ ] `docs/tests/scenarios/phase0_scenarios.md` (inventário e decisões de limpeza)
   - [ ] `docs/tests/scenarios/phase1_scenarios.md` (parsers/validação/utils)
@@ -124,15 +124,28 @@ Objetivo: Cobrir funções críticas de parsing/transformação/validação com 
   - [x] Lógica de filtro de fim de semana em `src/silent_period.py` e resumo `SilentPeriodManager.log_filtering_summary`
   - [x] PR #56 mergeada; rastreabilidade: `docs/issues/closed/issue-49.md`
   - [x] Validação (prioritários): Suíte estável: `79 passed`; cobertura total: 37.00% (2025-08-10)
-- [ ] Geração de cenários (unit)
-  - [ ] Criar diretório `tests/fixtures/` (se necessário)
-  - [ ] HTMLs mínimos para parsing (datas/horas, categorias, campos faltantes)
-  - [ ] Matrizes de casos para horários: 24h, AM/PM, sem minutos, overnight, naive vs aware
-  - [ ] Cenários de categoria: conhecidas vs fallback `Unknown`
-  - [ ] Casos iCal: PRODID, DTSTART/DTEND com TZ, URL, CATEGORIES, RRULE com `recurrence`
-- [ ] Documentação e rastreabilidade (Fase 1)
-  - [ ] Criar/atualizar `docs/tests/scenarios/phase1_scenarios.md` (matriz de casos, mapeamentos, status e links para testes)
-  - [ ] Adicionar itens derivados como checklist nesta seção do plano
+ 
+ Status (Fase 1 — issue #50): PR #57 pronta para revisão (ready for review); rastreabilidade sincronizada em `docs/issues/closed/issue-50.{md,json}`.
+ - [x] Geração de cenários (unit) — parcial
+  - [x] Criar diretório `tests/fixtures/` (se necessário)
+  - [x] HTMLs mínimos para parsing (datas/horas, categorias, campos faltantes)
+  - [x] Matrizes de casos para horários — parcial
+    - [x] 24h (ex.: `08:00`) — coberto por `tomada_tempo_weekend_minimal.html`
+    - [x] AM/PM — coberto por `tomada_tempo_weekend_edge_cases.html`
+    - [x] Sem minutos — coberto por `tomada_tempo_weekend_no_minutes.html`
+    - [x] Overnight — coberto por `tomada_tempo_weekend_overnight.html`
+    - Nota: "Naive vs Aware (TZ `America/Sao_Paulo`)" movido para a Fase 1.1
+  - [x] Cenários de categoria — parcial: fallback `Unknown` coberto; expansão de categorias ficará para a Fase 1.1.
+    - Nota: assert mínimo de `Unknown` no teste paramétrico (edge cases).
+  - [x] Casos iCal — movidos para a Fase 2 (integração): PRODID, DTSTART/DTEND com TZ, URL, CATEGORIES, RRULE com `recurrence`.
+ - [x] Documentação e rastreabilidade (Fase 1)
+  - [x] Criar/atualizar `docs/tests/scenarios/phase1_scenarios.md` (matriz de casos, mapeamentos, status e links para testes)
+  - [x] Adicionar itens derivados como checklist nesta seção do plano
+     - [x] Criar fixture de edge cases (AM/PM, separador com ponto, categoria desconhecida)
+     - [x] Atualizar teste paramétrico para incluir fixture de edge cases e assert de `Unknown`
+     - [x] Atualizar `CHANGELOG.md` e `RELEASES.md` com os novos fixtures/testes
+     - [x] Criar fixture de sem minutos (8h/14 horas/21/às 10) e adicionar ao teste paramétrico
+     - [x] Criar fixture de overnight (23:50→00:10) e adicionar ao teste paramétrico
   - [x] Abrir PR de rascunho do plano de mocks essenciais (#48) — PR #55; rastreabilidade: `docs/issues/open/issue-48.md`
 
 6) Execução e relatórios (local)
@@ -147,6 +160,25 @@ Objetivo: Cobrir funções críticas de parsing/transformação/validação com 
 - Relatórios HTML/ XML gerados e versionados apenas como artefatos (não no repo).
 
 ---
+
+## Fase 1.1 — Expansão para 80% (Unit)
+Objetivo: elevar a cobertura unitária para ≥ 80%, ampliando a matriz de casos e cobrindo ramos não exercitados.
+
+### Checklist — Fase 1.1
+- [ ] Matrizes de horários avançadas
+  - [ ] Naive vs Aware (TZ `America/Sao_Paulo`) — validação de parsing e normalização
+  - [ ] Bordas de fuso/virada de dia (00:00/23:59) e variações sazonais
+  - [ ] Horários atípicos e formatos incompletos (ex.: `10`, `10h`, `10h0`)
+- [ ] Categorias e locais
+  - [ ] Categorias conhecidas vs `Unknown` (matriz mais ampla)
+  - [ ] Eventos sem local/país e locais ambíguos
+- [ ] Robustez/erros
+  - [ ] HTML malformado e campos ausentes adicionais (variações realistas)
+  - [ ] Ambiguidades de parsing (decisões documentadas)
+- [ ] Cobertura por ramos
+  - [ ] Identificar trechos não cobertos via `htmlcov/index.html` e adicionar testes direcionados
+- [ ] Automação local
+  - [ ] Script/Makefile com alvos `test:unit`, `test:integration`, `coverage`, `report`
 
 # Fase 2 — Testes Integrados
 Objetivo: Validar fluxos entre componentes (coleta → processamento → iCal), sem dependência externa real (rede) sempre que possível.
@@ -173,20 +205,12 @@ Objetivo: Validar fluxos entre componentes (coleta → processamento → iCal), 
   - [ ] Consistência de timezone (naive → localized conforme config)
 - [ ] Documentação e rastreabilidade (Fase 2)
   - [ ] Criar/atualizar `docs/tests/scenarios/phase2_scenarios.md` (fluxos, casos, status e links)
-  - [ ] Adicionar itens derivados como checklist nesta seção do plano
-
-5) Execução e relatórios (local)
-- `pytest -m integration --cov=src --cov=sources --cov-append \
-   --cov-report=term-missing:skip-covered --cov-report=xml:coverage.xml \
-   --cov-report=html --junitxml=test_results/junit.xml`
-
-6) Critérios de aceite (Fase 2)
-- Fluxo end-to-end gerando `.ics` válido.
-- Cobertura incremental (meta global ≥ 80% ao final da fase).
-- Artefatos (JUnit + HTMLCov) disponíveis localmente e no CI.
-
----
-
+ - [ ] Adicionar itens derivados como checklist nesta seção do plano
+ - [ ] Automação CI (final da Fase 2)
+   - [ ] GitHub Actions: workflow para unit/integration com `pytest` + `pytest-cov`
+   - [ ] Upload de artefatos (HTML/ XML) e envio ao Codecov
+   - [ ] Codecov: upload de `coverage.xml`, status check e badge no `README.md`
+   - [ ] Gatilhos em PRs e pushes, gate por status de cobertura
 ## Execução Local — Guia Rápido
 - Instalação:
 ```
