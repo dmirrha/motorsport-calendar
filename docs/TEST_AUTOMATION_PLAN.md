@@ -125,6 +125,7 @@ Objetivo: Cobrir funções críticas de parsing/transformação/validação com 
 - [ ] Documentação e rastreabilidade (Fase 1)
   - [ ] Criar/atualizar `docs/tests/scenarios/phase1_scenarios.md` (matriz de casos, mapeamentos, status e links para testes)
   - [ ] Adicionar itens derivados como checklist nesta seção do plano
+  - [x] Abrir PR de rascunho do plano de mocks essenciais (#48) — PR #55; rastreabilidade: `docs/issues/open/issue-48.md`
 
 6) Execução e relatórios (local)
 - Instalação: `pip install -r requirements.txt && pip install pytest pytest-cov`
