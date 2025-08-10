@@ -15,13 +15,15 @@ Manutenção — Testes/Automação (issue #48, PR #55)
   - `tests/README.md` — seção de mocks essenciais e exemplos.
   - `README.md` — seção “🧪 Testes” com gate 25% e referências aos exemplos.
   - `CHANGELOG.md` — registro em “Não Lançado”.
- - Suíte estável: `67 passed`; cobertura total: 29.31%
+  - Suíte estável: `79 passed`; cobertura total: 37.00%
 
 Prioritários Fase 1 (issue #49, PR #56)
 
 - Testes unitários focados em parsers de data/hora e timezone em `sources/tomada_tempo.py` e validações em `sources/base_source.py`.
+- Testes unitários para processadores/validadores em `src/event_processor.py` (`_is_event_valid`, `_filter_weekend_events`).
 - Casos de borda adicionados/ajustados para refletir precedência atual dos padrões de data.
 - Documentação e checklists sincronizados em `docs/TEST_AUTOMATION_PLAN.md` e `docs/issues/open/issue-49.md`.
+ - Testes adicionais implementados: `ICalGenerator.generate_calendar`/`validate_calendar` e `SilentPeriodManager.log_filtering_summary`.
 
 ## Versão 0.5.2 (2025-08-09)
 Manutenção — Testes/Automação

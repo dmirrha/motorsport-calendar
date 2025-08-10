@@ -14,9 +14,9 @@
   "tasks": [
     {"item": "Parsers de data/hora e timezone — sources/tomada_tempo.py", "done": true},
     {"item": "Validadores de eventos — sources/base_source.py", "done": true},
-    {"item": "Utilitário iCal — src/ical_generator.py (generate_ical)", "done": false},
-    {"item": "Processadores/validadores de eventos — src/event_processor.py", "done": false},
-    {"item": "Lógica de filtro de fim de semana — src/silent_period.py", "done": false}
+    {"item": "Utilitário iCal — src/ical_generator.py (generate_ical)", "done": true},
+    {"item": "Processadores/validadores de eventos — src/event_processor.py", "done": true},
+    {"item": "Lógica de filtro de fim de semana — src/silent_period.py", "done": true}
   ],
   "acceptance": [
     "Casos felizes e bordas principais cobertos",
