@@ -58,7 +58,11 @@ e este projeto adere ao [Versionamento Semântico](https://semver.org/spec/v2.0.
     - Marcadores registrados: `unit`, `integration`
     - `tests/conftest.py`: fixture autouse de TZ `America/Sao_Paulo` e ajuste de `sys.path` (raiz e `src/`)
     - `requirements-dev.txt`: `pytest~=8`, `pytest-cov~=5`
-    - Documentação: `README.md` (seção "🧪 Testes") e atualização do plano em `docs/TEST_AUTOMATION_PLAN.md`
+    - [x] Documentação: `README.md` (seção "🧪 Testes") e atualização do plano em `docs/TEST_AUTOMATION_PLAN.md`
+  - Reorganização da suíte unitária por domínio em `tests/unit/` (sources/tomada_tempo, silent_period, utils)
+  - Remoção de hacks de `sys.path` nos testes (uso de `tests/conftest.py`)
+  - Criado `tests/README.md` com convenções e estrutura
+  - Validação pós-reorganização: `37 passed`
 
 ### Corrigido
 - **Issue #23**: Corrigido bug na filtragem de períodos de silêncio

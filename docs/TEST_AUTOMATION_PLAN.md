@@ -106,6 +106,7 @@ Objetivo: Cobrir funções críticas de parsing/transformação/validação com 
 - [x] Organização de testes
   - [x] Introduzir marcadores `@pytest.mark.unit`
   - [x] Criar/ajustar `conftest.py` com fixtures reutilizáveis (HTML mínimo, fuso horário padrão, relógio congelado)
+  - [x] Criar `tests/README.md` com convenções e estrutura-alvo
 - [ ] Mocks essenciais
   - [ ] Definir padrões de patch (compatíveis com shims):
     - [ ] `sources.tomada_tempo.requests.get`
