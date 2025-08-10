@@ -18,6 +18,6 @@ Elevar cobertura de `sources/base_source.py` para ≥60%, cobrindo tratamento de
 
 ## Progresso
 - [x] Branch criada
-- [ ] PR (draft) aberta
+- [x] PR (draft) aberta — https://github.com/dmirrha/motorsport-calendar/pull/67
 - [ ] Testes implementados e passando
 - [ ] Documentação sincronizada
