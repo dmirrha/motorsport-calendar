@@ -111,10 +111,10 @@ Objetivo: Cobrir funções críticas de parsing/transformação/validação com 
   - [x] Definir padrões de patch (compatíveis com shims):
     - [x] `sources.tomada_tempo.requests.get`
     - [x] `sources.base_source.requests.Session`
-  - [ ] Simular cenários: sucesso, timeout, HTTPError, HTML malformado
+  - [x] Simular cenários: sucesso, timeout, HTTPError, HTML malformado — ver `tests/unit/sources/base_source/test_make_request.py` e `tests/unit/sources/tomada_tempo/test_parse_calendar_page.py`
   - [x] Tempo e aleatoriedade: fixture TZ-aware (America/Sao_Paulo) e `random.seed(0)` com restauração
-  - [ ] Isolamento de filesystem: uso de `tmp_path`/`tmp_path_factory` em testes que tocam disco
-  - [ ] Variáveis de ambiente: `monkeypatch.setenv`/`delenv` para configurar/limpar `os.environ`
+  - [x] Isolamento de filesystem: uso de `tmp_path`/`tmp_path_factory` em testes que tocam disco — ver `tests/unit/utils/test_payload_manager.py`
+  - [x] Variáveis de ambiente: `monkeypatch.setenv`/`delenv` para configurar/limpar `os.environ` — ver `tests/unit/test_env_vars.py`
 - [ ] Alvos prioritários (unit)
   - [ ] Parsers de data/hora e categorias em `sources/tomada_tempo.py`
   - [ ] Normalização/validação no `src/motorsport_calendar/event_processor.py`

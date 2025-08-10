@@ -34,8 +34,8 @@ Garantir determinismo e isolamento em testes unitários por meio de mocks básic
 - [x] PR de rascunho aberto com este plano (referenciando #48 e épico #45)
 - [x] Fixtures de tempo e random criadas
 - [x] Mocks de rede definidos
-- [ ] Isolamento de FS aplicado com `tmp_path`
-- [ ] Fixtures de env aplicadas
+- [x] Isolamento de FS aplicado com `tmp_path`
+- [x] Fixtures de env aplicadas
 - [x] `tests/README.md` atualizado (seção de mocks)
 - [x] Validação: `pytest` estável sem dependências externas
 
@@ -44,9 +44,9 @@ Garantir determinismo e isolamento em testes unitários por meio de mocks básic
   - [x] `sources.tomada_tempo.requests.get`
   - [x] `sources.base_source.requests.Session`
 - [x] Tempo e aleatoriedade: fixture TZ-aware (America/Sao_Paulo) e `random.seed(0)` com restauração
-- [ ] Isolamento de filesystem: uso de `tmp_path`/`tmp_path_factory`
-- [ ] Variáveis de ambiente: `monkeypatch.setenv`/`delenv`
-- [ ] Simular cenários: sucesso, timeout, HTTPError, HTML malformado
+- [x] Isolamento de filesystem: uso de `tmp_path`/`tmp_path_factory` — ver `tests/unit/utils/test_payload_manager.py`
+- [x] Variáveis de ambiente: `monkeypatch.setenv`/`delenv` — ver `tests/unit/test_env_vars.py`
+- [x] Simular cenários: sucesso, timeout, HTTPError, HTML malformado — ver `tests/unit/sources/base_source/test_make_request.py` e `tests/unit/sources/tomada_tempo/test_parse_calendar_page.py`
 
 ## Critérios de Aceite
 - Testes não dependem de rede/tempo/FS real
