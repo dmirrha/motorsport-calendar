@@ -17,7 +17,7 @@ Elevar cobertura de `sources/base_source.py` para ≥60%, cobrindo tratamento de
 - PR inicia em draft até validação deste plano.
 
 ## Progresso
-- [ ] Branch criada
+- [x] Branch criada
 - [ ] PR (draft) aberta
 - [ ] Testes implementados e passando
 - [ ] Documentação sincronizada
