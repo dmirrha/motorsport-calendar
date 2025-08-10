@@ -1,0 +1,21 @@
+{
+  "id": 3307967502,
+  "number": 64,
+  "state": "open",
+  "title": "Fase 1.1 — Documentação e Cenários (sincronismo)",
+  "milestone": null,
+  "epic": 58,
+  "url": "https://github.com/dmirrha/motorsport-calendar/issues/64",
+  "created_at": "2025-08-10T21:03:10Z",
+  "updated_at": "2025-08-10T21:07:19Z",
+  "tasks": [
+    {"item": "Atualizar phase1_scenarios.md", "done": false},
+    {"item": "Atualizar SCENARIOS_INDEX.md", "done": false},
+    {"item": "Atualizar tests/README.md", "done": false},
+    {"item": "Atualizar TEST_AUTOMATION_PLAN.md", "done": false},
+    {"item": "Atualizar CHANGELOG/RELEASES", "done": false}
+  ],
+  "acceptance": [
+    "Documentação e rastreabilidade sincronizadas com as histórias da Fase 1.1"
+  ]
+}

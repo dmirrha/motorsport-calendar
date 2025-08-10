@@ -1,0 +1,25 @@
+ {
+  "id": 3307967373,
+  "number": 59,
+  "state": "open",
+  "title": "Fase 1.1 — Cobertura de sources/tomada_tempo.py ≥55% (paramétricos e edge cases)",
+  "milestone": null,
+  "epic": 58,
+  "url": "https://github.com/dmirrha/motorsport-calendar/issues/59",
+  "created_at": "2025-08-10T21:03:01Z",
+  "updated_at": "2025-08-10T21:07:17Z",
+  "tasks": [
+    {"item": "Ampliar testes paramétricos com novos fixtures", "done": false},
+    {"item": "Exercitar ramificações de parsing", "done": false},
+    {"item": "Garantir mocks de rede e TZ fixa", "done": false},
+    {"item": "Validar determinismo e registrar tempo", "done": false},
+    {"item": "Atualizar cenários e índices", "done": false},
+    {"item": "Atualizar tests/README.md", "done": false},
+    {"item": "Atualizar plano e CHANGELOG/RELEASES", "done": false}
+  ],
+  "acceptance": [
+    "Cobertura de sources/tomada_tempo.py ≥55%",
+    "Determinismo e isolamento garantidos",
+    "Documentação e rastreabilidade sincronizadas"
+  ]
+}
