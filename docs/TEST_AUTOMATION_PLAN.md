@@ -125,27 +125,27 @@ Objetivo: Cobrir funções críticas de parsing/transformação/validação com 
   - [x] PR #56 mergeada; rastreabilidade: `docs/issues/closed/issue-49.md`
   - [x] Validação (prioritários): Suíte estável: `79 passed`; cobertura total: 37.00% (2025-08-10)
  
- Status (Fase 1 — issue #50): PR #57 em draft; rastreabilidade sincronizada em `docs/issues/open/issue-50.{md,json}`.
-- [ ] Geração de cenários (unit)
+ Status (Fase 1 — issue #50): PR #57 pronta para revisão (ready for review); rastreabilidade sincronizada em `docs/issues/closed/issue-50.{md,json}`.
+ - [x] Geração de cenários (unit) — parcial
   - [x] Criar diretório `tests/fixtures/` (se necessário)
   - [x] HTMLs mínimos para parsing (datas/horas, categorias, campos faltantes)
-  - [ ] Matrizes de casos para horários
+  - [x] Matrizes de casos para horários — parcial
     - [x] 24h (ex.: `08:00`) — coberto por `tomada_tempo_weekend_minimal.html`
     - [x] AM/PM — coberto por `tomada_tempo_weekend_edge_cases.html`
     - [x] Sem minutos — coberto por `tomada_tempo_weekend_no_minutes.html`
     - [x] Overnight — coberto por `tomada_tempo_weekend_overnight.html`
-    - [ ] Naive vs Aware (TZ `America/Sao_Paulo`) — planejar na Fase 1.1
-  - [ ] Cenários de categoria: conhecidas vs fallback `Unknown`
-    - Progresso: assert mínimo de `Unknown` adicionado no teste paramétrico para o fixture de edge cases.
-  - [ ] Casos iCal: PRODID, DTSTART/DTEND com TZ, URL, CATEGORIES, RRULE com `recurrence`
-- [ ] Documentação e rastreabilidade (Fase 1)
+    - Nota: "Naive vs Aware (TZ `America/Sao_Paulo`)" movido para a Fase 1.1
+  - [x] Cenários de categoria — parcial: fallback `Unknown` coberto; expansão de categorias ficará para a Fase 1.1.
+    - Nota: assert mínimo de `Unknown` no teste paramétrico (edge cases).
+  - [x] Casos iCal — movidos para a Fase 2 (integração): PRODID, DTSTART/DTEND com TZ, URL, CATEGORIES, RRULE com `recurrence`.
+ - [x] Documentação e rastreabilidade (Fase 1)
   - [x] Criar/atualizar `docs/tests/scenarios/phase1_scenarios.md` (matriz de casos, mapeamentos, status e links para testes)
   - [x] Adicionar itens derivados como checklist nesta seção do plano
-    - [x] Criar fixture de edge cases (AM/PM, separador com ponto, categoria desconhecida)
-    - [x] Atualizar teste paramétrico para incluir fixture de edge cases e assert de `Unknown`
-    - [x] Atualizar `CHANGELOG.md` e `RELEASES.md` com os novos fixtures/testes
-    - [x] Criar fixture de sem minutos (8h/14 horas/21/às 10) e adicionar ao teste paramétrico
-    - [x] Criar fixture de overnight (23:50→00:10) e adicionar ao teste paramétrico
+     - [x] Criar fixture de edge cases (AM/PM, separador com ponto, categoria desconhecida)
+     - [x] Atualizar teste paramétrico para incluir fixture de edge cases e assert de `Unknown`
+     - [x] Atualizar `CHANGELOG.md` e `RELEASES.md` com os novos fixtures/testes
+     - [x] Criar fixture de sem minutos (8h/14 horas/21/às 10) e adicionar ao teste paramétrico
+     - [x] Criar fixture de overnight (23:50→00:10) e adicionar ao teste paramétrico
   - [x] Abrir PR de rascunho do plano de mocks essenciais (#48) — PR #55; rastreabilidade: `docs/issues/open/issue-48.md`
 
 6) Execução e relatórios (local)
@@ -177,14 +177,8 @@ Objetivo: elevar a cobertura unitária para ≥ 80%, ampliando a matriz de casos
   - [ ] Ambiguidades de parsing (decisões documentadas)
 - [ ] Cobertura por ramos
   - [ ] Identificar trechos não cobertos via `htmlcov/index.html` e adicionar testes direcionados
-- [ ] Integração de cobertura amigável
-  - [ ] Codecov: upload de `coverage.xml` no CI, status check e badge no `README.md`
 - [ ] Automação local
   - [ ] Script/Makefile com alvos `test:unit`, `test:integration`, `coverage`, `report`
-- [ ] GitHub Actions (CI)
-  - [ ] Workflow para unit/integration com `pytest` + `pytest-cov`
-  - [ ] Upload de artefatos (HTML/ XML) e envio ao Codecov
-  - [ ] Gatilhos em PRs e pushes, gate por status de cobertura
 
 # Fase 2 — Testes Integrados
 Objetivo: Validar fluxos entre componentes (coleta → processamento → iCal), sem dependência externa real (rede) sempre que possível.
@@ -211,25 +205,12 @@ Objetivo: Validar fluxos entre componentes (coleta → processamento → iCal), 
   - [ ] Consistência de timezone (naive → localized conforme config)
 - [ ] Documentação e rastreabilidade (Fase 2)
   - [ ] Criar/atualizar `docs/tests/scenarios/phase2_scenarios.md` (fluxos, casos, status e links)
-  - [ ] Adicionar itens derivados como checklist nesta seção do plano
-
-5) Execução e relatórios (local)
-- `pytest -m integration --cov=src --cov=sources --cov-append \
-   --cov-report=term-missing:skip-covered --cov-report=xml:coverage.xml \
-   --cov-report=html --junitxml=test_results/junit.xml`
-
-6) Critérios de aceite (Fase 2)
-- Fluxo end-to-end gerando `.ics` válido.
-- Cobertura incremental (meta global ≥ 80% ao final da fase).
-- Artefatos (JUnit + HTMLCov) disponíveis localmente e no CI.
- 
-### GitHub Actions (CI) — Fase 2
-- [ ] Workflow para unit/integration com `pytest` + `pytest-cov`
-- [ ] Upload de artefatos (HTML/ XML) e envio ao Codecov
-- [ ] Gatilhos em PRs e pushes, gate por status de cobertura
-
----
-
+ - [ ] Adicionar itens derivados como checklist nesta seção do plano
+ - [ ] Automação CI (final da Fase 2)
+   - [ ] GitHub Actions: workflow para unit/integration com `pytest` + `pytest-cov`
+   - [ ] Upload de artefatos (HTML/ XML) e envio ao Codecov
+   - [ ] Codecov: upload de `coverage.xml`, status check e badge no `README.md`
+   - [ ] Gatilhos em PRs e pushes, gate por status de cobertura
 ## Execução Local — Guia Rápido
 - Instalação:
 ```

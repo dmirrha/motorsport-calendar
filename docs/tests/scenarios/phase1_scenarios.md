@@ -44,4 +44,4 @@ Notas:
 
 ## Rastreamento
 - Status: documentos e fixtures mínimos criados.
-- Sincronizar checklists em `docs/TEST_AUTOMATION_PLAN.md` e `docs/issues/open/issue-50.md`.
+- Sincronizar checklists em `docs/TEST_AUTOMATION_PLAN.md` e `docs/issues/closed/issue-50.md`.
