@@ -1,1 +1,30 @@
-{"assignees":[],"body":"Objetivo: iniciar cobertura nos componentes críticos.\n\nTarefas:\n- [ ] Parsers de data/hora e timezone\n- [ ] `src/ical_generator.py`\n- [ ] Processadores/validadores de eventos\n- [ ] Lógica de filtro de fim de semana\n\nCritérios de aceite:\n- Casos felizes e bordas principais cobertos\n- Cobertura mínima atingida para esses módulos","createdAt":"2025-08-09T19:36:18Z","labels":[],"milestone":{"description":"Fase 1: estruturação inicial de testes unitários, cenários e CI de testes.","dueOn":null,"number":2,"title":"Automação de testes - Fase 1"},"number":49,"state":"OPEN","title":"Fase 1 — Alvos prioritários (unit)","updatedAt":"2025-08-09T19:38:23Z","url":"https://github.com/dmirrha/motorsport-calendar/issues/49"}
+{
+  "id": 3306754765,
+  "number": 49,
+  "state": "open",
+  "title": "Fase 1 — Alvos prioritários (unit)",
+  "milestone": {
+    "number": 2,
+    "title": "Automação de testes - Fase 1"
+  },
+  "epic": 45,
+  "url": "https://github.com/dmirrha/motorsport-calendar/issues/49",
+  "created_at": "2025-08-09T19:36:18Z",
+  "updated_at": "2025-08-10T15:52:46Z",
+  "tasks": [
+    {"item": "Parsers de data/hora e timezone — sources/tomada_tempo.py", "done": false},
+    {"item": "Utilitário iCal — src/ical_generator.py (generate_ical)", "done": false},
+    {"item": "Processadores/validadores de eventos — src/event_processor.py", "done": false},
+    {"item": "Lógica de filtro de fim de semana — src/silent_period.py", "done": false}
+  ],
+  "acceptance": [
+    "Casos felizes e bordas principais cobertos",
+    "Cobertura mínima atingida para esses módulos"
+  ],
+  "branch": "chore/tests-priority-targets-49-20250810",
+  "pull_request": {
+    "number": 56,
+    "url": "https://github.com/dmirrha/motorsport-calendar/pull/56",
+    "state": "draft"
+  }
+}
