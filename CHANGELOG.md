@@ -48,9 +48,17 @@ e este projeto adere ao [Versionamento Semântico](https://semver.org/spec/v2.0.
    - `pytest` 8.4.1 e `pytest-cov` 6.2.1 instalados e presentes em `requirements.txt`
    - Criado `pytest.ini` com `testpaths = tests` e `addopts = --cov=src --cov-report=term-missing`
    - Padronização confirmada: apenas `tests/` como diretório canônico
-   - Limpeza: remoção do índice de artefatos gerados (`.pytest_cache/`, `test_results/`, `junit.xml`, `coverage.xml`, `.coverage*`) mantendo arquivos locais
+   - Limpeza: remoção do índice de artefatos gerados (`.pytest_cache/`, `test_results/`, `test_results_github/`, `pytest.log`, `junit.xml`, `report.html`)
    - Documentados cenários em `docs/tests/scenarios/phase0_scenarios.md`
    - Scripts adicionados: `scripts/tests_phase0_inventory.sh`, `scripts/tests_phase0_move_outside_tests.sh`, `scripts/tests_phase0_cleanup.sh`
+  - Fase 1: configuração mínima do Pytest com cobertura e documentação
+    - `pytest.ini`: `testpaths=tests`; cobertura em `src/` e `sources/` com `--cov=src --cov=sources`
+    - Relatórios: `--cov-report=term-missing:skip-covered`, `--cov-report=xml:coverage.xml`, `--cov-report=html`, `--junitxml=test_results/junit.xml`
+    - Gate de cobertura inicial: `--cov-fail-under=40`
+    - Marcadores registrados: `unit`, `integration`
+    - `tests/conftest.py`: fixture autouse de TZ `America/Sao_Paulo` e ajuste de `sys.path` (raiz e `src/`)
+    - `requirements-dev.txt`: `pytest~=8`, `pytest-cov~=5`
+    - Documentação: `README.md` (seção "🧪 Testes") e atualização do plano em `docs/TEST_AUTOMATION_PLAN.md`
 
 ### Corrigido
 - **Issue #23**: Corrigido bug na filtragem de períodos de silêncio
