@@ -36,6 +36,33 @@ Relatórios são gerados em:
 - Cobertura HTML: `htmlcov/`
 - Cobertura XML: `coverage.xml`
 
+## Mocks e Isolamento
+
+- Timezone: fixture autouse define `America/Sao_Paulo` (em `tests/conftest.py`).
+- Aleatoriedade: fixture autouse `_fixed_random_seed` fixa `random.seed(0)` por teste, com restauração do estado.
+- Rede (shims/padrões de patch):
+  - `patch_requests_get`: patch para `sources.tomada_tempo.requests.get`
+  - `patch_requests_session`: patch para `sources.base_source.requests.Session`
+- Filesystem: use `tmp_path`/`tmp_path_factory` para interações com disco.
+- Variáveis de ambiente: use `monkeypatch.setenv`/`delenv` para configurar/limpar `os.environ`.
+
+Exemplos:
+
+```python
+def test_parse_from_html_ok(patch_requests_get, dummy_response):
+    html = "<html>...</html>"
+    patch_requests_get(lambda url, **kw: dummy_response(text=html))
+    # execute função que consome TomadaTempoSource
+```
+
+```python
+import requests
+
+def test_timeout_session(patch_requests_session):
+    sess = patch_requests_session(exception_to_raise=requests.Timeout())
+    # instanciar source que usa BaseSource -> requests.Session() será a sessão dummy
+```
+
 ## Diretrizes
 
 - Centralize helpers/fixtures reutilizáveis em `tests/utils/` e/ou `tests/conftest.py`.
