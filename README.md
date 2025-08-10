@@ -240,6 +240,24 @@ cp config/config.example.json config/config.json
 # Edite config/config.json conforme necessário
 ```
 
+## 🧪 Testes
+
+A suíte utiliza Pytest com cobertura via pytest-cov. Durante a estabilização dos mocks essenciais (issue #48), o gate de cobertura global está temporariamente em 25%.
+
+- Gate temporário: `--cov-fail-under=25` (definido em `pytest.ini`)
+- Mocks essenciais:
+  - Timezone fixo `America/Sao_Paulo` e aleatoriedade determinística (`random.seed(0)`)
+  - Shims de rede: `sources.tomada_tempo.requests.get` e `sources.base_source.requests.Session`
+  - Isolamento de filesystem via `tmp_path`/`tmp_path_factory`
+  - Variáveis de ambiente com `monkeypatch.setenv`/`delenv`
+- Como rodar: consulte `tests/README.md` para comandos, estrutura e exemplos.
+
+Cobertura e métricas recentes (Fase 1.1 — issue #59):
+- `sources/tomada_tempo.py`: 63%
+- Suíte: 101 passed; cobertura global: 40.64%
+
+> Nota: o bug de precedência ISO vs BR em `_extract_date()` foi documentado para importação em lote ao final da Fase 1.1; arquivos no importador: `.github/import_issues/open/025-tomadatemposource-extract-date-parsing-precedence.{json,md}`.
+
 ## 🚀 Uso
 
 ```bash

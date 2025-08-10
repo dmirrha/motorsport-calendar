@@ -1,0 +1,15 @@
+{
+  "title": "Bug: Precedência de parsing ISO vs BR em TomadaTempoSource._extract_date()",
+  "body": "025-tomadatemposource-extract-date-parsing-precedence.md",
+  "labels": ["bug"],
+  "assignees": [],
+  "milestone": null,
+  "state": "open",
+  "metadata": {
+    "created_at": "2025-08-10T19:20:34-03:00",
+    "priority": "medium",
+    "type": "bug",
+    "components": ["sources/tomada_tempo.py"],
+    "related_issues": [58, 59]
+  }
+}

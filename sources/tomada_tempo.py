@@ -660,6 +660,16 @@ class TomadaTempoSource(BaseSource):
     
     def _extract_event_name(self, text: str) -> Optional[str]:
         """Extract event name from text."""
+        # Normalize common separators
+        normalized = re.sub(r'[—|:]+', ' ', text)
+        normalized = re.sub(r'\s+', ' ', normalized).strip()
+
+        # Prefer a simple readable name when starting with common prefixes
+        lowered = normalized.lower()
+        if lowered.startswith('grande prêmio') or lowered.startswith('grande premio') or lowered.startswith('gp '):
+            words = normalized.split()[:5]
+            return ' '.join(words) if words else None
+
         # Look for common event name patterns
         patterns = [
             r'GP\s+(?:da\s+|de\s+|do\s+)?([A-Za-z\s]+)',  # GP events
@@ -670,14 +680,14 @@ class TomadaTempoSource(BaseSource):
         ]
         
         for pattern in patterns:
-            match = re.search(pattern, text, re.IGNORECASE)
+            match = re.search(pattern, normalized, re.IGNORECASE)
             if match and match.group(1):
                 name = match.group(1).strip()
                 if len(name) > 3:  # Reasonable name length
                     return name
         
         # Fallback: use first meaningful words
-        words = text.split()[:5]
+        words = normalized.split()[:5]
         return ' '.join(words) if words else None
     
     def _extract_date(self, text: str) -> Optional[str]:

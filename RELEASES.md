@@ -19,6 +19,15 @@ Manutenção — Testes/Automação (issue #48, PR #55)
 
 - Fase 1.1 — Checklist reorganizada por issues (#59–#64) com sincronismo automático entre plano (`docs/TEST_AUTOMATION_PLAN.md`) e issues (docs/issues/open/issue-<n>.{md,json}); rastreabilidade 58–64 adicionada.
 
+Issue #59 (PR #66 — draft)
+
+- Testes unitários adicionais para `sources/tomada_tempo.py` (parsers e funções auxiliares)
+- Cobertura do arquivo `sources/tomada_tempo.py`: 63%
+- Suíte: 101 passed; cobertura global: 40.64%
+- Documentação sincronizada: `docs/TEST_AUTOMATION_PLAN.md` e `docs/issues/open/issue-59.{md,json}`
+- Nota: subtarefas avançadas originalmente listadas para #59 foram replanejadas para as issues #60–#64.
+- Nota: bug de precedência ISO vs BR em `_extract_date()` será importado em lote ao final da Fase 1.1; arquivos mantidos no importador: `.github/import_issues/open/025-tomadatemposource-extract-date-parsing-precedence.{json,md}`.
+
 Fase 1 — Cenários (issue #50, PR #57 draft)
 
 - Fixtures HTML adicionados para o parser `TomadaTempoSource`:
