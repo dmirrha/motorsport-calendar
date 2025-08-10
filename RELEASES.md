@@ -15,7 +15,7 @@ Manutenção — Testes/Automação (issue #48, PR #55)
   - `tests/README.md` — seção de mocks essenciais e exemplos.
   - `README.md` — seção “🧪 Testes” com gate 25% e referências aos exemplos.
   - `CHANGELOG.md` — registro em “Não Lançado”.
- - Suíte estável: `67 passed`; cobertura total: 38.33%
+ - Suíte estável: `67 passed`; cobertura total: 29.31%
 
 Prioritários Fase 1 (issue #49, PR #56)
 

@@ -123,7 +123,7 @@ Objetivo: Cobrir funções críticas de parsing/transformação/validação com 
   - [ ] Utilitário iCal `src/ical_generator.py` (`generate_ical`)
   - [ ] Lógica de filtro de fim de semana em `src/silent_period.py`
   - [x] PR (draft) do plano aberta para aprovação — PR #56; rastreabilidade: `docs/issues/open/issue-49.md`
- - [x] Validação (prioritários): Suíte estável: `67 passed`; cobertura total: 38.33% (2025-08-10)
+ - [x] Validação (prioritários): Suíte estável: `67 passed`; cobertura total: 29.31% (2025-08-10)
 - [ ] Geração de cenários (unit)
   - [ ] Criar diretório `tests/fixtures/` (se necessário)
   - [ ] HTMLs mínimos para parsing (datas/horas, categorias, campos faltantes)

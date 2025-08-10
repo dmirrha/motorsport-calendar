@@ -22,7 +22,7 @@ Iniciar cobertura nos componentes críticos (parsers/validadores/processadores) 
 - [x] Branch criada: `chore/tests-priority-targets-49-20250810`
 - [x] Checklists sincronizadas com `docs/TEST_AUTOMATION_PLAN.md` (seção “Alvos prioritários (unit)”).
 - [x] PR (draft) aberta: #56 — https://github.com/dmirrha/motorsport-calendar/pull/56
- - [x] Validação: suíte estável `67 passed`; cobertura total 38.33% (2025-08-10)
+ - [x] Validação: suíte estável `67 passed`; cobertura total 29.31% (2025-08-10)
 
 ## Notas
 - Seguir mocks essenciais já padronizados: rede (requests/Session), tempo/TZ, `tmp_path` e `os.environ`.
