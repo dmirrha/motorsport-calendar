@@ -116,7 +116,7 @@ Objetivo: Cobrir funções críticas de parsing/transformação/validação com 
   - [x] Isolamento de filesystem: uso de `tmp_path`/`tmp_path_factory` em testes que tocam disco — ver `tests/unit/utils/test_payload_manager.py`
   - [x] Variáveis de ambiente: `monkeypatch.setenv`/`delenv` para configurar/limpar `os.environ` — ver `tests/unit/test_env_vars.py`
   - [x] Validação: Suíte estável: `45 passed`; cobertura total: 28.75% (2025-08-10)
-- [ ] Alvos prioritários (unit)
+- [x] Alvos prioritários (unit)
   - [x] Parsers de data/hora e timezone em `sources/tomada_tempo.py`
   - [x] Validadores de eventos em `sources/base_source.py`
   - [x] Processadores/validadores de eventos em `src/event_processor.py`
