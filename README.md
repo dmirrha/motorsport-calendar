@@ -524,6 +524,39 @@ O projeto utiliza um sistema automatizado para gerenciar issues através de arqu
 4. Push para a branch (`git push origin feature/AmazingFeature`)
 5. Abra um Pull Request
 
+## 🧪 Testes
+
+Execute os testes com Pytest (cobertura habilitada por padrão via `pytest.ini`).
+
+### Instalação das dependências de desenvolvimento
+
+```bash
+pip install -r requirements.txt
+pip install -r requirements-dev.txt
+```
+
+### Comandos principais
+
+```bash
+# Testes unitários com cobertura e relatórios (padrão)
+pytest
+
+# Apenas testes marcados como unit
+pytest -m unit
+
+# Abrir relatório HTML de cobertura após a execução
+open htmlcov/index.html  # macOS
+
+# Saídas configuradas
+# - Cobertura XML: coverage.xml
+# - Cobertura HTML: htmlcov/
+# - JUnit XML: test_results/junit.xml
+```
+
+Notas:
+- Gate de cobertura inicial: 40% (`--cov-fail-under=40`).
+- Timezone padrão dos testes: `America/Sao_Paulo` (fixture autouse em `tests/conftest.py`).
+
 ## 📝 Licença
 
 Este projeto está sob a licença MIT. Veja o arquivo `LICENSE` para detalhes.

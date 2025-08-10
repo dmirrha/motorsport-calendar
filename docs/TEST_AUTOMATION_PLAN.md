@@ -97,15 +97,15 @@ Objetivo: Remover legados e padronizar a base de testes antes de iniciar as fase
 Objetivo: Cobrir funções críticas de parsing/transformação/validação com testes rápidos, determinísticos e independentes de rede/FS.
 
 ## Checklist — Fase 1 (ordem sequencial)
-- [ ] Configuração mínima do Pytest
-  - [ ] Criar `pytest.ini`
-    - [ ] Descoberta em `tests/`
-    - [ ] Cobertura de `src/` e `sources/`
-    - [ ] Relatórios: term-missing, XML (coverage.xml), HTML (htmlcov), JUnit (test_results/junit.xml)
-    - [ ] Fail gate inicial (ex.: `--cov-fail-under=70`), com roadmap para 80%
-- [ ] Organização de testes
-  - [ ] Introduzir marcadores `@pytest.mark.unit`
-  - [ ] Criar/ajustar `conftest.py` com fixtures reutilizáveis (HTML mínimo, fuso horário padrão, relógio congelado)
+- [x] Configuração mínima do Pytest
+  - [x] Criar `pytest.ini`
+    - [x] Descoberta em `tests/`
+    - [x] Cobertura de `src/` e `sources/`
+    - [x] Relatórios: term-missing, XML (coverage.xml), HTML (htmlcov), JUnit (test_results/junit.xml)
+    - [x] Fail gate inicial (ex.: `--cov-fail-under=70`), com roadmap para 80%
+- [x] Organização de testes
+  - [x] Introduzir marcadores `@pytest.mark.unit`
+  - [x] Criar/ajustar `conftest.py` com fixtures reutilizáveis (HTML mínimo, fuso horário padrão, relógio congelado)
 - [ ] Mocks essenciais
   - [ ] Definir padrões de patch (compatíveis com shims):
     - [ ] `sources.tomada_tempo.requests.get`
