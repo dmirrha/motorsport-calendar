@@ -1,0 +1,32 @@
+# Issue #50 — Fase 1: Geração de cenários (unit)
+
+Referências:
+- Epic: #45 — Automação de testes
+- Milestone: #2 — Automação de testes - Fase 1
+- GitHub: https://github.com/dmirrha/motorsport-calendar/issues/50
+
+## Objetivo
+Criar fixtures/cenários reutilizáveis para testes unitários, com dados minimamente realistas, cobrindo parsers, validadores e utilitários, e documentar os cenários para reuso em fases seguintes.
+
+## Plano de Execução (Checklist)
+- [ ] Criar diretório `tests/fixtures/` (se necessário)
+- [ ] HTMLs mínimos para parsing (datas/horas, categorias, campos faltantes)
+- [ ] Matrizes de casos para horários: 24h, AM/PM, sem minutos, overnight, naive vs aware
+- [ ] Cenários de categoria: conhecidas vs fallback `Unknown`
+- [ ] Casos iCal: PRODID, DTSTART/DTEND com TZ, URL, CATEGORIES, RRULE com `recurrence`
+
+### Documentação e rastreabilidade (Fase 1)
+- [ ] Criar/atualizar `docs/tests/scenarios/phase1_scenarios.md` (matriz de casos, mapeamentos, status e links para testes)
+- [ ] Adicionar itens derivados como checklist nesta seção do plano (`docs/TEST_AUTOMATION_PLAN.md`)
+
+## PARE — Autorização
+- Implementação requer confirmação. A PR será aberta como draft com este gate indicado apenas no corpo/labels/estado (título limpo e objetivo).
+
+## Progresso
+- [x] Branch criada: `chore/tests-scenarios-unit-50-20250810`
+- [x] Checklists sincronizadas com `docs/TEST_AUTOMATION_PLAN.md` (seção “Geração de cenários (unit)”).
+- [ ] PR (draft) aberta: (a preencher após abertura)
+
+## Notas
+- Reutilizar mocks essenciais: rede (requests/Session), tempo/TZ, `tmp_path`, `os.environ`.
+- Manter documentação e rastreabilidade: atualizar CHANGELOG/RELEASES/README/tests/README conforme necessário a cada marco.

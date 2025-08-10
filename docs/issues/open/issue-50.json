@@ -1,0 +1,33 @@
+{
+  "id": 3306754771,
+  "number": 50,
+  "state": "open",
+  "title": "Fase 1 — Geração de cenários (unit)",
+  "milestone": {
+    "number": 2,
+    "title": "Automação de testes - Fase 1"
+  },
+  "epic": 45,
+  "url": "https://github.com/dmirrha/motorsport-calendar/issues/50",
+  "created_at": "2025-08-09T19:36:19Z",
+  "updated_at": "2025-08-10T15:22:20-03:00",
+  "tasks": [
+    {"item": "Criar diretório tests/fixtures/ (se necessário)", "done": false},
+    {"item": "HTMLs mínimos para parsing (datas/horas, categorias, campos faltantes)", "done": false},
+    {"item": "Matrizes de casos para horários: 24h, AM/PM, sem minutos, overnight, naive vs aware", "done": false},
+    {"item": "Cenários de categoria: conhecidas vs fallback Unknown", "done": false},
+    {"item": "Casos iCal: PRODID, DTSTART/DTEND com TZ, URL, CATEGORIES, RRULE com recurrence", "done": false},
+    {"item": "Criar/atualizar docs/tests/scenarios/phase1_scenarios.md (matriz de casos, mapeamentos, status e links para testes)", "done": false},
+    {"item": "Adicionar itens derivados como checklist na seção do plano (docs/TEST_AUTOMATION_PLAN.md)", "done": false}
+  ],
+  "acceptance": [
+    "Reuso de fixtures entre testes",
+    "Documentação dos cenários gerados"
+  ],
+  "branch": "chore/tests-scenarios-unit-50-20250810",
+  "pull_request": {
+    "number": null,
+    "url": "",
+    "state": "draft"
+  }
+}
