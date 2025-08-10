@@ -554,9 +554,20 @@ open htmlcov/index.html  # macOS
 ```
 
 Notas:
-- Gate de cobertura inicial: 40% (`--cov-fail-under=40`).
+- Gate de cobertura temporário: 25% (`--cov-fail-under=25`) — estabilização dos mocks essenciais (issue #48, PR #55).
 - Timezone padrão dos testes: `America/Sao_Paulo` (fixture autouse em `tests/conftest.py`).
-- Convenções e estrutura da suíte de testes: consulte `tests/README.md`.
+- Mocks essenciais documentados em `tests/README.md`:
+  - TZ e aleatoriedade fixas (fixtures autouse em `tests/conftest.py`).
+  - Rede com shims/patches (`patch_requests_get`, `patch_requests_session`).
+  - Isolamento de filesystem com `tmp_path`.
+  - Variáveis de ambiente com `monkeypatch.setenv`/`delenv`.
+- Exemplos-práticos:
+  - `tests/unit/utils/test_payload_manager.py`
+  - `tests/unit/test_env_vars.py`
+  - `tests/unit/sources/base_source/test_make_request.py`
+  - `tests/unit/sources/tomada_tempo/test_parse_calendar_page.py`
+
+Para detalhes, veja `tests/README.md`.
 
 ## 📝 Licença
 
