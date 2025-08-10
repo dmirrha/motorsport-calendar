@@ -32,18 +32,18 @@ Garantir determinismo e isolamento em testes unitários por meio de mocks básic
 ## Progresso
 - [x] Branch criada: `chore/tests-mocks-essenciais-48-20250810`
 - [x] PR de rascunho aberto com este plano (referenciando #48 e épico #45)
-- [ ] Fixtures de tempo e random criadas
-- [ ] Mocks de rede definidos
+- [x] Fixtures de tempo e random criadas
+- [x] Mocks de rede definidos
 - [ ] Isolamento de FS aplicado com `tmp_path`
 - [ ] Fixtures de env aplicadas
-- [ ] `tests/README.md` atualizado (seção de mocks)
-- [ ] Validação: `pytest` estável sem dependências externas
+- [x] `tests/README.md` atualizado (seção de mocks)
+- [x] Validação: `pytest` estável sem dependências externas
 
 ## Checklist — Mocks essenciais
-- [ ] Definir padrões de patch (compatíveis com shims):
-  - [ ] `sources.tomada_tempo.requests.get`
-  - [ ] `sources.base_source.requests.Session`
-- [ ] Tempo e aleatoriedade: fixture TZ-aware (America/Sao_Paulo) e `random.seed(0)` com restauração
+- [x] Definir padrões de patch (compatíveis com shims):
+  - [x] `sources.tomada_tempo.requests.get`
+  - [x] `sources.base_source.requests.Session`
+- [x] Tempo e aleatoriedade: fixture TZ-aware (America/Sao_Paulo) e `random.seed(0)` com restauração
 - [ ] Isolamento de filesystem: uso de `tmp_path`/`tmp_path_factory`
 - [ ] Variáveis de ambiente: `monkeypatch.setenv`/`delenv`
 - [ ] Simular cenários: sucesso, timeout, HTTPError, HTML malformado

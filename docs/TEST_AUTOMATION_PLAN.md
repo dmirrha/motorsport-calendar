@@ -108,11 +108,11 @@ Objetivo: Cobrir funções críticas de parsing/transformação/validação com 
   - [x] Criar/ajustar `conftest.py` com fixtures reutilizáveis (HTML mínimo, fuso horário padrão, relógio congelado)
   - [x] Criar `tests/README.md` com convenções e estrutura-alvo
 - [ ] Mocks essenciais
-  - [ ] Definir padrões de patch (compatíveis com shims):
-    - [ ] `sources.tomada_tempo.requests.get`
-    - [ ] `sources.base_source.requests.Session`
+  - [x] Definir padrões de patch (compatíveis com shims):
+    - [x] `sources.tomada_tempo.requests.get`
+    - [x] `sources.base_source.requests.Session`
   - [ ] Simular cenários: sucesso, timeout, HTTPError, HTML malformado
-  - [ ] Tempo e aleatoriedade: fixture TZ-aware (America/Sao_Paulo) e `random.seed(0)` com restauração
+  - [x] Tempo e aleatoriedade: fixture TZ-aware (America/Sao_Paulo) e `random.seed(0)` com restauração
   - [ ] Isolamento de filesystem: uso de `tmp_path`/`tmp_path_factory` em testes que tocam disco
   - [ ] Variáveis de ambiente: `monkeypatch.setenv`/`delenv` para configurar/limpar `os.environ`
 - [ ] Alvos prioritários (unit)
