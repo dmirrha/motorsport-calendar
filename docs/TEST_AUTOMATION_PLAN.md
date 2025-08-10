@@ -66,7 +66,7 @@ Objetivo: Remover legados e padronizar a base de testes antes de iniciar as fase
   - [x] Remover `__init__.py` em `tests/` (a menos que necessário)
 - [x] Limpeza de artefatos gerados (não versionados; exclusão local é opcional)
   - [x] (N/A) Exclusão local opcional; diretórios/arquivos já ignorados pelo git: `.pytest_cache/`, `htmlcov/`, `.coverage*`, `coverage.xml`, `junit.xml`, `test_results/`
-  - [x] Atualizar `.gitignore` para garantir ignorados consistentes
+  - [x] Revisar e atualizar `CHANGELOG.md`, `RELEASES.md`, `README.md` e `tests/README.md` para garantir documentação dos mocks essenciais, gate de cobertura temporário e referência à issue #48. (PR #55)
 - [x] Scripts temporários e dispersos (N/A — sem scripts temporários; utilitários mantidos)
   - [x] Revisão realizada: manter `scripts/tests_phase0_*` e `scripts/create_patch_0_5_2_pr.sh`; nenhum `tmp_*` encontrado
 - [x] CI antigo (N/A — apenas `release-drafter.yml` presente)
@@ -107,7 +107,7 @@ Objetivo: Cobrir funções críticas de parsing/transformação/validação com 
   - [x] Introduzir marcadores `@pytest.mark.unit`
   - [x] Criar/ajustar `conftest.py` com fixtures reutilizáveis (HTML mínimo, fuso horário padrão, relógio congelado)
   - [x] Criar `tests/README.md` com convenções e estrutura-alvo
-- [ ] Mocks essenciais
+- [x] Mocks essenciais
   - [x] Definir padrões de patch (compatíveis com shims):
     - [x] `sources.tomada_tempo.requests.get`
     - [x] `sources.base_source.requests.Session`
@@ -115,6 +115,7 @@ Objetivo: Cobrir funções críticas de parsing/transformação/validação com 
   - [x] Tempo e aleatoriedade: fixture TZ-aware (America/Sao_Paulo) e `random.seed(0)` com restauração
   - [x] Isolamento de filesystem: uso de `tmp_path`/`tmp_path_factory` em testes que tocam disco — ver `tests/unit/utils/test_payload_manager.py`
   - [x] Variáveis de ambiente: `monkeypatch.setenv`/`delenv` para configurar/limpar `os.environ` — ver `tests/unit/test_env_vars.py`
+  - [x] Validação: Suíte estável: `45 passed`; cobertura total: 28.75% (2025-08-10)
 - [ ] Alvos prioritários (unit)
   - [ ] Parsers de data/hora e categorias em `sources/tomada_tempo.py`
   - [ ] Normalização/validação no `src/motorsport_calendar/event_processor.py`
