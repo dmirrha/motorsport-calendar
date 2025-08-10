@@ -39,16 +39,10 @@ Organizar a suíte de testes para escalabilidade e manutenção:
   - `tests/regression/test_processing/test_issue_3_fixes.py`
 - [x] Criado `tests/README.md` (convenções)
 - [x] Validação: `pytest -q` → 37 passed
-<<<<<<< HEAD
 - [x] Atualizar `docs/TEST_AUTOMATION_PLAN.md` com item do `tests/README.md`
 - [x] Atualizar `PROJECT_STRUCTURE.md` com nova árvore de `tests/`
 - [x] Atualizar `CHANGELOG.md` (Não lançado)
   - [x] Atualizar `README.md` (seção Testes) com link para `tests/README.md`
-=======
-- [ ] Atualizar `docs/TEST_AUTOMATION_PLAN.md` com item do `tests/README.md`
-- [ ] Atualizar `PROJECT_STRUCTURE.md` com nova árvore de `tests/`
-- [ ] Atualizar `CHANGELOG.md` (0.5.3 — Não lançado)
->>>>>>> c0cd374 (chore(tests): atualizar docs e rastreabilidade da organização da suíte; 37 testes passando (#47))
 
 ## Notas
 - Descoberta segue restrita a `tests/` via `pytest.ini`.
