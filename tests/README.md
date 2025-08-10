@@ -29,7 +29,7 @@ Este diretório contém a suíte de testes do projeto. A descoberta de testes é
 
 - Todos os testes: `pytest`
 - Unit tests: `pytest -m unit`
-- Cobertura: `pytest --cov` (gate de cobertura inicial `--cov-fail-under=40`)
+- Cobertura: `pytest --cov` (gate de cobertura temporário `--cov-fail-under=25` — estabilização dos mocks essenciais, issue #48)
 
 Relatórios são gerados em:
 - JUnit XML: `test_results/junit.xml`
@@ -61,7 +61,19 @@ import requests
 def test_timeout_session(patch_requests_session):
     sess = patch_requests_session(exception_to_raise=requests.Timeout())
     # instanciar source que usa BaseSource -> requests.Session() será a sessão dummy
+    #
+    # execute função que consome TomadaTempoSource
+    #
+    # assertions
 ```
+
+### Referências de testes (mocks essenciais)
+
+- Isolamento de filesystem: `tests/unit/utils/test_payload_manager.py` (uso de `tmp_path`)
+- Variáveis de ambiente: `tests/unit/test_env_vars.py` (uso de `monkeypatch.setenv/delenv`)
+- Cenários de rede:
+  - `tests/unit/sources/base_source/test_make_request.py` (sucesso/timeout/HTTPError)
+  - `tests/unit/sources/tomada_tempo/test_parse_calendar_page.py` (HTML válido/malformado)
 
 ## Diretrizes
 

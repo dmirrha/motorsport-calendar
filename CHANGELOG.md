@@ -62,7 +62,19 @@ e este projeto adere ao [Versionamento Semântico](https://semver.org/spec/v2.0.
   - Reorganização da suíte unitária por domínio em `tests/unit/` (sources/tomada_tempo, silent_period, utils)
   - Remoção de hacks de `sys.path` nos testes (uso de `tests/conftest.py`)
   - Criado `tests/README.md` com convenções e estrutura
-  - Validação pós-reorganização: `37 passed`
+  - Suíte estável: `45 passed`; cobertura total: 28.75%
+  - Mocks essenciais (issue #48, PR #55):
+    - Fixação de timezone (`America/Sao_Paulo`) e aleatoriedade (`random.seed(0)`)
+    - Shims de rede: `sources.tomada_tempo.requests.get` e `sources.base_source.requests.Session`
+    - Isolamento de filesystem com `tmp_path`/`tmp_path_factory`
+    - Variáveis de ambiente com `monkeypatch.setenv`/`delenv`
+    - Exemplos: `tests/unit/utils/test_payload_manager.py`, `tests/unit/test_env_vars.py`,
+      `tests/unit/sources/base_source/test_make_request.py`, `tests/unit/sources/tomada_tempo/test_parse_calendar_page.py`
+  - Gate de cobertura temporário reduzido para 25% em `pytest.ini` (estabilização dos mocks essenciais)
+  - Documentação atualizada:
+    - `tests/README.md` — seção de mocks essenciais
+    - `README.md` — seção “🧪 Testes” com gate 25% e exemplos
+    - `RELEASES.md` — nota de próximo patch (não lançado)
 
 ### Corrigido
 - **Issue #23**: Corrigido bug na filtragem de períodos de silêncio

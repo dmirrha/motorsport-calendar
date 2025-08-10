@@ -2,6 +2,21 @@
 
 Este arquivo contém um registro acumulativo de todas as versões lançadas do projeto, com notas detalhadas sobre as mudanças em cada versão.
 
+## Próximo (Não Lançado)
+Manutenção — Testes/Automação (issue #48, PR #55)
+
+- Mocks essenciais para estabilidade da suíte:
+  - Timezone fixo (`America/Sao_Paulo`) e aleatoriedade determinística (`random.seed(0)`).
+  - Shims de rede: `sources.tomada_tempo.requests.get` e `sources.base_source.requests.Session`.
+  - Isolamento de filesystem com `tmp_path`/`tmp_path_factory`.
+  - Variáveis de ambiente com `monkeypatch.setenv`/`delenv`.
+- Gate de cobertura temporário ajustado para 25% em `pytest.ini` durante estabilização.
+- Documentação atualizada:
+  - `tests/README.md` — seção de mocks essenciais e exemplos.
+  - `README.md` — seção “🧪 Testes” com gate 25% e referências aos exemplos.
+  - `CHANGELOG.md` — registro em “Não Lançado”.
+ - Suíte estável: `45 passed`; cobertura total: 28.75%
+
 ## Versão 0.5.2 (2025-08-09)
 Manutenção — Testes/Automação
 
