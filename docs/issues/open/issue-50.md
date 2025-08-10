@@ -25,7 +25,7 @@ Criar fixtures/cenários reutilizáveis para testes unitários, com dados minima
 ## Progresso
 - [x] Branch criada: `chore/tests-scenarios-unit-50-20250810`
 - [x] Checklists sincronizadas com `docs/TEST_AUTOMATION_PLAN.md` (seção “Geração de cenários (unit)”).
-- [ ] PR (draft) aberta: (a preencher após abertura)
+ - [x] PR (draft) aberta: #57 — https://github.com/dmirrha/motorsport-calendar/pull/57
 
 ## Notas
 - Reutilizar mocks essenciais: rede (requests/Session), tempo/TZ, `tmp_path`, `os.environ`.

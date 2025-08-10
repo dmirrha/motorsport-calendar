@@ -124,6 +124,8 @@ Objetivo: Cobrir funções críticas de parsing/transformação/validação com 
   - [x] Lógica de filtro de fim de semana em `src/silent_period.py` e resumo `SilentPeriodManager.log_filtering_summary`
   - [x] PR #56 mergeada; rastreabilidade: `docs/issues/closed/issue-49.md`
   - [x] Validação (prioritários): Suíte estável: `79 passed`; cobertura total: 37.00% (2025-08-10)
+ 
+ Status (Fase 1 — issue #50): PR #57 em draft; rastreabilidade sincronizada em `docs/issues/open/issue-50.{md,json}`.
 - [ ] Geração de cenários (unit)
   - [ ] Criar diretório `tests/fixtures/` (se necessário)
   - [ ] HTMLs mínimos para parsing (datas/horas, categorias, campos faltantes)
