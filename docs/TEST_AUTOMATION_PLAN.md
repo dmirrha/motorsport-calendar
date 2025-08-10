@@ -222,6 +222,11 @@ Objetivo: Validar fluxos entre componentes (coleta → processamento → iCal), 
 - Fluxo end-to-end gerando `.ics` válido.
 - Cobertura incremental (meta global ≥ 80% ao final da fase).
 - Artefatos (JUnit + HTMLCov) disponíveis localmente e no CI.
+ 
+### GitHub Actions (CI) — Fase 2
+- [ ] Workflow para unit/integration com `pytest` + `pytest-cov`
+- [ ] Upload de artefatos (HTML/ XML) e envio ao Codecov
+- [ ] Gatilhos em PRs e pushes, gate por status de cobertura
 
 ---
 
