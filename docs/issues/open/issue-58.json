@@ -1,0 +1,25 @@
+ {
+  "id": 3307967361,
+  "number": 58,
+  "state": "open",
+  "title": "Fase 1.1 — Elevação de Cobertura e Robustez Unitária (Épico)",
+  "milestone": null,
+  "epic": null,
+  "url": "https://github.com/dmirrha/motorsport-calendar/issues/58",
+  "created_at": "2025-08-10T21:03:00Z",
+  "updated_at": "2025-08-10T21:07:17Z",
+  "tasks": [
+    {"item": "#59 — Cobertura de sources/tomada_tempo.py ≥55%", "done": false},
+    {"item": "#60 — Cobertura de sources/base_source.py ≥60%", "done": false},
+    {"item": "#61 — Cobertura de src/event_processor.py ≥60%", "done": false},
+    {"item": "#62 — Cobertura de src/ical_generator.py ≥60%", "done": false},
+    {"item": "#63 — Gate global ≥45% (pytest.ini)", "done": false},
+    {"item": "#64 — Documentação e Cenários (sincronismo)", "done": false}
+  ],
+  "acceptance": [
+    "Cobertura global ≥50%",
+    "Gate de cobertura ≥45% com suíte passando",
+    "Testes determinísticos (<30s local)",
+    "Documentação e rastreabilidade sincronizadas"
+  ]
+}

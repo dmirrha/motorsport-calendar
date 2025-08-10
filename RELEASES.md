@@ -17,6 +17,8 @@ Manutenção — Testes/Automação (issue #48, PR #55)
   - `CHANGELOG.md` — registro em “Não Lançado”.
   - Suíte estável: `79 passed`; cobertura total: 37.00%
 
+- Fase 1.1 — Checklist reorganizada por issues (#59–#64) com sincronismo automático entre plano (`docs/TEST_AUTOMATION_PLAN.md`) e issues (docs/issues/open/issue-<n>.{md,json}); rastreabilidade 58–64 adicionada.
+
 Fase 1 — Cenários (issue #50, PR #57 draft)
 
 - Fixtures HTML adicionados para o parser `TomadaTempoSource`:

@@ -1,0 +1,22 @@
+{
+  "id": 3307967398,
+  "number": 60,
+  "state": "open",
+  "title": "Fase 1.1 — Cobertura de sources/base_source.py ≥60% (erros/retries)",
+  "milestone": null,
+  "epic": 58,
+  "url": "https://github.com/dmirrha/motorsport-calendar/issues/60",
+  "created_at": "2025-08-10T21:03:03Z",
+  "updated_at": "2025-08-10T21:07:17Z",
+  "tasks": [
+    {"item": "Testar timeouts e HTTP errors", "done": false},
+    {"item": "Simular exceções de requests", "done": false},
+    {"item": "Cobrir logging e caminhos de falha", "done": false},
+    {"item": "Atualizar documentação e rastreabilidade", "done": false}
+  ],
+  "acceptance": [
+    "Cobertura de sources/base_source.py ≥60%",
+    "Mocks de rede cobrindo cenários críticos",
+    "Documentação sincronizada"
+  ]
+}

@@ -165,20 +165,31 @@ Objetivo: Cobrir funções críticas de parsing/transformação/validação com 
 Objetivo: elevar a cobertura unitária para ≥ 80%, ampliando a matriz de casos e cobrindo ramos não exercitados.
 
 ### Checklist — Fase 1.1
-- [ ] Matrizes de horários avançadas
-  - [ ] Naive vs Aware (TZ `America/Sao_Paulo`) — validação de parsing e normalização
-  - [ ] Bordas de fuso/virada de dia (00:00/23:59) e variações sazonais
-  - [ ] Horários atípicos e formatos incompletos (ex.: `10`, `10h`, `10h0`)
-- [ ] Categorias e locais
-  - [ ] Categorias conhecidas vs `Unknown` (matriz mais ampla)
-  - [ ] Eventos sem local/país e locais ambíguos
-- [ ] Robustez/erros
-  - [ ] HTML malformado e campos ausentes adicionais (variações realistas)
-  - [ ] Ambiguidades de parsing (decisões documentadas)
-- [ ] Cobertura por ramos
-  - [ ] Identificar trechos não cobertos via `htmlcov/index.html` e adicionar testes direcionados
-- [ ] Automação local
-  - [ ] Script/Makefile com alvos `test:unit`, `test:integration`, `coverage`, `report`
+*Sincronismo automático: esta checklist espelha as issues #59–#64 no GitHub (corpo e docs/issues/open/issue-<n>.{md,json}).*
+- [ ] #59 — Cobertura de `sources/tomada_tempo.py` ≥ 55%
+  - [ ] Matrizes de horários avançadas
+    - [ ] Naive vs Aware (TZ `America/Sao_Paulo`) — validação de parsing e normalização
+    - [ ] Bordas de fuso/virada de dia (00:00/23:59) e variações sazonais
+    - [ ] Horários atípicos e formatos incompletos (ex.: `10`, `10h`, `10h0`)
+  - [ ] Categorias e locais
+    - [ ] Categorias conhecidas vs `Unknown` (matriz mais ampla)
+  - [ ] Robustez/erros
+    - [ ] Ambiguidades de parsing (decisões documentadas)
+- [ ] #60 — Cobertura de `sources/base_source.py` ≥ 60%
+  - [ ] Robustez/erros
+    - [ ] HTML malformado e campos ausentes adicionais (variações realistas)
+  - [ ] Cobertura por ramos
+    - [ ] Identificar trechos não cobertos via `htmlcov/index.html` e adicionar testes direcionados
+- [ ] #61 — Cobertura de `src/event_processor.py` ≥ 60%
+  - [ ] Categorias e locais
+    - [ ] Eventos sem local/país e locais ambíguos
+  - [ ] Cobertura por ramos
+- [ ] #62 — Cobertura de `src/ical_generator.py` ≥ 60%
+  - [ ] Cobertura por ramos
+- [ ] #63 — Gate global ≥ 45% (`pytest.ini`)
+  - [ ] Automação local
+    - [ ] Script/Makefile com alvos `test:unit`, `test:integration`, `coverage`, `report`
+- [ ] #64 — Documentação e Cenários (sincronismo)
 
 # Fase 2 — Testes Integrados
 Objetivo: Validar fluxos entre componentes (coleta → processamento → iCal), sem dependência externa real (rede) sempre que possível.

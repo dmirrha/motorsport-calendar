@@ -1,0 +1,20 @@
+{
+  "id": 3307967472,
+  "number": 63,
+  "state": "open",
+  "title": "Fase 1.1 — Aumentar gate de cobertura para ≥45% (pytest.ini)",
+  "milestone": null,
+  "epic": 58,
+  "url": "https://github.com/dmirrha/motorsport-calendar/issues/63",
+  "created_at": "2025-08-10T21:03:08Z",
+  "updated_at": "2025-08-10T21:07:18Z",
+  "tasks": [
+    {"item": "Atualizar pytest.ini (fail-under=45)", "done": false},
+    {"item": "Garantir suíte passando localmente", "done": false},
+    {"item": "Atualizar documentação e releases", "done": false}
+  ],
+  "acceptance": [
+    "Suíte passando com gate 45%",
+    "Documentação sincronizada"
+  ]
+}
