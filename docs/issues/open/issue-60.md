@@ -7,11 +7,12 @@ Referências:
 ## Objetivo
 Elevar cobertura de `sources/base_source.py` para ≥60%, cobrindo tratamento de erros e políticas de retry.
 
-## Plano de Execução
-1. Testar timeouts, HTTP errors (4xx/5xx), backoff/retries e limites
-2. Mockar `requests` e simular exceções
-3. Cobrir logging e caminhos de falha (retornos nulos, validação de payload)
-4. Atualizar documentação e rastreabilidade (planos, cenários, tests/README, CHANGELOG)
+## Checklist
+- [x] Testar timeouts, HTTP errors (4xx/5xx), backoff/retries e limites
+- [x] Mockar `requests` e simular exceções
+- [x] Cobrir logging e caminhos de falha (retornos nulos, validação de payload)
+- [x] Atualizar documentação e rastreabilidade (planos, cenários, tests/README, CHANGELOG)
+- [x] Cobertura por ramos de BaseSource concluída
 
 ## PARE — Autorização
 - PR inicia em draft até validação deste plano.
@@ -22,6 +23,11 @@ Elevar cobertura de `sources/base_source.py` para ≥60%, cobrindo tratamento de
 - [x] Testes implementados e passando
 - [x] Documentação sincronizada
  - [x] Cobertura por ramos de BaseSource concluída
+
+## Critérios de aceite
+- [x] Cobertura de `sources/base_source.py` ≥60%
+- [x] Mocks de rede cobrindo cenários críticos com determinismo
+- [x] Documentação sincronizada
 
 ## Métricas (2025-08-11)
 - Suíte: 132 passed
