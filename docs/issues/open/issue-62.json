@@ -7,16 +7,22 @@
   "epic": 58,
   "url": "https://github.com/dmirrha/motorsport-calendar/issues/62",
   "created_at": "2025-08-10T21:03:06Z",
-  "updated_at": "2025-08-10T21:07:18Z",
+  "updated_at": "2025-08-11T09:56:00Z",
   "tasks": [
     {"item": "Validar campos ICS obrigatórios", "done": false},
     {"item": "Usar fixtures golden/snapshots", "done": false},
     {"item": "Garantir determinismo e isolamento de FS", "done": false},
-    {"item": "Atualizar documentação e rastreabilidade", "done": false}
+    {"item": "Atualizar documentação e rastreabilidade", "done": false},
+    {"item": "Branch criada", "done": true},
+    {"item": "PR (draft) aberta", "done": false}
   ],
   "acceptance": [
     "Cobertura de src/ical_generator.py ≥60%",
     "Geração ICS validada e determinística",
     "Documentação sincronizada"
+  ],
+  "docs_updated": [
+    "docs/issues/open/issue-62.md",
+    "docs/issues/open/issue-62.json"
   ]
 }

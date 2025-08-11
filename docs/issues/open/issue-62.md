@@ -7,17 +7,17 @@ Referências:
 ## Objetivo
 Elevar cobertura de `src/ical_generator.py` para ≥60% com validação de campos ICS.
 
-## Plano de Execução
-1. Validar campos ICS obrigatórios (UID, DTSTART, DTEND, TZID, SUMMARY)
-2. Usar fixtures "golden" (snapshots) controladas em `tests/fixtures/`
-3. Garantir determinismo (TZ/random) e isolamento de FS
-4. Atualizar documentação e rastreabilidade (planos, cenários, tests/README, CHANGELOG)
+## Checklist
+- [ ] Validar campos ICS obrigatórios (UID, DTSTART, DTEND, TZID, SUMMARY)
+- [ ] Usar fixtures "golden" (snapshots) controladas em `tests/fixtures/`
+- [ ] Garantir determinismo (TZ/random) e isolamento de FS
+- [ ] Atualizar documentação e rastreabilidade (planos, cenários, tests/README, CHANGELOG)
 
 ## PARE — Autorização
 - PR inicia em draft até validação deste plano.
 
 ## Progresso
-- [ ] Branch criada
+- [x] Branch criada
 - [ ] PR (draft) aberta
 - [ ] Testes implementados e passando
 - [ ] Documentação sincronizada
