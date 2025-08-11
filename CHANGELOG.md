@@ -77,6 +77,13 @@ e este projeto adere ao [Versionamento Semântico](https://semver.org/spec/v2.0.
     - `RELEASES.md` — nota de próximo patch (não lançado)
    - Fase 1.1 — checklist reorganizada por issues (#59–#64) com sincronismo automático entre plano e issues (docs/issues/open/issue-<n>.{md,json}); rastreabilidade 58–64 adicionada.
    - Issue #59 (PR #66 — draft): testes unitários adicionais para `sources/tomada_tempo.py`; cobertura atual do arquivo: 63%; suíte: 101 passed; cobertura global: 40.64%; documentação sincronizada (`docs/TEST_AUTOMATION_PLAN.md`, `docs/issues/open/issue-59.{md,json}`).
+   - Issue #60 (PR #67 — draft): testes de `BaseSource.make_request`
+     - Cobertura do arquivo `sources/base_source.py`: 97% (meta ≥60% atingida)
+     - Suíte: 132 passed; cobertura global: 38.57%
+     - Abrange: erros HTTP 4xx/5xx com retries e logs; backoff exponencial/rate-limit com monkeypatch em `time.sleep` (sem sleeps reais); comportamento seguro quando `logger=None` via `getattr` para métodos customizados; verificação de logs e salvamento de payload; teste opcional de rotação de `User-Agent` na 10ª requisição (determinístico via `random.choice`). Cobertos helpers/parsers: `parse_date_time`, `normalize_event_data`, `filter_weekend_events`, `_setup_session` (headers), `get_streaming_links`.
+     - Atualização (branch coverage): cobertos ramos adicionais — exceção em `filter_weekend_events`, limpeza de campos com espaços em `normalize_event_data`, e uso do context manager (`__enter__/__exit__`), `__str__`/`__repr__`.
+     - Incrementais entregues: campos ausentes/HTML malformado, slice de `recent_errors` em `get_statistics`, `filter_weekend_events(None)`, formatos adicionais de data/segundos e timezone custom, estabilidade/variação de `_generate_event_id`.
+     - Bug corrigido (mantido para importação em lote): `.github/import_issues/open/026-basesource-logger-none-attributeerror.{md,json}` — remoção de fallback para `logging.getLogger(__name__)` quando `logger=None` e proteção de chamadas a métodos customizados com `getattr`.
      - Nota: subtarefas avançadas originalmente listadas para #59 foram replanejadas para as issues #60–#64.
      - Nota: bug de precedência ISO vs BR em `_extract_date()` documentado para importação em lote ao final da Fase 1.1; arquivos mantidos em `.github/import_issues/open/025-tomadatemposource-extract-date-parsing-precedence.{json,md}`.
   - Fase 1 — Cenários (issue #50, PR #57 draft)

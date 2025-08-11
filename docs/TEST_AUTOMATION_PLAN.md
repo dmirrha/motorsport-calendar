@@ -170,11 +170,15 @@ Objetivo: elevar a cobertura unitária para ≥ 80%, ampliando a matriz de casos
 - [x] #59 — Cobertura de `sources/tomada_tempo.py` ≥ 55% (progresso: 63% em 2025-08-10; 101 passed; cobertura global 40.64%; PR #66 draft; bug de precedência ISO vs BR documentado)
   - [x] Escopo entregue: cobertura 63%, 101 passed, global 40.64% (2025-08-10)
   - [x] Subtarefas avançadas replanejadas para #60–#64 (detalhamento nas respectivas issues)
-- [ ] #60 — Cobertura de `sources/base_source.py` ≥ 60%
-  - [ ] Robustez/erros
-    - [ ] HTML malformado e campos ausentes adicionais (variações realistas)
-  - [ ] Cobertura por ramos
-    - [ ] Identificar trechos não cobertos via `htmlcov/index.html` e adicionar testes direcionados
+- [x] #60 — Cobertura de `sources/base_source.py` ≥ 60%
+  - [x] Métricas (2025-08-11): `sources/base_source.py` 97% (meta ≥60% atingida); suíte 132 passed; cobertura global 38.57%
+  - [x] Escopo coberto: erros HTTP 4xx/5xx com retries e logs; backoff exponencial/rate-limit com monkeypatch em `time.sleep` (sem sleeps reais); comportamento seguro quando `logger=None` via `getattr` para métodos customizados; verificações de logs e salvamento de payload; teste opcional da rotação de `User-Agent` na 10ª requisição (determinístico via `random.choice`)
+  - [x] Documentação sincronizada: `tests/README.md` (execução, métricas e destaques), `CHANGELOG.md` (Não Lançado), `RELEASES.md` (Próximo), `docs/issues/open/issue-60.md` (progresso)
+  - [x] Bug documentado para importação em lote: `.github/import_issues/open/026-basesource-logger-none-attributeerror.{md,json}` — remoção de fallback para `logging.getLogger(__name__)` quando `logger=None` e guarda com `getattr`
+  - [x] Robustez/erros (complementares concluídos)
+    - [x] HTML malformado e campos ausentes adicionais (variações realistas)
+  - [x] Cobertura por ramos (concluída)
+    - [x] Ramos adicionais cobertos: exceção em `filter_weekend_events`, limpeza de campos vazios em `normalize_event_data`, context manager (`__enter__/__exit__`), `__str__`/`__repr__`
 - [ ] #61 — Cobertura de `src/event_processor.py` ≥ 60%
   - [ ] Categorias e locais
     - [ ] Eventos sem local/país e locais ambíguos

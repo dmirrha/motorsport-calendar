@@ -19,5 +19,30 @@ Elevar cobertura de `sources/base_source.py` para ≥60%, cobrindo tratamento de
 ## Progresso
 - [x] Branch criada
 - [x] PR (draft) aberta — https://github.com/dmirrha/motorsport-calendar/pull/67
-- [ ] Testes implementados e passando
-- [ ] Documentação sincronizada
+- [x] Testes implementados e passando
+- [x] Documentação sincronizada
+
+## Métricas (2025-08-11)
+- Suíte: 132 passed
+- Cobertura global: 38.57%
+- Cobertura `sources/base_source.py`: 97%
+
+## Escopo entregue (resumo)
+- Erros HTTP 4xx/5xx com retries e logs
+- Backoff exponencial/rate-limit com monkeypatch em `time.sleep` (sem sleeps reais)
+- Comportamento seguro quando `logger=None` via `getattr` para métodos customizados
+- Verificações de logs de debug e salvamento de payloads
+- Teste opcional: rotação de `User-Agent` (determinístico via `random.choice`)
+- Helpers/parsers cobertos: `parse_date_time`, `normalize_event_data`, `filter_weekend_events`, `_setup_session` (headers), `get_streaming_links`
+
+- Incrementais entregues: campos ausentes/HTML malformado, slice de `recent_errors` em `get_statistics`, `filter_weekend_events(None)`, formatos adicionais de data/segundos e timezone custom, estabilidade/variação de `_generate_event_id`.
+
+## Cobertura por ramos — Concluída
+- Exceção em `filter_weekend_events` (ramo de erro ao parsear data)
+- Limpeza de campos com espaços em `normalize_event_data` (cleanup loop)
+- Uso do context manager `__enter__/__exit__` e validações de `__str__`/`__repr__`
+
+## Referências
+- `tests/unit/sources/base_source/test_make_request.py`
+- `tests/unit/sources/base_source/test_helpers_and_parsers.py`
+- Documentação atualizada: `tests/README.md`, `CHANGELOG.md`, `RELEASES.md`, `docs/TEST_AUTOMATION_PLAN.md`
