@@ -21,6 +21,7 @@ Elevar cobertura de `sources/base_source.py` para ≥60%, cobrindo tratamento de
 - [x] PR (draft) aberta — https://github.com/dmirrha/motorsport-calendar/pull/67
 - [x] Testes implementados e passando
 - [x] Documentação sincronizada
+ - [x] Cobertura por ramos de BaseSource concluída
 
 ## Métricas (2025-08-11)
 - Suíte: 132 passed
