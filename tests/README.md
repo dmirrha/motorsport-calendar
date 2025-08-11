@@ -44,6 +44,16 @@ Este diretório contém a suíte de testes do projeto. A descoberta de testes é
   - Suíte: **125 passed (~13.9s)**
   - Cobertura global: **41.72%**
   - `sources/base_source.py`: **92%**
+ 
+ - Fase 1.1 — issue #61
+   - Suíte (foco no módulo): **24 passed, 125 deselected**
+   - Cobertura de `src/event_processor.py`: **83%**
+   - Escopo: normalização (links/data/hora/categoria/local/país/sessão), deduplicação (threshold/tolerância/merge), pipeline (`process_events`), categorias (`_detect_categories`), weekend target (`_detect_target_weekend`), estatísticas e logs
+   - Novos testes:
+     - `tests/unit/processing/test_event_processor_normalization.py`
+     - `tests/unit/processing/test_event_processor_dedup.py`
+     - `tests/unit/processing/test_event_processor_stats_repr.py`
+     - `tests/unit/processing/test_event_processor_pipeline.py`
 
 ### Destaques — BaseSource (issue #60)
 - HTTP 4xx com retries e logs

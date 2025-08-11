@@ -19,6 +19,17 @@ Manutenção — Testes/Automação (issue #48, PR #55)
 
 - Fase 1.1 — Checklist reorganizada por issues (#59–#64) com sincronismo automático entre plano (`docs/TEST_AUTOMATION_PLAN.md`) e issues (docs/issues/open/issue-<n>.{md,json}); rastreabilidade 58–64 adicionada.
 
+Issue #61 (PR #68 — draft)
+
+- Cobertura de `src/event_processor.py`: **83%** (meta ≥60% atingida)
+- Novos testes adicionados:
+  - `tests/unit/processing/test_event_processor_normalization.py`
+  - `tests/unit/processing/test_event_processor_dedup.py`
+  - `tests/unit/processing/test_event_processor_stats_repr.py`
+  - `tests/unit/processing/test_event_processor_pipeline.py`
+- Escopo coberto: normalização (links/data/hora/categoria/local/país/sessão), deduplicação (threshold/tolerância/merge), pipeline (`process_events`), categorias (`_detect_categories`), weekend target (`_detect_target_weekend`), estatísticas e logs
+- Execução local direcionada com `--cov=src/event_processor.py` para aferição do alvo sem afetar gate global durante estabilização
+
 Issue #59 (PR #66 — draft)
 
 - Testes unitários adicionais para `sources/tomada_tempo.py` (parsers e funções auxiliares)

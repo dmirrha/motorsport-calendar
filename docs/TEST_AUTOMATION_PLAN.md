@@ -179,10 +179,10 @@ Objetivo: elevar a cobertura unitária para ≥ 80%, ampliando a matriz de casos
     - [x] HTML malformado e campos ausentes adicionais (variações realistas)
   - [x] Cobertura por ramos (concluída)
     - [x] Ramos adicionais cobertos: exceção em `filter_weekend_events`, limpeza de campos vazios em `normalize_event_data`, context manager (`__enter__/__exit__`), `__str__`/`__repr__`
-- [ ] #61 — Cobertura de `src/event_processor.py` ≥ 60%
-  - [ ] Categorias e locais
-    - [ ] Eventos sem local/país e locais ambíguos
-  - [ ] Cobertura por ramos
+ - [x] #61 — Cobertura de `src/event_processor.py` ≥ 60%
+   - [x] Métricas (2025-08-11): `src/event_processor.py` 83% (meta ≥60% atingida)
+   - [x] Escopo coberto: normalização (links/data/hora/categoria/local/país/sessão), deduplicação (threshold/tolerância/merge), pipeline (`process_events`), categorias (`_detect_categories`), weekend target (`_detect_target_weekend`), estatísticas e logs
+   - [x] Documentação sincronizada: `tests/README.md`, `CHANGELOG.md`, `RELEASES.md`, `docs/TEST_AUTOMATION_PLAN.md`, `docs/issues/open/issue-61.md`, `docs/issues/open/issue-61.json`
 - [ ] #62 — Cobertura de `src/ical_generator.py` ≥ 60%
   - [ ] Cobertura por ramos
 - [ ] #63 — Gate global ≥ 45% (`pytest.ini`)

@@ -51,6 +51,16 @@ e este projeto adere ao [Versionamento Semântico](https://semver.org/spec/v2.0.
    - Limpeza: remoção do índice de artefatos gerados (`.pytest_cache/`, `test_results/`, `test_results_github/`, `pytest.log`, `junit.xml`, `report.html`)
    - Documentados cenários em `docs/tests/scenarios/phase0_scenarios.md`
    - Scripts adicionados: `scripts/tests_phase0_inventory.sh`, `scripts/tests_phase0_move_outside_tests.sh`, `scripts/tests_phase0_cleanup.sh`
+
+  - Issue #61 (PR #68 — draft): cobertura de `src/event_processor.py`
+    - Cobertura do arquivo: **83%** (meta ≥60% atingida)
+    - Novos testes unitários:
+      - `tests/unit/processing/test_event_processor_normalization.py`
+      - `tests/unit/processing/test_event_processor_dedup.py`
+      - `tests/unit/processing/test_event_processor_stats_repr.py`
+      - `tests/unit/processing/test_event_processor_pipeline.py`
+    - Escopo: normalização (links/data/hora/categoria/local/país/sessão), deduplicação (threshold/tolerância/merge), pipeline (`process_events`), categorias (`_detect_categories`), weekend target (`_detect_target_weekend`), estatísticas e logs
+    - Execução local focada no módulo com gate temporário por arquivo (sem afetar gate global do projeto durante estabilização)
   - Fase 1: configuração mínima do Pytest com cobertura e documentação
     - `pytest.ini`: `testpaths=tests`; cobertura em `src/` e `sources/` com `--cov=src --cov=sources`
     - Relatórios: `--cov-report=term-missing:skip-covered`, `--cov-report=xml:coverage.xml`, `--cov-report=html`, `--junitxml=test_results/junit.xml`
