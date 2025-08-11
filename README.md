@@ -258,6 +258,12 @@ Cobertura e métricas recentes (Fase 1.1 — issue #59):
 
 > Nota: o bug de precedência ISO vs BR em `_extract_date()` foi documentado para importação em lote ao final da Fase 1.1; arquivos no importador: `.github/import_issues/open/025-tomadatemposource-extract-date-parsing-precedence.{json,md}`.
 
+Cobertura e métricas recentes (Fase 1.1 — issue #62):
+- `src/ical_generator.py`: **76%**
+- Suíte: **156 passed**; cobertura global: **51.92%**
+- Novos testes: `tests/unit/ical/test_ical_generator_extended.py`
+- Nota: corrigido efeito colateral de monkeypatch global em `pytz.timezone` nos testes de processamento para não interferir nos testes de iCal
+
 ## 🚀 Uso
 
 ```bash

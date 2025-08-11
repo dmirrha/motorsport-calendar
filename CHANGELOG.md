@@ -61,6 +61,10 @@ e este projeto adere ao [Versionamento Semântico](https://semver.org/spec/v2.0.
       - `tests/unit/processing/test_event_processor_pipeline.py`
     - Escopo: normalização (links/data/hora/categoria/local/país/sessão), deduplicação (threshold/tolerância/merge), pipeline (`process_events`), categorias (`_detect_categories`), weekend target (`_detect_target_weekend`), estatísticas e logs
     - Execução local focada no módulo com gate temporário por arquivo (sem afetar gate global do projeto durante estabilização)
+  - Issue #62 (PR #69 — draft): cobertura de `src/ical_generator.py`
+    - Cobertura do arquivo: **76%**; suíte: **156 passed**; cobertura global: **51.92%**
+    - Novos testes: `tests/unit/ical/test_ical_generator_extended.py`
+    - Nota: corrigido efeito colateral de monkeypatch global em `pytz.timezone` nos testes de processamento para não interferir nos testes de iCal
   - Fase 1: configuração mínima do Pytest com cobertura e documentação
     - `pytest.ini`: `testpaths=tests`; cobertura em `src/` e `sources/` com `--cov=src --cov=sources`
     - Relatórios: `--cov-report=term-missing:skip-covered`, `--cov-report=xml:coverage.xml`, `--cov-report=html`, `--junitxml=test_results/junit.xml`

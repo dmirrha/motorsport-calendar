@@ -1,20 +1,23 @@
 {
   "id": 3307967457,
   "number": 62,
-  "state": "open",
+  "state": "closed",
   "title": "Fase 1.1 — Cobertura de src/ical_generator.py ≥60% (validação ICS)",
   "milestone": null,
   "epic": 58,
   "url": "https://github.com/dmirrha/motorsport-calendar/issues/62",
   "created_at": "2025-08-10T21:03:06Z",
-  "updated_at": "2025-08-11T10:03:37Z",
+  "updated_at": "2025-08-11T16:41:52Z",
+  "closed_at": "2025-08-11T16:41:52Z",
   "tasks": [
-    {"item": "Validar campos ICS obrigatórios", "done": false},
+    {"item": "Validar campos ICS obrigatórios", "done": true},
     {"item": "Usar fixtures golden/snapshots", "done": false},
-    {"item": "Garantir determinismo e isolamento de FS", "done": false},
-    {"item": "Atualizar documentação e rastreabilidade", "done": false},
+    {"item": "Garantir determinismo e isolamento de FS", "done": true},
+    {"item": "Atualizar documentação e rastreabilidade", "done": true},
     {"item": "Branch criada", "done": true},
-    {"item": "PR (draft) aberta", "done": true}
+    {"item": "PR (draft) aberta", "done": true},
+    {"item": "PR pronto para review", "done": true},
+    {"item": "PR mergeado (squash)", "done": true}
   ],
   "acceptance": [
     "Cobertura de src/ical_generator.py ≥60%",
@@ -23,6 +26,11 @@
   ],
   "docs_updated": [
     "docs/issues/open/issue-62.md",
-    "docs/issues/open/issue-62.json"
+    "docs/issues/open/issue-62.json",
+    "CHANGELOG.md",
+    "RELEASES.md",
+    "tests/README.md",
+    "docs/TEST_AUTOMATION_PLAN.md",
+    "README.md"
   ]
 }
