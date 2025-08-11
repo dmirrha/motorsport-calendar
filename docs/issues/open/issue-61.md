@@ -7,17 +7,22 @@ Referências:
 ## Objetivo
 Elevar cobertura de `src/event_processor.py` para ≥60%.
 
-## Plano de Execução
-1. Criar fixtures de entrada/saída (tmp_path) para validar processamento de eventos
-2. Testar validações, merges e cenários de dados faltantes
-3. Garantir isolamento de FS/env e determinismo de random/TZ
-4. Atualizar documentação e rastreabilidade (planos, cenários, tests/README, CHANGELOG)
+## Checklist
+- [ ] Criar fixtures de entrada/saída (tmp_path) para validar processamento de eventos
+- [ ] Testar validações, merges e cenários de dados faltantes
+- [ ] Garantir isolamento de FS/env e determinismo de random/TZ
+- [ ] Atualizar documentação e rastreabilidade (planos, cenários, tests/README, CHANGELOG)
 
 ## PARE — Autorização
 - PR inicia em draft até validação deste plano.
 
 ## Progresso
-- [ ] Branch criada
+- [x] Branch criada
 - [ ] PR (draft) aberta
 - [ ] Testes implementados e passando
+- [ ] Documentação sincronizada
+
+## Critérios de aceite
+- [ ] Cobertura de `src/event_processor.py` ≥60%
+- [ ] Testes determinísticos e isolados
 - [ ] Documentação sincronizada

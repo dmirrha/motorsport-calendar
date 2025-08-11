@@ -7,16 +7,21 @@
   "epic": 58,
   "url": "https://github.com/dmirrha/motorsport-calendar/issues/61",
   "created_at": "2025-08-10T21:03:05Z",
-  "updated_at": "2025-08-10T21:07:18Z",
+  "updated_at": "2025-08-11T01:16:31Z",
   "tasks": [
     {"item": "Criar fixtures de entrada/saída (tmp_path)", "done": false},
     {"item": "Testar validações, merges e faltantes", "done": false},
     {"item": "Garantir isolamento de FS/env/TZ/random", "done": false},
-    {"item": "Atualizar documentação e rastreabilidade", "done": false}
+    {"item": "Atualizar documentação e rastreabilidade", "done": false},
+    {"item": "Branch criada", "done": true}
   ],
   "acceptance": [
     "Cobertura de src/event_processor.py ≥60%",
     "Testes determinísticos e isolados",
     "Documentação sincronizada"
+  ],
+  "docs_updated": [
+    "docs/issues/open/issue-61.md",
+    "docs/issues/open/issue-61.json"
   ]
 }
