@@ -183,12 +183,49 @@ Objetivo: elevar a cobertura unitária para ≥ 80%, ampliando a matriz de casos
    - [x] Métricas (2025-08-11): `src/event_processor.py` 83% (meta ≥60% atingida)
    - [x] Escopo coberto: normalização (links/data/hora/categoria/local/país/sessão), deduplicação (threshold/tolerância/merge), pipeline (`process_events`), categorias (`_detect_categories`), weekend target (`_detect_target_weekend`), estatísticas e logs
    - [x] Documentação sincronizada: `tests/README.md`, `CHANGELOG.md`, `RELEASES.md`, `docs/TEST_AUTOMATION_PLAN.md`, `docs/issues/open/issue-61.md`, `docs/issues/open/issue-61.json`
-- [ ] #62 — Cobertura de `src/ical_generator.py` ≥ 60%
-  - [ ] Cobertura por ramos
+- [x] #62 — Cobertura de `src/ical_generator.py` ≥ 60%
+  - [x] Métricas (2025-08-11): `src/ical_generator.py` 76%; suíte 156 passed; cobertura global 51.92%
+  - [x] Novos testes: `tests/unit/ical/test_ical_generator_extended.py`
+  - [x] Nota: corrigido side-effect de monkeypatch global em `pytz.timezone` nos testes de processamento
 - [ ] #63 — Gate global ≥ 45% (`pytest.ini`)
   - [ ] Automação local
     - [ ] Script/Makefile com alvos `test:unit`, `test:integration`, `coverage`, `report`
 - [ ] #64 — Documentação e Cenários (sincronismo)
+
+# Fase 1.2 — Fixtures “golden” para ICS (Snapshots)
+Objetivo: introduzir snapshots estáveis para validar a saída do `src/ical_generator.py`, garantindo regressão determinística.
+
+## Entregáveis
+- Diretório `tests/fixtures/ical/` com arquivos `.ics` canônicos (e/ou JSON normalizado auxiliar).
+- Utilitários em `tests/utils/ical_snapshots.py` para normalizar e comparar snapshots.
+- Casos em `tests/unit/ical/test_ical_generator_snapshots.py` cobrindo cenários básicos, com alarmes e com timezone.
+
+## Estrutura sugerida
+- `tests/fixtures/ical/`
+  - `basic_event.ics`
+  - `event_with_alarms.ics`
+  - `event_with_timezone.ics`
+- `tests/utils/ical_snapshots.py`
+  - `normalize_ics(text: str) -> str`
+  - `strip_volatile_props(text: str, props: list[str]) -> str`
+  - `compare_snapshot(actual: str, golden_path: str) -> None`
+
+## Normalização e determinismo
+- Remover/normalizar propriedades voláteis: `UID`, `DTSTAMP`, `CREATED`, `LAST-MODIFIED`, `SEQUENCE`, `PRODID` (se dinâmico).
+- Fixar TZ e tempo (congelar relógio com fixture; evitar monkeypatch global persistente).
+- Normalizar terminadores de linha (CRLF/LF), espaços e ordem relevante quando aplicável.
+
+## Tarefas
+- Criar fixtures em `tests/fixtures/ical/` (cenários: simples, com alarmes, com TZ).
+- Implementar utilitários de normalização/compare em `tests/utils/ical_snapshots.py`.
+- Escrever `tests/unit/ical/test_ical_generator_snapshots.py` exercitando geração e comparação.
+- Atualizar documentação: `tests/README.md`, `docs/TEST_AUTOMATION_PLAN.md`, `CHANGELOG.md`, `RELEASES.md`.
+- Rastreabilidade: criar issue e PR dedicados (draft com PARE), checklists sincronizados (issue/PR/docs).
+
+## Critérios de aceite
+- Comparação por snapshot estável aprovada nos cenários definidos.
+- Testes determinísticos (sem flakiness por TZ/tempo/SO).
+- Documentação e rastreabilidade sincronizadas (inclui `docs/issues/open/issue-XX.{md,json}`).
 
 # Fase 2 — Testes Integrados
 Objetivo: Validar fluxos entre componentes (coleta → processamento → iCal), sem dependência externa real (rede) sempre que possível.

@@ -55,6 +55,12 @@ Este diretório contém a suíte de testes do projeto. A descoberta de testes é
      - `tests/unit/processing/test_event_processor_stats_repr.py`
      - `tests/unit/processing/test_event_processor_pipeline.py`
 
+ - Fase 1.1 — issue #62
+   - Suíte: **156 passed**; cobertura global: **51.92%**
+   - Cobertura de `src/ical_generator.py`: **76%**
+   - Novos testes: `tests/unit/ical/test_ical_generator_extended.py`
+   - Nota: corrigido efeito colateral de monkeypatch global em `pytz.timezone` nos testes de processamento para não interferir nos testes de iCal
+
 ### Destaques — BaseSource (issue #60)
 - HTTP 4xx com retries e logs
 - Backoff exponencial/rate-limit com monkeypatch em `time.sleep` (sem sleeps reais)

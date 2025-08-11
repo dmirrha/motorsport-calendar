@@ -49,6 +49,13 @@ Issue #60 (PR #67 — draft)
  - Atualização (branch coverage): cobertos ramos adicionais — exceção em `filter_weekend_events`, limpeza de campos com espaços em `normalize_event_data`, e uso do context manager (`__enter__/__exit__`), `__str__`/`__repr__`.
 - Bug corrigido (mantido para importação em lote): `.github/import_issues/open/026-basesource-logger-none-attributeerror.{md,json}` — remoção de fallback para `logging.getLogger(__name__)` quando `logger=None` e proteção de chamadas a métodos customizados com `getattr`.
 
+Issue #62 (PR #69 — draft)
+
+- Cobertura de `src/ical_generator.py`: **76%**
+- Suíte: **156 passed**; cobertura global: **51.92%**
+- Novos testes: `tests/unit/ical/test_ical_generator_extended.py`
+- Observação: corrigido side-effect de monkeypatch global em `pytz.timezone` nos testes de processamento para não interferir nos testes de iCal
+
 Fase 1 — Cenários (issue #50, PR #57 draft)
 
 - Fixtures HTML adicionados para o parser `TomadaTempoSource`:
