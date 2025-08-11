@@ -20,6 +20,7 @@ Este diretório contém a suíte de testes do projeto. A descoberta de testes é
 
 - `tests/unit/`
   - `sources/tomada_tempo/test_tomada_tempo.py`
+  - `sources/base_source/test_helpers_and_parsers.py`
   - `utils/test_config_validator.py`
   - `silent_period/test_silent_period.py`
 - `tests/integration/` (reservado para testes de integração)
@@ -27,9 +28,31 @@ Este diretório contém a suíte de testes do projeto. A descoberta de testes é
 
 ## Execução
 
-- Todos os testes: `pytest`
-- Unit tests: `pytest -m unit`
-- Cobertura: `pytest --cov` (gate de cobertura temporário `--cov-fail-under=25` — estabilização dos mocks essenciais, issue #48)
+- Execução rápida:
+  - `pytest -q`
+  - `pytest -m unit -q`
+  
+- Com cobertura:
+  - `pytest --cov=src --cov=sources \
+    --cov-report=term-missing:skip-covered \
+    --cov-report=xml:coverage.xml --cov-report=html \
+    --junitxml=test_results/junit.xml`
+  - Gate temporário de cobertura: `--cov-fail-under=25` (estabilização dos mocks essenciais, issue #48)
+  
+### Métricas recentes
+- Fase 1.1 — issue #60
+  - Suíte: **125 passed (~13.9s)**
+  - Cobertura global: **41.72%**
+  - `sources/base_source.py`: **92%**
+
+### Destaques — BaseSource (issue #60)
+- HTTP 4xx com retries e logs
+- Backoff exponencial/rate-limit com monkeypatch em `time.sleep` (sem sleeps reais)
+- Comportamento seguro quando `logger=None` via `getattr` para métodos customizados
+- Verificações de logs de debug e salvamento de payloads
+- Teste opcional: rotação de `User-Agent` na 10ª requisição (determinístico via monkeypatch em `random.choice`)
+- Helpers e parsers cobertos: `parse_date_time`, `normalize_event_data`, `filter_weekend_events`, `_setup_session` (headers), `get_streaming_links`
+  - Incrementais: campos ausentes/HTML malformado, `recent_errors` slice em `get_statistics`, `filter_weekend_events(None)`, formatos adicionais de data e timezone custom, estabilidade de `_generate_event_id`
 
 Relatórios são gerados em:
 - JUnit XML: `test_results/junit.xml`

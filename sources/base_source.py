@@ -28,7 +28,10 @@ class BaseSource(ABC):
             ui_manager: UI manager instance
         """
         self.config = config_manager
-        self.logger = logger or logging.getLogger(__name__)
+        # Não utilizar logger padrão do logging aqui: manter None quando não fornecido
+        # para que chamadas a métodos específicos (ex.: save_payload, log_source_error)
+        # sejam condicionais e não causem AttributeError.
+        self.logger = logger
         self.ui = ui_manager
         
         # Source identification
@@ -168,8 +171,8 @@ class BaseSource(ABC):
                 
                 self.stats['successful_requests'] += 1
                 
-                # Save payload if logger is available
-                if self.logger:
+                # Save payload if logger supports it
+                if getattr(self.logger, "save_payload", None):
                     self.logger.save_payload(
                         source=self.source_name,
                         data=response.text,
@@ -200,7 +203,7 @@ class BaseSource(ABC):
                 else:
                     # Final attempt failed
                     self.stats['failed_requests'] += 1
-                    if self.logger:
+                    if getattr(self.logger, "log_source_error", None):
                         self.logger.log_source_error(self.source_display_name, error_msg)
                     return None
         

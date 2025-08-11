@@ -1,0 +1,15 @@
+{
+  "title": "Bug: BaseSource logger None causa AttributeError em log_source_error/save_payload",
+  "body": "026-basesource-logger-none-attributeerror.md",
+  "labels": ["bug"],
+  "assignees": [],
+  "milestone": null,
+  "state": "open",
+  "metadata": {
+    "created_at": "2025-08-10T20:40:00-03:00",
+    "priority": "medium",
+    "type": "bug",
+    "components": ["sources/base_source.py"],
+    "related_issues": [60]
+  }
+}

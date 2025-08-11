@@ -28,6 +28,16 @@ Issue #59 (PR #66 — draft)
 - Nota: subtarefas avançadas originalmente listadas para #59 foram replanejadas para as issues #60–#64.
 - Nota: bug de precedência ISO vs BR em `_extract_date()` será importado em lote ao final da Fase 1.1; arquivos mantidos no importador: `.github/import_issues/open/025-tomadatemposource-extract-date-parsing-precedence.{json,md}`.
 
+Issue #60 (PR #67 — draft)
+
+- Testes unitários para `BaseSource.make_request`
+ - Cobertura do arquivo `sources/base_source.py`: **97%** (meta ≥60% atingida)
+ - Suíte: **132 passed**; cobertura global: **38.57%**
+ - Abrange: erros HTTP 4xx/5xx com retries e logs; backoff exponencial/rate-limit com monkeypatch em `time.sleep` (sem sleeps reais); comportamento seguro quando `logger=None` via `getattr` para métodos customizados; verificação de logs e salvamento de payload; teste opcional de rotação de `User-Agent` na 10ª requisição (determinístico via `random.choice`). Helpers/parsers cobertos: `parse_date_time`, `normalize_event_data`, `filter_weekend_events`, `_setup_session` (headers), `get_streaming_links`.
+ - Incrementais entregues: campos ausentes/HTML malformado, `recent_errors` slice em `get_statistics`, `filter_weekend_events(None)`, formatos adicionais de data/segundos e timezone custom, estabilidade/variação de `_generate_event_id`.
+ - Atualização (branch coverage): cobertos ramos adicionais — exceção em `filter_weekend_events`, limpeza de campos com espaços em `normalize_event_data`, e uso do context manager (`__enter__/__exit__`), `__str__`/`__repr__`.
+- Bug corrigido (mantido para importação em lote): `.github/import_issues/open/026-basesource-logger-none-attributeerror.{md,json}` — remoção de fallback para `logging.getLogger(__name__)` quando `logger=None` e proteção de chamadas a métodos customizados com `getattr`.
+
 Fase 1 — Cenários (issue #50, PR #57 draft)
 
 - Fixtures HTML adicionados para o parser `TomadaTempoSource`:
