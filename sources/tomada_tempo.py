@@ -432,8 +432,7 @@ class TomadaTempoSource(BaseSource):
         """
         try:
             # Extract time (e.g., "04:55", "08:30")
-            time_match = re.search(r'(\d{1,2}[:\.]\d{2})', li_text)
-            event_time = time_match.group(1).replace('.', ':') if time_match else None
+            event_time = self._extract_time(li_text)
             
             # Extract category/name (e.g., "FÓRMULA 1", "NASCAR CUP")
             category_match = re.search(r'(\d{1,2}[:\.]\d{2})\s*[–-]?\s*([^–-]+?)(?:\s*[–-]|$)', li_text)
@@ -756,6 +755,7 @@ class TomadaTempoSource(BaseSource):
         """Extract time from text with improved format support."""
         time_patterns = [
             r'(\d{1,2}):(\d{2})\s*(?:h|hrs?|horas?)?',  # 14:30, 14:30h
+            r'(\d{1,2})\.(\d{2})',  # 14.30
             r'(\d{1,2})h(\d{2})',  # 14h30
             r'(\d{1,2})h\s*(\d{2})',  # 14h 30
             r'(\d{1,2}):(\d{2})',  # 14:30
