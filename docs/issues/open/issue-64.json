@@ -12,8 +12,8 @@
     {"item": "Atualizar phase1_scenarios.md", "done": false},
     {"item": "Atualizar SCENARIOS_INDEX.md", "done": false},
     {"item": "Atualizar tests/README.md", "done": false},
-    {"item": "Atualizar TEST_AUTOMATION_PLAN.md", "done": false},
-    {"item": "Atualizar CHANGELOG/RELEASES", "done": false},
+    {"item": "Atualizar TEST_AUTOMATION_PLAN.md", "done": true},
+    {"item": "Atualizar CHANGELOG/RELEASES", "done": true},
     {"item": "Elevar cobertura unitária para ≥ 80%, ampliando a matriz de casos e cobrindo ramos não exercitados", "done": false}
   ],
   "acceptance": [

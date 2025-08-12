@@ -194,6 +194,12 @@ Objetivo: elevar a cobertura unitária para ≥ 80%, ampliando a matriz de casos
   - [x] Fechada via PR #71 (merged em 2025-08-12T00:56:05Z)
 - [ ] #64 — Documentação e Cenários (sincronismo)
   - [ ] Objetivo final: elevar a cobertura unitária para ≥ 80%, ampliando a matriz de casos e cobrindo ramos não exercitados
+  - [ ] Incremento atual: `ConfigManager`
+    - Novos testes: `tests/unit/config/test_config_manager_merge_and_nested_set.py`, `tests/unit/config/test_config_manager_validation_and_streaming.py`, `tests/unit/config/test_config_manager_save_errors.py`
+    - Escopo: merge profundo com defaults; `get`/`set` aninhados; validação (timezone inválida, diretório inacessível, seções ausentes); `get_streaming_providers` por região; erros em `save_config` (mkdir/open)
+    - Métricas: suíte **191 passed**; cobertura global **59.15%**; `src/config_manager.py` **83%**
+  - [x] CHANGELOG/RELEASES atualizados
+  - [ ] PR (draft) aberta
 
 # Fase 1.2 — Fixtures “golden” para ICS (Snapshots)
 Objetivo: introduzir snapshots estáveis para validar a saída do `src/ical_generator.py`, garantindo regressão determinística.

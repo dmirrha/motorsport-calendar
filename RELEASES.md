@@ -30,6 +30,17 @@ Issue #61 (PR #68 — draft)
 - Escopo coberto: normalização (links/data/hora/categoria/local/país/sessão), deduplicação (threshold/tolerância/merge), pipeline (`process_events`), categorias (`_detect_categories`), weekend target (`_detect_target_weekend`), estatísticas e logs
 - Execução local direcionada com `--cov=src/event_processor.py` para aferição do alvo sem afetar gate global durante estabilização
 
+Issue #64 (draft)
+
+- Elevação de qualidade dos testes (qualidade-first) — ConfigManager
+- Novos testes adicionados (determinísticos, isolados):
+  - `tests/unit/config/test_config_manager_merge_and_nested_set.py`
+  - `tests/unit/config/test_config_manager_validation_and_streaming.py`
+  - `tests/unit/config/test_config_manager_save_errors.py`
+- Escopo coberto: merge profundo com defaults, `get`/`set` com paths aninhados, validação (timezone inválida, diretório inacessível, seções ausentes), `get_streaming_providers` por região, e erros em `save_config` (mkdir/open) com rethrow e logs
+- Métricas atuais: **191 passed**; cobertura global: **59.15%**; `src/config_manager.py`: **83%**
+- Observação: sem duplicar testes existentes; alinhado ao guia `.windsurf/rules/tester.md` (determinismo <30s, isolamento de FS/TZ, oráculos claros)
+
 Issue #59 (PR #66 — draft)
 
 - Testes unitários adicionais para `sources/tomada_tempo.py` (parsers e funções auxiliares)

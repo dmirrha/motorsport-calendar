@@ -121,11 +121,19 @@ e este projeto adere ao [Versionamento Semântico](https://semver.org/spec/v2.0.
        - `tests/unit/utils/test_payload_manager_extended.py`
        - `tests/unit/config/test_config_manager_basic.py`
      - Documentação sincronizada: `tests/README.md`, `docs/TEST_AUTOMATION_PLAN.md`, `README.md`, `CHANGELOG.md`, `RELEASES.md`, `docs/issues/open/issue-63.{md,json}`
- - Fase 1 — Alvos prioritários (issue #49, PR #56)
-   - Testes unitários para parsers de data/hora em `sources/tomada_tempo.py` e validações em `sources/base_source.py`
-   - Testes unitários para processadores/validadores em `src/event_processor.py` (`_is_event_valid`, `_filter_weekend_events`)
-   - Ajuste de casos de borda para refletir precedência atual dos padrões de data
-   - Testes adicionais: `ICalGenerator.generate_calendar`/`validate_calendar` e `SilentPeriodManager.log_filtering_summary`
+   - Issue #64 (PR — draft): elevação de qualidade dos testes (qualidade-first)
+     - Novos testes para `ConfigManager` (determinísticos, isolados):
+       - `tests/unit/config/test_config_manager_merge_and_nested_set.py`
+       - `tests/unit/config/test_config_manager_validation_and_streaming.py`
+       - `tests/unit/config/test_config_manager_save_errors.py`
+     - Escopo coberto: merge profundo com defaults, `get`/`set` com paths aninhados, validação (timezone inválida, diretório inacessível, seções ausentes), `get_streaming_providers` por região, e erros em `save_config` (mkdir/open) com rethrow e logs.
+     - Métricas atuais: **191 passed**; cobertura global: **59.15%**; `src/config_manager.py`: **83%**.
+     - Observação: sem duplicar testes existentes; alinhado ao guia `.windsurf/rules/tester.md` (determinismo <30s, isolamento de FS/TZ, oráculos claros).
+  - Fase 1 — Alvos prioritários (issue #49, PR #56)
+    - Testes unitários para parsers de data/hora em `sources/tomada_tempo.py` e validações em `sources/base_source.py`
+    - Testes unitários para processadores/validadores em `src/event_processor.py` (`_is_event_valid`, `_filter_weekend_events`)
+    - Ajuste de casos de borda para refletir precedência atual dos padrões de data
+    - Testes adicionais: `ICalGenerator.generate_calendar`/`validate_calendar` e `SilentPeriodManager.log_filtering_summary`
    - Validação: suíte estável `79 passed`; cobertura total 37.00% (2025-08-10)
 
 ### Corrigido

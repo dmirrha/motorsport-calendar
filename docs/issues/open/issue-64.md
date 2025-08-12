@@ -44,6 +44,6 @@ Meta de cobertura derivada (não-fim): atingir ≥ 80% quando a qualidade estive
 ## Progresso
 - [x] Branch criada
 - [ ] PR (draft) aberta
-- [ ] Documentação atualizada
-- [ ] Releases/Changelog atualizados
+- [x] Documentação atualizada
+- [x] Releases/Changelog atualizados
 - [ ] Cobertura unitária ≥ 80% (meta)
