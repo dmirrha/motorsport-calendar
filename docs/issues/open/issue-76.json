@@ -1,0 +1,31 @@
+{
+  "id": 3313401148,
+  "number": 76,
+  "state": "open",
+  "title": "Bug: BaseSource logger None causa AttributeError em métodos customizados",
+  "url": "https://github.com/dmirrha/motorsport-calendar/issues/76",
+  "created_at": "2025-08-12T09:36:21Z",
+  "updated_at": "2025-08-12T09:36:21Z",
+  "file": "sources/base_source.py",
+  "methods": ["__init__", "make_request"],
+  "tests": [
+    "tests/unit/sources/base_source/test_make_request.py::test_make_request_logger_none_safe"
+  ],
+  "tasks": [
+    {"item": "Remover fallback para logging.getLogger quando logger=None", "done": true},
+    {"item": "Proteger chamadas a métodos custom com getattr", "done": true},
+    {"item": "Validar com testes e rodar suíte 3×", "done": true},
+    {"item": "Atualizar documentação e rastreabilidade", "done": false}
+  ],
+  "acceptance": [
+    "Sem AttributeError quando logger=None",
+    "Retries e stats mantidos",
+    "Suíte sem warnings"
+  ],
+  "metrics": {
+    "suite": "205 passed (3×)",
+    "coverage_total": "61.68%",
+    "coverage_base_source": "98%"
+  },
+  "pr": 73
+}
