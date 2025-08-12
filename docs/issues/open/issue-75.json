@@ -1,0 +1,35 @@
+{
+  "id": 3313401147,
+  "number": 75,
+  "state": "open",
+  "title": "Bug: Precedência de parsing ISO vs BR em TomadaTempoSource._extract_date()",
+  "url": "https://github.com/dmirrha/motorsport-calendar/issues/75",
+  "created_at": "2025-08-12T09:36:19Z",
+  "updated_at": "2025-08-12T09:36:19Z",
+  "file": "sources/tomada_tempo.py",
+  "function": "_extract_date",
+  "tests": [
+    "tests/unit/sources/tomada_tempo/test_parsing_core.py",
+    "tests/unit/sources/tomada_tempo/test_extract_date_time_edge_cases.py"
+  ],
+  "tasks": [
+    {"item": "Mapear competição de regex e subcapturas", "done": true},
+    {"item": "Priorizar ISO completo e BR com ano completo", "done": true},
+    {"item": "Adicionar lookarounds/limites de palavra", "done": true},
+    {"item": "Atualizar testes e expectativas", "done": true},
+    {"item": "Rodar suíte 3× (zero flakes)", "done": true},
+    {"item": "Atualizar documentação e rastreabilidade", "done": false}
+  ],
+  "acceptance": [
+    "Datas ISO completas priorizadas",
+    "BR com ano completo priorizado sobre BR de 2 dígitos",
+    "Sem matches parciais",
+    "Suíte sem warnings"
+  ],
+  "metrics": {
+    "suite": "205 passed (3×)",
+    "coverage_total": "61.68%",
+    "coverage_tomada_tempo": "~63%"
+  },
+  "pr": 73
+}
