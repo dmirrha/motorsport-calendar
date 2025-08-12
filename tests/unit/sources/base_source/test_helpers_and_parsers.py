@@ -8,6 +8,8 @@ from sources.base_source import BaseSource
 
 
 class TestSource(BaseSource):
+    # Evita coleta pelo pytest como classe de teste
+    __test__ = False
     def get_display_name(self) -> str:
         return "Test Source"
 
