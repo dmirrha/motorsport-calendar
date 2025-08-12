@@ -42,6 +42,11 @@ e este projeto adere ao [Versionamento Semântico](https://semver.org/spec/v2.0.
   - Adicionada validação de tipos e valores nas configurações
   - Implementada documentação detalhada para todas as opções de configuração
 
+### Corrigido
+ - Issue #74 — PytestCollectionWarning: eliminada a coleta indevida de classe auxiliar em `tests/unit/sources/base_source/test_helpers_and_parsers.py` marcando `__test__ = False`.
+ - Issue #75 — TomadaTempo `_extract_date`: ajustada a precedência para priorizar ISO completo (`YYYY-MM-DD`/`YYYY/MM/DD`) e evitar matches parciais; testes atualizados em `tests/unit/sources/tomada_tempo/`.
+ - Issue #76 — BaseSource `logger=None`: remoção de fallback para `logging.getLogger(__name__)` e proteção de chamadas a métodos customizados via `getattr`, evitando `AttributeError`.
+
 ### Manutenção — Testes/Automação
  - Fase 0: revisão do ambiente de testes conforme plano
    - Python 3.11.5 e pip verificados
