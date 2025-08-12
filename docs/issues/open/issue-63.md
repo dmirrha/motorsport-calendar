@@ -18,9 +18,10 @@ Elevar o gate de cobertura global para ≥45% no `pytest.ini`.
 
 ## Progresso
  - [x] Branch criada (chore/issue-63-coverage-gate-45)
- - [ ] PR (draft) aberta
+ - [x] PR (draft) aberta — https://github.com/dmirrha/motorsport-calendar/pull/71
  - [x] Suíte passando com gate (45%)
  - [x] Documentação sincronizada
+ - [x] Issue fechada via PR #71 — merged em 2025-08-12T00:56:05Z (merge_commit_sha: 733a51871453d12532cee121935d9c847c14b4af)
 
 ## Plano de Resolução
 

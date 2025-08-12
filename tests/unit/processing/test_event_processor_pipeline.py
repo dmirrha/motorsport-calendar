@@ -187,16 +187,16 @@ class TestEventProcessorPipeline:
         assert out == []
         assert any('Failed to normalize event' in d for d in logger.debugs)
 
-    def test_compute_datetime_invalid_timezone_logs_and_none(self):
+    def test_compute_datetime_invalid_timezone_logs_and_none(self, monkeypatch):
         _ensure_stubs()
         from src.event_processor import EventProcessor
         logger = _LoggerStub()
         ep = EventProcessor(logger=logger)
-        # patch pytz to raise
         import pytz
+        # patch pytz to raise
         def bad_tz(_):
             raise Exception('bad tz')
-        pytz.timezone = bad_tz
+        monkeypatch.setattr(pytz, 'timezone', bad_tz)
         dt = ep._compute_datetime('2025-08-09', '09:00', 'Invalid/TZ')
         assert dt is None
         assert any('Failed to compute datetime' in d for d in logger.debugs)
