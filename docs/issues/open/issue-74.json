@@ -1,0 +1,23 @@
+{
+  "id": "I_kwDOPWyu9M7Ffnzz",
+  "number": 74,
+  "state": "open",
+  "title": "PytestCollectionWarning: classe com __init__ não colecionável em test_helpers_and_parsers",
+  "milestone": null,
+  "epic": null,
+  "url": "https://github.com/dmirrha/motorsport-calendar/issues/74",
+  "created_at": "2025-08-12T09:36:18Z",
+  "updated_at": "2025-08-12T09:36:18Z",
+  "labels": ["tests", "quality", "warning"],
+  "tasks": [
+    {"item": "Refatorar tests/unit/sources/base_source/test_helpers_and_parsers.py para remover __init__ de classes de teste ou migrar para funções soltas", "done": false},
+    {"item": "Garantir descoberta sem avisos (pytest -q)", "done": false},
+    {"item": "Atualizar tests/README.md com boa prática de coleção (sem __init__ em classes Test*)", "done": false},
+    {"item": "Atualizar CHANGELOG.md e docs/TEST_AUTOMATION_PLAN.md com a correção do aviso", "done": false}
+  ],
+  "acceptance": [
+    "Suíte executa sem PytestCollectionWarning",
+    "Arquivo test_helpers_and_parsers.py compatível com modelo de coleção do Pytest",
+    "Documentação atualizada (tests/README.md, CHANGELOG.md, docs/TEST_AUTOMATION_PLAN.md)"
+  ]
+}
