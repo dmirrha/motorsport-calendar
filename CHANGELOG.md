@@ -65,7 +65,7 @@ e este projeto adere ao [Versionamento Semântico](https://semver.org/spec/v2.0.
     - Cobertura do arquivo: **76%**; suíte: **156 passed**; cobertura global: **51.92%**
     - Novos testes: `tests/unit/ical/test_ical_generator_extended.py`
     - Nota: corrigido efeito colateral de monkeypatch global em `pytz.timezone` nos testes de processamento para não interferir nos testes de iCal
-  - Fase 1: configuração mínima do Pytest com cobertura e documentação
+   - Fase 1: configuração mínima do Pytest com cobertura e documentação
     - `pytest.ini`: `testpaths=tests`; cobertura em `src/` e `sources/` com `--cov=src --cov=sources`
     - Relatórios: `--cov-report=term-missing:skip-covered`, `--cov-report=xml:coverage.xml`, `--cov-report=html`, `--junitxml=test_results/junit.xml`
     - Gate de cobertura inicial: `--cov-fail-under=40`
@@ -113,6 +113,14 @@ e este projeto adere ao [Versionamento Semântico](https://semver.org/spec/v2.0.
     - Documentação de cenários atualizada:
       - `docs/tests/scenarios/SCENARIOS_INDEX.md`
       - `docs/tests/scenarios/phase1_scenarios.md`
+   - Issue #63: Gate de cobertura global elevado para 45%
+     - `pytest.ini`: `--cov-fail-under=45`
+     - Suíte: **170 passed**; cobertura global: **57.86%**
+     - Novos testes:
+       - `tests/unit/category/test_category_detector_basic.py`
+       - `tests/unit/utils/test_payload_manager_extended.py`
+       - `tests/unit/config/test_config_manager_basic.py`
+     - Documentação sincronizada: `tests/README.md`, `docs/TEST_AUTOMATION_PLAN.md`, `README.md`, `CHANGELOG.md`, `RELEASES.md`, `docs/issues/open/issue-63.{md,json}`
  - Fase 1 — Alvos prioritários (issue #49, PR #56)
    - Testes unitários para parsers de data/hora em `sources/tomada_tempo.py` e validações em `sources/base_source.py`
    - Testes unitários para processadores/validadores em `src/event_processor.py` (`_is_event_valid`, `_filter_weekend_events`)
