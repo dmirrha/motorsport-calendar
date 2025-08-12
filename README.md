@@ -252,6 +252,23 @@ A suíte utiliza Pytest com cobertura via pytest-cov. O gate de cobertura global
   - Variáveis de ambiente com `monkeypatch.setenv`/`delenv`
 - Como rodar: consulte `tests/README.md` para comandos, estrutura e exemplos.
 
+Comandos rápidos (local):
+
+```bash
+# Suíte completa com cobertura e relatórios
+pytest --cov=src --cov=sources \
+  --cov-report=term-missing:skip-covered \
+  --cov-report=xml:coverage.xml --cov-report=html \
+  -q --junitxml=test_results/junit.xml
+
+# Foco em módulos críticos
+pytest -q tests/unit/utils/test_payload_manager*.py
+pytest -q tests/unit/ical/test_ical_generator*.py
+
+# Checagem de estabilidade (zero flakes)
+for i in 1 2 3; do pytest -q; done
+```
+
 Cobertura e métricas recentes (Fase 1.1 — issue #59):
 - `sources/tomada_tempo.py`: 63%
 - Suíte: 101 passed; cobertura global: 40.64%
@@ -268,6 +285,13 @@ Cobertura e métricas recentes (Fase 1.1 — issue #63):
 - Suíte: **170 passed**; cobertura global: **57.86%**
 - Gate global: `--cov-fail-under=45`
 - Novos testes: `tests/unit/category/test_category_detector_basic.py`, `tests/unit/utils/test_payload_manager_extended.py`, `tests/unit/config/test_config_manager_basic.py`
+
+Cobertura e métricas recentes (Fase 1.1 — issue #64):
+- Suíte: **205 passed**; cobertura global: **61.52%**
+- `src/utils/payload_manager.py`: **90%**
+- `src/ical_generator.py`: **93%**
+- Novos testes: `tests/unit/utils/test_payload_manager_errors.py`, `tests/unit/ical/test_ical_generator_branches.py`
+- Ajustes: construtor de `ICalGenerator` aceita `config_manager` (no teste) e exceção encapsulada em `PayloadManager.save_payload` validada como `IOError`
 
 ## 🚀 Uso
 

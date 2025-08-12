@@ -129,6 +129,21 @@ e este projeto adere ao [Versionamento Semântico](https://semver.org/spec/v2.0.
      - Escopo coberto: merge profundo com defaults, `get`/`set` com paths aninhados, validação (timezone inválida, diretório inacessível, seções ausentes), `get_streaming_providers` por região, e erros em `save_config` (mkdir/open) com rethrow e logs.
      - Métricas atuais: **191 passed**; cobertura global: **59.15%**; `src/config_manager.py`: **83%**.
      - Observação: sem duplicar testes existentes; alinhado ao guia `.windsurf/rules/tester.md` (determinismo <30s, isolamento de FS/TZ, oráculos claros).
+     - Incremento atual: `PayloadManager` e `ICalGenerator`
+       - Novos testes:
+         - `tests/unit/utils/test_payload_manager_errors.py`
+         - `tests/unit/ical/test_ical_generator_branches.py`
+       - Ajustes de testes:
+         - Construtor de `ICalGenerator`: uso correto do parâmetro `config_manager` no teste
+         - `PayloadManager.save_payload`: exceção encapsulada validada como `IOError`
+       - Métricas (pós-incremento):
+         - Suíte: **205 passed**; cobertura global: **61.52%**
+         - `src/utils/payload_manager.py`: **90%**
+         - `src/ical_generator.py`: **93%**
+       - Próximos passos:
+         - Rodar a suíte 3× localmente para confirmar zero flakes
+         - Atualizar documentação correlata (`README.md`, `RELEASES.md`, `docs/TEST_AUTOMATION_PLAN.md`, `docs/issues/open/issue-64.{md,json}`)
+         - Manter PR #73 como draft na branch `chore/issue-64-coverage-80`
   - Fase 1 — Alvos prioritários (issue #49, PR #56)
     - Testes unitários para parsers de data/hora em `sources/tomada_tempo.py` e validações em `sources/base_source.py`
     - Testes unitários para processadores/validadores em `src/event_processor.py` (`_is_event_valid`, `_filter_weekend_events`)

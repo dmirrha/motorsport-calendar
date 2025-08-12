@@ -14,6 +14,8 @@
     {"item": "Atualizar tests/README.md", "done": false},
     {"item": "Atualizar TEST_AUTOMATION_PLAN.md", "done": true},
     {"item": "Atualizar CHANGELOG/RELEASES", "done": true},
+    {"item": "Atualizar README.md (seção de testes)", "done": true},
+    {"item": "Executar suíte 3× localmente para confirmar zero flakes", "done": true},
     {"item": "Elevar cobertura unitária para ≥ 80%, ampliando a matriz de casos e cobrindo ramos não exercitados", "done": false}
   ],
   "acceptance": [

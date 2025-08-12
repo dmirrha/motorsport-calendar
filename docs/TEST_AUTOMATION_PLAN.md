@@ -204,6 +204,21 @@ Objetivo: elevar a cobertura unitária para ≥ 80%, ampliando a matriz de casos
   - [x] Incremento atual: `TomadaTempo`
     - Novos testes: `tests/unit/sources/tomada_tempo/test_tomada_tempo_parsing.py`
     - Escopo: parsing determinístico cobrindo variações reais de HTML e formatos de horário
+  - [x] Incremento atual: `PayloadManager` e `ICalGenerator`
+    - Novos testes:
+      - `tests/unit/utils/test_payload_manager_errors.py`
+      - `tests/unit/ical/test_ical_generator_branches.py`
+    - Ajustes:
+      - Construtor de `ICalGenerator`: uso correto do parâmetro `config_manager` no teste
+      - `PayloadManager.save_payload`: exceção encapsulada validada como `IOError`
+    - Métricas (pós-incremento):
+      - Suíte: **205 passed**; cobertura global: **61.52%**
+      - `src/utils/payload_manager.py`: **90%**
+      - `src/ical_generator.py`: **93%**
+    - Próximos passos:
+      - Executar suíte 3× para confirmar zero flakes
+      - Sincronizar documentação correlata (`README.md`, `RELEASES.md`, `docs/issues/open/issue-64.{md,json}`)
+      - Manter PR #73 como draft na branch `chore/issue-64-coverage-80`
   - [x] CHANGELOG/RELEASES atualizados
   - [x] PR (draft) aberta — PR #73: https://github.com/dmirrha/motorsport-calendar/pull/73
 

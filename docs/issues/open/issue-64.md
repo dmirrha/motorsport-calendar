@@ -46,5 +46,23 @@ Meta de cobertura derivada (não-fim): atingir ≥ 80% quando a qualidade estive
 - [x] Branch criada
 - [x] PR (draft) aberta — PR #73: https://github.com/dmirrha/motorsport-calendar/pull/73
 - [x] Documentação atualizada
-- [x] Releases/Changelog atualizados
-- [ ] Cobertura unitária ≥ 80% (meta)
+ - [x] Releases/Changelog atualizados
+
+### Incremento atual: PayloadManager e ICalGenerator
+
+- Novos testes:
+  - `tests/unit/utils/test_payload_manager_errors.py`
+  - `tests/unit/ical/test_ical_generator_branches.py`
+- Ajustes de testes:
+  - Construtor de `ICalGenerator`: uso correto do parâmetro `config_manager` no teste
+  - `PayloadManager.save_payload`: exceção encapsulada validada como `IOError`
+- Métricas (pós-incremento):
+  - Suíte: **205 passed**; cobertura global: **61.52%**
+  - `src/utils/payload_manager.py`: **90%**
+  - `src/ical_generator.py`: **93%**
+- Próximos passos:
+  - Executar suíte 3× localmente para confirmar zero flakes
+  - Sincronizar documentação correlata (`README.md`, `RELEASES.md`, `docs/TEST_AUTOMATION_PLAN.md`, `docs/issues/open/issue-64.{md,json}`)
+  - Manter PR #73 como draft na branch `chore/issue-64-coverage-80`
+
+ - [ ] Cobertura unitária ≥ 80% (meta)
