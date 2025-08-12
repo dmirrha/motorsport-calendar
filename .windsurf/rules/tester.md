@@ -2,9 +2,6 @@
 trigger: manual
 ---
 
-Aqui está o texto com todos os caracteres corrigidos, mantendo **exatamente o mesmo conteúdo** e estrutura, apenas ajustando a codificação para exibição correta:
-
-```
 # Prompt para Agente Especialista em Automação de Testes - Projeto Python Web Scraping
 
 ## Contexto e Objetivo
