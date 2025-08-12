@@ -37,7 +37,7 @@ Este diretório contém a suíte de testes do projeto. A descoberta de testes é
     --cov-report=term-missing:skip-covered \
     --cov-report=xml:coverage.xml --cov-report=html \
     --junitxml=test_results/junit.xml`
-  - Gate temporário de cobertura: `--cov-fail-under=25` (estabilização dos mocks essenciais, issue #48)
+  - Gate global de cobertura: `--cov-fail-under=45` (issue #63)
   
 ### Métricas recentes
 - Fase 1.1 — issue #60
@@ -60,6 +60,14 @@ Este diretório contém a suíte de testes do projeto. A descoberta de testes é
    - Cobertura de `src/ical_generator.py`: **76%**
    - Novos testes: `tests/unit/ical/test_ical_generator_extended.py`
    - Nota: corrigido efeito colateral de monkeypatch global em `pytz.timezone` nos testes de processamento para não interferir nos testes de iCal
+
+ - Fase 1.1 — issue #63
+   - Suíte: **170 passed**; cobertura global: **57.86%**
+   - Gate global em `pytest.ini`: `--cov-fail-under=45`
+   - Novos testes:
+     - `tests/unit/category/test_category_detector_basic.py`
+     - `tests/unit/utils/test_payload_manager_extended.py`
+     - `tests/unit/config/test_config_manager_basic.py`
 
 ### Destaques — BaseSource (issue #60)
 - HTTP 4xx com retries e logs

@@ -188,8 +188,9 @@ Objetivo: elevar a cobertura unitária para ≥ 80%, ampliando a matriz de casos
   - [x] Novos testes: `tests/unit/ical/test_ical_generator_extended.py`
   - [x] Nota: corrigido side-effect de monkeypatch global em `pytz.timezone` nos testes de processamento
 - [ ] #63 — Gate global ≥ 45% (`pytest.ini`)
-  - [ ] Automação local
-    - [ ] Script/Makefile com alvos `test:unit`, `test:integration`, `coverage`, `report`
+  - [x] Métricas (2025-08-12): suíte **170 passed**; cobertura global **57.86%**; gate aplicado em `pytest.ini` (`--cov-fail-under=45`)
+  - [x] Automação local
+    - [x] Script/Makefile com alvos `test.unit`, `test.integration`, `coverage`, `report`
 - [ ] #64 — Documentação e Cenários (sincronismo)
 
 # Fase 1.2 — Fixtures “golden” para ICS (Snapshots)

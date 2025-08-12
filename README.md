@@ -242,9 +242,9 @@ cp config/config.example.json config/config.json
 
 ## 🧪 Testes
 
-A suíte utiliza Pytest com cobertura via pytest-cov. Durante a estabilização dos mocks essenciais (issue #48), o gate de cobertura global está temporariamente em 25%.
+A suíte utiliza Pytest com cobertura via pytest-cov. O gate de cobertura global está configurado em **45%**.
 
-- Gate temporário: `--cov-fail-under=25` (definido em `pytest.ini`)
+- Gate atual: `--cov-fail-under=45` (definido em `pytest.ini`)
 - Mocks essenciais:
   - Timezone fixo `America/Sao_Paulo` e aleatoriedade determinística (`random.seed(0)`)
   - Shims de rede: `sources.tomada_tempo.requests.get` e `sources.base_source.requests.Session`
@@ -263,6 +263,11 @@ Cobertura e métricas recentes (Fase 1.1 — issue #62):
 - Suíte: **156 passed**; cobertura global: **51.92%**
 - Novos testes: `tests/unit/ical/test_ical_generator_extended.py`
 - Nota: corrigido efeito colateral de monkeypatch global em `pytz.timezone` nos testes de processamento para não interferir nos testes de iCal
+
+Cobertura e métricas recentes (Fase 1.1 — issue #63):
+- Suíte: **170 passed**; cobertura global: **57.86%**
+- Gate global: `--cov-fail-under=45`
+- Novos testes: `tests/unit/category/test_category_detector_basic.py`, `tests/unit/utils/test_payload_manager_extended.py`, `tests/unit/config/test_config_manager_basic.py`
 
 ## 🚀 Uso
 
@@ -578,9 +583,9 @@ open htmlcov/index.html  # macOS
 ```
 
 Notas:
-- Gate de cobertura temporário: 25% (`--cov-fail-under=25`) — estabilização dos mocks essenciais (issue #48, PR #55).
-- Timezone padrão dos testes: `America/Sao_Paulo` (fixture autouse em `tests/conftest.py`).
-- Mocks essenciais documentados em `tests/README.md`:
+- Gate de cobertura global: 45% (`--cov-fail-under=45`).
+ - Timezone padrão dos testes: `America/Sao_Paulo` (fixture autouse em `tests/conftest.py`).
+ - Mocks essenciais documentados em `tests/README.md`:
   - TZ e aleatoriedade fixas (fixtures autouse em `tests/conftest.py`).
   - Rede com shims/patches (`patch_requests_get`, `patch_requests_session`).
   - Isolamento de filesystem com `tmp_path`.

@@ -56,6 +56,16 @@ Issue #62 (PR #69 — draft)
 - Novos testes: `tests/unit/ical/test_ical_generator_extended.py`
 - Observação: corrigido side-effect de monkeypatch global em `pytz.timezone` nos testes de processamento para não interferir nos testes de iCal
 
+Issue #63
+
+- Gate global de cobertura ajustado em `pytest.ini`: `--cov-fail-under=45`
+- Suíte: **170 passed**; cobertura global: **57.86%**
+- Novos testes adicionados:
+  - `tests/unit/category/test_category_detector_basic.py`
+  - `tests/unit/utils/test_payload_manager_extended.py`
+  - `tests/unit/config/test_config_manager_basic.py`
+- Documentação sincronizada: `tests/README.md`, `docs/TEST_AUTOMATION_PLAN.md`, `README.md`, `CHANGELOG.md`, `RELEASES.md`, `docs/issues/open/issue-63.{md,json}`
+
 Fase 1 — Cenários (issue #50, PR #57 draft)
 
 - Fixtures HTML adicionados para o parser `TomadaTempoSource`:
