@@ -193,6 +193,7 @@ Objetivo: elevar a cobertura unitária para ≥ 80%, ampliando a matriz de casos
     - [x] Script/Makefile com alvos `test.unit`, `test.integration`, `coverage`, `report`
   - [x] Fechada via PR #71 (merged em 2025-08-12T00:56:05Z)
 - [ ] #64 — Documentação e Cenários (sincronismo)
+  - [ ] Objetivo final: elevar a cobertura unitária para ≥ 80%, ampliando a matriz de casos e cobrindo ramos não exercitados
 
 # Fase 1.2 — Fixtures “golden” para ICS (Snapshots)
 Objetivo: introduzir snapshots estáveis para validar a saída do `src/ical_generator.py`, garantindo regressão determinística.
