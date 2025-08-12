@@ -82,6 +82,14 @@ e este projeto adere ao [Versionamento Semântico](https://semver.org/spec/v2.0.
   - Remoção de hacks de `sys.path` nos testes (uso de `tests/conftest.py`)
   - Criado `tests/README.md` com convenções e estrutura
   - Suíte estável: `45 passed`; cobertura total: 28.75%
+  - Issue #64 — P1 (TomadaTempo): módulo `sources/tomada_tempo.py` com cobertura **90%** e **3×** execução estável (<30s). Documentação sincronizada (`docs/TEST_AUTOMATION_PLAN.md`, `RELEASES.md`) e PR #73 atualizado com o resumo do incremento.
+  - Issue #64 — P2 (CategoryDetector):
+    - Testes adicionados: persistência `save_learned_categories`/`load_learned_categories` com mock de filesystem (`tmp_path`) e estatísticas via `get_statistics`.
+    - Ajustes no algoritmo:
+      - `detect_category`: priorização determinística de matches exatos sobre fuzzy (evita fuzzy 1.0 sobrepor exato), atualização de stats e aprendizado controlado.
+      - `detect_categories_batch`: tenta primeiro `raw_category` isolado; só combina com `name` quando necessário.
+    - Métricas: módulo `src/category_detector.py` ~96% de cobertura; suíte **258 passed**, cobertura global **67.78%**; estabilidade confirmada **3×** (<30s).
+    - Documentação sincronizada: `docs/TEST_AUTOMATION_PLAN.md`, `CHANGELOG.md`, `RELEASES.md`, `docs/issues/open/issue-64.{md,json}`. PR #73 (draft) atualizado.
   - Mocks essenciais (issue #48, PR #55):
     - Fixação de timezone (`America/Sao_Paulo`) e aleatoriedade (`random.seed(0)`)
     - Shims de rede: `sources.tomada_tempo.requests.get` e `sources.base_source.requests.Session`

@@ -48,21 +48,43 @@ Meta de cobertura derivada (não-fim): atingir ≥ 80% quando a qualidade estive
 - [x] Documentação atualizada
  - [x] Releases/Changelog atualizados
 
-### Incremento atual: PayloadManager e ICalGenerator
+### Incremento atual: P2 — CategoryDetector (Concluído)
 
-- Novos testes:
-  - `tests/unit/utils/test_payload_manager_errors.py`
-  - `tests/unit/ical/test_ical_generator_branches.py`
-- Ajustes de testes:
-  - Construtor de `ICalGenerator`: uso correto do parâmetro `config_manager` no teste
-  - `PayloadManager.save_payload`: exceção encapsulada validada como `IOError`
-- Métricas (pós-incremento):
-  - Suíte: **205 passed**; cobertura global: **61.52%**
-  - `src/utils/payload_manager.py`: **90%**
-  - `src/ical_generator.py`: **93%**
+- Testes adicionados:
+  - Persistência: `save_learned_categories` e `load_learned_categories` com mock de filesystem (`tmp_path`), incluindo cenários de erro.
+  - Estatísticas: `get_statistics` com agregação por fonte e categoria após múltiplas detecções.
+- Ajustes no algoritmo:
+  - `detect_category`: matches exatos têm prioridade determinística sobre fuzzy (evita fuzzy 1.0 sobrepor exato); aprendizado controlado; stats atualizadas.
+  - `detect_categories_batch`: tentar primeiro `raw_category` isolado; combinar com `name` apenas se necessário.
+- Métricas:
+  - Suíte: **258 passed**; cobertura global: **67.78%**
+  - Módulo `src/category_detector.py`: ~**96%** de cobertura
+  - Estabilidade confirmada **3×** (<30s)
+- Sincronismo de documentação/PR:
+  - Atualizados: `CHANGELOG.md`, `RELEASES.md`, `docs/TEST_AUTOMATION_PLAN.md`, `docs/issues/open/issue-64.{md,json}`
+  - PR #73 (draft) atualizado na branch `chore/issue-64-coverage-80`
 - Próximos passos:
-  - Executar suíte 3× localmente para confirmar zero flakes
-  - Sincronizar documentação correlata (`README.md`, `RELEASES.md`, `docs/TEST_AUTOMATION_PLAN.md`, `docs/issues/open/issue-64.{md,json}`)
-  - Manter PR #73 como draft na branch `chore/issue-64-coverage-80`
+  - P3 — `src/utils/error_codes.py`: cobrir mapeamentos, mensagens de fallback e tipos inválidos.
+
+### Prioridades — Módulos abaixo de 80% (12/08/2025)
+
+1) [Concluído] `sources/tomada_tempo.py` — 90% (3× estável)
+   - Foco: `filter_weekend_events`, `_extract_event_from_element`, `_extract_time`.
+   - Casos: datas ISO vs BR (precedência), eventos sem data, AM/PM, overnight, separadores variados, HTML malformado.
+
+2) `src/category_detector.py` — 69%
+   - Foco: fallback "Unknown", conflitos de regras, métricas/estatísticas, persistência (save/load).
+
+3) `src/utils/error_codes.py` — 76%
+   - Foco: caminhos de erro e mapeamentos pouco exercitados.
+
+4) `src/data_collector.py` — 13%
+   - Foco: fluxos críticos mínimos isolados com mocks (adiar casos pesados).
+
+5) `src/ui_manager.py` — 13%
+   - Foco: comportamento básico sem I/O real.
+
+6) `src/logger.py` — 12%
+   - Foco: ramos de configuração e formatadores mais usados.
 
  - [ ] Cobertura unitária ≥ 80% (meta)

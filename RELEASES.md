@@ -51,6 +51,12 @@ Issue #64 (draft)
      - Suíte: **205 passed**; cobertura global: **61.52%**
      - `src/utils/payload_manager.py`: **90%**
      - `src/ical_generator.py`: **93%**
+  - Conclusão do P1 — `sources/tomada_tempo.py`: cobertura **90%** e **3×** execução estável (<30s); documentação sincronizada (`CHANGELOG.md`, `docs/TEST_AUTOMATION_PLAN.md`) e PR #73 atualizado com resumo.
+  - P2 — `src/category_detector.py`:
+     - Testes: persistência `save_learned_categories`/`load_learned_categories` (mock FS via `tmp_path`) e estatísticas `get_statistics`.
+     - Ajustes: prioridade determinística de matches exatos sobre fuzzy; no batch, tentar `raw_category` antes de combinar com `name`.
+     - Métricas: **258 passed**; cobertura global **67.78%**; módulo `category_detector` ~**96%**; estabilidade **3×** (<30s).
+     - Docs sincronizadas: `CHANGELOG.md`, `RELEASES.md`, `docs/TEST_AUTOMATION_PLAN.md`, `docs/issues/open/issue-64.{md,json}`. PR #73 (draft) atualizado.
 
 Issue #59 (PR #66 — draft)
 

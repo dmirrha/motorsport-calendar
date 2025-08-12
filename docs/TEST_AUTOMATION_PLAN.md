@@ -367,6 +367,38 @@ Notas:
 2. Paralelizar testes com `pytest -n auto` (quando estável e sem condições de corrida).
 3. Opcional: adicionar `pytest-rerunfailures` para flakies pontuais.
 
+ ## Backlog Prioritário — Issue #64 (trabalho 1 a 1)
+ Seguindo `.windsurf/rules/tester.md` e a diretriz qualidade-first, vamos atacar módulos que hoje estão abaixo da meta de 80% de cobertura, priorizando parsers/validadores/processadores. Marque cada item ao concluir.
+ 
+ - [x] P1 — `sources/tomada_tempo.py` (Concluído: cobertura 90% e 3× estável <30s; docs/PR sincronizados — refs #64, PR #73)
+   - Foco: `_extract_time`, `_extract_date`, `_extract_event_from_element`, `_extract_streaming_links`, `_extract_official_url`, `filter_weekend_events` (herdado).
+   - Casos: ISO vs BR (precedência), sem data (usar contexto), AM/PM (ignorado), overnight (sem ajuste na hora), separadores variados, HTML malformado.
+   - Caminho: `sources/tomada_tempo.py` | Tests: `tests/unit/sources/tomada_tempo/`
+
+ - [x] P2 — `src/category_detector.py` (Concluído: cobertura ~96% e 3× estável <30s; docs/PR sincronizados — refs #64, PR #73)
+  - Foco: fallback "Unknown", conflitos de regras (prioridade determinística), métricas/estatísticas (se expostas), persistência save/load (mock de FS).
+  - Caminho: `src/category_detector.py` | Tests sugeridos: `tests/unit/category/`
+
+- [ ] P3 — `src/utils/error_codes.py`
+   - Foco: mapeamentos específicos, mensagens de fallback para códigos desconhecidos, tipos inválidos.
+   - Caminho: `src/utils/error_codes.py` | Tests sugeridos: `tests/unit/utils/`
+
+- [ ] P4 — `src/data_collector.py`
+  - Foco mínimo de valor: fluxos críticos isolados com mocks (sem rede), erros comuns (timeout/404), validação de dados obrigatórios.
+  - Caminho: `src/data_collector.py` | Tests sugeridos: `tests/unit/data_collector/`
+
+- [ ] P5 — `src/ui_manager.py`
+  - Foco: comportamento básico sem I/O real, ramos de mensagens e estados simples.
+  - Caminho: `src/ui_manager.py` | Tests sugeridos: `tests/unit/ui/`
+
+- [ ] P6 — `src/logger.py`
+  - Foco: configuração de handlers/formatters mais usados, ramos de nível de log.
+  - Caminho: `src/logger.py` | Tests sugeridos: `tests/unit/logger/`
+
+Notas rápidas:
+- Critérios de qualidade: 3× sem flakes (<30s), documentação sincronizada (CHANGELOG, RELEASES, TEST_AUTOMATION_PLAN, docs/issues/open/issue-64.{md,json}).
+- Após cada incremento testado: atualizar PR draft #73 (branch `chore/issue-64-coverage-80`) referenciando a Issue #64.
+
 ## Referências
 - Guia de simplicidade: `.windsurf/rules/tester.md`.
 - Código relevante: `sources/`, `src/motorsport_calendar/`, `tests/`.
