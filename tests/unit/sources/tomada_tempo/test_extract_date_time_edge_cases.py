@@ -22,15 +22,13 @@ class TestExtractDateEdgeCases:
         assert source._extract_date("Evento 31/12/69") == "31/12/1969"
 
     def test_yyyy_mm_dd(self, source):
-        # Devido à precedência do padrão DD-MM-YY, a substring "25-08-01" é capturada
-        # em "2025-08-01". Comportamento atual: retorna 25/08/2001.
-        assert source._extract_date("Data 2025-08-01 confirmada") == "25/08/2001"
+        # Agora prioriza ISO completo: deve retornar 01/08/2025
+        assert source._extract_date("Data 2025-08-01 confirmada") == "01/08/2025"
 
     def test_reject_years_below_2020_in_full_year_formats(self, source):
-        # Em "12/05/2019", o padrão DD/MM/YY casa a substring "12/05/20" -> 2020
-        assert source._extract_date("Evento em 12/05/2019") == "12/05/2020"
-        # Em "2019-05-12", o padrão DD-MM-YY casa a substring "19-05-12" -> 2012
-        assert source._extract_date("Evento em 2019-05-12") == "19/05/2012"
+        # Anos < 2020 devem ser rejeitados (sem casar substrings parciais)
+        assert source._extract_date("Evento em 12/05/2019") is None
+        assert source._extract_date("Evento em 2019-05-12") is None
 
 
 class TestExtractTimeEdgeCases:

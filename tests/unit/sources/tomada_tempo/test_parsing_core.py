@@ -167,8 +167,8 @@ def test_extract_time_missing_minutes_defaults_to_zero(source, text, expected):
 
 @pytest.mark.unit
 def test_extract_date_iso_and_weekday_variants(source):
-    # Precedência do padrão DD-MM-YY dentro de YYYY-MM-DD
-    assert source._extract_date("Evento em 2025-08-02") == "25/08/2002"
+    # Agora ISO completo tem precedência
+    assert source._extract_date("Evento em 2025-08-02") == "02/08/2025"
     # Weekday + dd/mm/yy com hífen e ano 2 dígitos
     assert source._extract_date("SÁBADO – 2/8/25") == "02/08/2025"
 

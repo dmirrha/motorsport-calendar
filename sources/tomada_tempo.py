@@ -709,43 +709,41 @@ class TomadaTempoSource(BaseSource):
                 except ValueError:
                     pass
         
-        # Look for dates in DD/MM/YYYY or DD-MM-YYYY format first
-        dd_mm_yyyy_pattern = r'(\d{1,2})[\/\-](\d{1,2})[\/\-](\d{4})'
+        # Prefer full-year formats with boundaries to avoid partial captures
+        # 1) DD/MM/YYYY or DD-MM-YYYY (with word boundaries)
+        dd_mm_yyyy_pattern = r'(?<!\d)(\d{1,2})[\/\-](\d{1,2})[\/\-](\d{4})(?!\d)'
         match = re.search(dd_mm_yyyy_pattern, text)
         if match:
             day, month, year = match.groups()
-            # Validate date components
             try:
                 day_int, month_int, year_int = int(day), int(month), int(year)
                 if 1 <= day_int <= 31 and 1 <= month_int <= 12 and year_int >= 2020:
                     return f"{day_int:02d}/{month_int:02d}/{year_int}"
             except ValueError:
                 pass
-        
-        # Look for dates in DD/MM/YY or DD-MM-YY format
-        dd_mm_yy_pattern = r'(\d{1,2})[\/\-](\d{1,2})[\/\-](\d{2})'
+
+        # 2) YYYY/MM/DD or YYYY-MM-DD (ISO) BEFORE 2-digit-year patterns
+        yyyy_mm_dd_pattern = r'(?<!\d)(\d{4})[\/\-](\d{1,2})[\/\-](\d{1,2})(?!\d)'
+        match = re.search(yyyy_mm_dd_pattern, text)
+        if match:
+            year, month, day = match.groups()
+            try:
+                year_int, month_int, day_int = int(year), int(month), int(day)
+                if 1 <= day_int <= 31 and 1 <= month_int <= 12 and year_int >= 2020:
+                    return f"{day_int:02d}/{month_int:02d}/{year_int}"
+            except ValueError:
+                pass
+
+        # 3) DD/MM/YY or DD-MM-YY (with boundaries) as last resort
+        dd_mm_yy_pattern = r'(?<!\d)(\d{1,2})[\/\-](\d{1,2})[\/\-](\d{2})(?!\d)'
         match = re.search(dd_mm_yy_pattern, text)
         if match:
             day, month, year = match.groups()
-            # Validate date components
             try:
                 day_int, month_int, year_int = int(day), int(month), int(year)
                 if 1 <= day_int <= 31 and 1 <= month_int <= 12:
                     full_year = 2000 + year_int if year_int < 50 else 1900 + year_int
                     return f"{day_int:02d}/{month_int:02d}/{full_year}"
-            except ValueError:
-                pass
-        
-        # Look for dates in YYYY/MM/DD or YYYY-MM-DD format
-        yyyy_mm_dd_pattern = r'(\d{4})[\/\-](\d{1,2})[\/\-](\d{1,2})'
-        match = re.search(yyyy_mm_dd_pattern, text)
-        if match:
-            year, month, day = match.groups()
-            # Validate date components
-            try:
-                year_int, month_int, day_int = int(year), int(month), int(day)
-                if 1 <= day_int <= 31 and 1 <= month_int <= 12 and year_int >= 2020:
-                    return f"{day_int:02d}/{month_int:02d}/{year_int}"
             except ValueError:
                 pass
         
