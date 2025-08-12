@@ -3,6 +3,7 @@
 Referências:
 - Epic: #58 — Fase 1.1
 - GitHub: https://github.com/dmirrha/motorsport-calendar/issues/64
+ - PR (draft): https://github.com/dmirrha/motorsport-calendar/pull/73
 
 ## Objetivo
 Elevar a qualidade da suíte de testes, priorizando confiabilidade sobre números. Foco em parsers, validadores e processadores de dados, garantindo:
@@ -43,7 +44,7 @@ Meta de cobertura derivada (não-fim): atingir ≥ 80% quando a qualidade estive
 
 ## Progresso
 - [x] Branch criada
-- [ ] PR (draft) aberta
+- [x] PR (draft) aberta — PR #73: https://github.com/dmirrha/motorsport-calendar/pull/73
 - [x] Documentação atualizada
 - [x] Releases/Changelog atualizados
 - [ ] Cobertura unitária ≥ 80% (meta)

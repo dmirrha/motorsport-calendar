@@ -194,12 +194,18 @@ Objetivo: elevar a cobertura unitária para ≥ 80%, ampliando a matriz de casos
   - [x] Fechada via PR #71 (merged em 2025-08-12T00:56:05Z)
 - [ ] #64 — Documentação e Cenários (sincronismo)
   - [ ] Objetivo final: elevar a cobertura unitária para ≥ 80%, ampliando a matriz de casos e cobrindo ramos não exercitados
-  - [ ] Incremento atual: `ConfigManager`
+  - [x] Incremento atual: `ConfigManager`
     - Novos testes: `tests/unit/config/test_config_manager_merge_and_nested_set.py`, `tests/unit/config/test_config_manager_validation_and_streaming.py`, `tests/unit/config/test_config_manager_save_errors.py`
     - Escopo: merge profundo com defaults; `get`/`set` aninhados; validação (timezone inválida, diretório inacessível, seções ausentes); `get_streaming_providers` por região; erros em `save_config` (mkdir/open)
     - Métricas: suíte **191 passed**; cobertura global **59.15%**; `src/config_manager.py` **83%**
+  - [x] Incremento atual: `CategoryDetector`
+    - Novos testes: `tests/unit/category/test_category_detector_normalize_more.py`, `tests/unit/category/test_category_detector_threshold_and_learning.py`, `tests/unit/category/test_category_detector_persistence.py`
+    - Escopo: normalização avançada; thresholds/aprendizado; persistência integrada com logger/config stub
+  - [x] Incremento atual: `TomadaTempo`
+    - Novos testes: `tests/unit/sources/tomada_tempo/test_tomada_tempo_parsing.py`
+    - Escopo: parsing determinístico cobrindo variações reais de HTML e formatos de horário
   - [x] CHANGELOG/RELEASES atualizados
-  - [ ] PR (draft) aberta
+  - [x] PR (draft) aberta — PR #73: https://github.com/dmirrha/motorsport-calendar/pull/73
 
 # Fase 1.2 — Fixtures “golden” para ICS (Snapshots)
 Objetivo: introduzir snapshots estáveis para validar a saída do `src/ical_generator.py`, garantindo regressão determinística.
