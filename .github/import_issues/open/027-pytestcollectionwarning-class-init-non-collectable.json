@@ -1,0 +1,7 @@
+{
+  "title": "PytestCollectionWarning: classe com __init__ não colecionável em test_helpers_and_parsers",
+  "body": "027-pytestcollectionwarning-class-init-non-collectable.md",
+  "labels": ["tests", "quality", "warning"],
+  "assignees": [],
+  "milestone": null
+}
