@@ -30,6 +30,7 @@ e este projeto adere ao [Versionamento Semântico](https://semver.org/spec/v2.0.
 - Registrado marker `integration` em `pytest.ini` (markers registrados para evitar warnings)
 - Documentação atualizada: `tests/README.md`, `docs/tests/overview.md`, `docs/TEST_AUTOMATION_PLAN.md`
 - Smoke test `pytest -m integration -q -o addopts=""` executado localmente 3× (<30s): 0.84s, 0.68s, 0.71s
+- Arquivados artefatos da issue em `docs/issues/closed/issue-85-2025-08-13.{md,json}`
 
 ### Adicionado
 - **Documentação de Configuração**
