@@ -35,11 +35,27 @@ Manutenção — Testes/Automação (issue #48, PR #55)
 
 - Criado diretório `tests/integration/` (sem `__init__.py`, por convenção)
 - Registrado marker `integration` em `pytest.ini` (markers registrados para evitar warnings)
-- Documentação atualizada: `tests/README.md`, `docs/tests/overview.md`, `docs/TEST_AUTOMATION_PLAN.md`
-- Smoke test `pytest -m integration -q -o addopts=""` executado localmente 3× (<30s): 0.84s, 0.68s, 0.71s
-- Arquivados artefatos da issue em `docs/issues/closed/issue-85-2025-08-13.{md,json}`
+ - Documentação atualizada: `tests/README.md`, `docs/tests/overview.md`, `docs/TEST_AUTOMATION_PLAN.md`
+ - Smoke test `pytest -m integration -q -o addopts=""` executado localmente 3× (<30s): 0.84s, 0.68s, 0.71s
+ - Arquivados artefatos da issue em `docs/issues/closed/issue-85-2025-08-13.{md,json}`
 
-- Fase 1.1 — Checklist reorganizada por issues (#59–#64) com sincronismo automático entre plano (`docs/TEST_AUTOMATION_PLAN.md`) e issues (docs/issues/open/issue-<n>.{md,json}); rastreabilidade 58–64 adicionada.
+### Mocks/Fakes e Fixtures (Issue #79 — Fase 2)
+
+- Fixtures e fakes para testes determinísticos:
+  - `freeze_datetime`: congela `datetime.now()`/`today()` nos módulos relevantes para tempo determinístico nos testes.
+  - `fixed_uuid`: substitui `uuid.uuid4()` por UUID fixo para oráculos estáveis.
+  - Fakes de HTTP consolidados: `_DummyResponse` e `_DummySession` com `patch_requests_get`/`patch_requests_session` em `tests/conftest.py` (sem rede real).
+- Dados de teste:
+  - Diretório `tests/data/` criado com `README.md` para artefatos mínimos (HTML/JSON/etc.).
+- Documentação:
+  - `tests/README.md` atualizado com instruções e exemplos das novas fixtures.
+- Estabilidade e performance:
+  - Suíte executada 3× consecutivas localmente sem flakes, cada run <30s; métricas atuais: 335 passed; cobertura ~90%.
+- Rastreabilidade:
+  - Branch de trabalho: `chore/issue-79-fakes-phase2`.
+  - Plano e artefatos em `docs/issues/open/issue-79.{md,json}` atualizados.
+
+ - Fase 1.1 — Checklist reorganizada por issues (#59–#64) com sincronismo automático entre plano (`docs/TEST_AUTOMATION_PLAN.md`) e issues (docs/issues/open/issue-<n>.{md,json}); rastreabilidade 58–64 adicionada.
 
 Issue #61 (PR #68 — draft)
 
