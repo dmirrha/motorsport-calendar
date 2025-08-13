@@ -45,6 +45,15 @@ Objetivo: Garantir documentação padrão, simples e completa para explicar a es
 - Matrizes de cenários adicionadas: Fase 0 e Fase 1 (ToDo/Doing/Done com refs a testes/PRs)
 - Rastreabilidade sincronizada: `docs/issues/open/issue-72.{md,json}` e este plano
  - CI: criado `./github/workflows/tests.yml` (Ubuntu, Python 3.11, cache pip, relatórios e artefatos); documentação atualizada em `README.md`, `tests/README.md`, `CHANGELOG.md`, `RELEASES.md`
+ - Status: Issue #72 concluída em 2025-08-13; PR #77 mergeada; Épico #58 finalizado.
+
+## Encerramento do Épico #58 — Fase 1.1 (2025-08-13)
+
+- PRs principais: #55, #57, #66, #71, #73, #77
+- Issues vinculadas concluídas: #59, #60, #61, #62, #63, #64
+- CI de testes ativo: `.github/workflows/tests.yml`
+- Documentação sincronizada: `README.md`, `tests/README.md`, `CHANGELOG.md`, `RELEASES.md`, `docs/TEST_AUTOMATION_PLAN.md`
+- Resultado: Épico concluído e fechado no GitHub em 2025-08-13
 
 # Fase 0 — Limpeza do Repositório
 Objetivo: Remover legados e padronizar a base de testes antes de iniciar as fases seguintes, seguindo a simplicidade descrita em `.windsurf/rules/tester.md`.
