@@ -13,9 +13,11 @@
 - `.DS_Store` e demais arquivos de sistema do macOS
 # Estrutura do Projeto - Motorsport Calendar
 
-> Nota pós-rollback (0.5.1)
->
-> O projeto foi revertido para o snapshot do commit `9362503`. Algumas seções podem descrever funcionalidades planejadas que ainda serão reintroduzidas em PRs futuros.
+ > Política vigente (CI ativo)
+ >
+ > - CI (GitHub Actions) ativo: pytest + cobertura + artefatos.
+ > - Testes determinísticos: executar 3× sem flakes (<30s) com fixtures/fakes — ver `tests/README.md` e `tests/data/`.
+ > - SemVer adotado: cada commit testado incrementa a versão (0.x.y até 1.0.0).
 
 ## **Visão Geral da Arquitetura**
 
@@ -80,6 +82,7 @@ Race Calendar/
     │   └── utils/
     │       └── test_config_validator.py
     ├── integration/                # Testes de integração
+    ├── data/                       # Artefatos e samples reutilizados nos testes
     └── regression/                 # Testes de regressão e scripts específicos
         └── test_processing/
             └── test_issue_3_fixes.py
