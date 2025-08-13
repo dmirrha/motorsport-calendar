@@ -11,4 +11,4 @@ Referências:
 - Cenários e fixtures (parsers/validadores/utils): `docs/tests/scenarios/phase1_scenarios.md`
 
 ## Fase 2 (Integração)
-- Em planejamento. Arquivo alvo: `docs/tests/scenarios/phase2_scenarios.md`
+- Cenários e fluxos: `docs/tests/scenarios/phase2_scenarios.md`

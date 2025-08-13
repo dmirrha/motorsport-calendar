@@ -9,12 +9,12 @@ Referências:
 Consolidar e manter atualizadas as documentações de testes referentes às fases 0, 1, 1.1 e 1.2, incluindo visão geral, cenários por fase e processo de tracking.
 
 ## Checklist — Documentação Padrão
-- [ ] Criar/atualizar visão geral de testes em `docs/tests/overview.md` (estratégia, escopo, como rodar local/CI, estrutura de pastas)
+- [x] Criar/atualizar visão geral de testes em `docs/tests/overview.md` (estratégia, escopo, como rodar local/CI, estrutura de pastas)
 - [x] Criar índice de cenários em `docs/tests/scenarios/SCENARIOS_INDEX.md` (links para cenários por fase)
 - [ ] Criar/atualizar mapeamento de cenários por fase:
   - [ ] `docs/tests/scenarios/phase0_scenarios.md` (inventário e decisões de limpeza)
   - [ ] `docs/tests/scenarios/phase1_scenarios.md` (parsers/validação/utils)
-  - [ ] `docs/tests/scenarios/phase2_scenarios.md` (fluxos de integração e iCal)
+  - [x] `docs/tests/scenarios/phase2_scenarios.md` (fluxos de integração e iCal)
 - [ ] Atualizar documentações obrigatórias a cada mudança testada:
   - [x] `CHANGELOG.md`, `RELEASES.md`, `docs/TEST_AUTOMATION_PLAN.md` (atualizados em 2025-08-09 após patch 0.5.2)
 - [ ] Processo de tracking
@@ -26,7 +26,7 @@ Consolidar e manter atualizadas as documentações de testes referentes às fase
 
 ## Progresso
 - [x] Branch criada (`chore/issue-72-docs-tests`)
-- [ ] PR (draft) aberta
+- [x] PR (draft) aberta — PR #77: https://github.com/dmirrha/motorsport-calendar/pull/77
 - [ ] Documentações criadas/atualizadas conforme checklist
 - [ ] Rastreabilidade sincronizada (issues/PRs, docs locais, CHANGELOG/RELEASES, TEST_AUTOMATION_PLAN)
 

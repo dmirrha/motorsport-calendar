@@ -26,17 +26,23 @@ Estabelecer uma estratégia simples e efetiva para implementar e evoluir testes 
 Objetivo: Garantir documentação padrão, simples e completa para explicar a estratégia de testes e permitir rastreabilidade fina das atividades, conforme `.windsurf/rules/tester.md` e políticas do projeto.
 
 ## Checklist — Documentação Padrão
-- [ ] Criar/atualizar visão geral de testes em `docs/tests/overview.md` (estratégia, escopo, como rodar local/CI, estrutura de pastas)
+- [x] Criar/atualizar visão geral de testes em `docs/tests/overview.md` (estratégia, escopo, como rodar local/CI, estrutura de pastas)
 - [x] Criar índice de cenários em `docs/tests/scenarios/SCENARIOS_INDEX.md` (links para cenários por fase)
 - [ ] Criar/atualizar mapeamento de cenários por fase:
   - [ ] `docs/tests/scenarios/phase0_scenarios.md` (inventário e decisões de limpeza)
   - [ ] `docs/tests/scenarios/phase1_scenarios.md` (parsers/validação/utils)
-  - [ ] `docs/tests/scenarios/phase2_scenarios.md` (fluxos de integração e iCal)
+  - [x] `docs/tests/scenarios/phase2_scenarios.md` (fluxos de integração e iCal)
 - [ ] Atualizar documentações obrigatórias a cada mudança testada:
   - [x] `CHANGELOG.md`, `RELEASES.md`, `docs/TEST_AUTOMATION_PLAN.md` (atualizados em 2025-08-09 após patch 0.5.2)
 - [ ] Processo de tracking
   - [ ] Toda descoberta/melhoria gera itens no plano em formato checklist, e issues quando aplicável (via GH)
   - [ ] Registrar no(s) arquivo(s) de cenários o status (ToDo/Doing/Done) e referência a PRs/Issues
+
+### Progresso — Issue #72
+- Branch: `chore/issue-72-docs-tests`
+- PR (draft): #77
+- Criados: `docs/tests/overview.md`, `docs/tests/scenarios/phase2_scenarios.md`
+- Atualizado: `docs/tests/scenarios/SCENARIOS_INDEX.md` (link para Fase 2)
 
 # Fase 0 — Limpeza do Repositório
 Objetivo: Remover legados e padronizar a base de testes antes de iniciar as fases seguintes, seguindo a simplicidade descrita em `.windsurf/rules/tester.md`.
