@@ -18,5 +18,6 @@
     "Sem acesso a rede/FS externo",
     "Execução determinística 3× local",
     "Documentação em tests/README.md"
-  ]
+  ],
+  "work_branch": "chore/issue-79-fakes-phase2"
 }
