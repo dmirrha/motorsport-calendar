@@ -40,7 +40,7 @@ Criar a infraestrutura mínima para testes integrados com pytest.
 - [x] Rastreabilidade atualizada: `docs/issues/open/issue-85.{md,json}`
 - [x] Documentação sincronizada: `CHANGELOG.md`, `RELEASES.md`, `docs/TEST_AUTOMATION_PLAN.md`
 - [x] Smoke test de integração validado 3× (<30s) e métricas registradas
-- [ ] Abrir PR mencionando "Closes #85"
+- [x] Abrir PR mencionando "Closes #85" — PR #88: https://github.com/dmirrha/motorsport-calendar/pull/88
 
 ### Entregáveis
 - `tests/integration/` (sem `__init__.py`, por convenção)
