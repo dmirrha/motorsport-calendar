@@ -37,6 +37,7 @@ Manutenção — Testes/Automação (issue #48, PR #55)
 - Registrado marker `integration` em `pytest.ini` (markers registrados para evitar warnings)
 - Documentação atualizada: `tests/README.md`, `docs/tests/overview.md`, `docs/TEST_AUTOMATION_PLAN.md`
 - Smoke test `pytest -m integration -q -o addopts=""` executado localmente 3× (<30s): 0.84s, 0.68s, 0.71s
+- Arquivados artefatos da issue em `docs/issues/closed/issue-85-2025-08-13.{md,json}`
 
 - Fase 1.1 — Checklist reorganizada por issues (#59–#64) com sincronismo automático entre plano (`docs/TEST_AUTOMATION_PLAN.md`) e issues (docs/issues/open/issue-<n>.{md,json}); rastreabilidade 58–64 adicionada.
 
