@@ -213,6 +213,19 @@ Agradecemos seu interesse em contribuir para o Motorsport Calendar! Aqui está c
 - Atualize a documentação relevante
 - Mantenha os commits atômicos e bem descritos
 
+## 🧪 Testes
+
+- Execução local:
+  ```bash
+  pytest -q
+  ```
+- Fixtures essenciais (determinismo/isolamento):
+  - `freeze_datetime`: congela `datetime.now()`/`today()` nos módulos relevantes.
+  - `fixed_uuid`: força `uuid.uuid4()` a retornar UUID fixo.
+  - Fakes de HTTP: `_DummyResponse`/`_DummySession` com `patch_requests_get`/`patch_requests_session` (sem rede real).
+- Dados de teste: `tests/data/` com exemplos mínimos (ver `tests/data/README.md`).
+- Guia completo: consulte `tests/README.md` para exemplos e boas práticas.
+
 ## 🔧 Requisitos
 
 - **Python 3.8+**

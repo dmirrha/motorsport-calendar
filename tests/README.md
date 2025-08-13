@@ -132,6 +132,8 @@ O projeto executa a suíte de testes no GitHub Actions via workflow em `.github/
   - `patch_requests_session`: patch para `sources.base_source.requests.Session`
 - Filesystem: use `tmp_path`/`tmp_path_factory` para interações com disco.
 - Variáveis de ambiente: use `monkeypatch.setenv`/`delenv` para configurar/limpar `os.environ`.
+- Tempo congelado: use `freeze_datetime()` para fixar `datetime.now()/today()` em módulos-chave (`src.logger`, `src.event_processor`, `src.utils.payload_manager`, `src.ical_generator`, `src.data_collector`, `motorsport_calendar`, `sources.base_source`, `sources.tomada_tempo`).
+- UUID determinístico: use `fixed_uuid()` para tornar `uuid.uuid4()` previsível durante os testes.
 
 Exemplos:
 
@@ -152,6 +154,23 @@ def test_timeout_session(patch_requests_session):
     # execute função que consome TomadaTempoSource
     #
     # assertions
+```
+
+```python
+from datetime import datetime
+
+def test_freeze_time(freeze_datetime):
+    fixed = datetime(2024, 1, 1, 12, 0, 0)
+    freeze_datetime(dt=fixed)
+    # chamadas internas a datetime.now() em módulos-alvo retornarão 2024-01-01T12:00:00
+```
+
+```python
+import uuid
+
+def test_fixed_uuid(fixed_uuid):
+    fixed_uuid()  # aplica UUID constante
+    assert str(uuid.uuid4()) == "00000000-0000-0000-0000-000000000000"
 ```
 
 ### Referências de testes (mocks essenciais)
