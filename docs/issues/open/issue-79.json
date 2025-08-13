@@ -9,15 +9,17 @@
   "created_at": "2025-08-13T12:44:01Z",
   "updated_at": "2025-08-13T12:44:01Z",
   "tasks": [
-    {"item": "Fake de coleta (HTTP → dados locais)", "done": false},
-    {"item": "Controle de tempo (freezegun/wrapper)", "done": false},
-    {"item": "Estabilizar aleatoriedade/UID", "done": false},
-    {"item": "Documentar uso nas fixtures/utilitários", "done": false}
+    {"item": "Fake de coleta (HTTP → dados locais)", "done": true},
+    {"item": "Controle de tempo (freezegun/wrapper)", "done": true},
+    {"item": "Estabilizar aleatoriedade/UID", "done": true},
+    {"item": "Documentar uso nas fixtures/utilitários", "done": true}
   ],
   "acceptance": [
     "Sem acesso a rede/FS externo",
     "Execução determinística 3× local",
     "Documentação em tests/README.md"
   ],
-  "work_branch": "chore/issue-79-fakes-phase2"
+  "work_branch": "chore/issue-79-fakes-phase2",
+  "pr_number": 90,
+  "pr_url": "https://github.com/dmirrha/motorsport-calendar/pull/90"
 }

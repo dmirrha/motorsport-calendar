@@ -11,15 +11,15 @@ Referências:
 Fornecer mocks/fakes mínimos para rede, tempo e aleatoriedade para tornar testes determinísticos.
 
 ## Tarefas
-- [ ] Fake de coleta (substitui requests/HTTP com dados locais)
-- [ ] Controle de tempo (ex.: freezegun ou wrapper de tempo existente)
-- [ ] Estabilizar aleatoriedade/UID quando aplicável
-- [ ] Instruções de uso nas fixtures/utilitários
+- [x] Fake de coleta (substitui requests/HTTP com dados locais)
+- [x] Controle de tempo (ex.: freezegun ou wrapper de tempo existente)
+- [x] Estabilizar aleatoriedade/UID quando aplicável
+- [x] Instruções de uso nas fixtures/utilitários
 
 ## Critérios de Aceite
-- [ ] Testes não acessam rede/FS externo
-- [ ] Execução determinística 3× local
-- [ ] Documentação em `tests/README.md`
+- [x] Testes não acessam rede/FS externo
+- [x] Execução determinística 3× local
+- [x] Documentação em `tests/README.md`
 
 ## Plano de Resolução (Fase 2 — Mocks/Fakes)
  
@@ -43,8 +43,9 @@ Fornecer mocks/fakes mínimos para rede, tempo e aleatoriedade para tornar teste
    - Documentar comandos em `tests/README.md`.
  
  - Branch de trabalho: `chore/issue-79-fakes-phase2`
+ - PR: #90 (https://github.com/dmirrha/motorsport-calendar/pull/90)
  
 ## Progresso
-- [ ] Estrutura de fakes definida
-- [ ] Execução estável confirmada 3× (<30s)
-- [ ] Documentação sincronizada
+- [x] Estrutura de fakes definida
+- [x] Execução estável confirmada 3× (<30s)
+- [x] Documentação sincronizada
