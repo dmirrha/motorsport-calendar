@@ -5,6 +5,24 @@ Todas as mudanças notáveis neste projeto serão documentadas neste arquivo.
 O formato é baseado em [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 e este projeto adere ao [Versionamento Semântico](https://semver.org/spec/v2.0.0.html).
 
+## [0.5.10] - 2025-08-13
+### Mocks/Fakes e Fixtures (Issue #79 — Fase 2)
+
+- Fixtures e fakes determinísticos para a suíte:
+  - `freeze_datetime`: congela `datetime.now()`/`today()` para tempo determinístico nos módulos relevantes.
+  - `fixed_uuid`: substitui `uuid.uuid4()` por UUID fixo para oráculos estáveis.
+  - Fakes de HTTP: `_DummyResponse` e `_DummySession` + `patch_requests_get`/`patch_requests_session` em `tests/conftest.py` (sem rede real).
+- Dados de teste:
+  - Diretório `tests/data/` criado com `README.md` para artefatos mínimos.
+- Documentação:
+  - `tests/README.md` atualizado com instruções e exemplos das novas fixtures.
+- Estabilidade e performance:
+  - Suíte executada 3× consecutivas localmente sem flakes, cada execução <30s; métricas atuais: 335 passed; cobertura ~90%.
+- Rastreabilidade:
+  - Branch de trabalho: `chore/issue-79-fakes-phase2`.
+  - Plano e artefatos em `docs/issues/open/issue-79.{md,json}` atualizados.
+- PR: #90 (merge via squash)
+
 ## [0.5.2] - 2025-08-09
 ### Manutenção — Testes/Automação
 - Ajustado ambiente de testes para evitar `ModuleNotFoundError` via `tests/conftest.py` (inclusão de caminhos da raiz e `src/`).
@@ -32,21 +50,7 @@ e este projeto adere ao [Versionamento Semântico](https://semver.org/spec/v2.0.
 - Smoke test `pytest -m integration -q -o addopts=""` executado localmente 3× (<30s): 0.84s, 0.68s, 0.71s
 - Arquivados artefatos da issue em `docs/issues/closed/issue-85-2025-08-13.{md,json}`
 
-### Mocks/Fakes e Fixtures (Issue #79 — Fase 2)
-
-- Fixtures e fakes determinísticos para a suíte:
-  - `freeze_datetime`: congela `datetime.now()`/`today()` para tempo determinístico nos módulos relevantes.
-  - `fixed_uuid`: substitui `uuid.uuid4()` por UUID fixo para oráculos estáveis.
-  - Fakes de HTTP: `_DummyResponse` e `_DummySession` + `patch_requests_get`/`patch_requests_session` em `tests/conftest.py` (sem rede real).
-- Dados de teste:
-  - Diretório `tests/data/` criado com `README.md` para artefatos mínimos.
-- Documentação:
-  - `tests/README.md` atualizado com instruções e exemplos das novas fixtures.
-- Estabilidade e performance:
-  - Suíte executada 3× consecutivas localmente sem flakes, cada execução <30s; métricas atuais: 335 passed; cobertura ~90%.
-- Rastreabilidade:
-  - Branch de trabalho: `chore/issue-79-fakes-phase2`.
-  - Plano e artefatos em `docs/issues/open/issue-79.{md,json}` atualizados.
+### (movido para 0.5.10) Mocks/Fakes e Fixtures (Issue #79 — Fase 2)
 
 ### Adicionado
 - **Documentação de Configuração**
