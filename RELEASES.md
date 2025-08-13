@@ -31,6 +31,13 @@ Manutenção — Testes/Automação (issue #48, PR #55)
 - Rastreabilidade: `docs/issues/open/issue-{78..86}.{md,json}`
  - PR: #87 (https://github.com/dmirrha/motorsport-calendar/pull/87)
 
+### Integração — Infra mínima e markers (Issue #85)
+
+- Criado diretório `tests/integration/` (sem `__init__.py`, por convenção)
+- Registrado marker `integration` em `pytest.ini` (markers registrados para evitar warnings)
+- Documentação atualizada: `tests/README.md`, `docs/tests/overview.md`, `docs/TEST_AUTOMATION_PLAN.md`
+- Smoke test `pytest -m integration -q -o addopts=""` executado localmente 3× (<30s): 0.84s, 0.68s, 0.71s
+
 - Fase 1.1 — Checklist reorganizada por issues (#59–#64) com sincronismo automático entre plano (`docs/TEST_AUTOMATION_PLAN.md`) e issues (docs/issues/open/issue-<n>.{md,json}); rastreabilidade 58–64 adicionada.
 
 Issue #61 (PR #68 — draft)
