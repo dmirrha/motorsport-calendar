@@ -25,10 +25,25 @@ Consolidar e manter atualizadas as documentações de testes referentes às fase
 - PR inicia em draft até validação deste plano.
 
 ## Progresso
-- [ ] Branch criada
+- [x] Branch criada (`chore/issue-72-docs-tests`)
 - [ ] PR (draft) aberta
 - [ ] Documentações criadas/atualizadas conforme checklist
 - [ ] Rastreabilidade sincronizada (issues/PRs, docs locais, CHANGELOG/RELEASES, TEST_AUTOMATION_PLAN)
+
+## Plano de Resolução
+- Criar estrutura `docs/tests/` e arquivos:
+  - `docs/tests/overview.md`
+  - `docs/tests/scenarios/SCENARIOS_INDEX.md`
+  - `docs/tests/scenarios/phase0_scenarios.md`
+  - `docs/tests/scenarios/phase1_scenarios.md`
+  - `docs/tests/scenarios/phase2_scenarios.md`
+- Conteúdo mínimo e simples, seguindo `.windsurf/rules/tester.md`:
+  - Overview: estratégia, escopo, como rodar local/CI, estrutura de pastas
+  - SCENARIOS_INDEX: links para cenários por fase
+  - PhaseX: lista de cenários por módulo, status (ToDo/Doing/Done) e refs de PR/Issues
+- Atualizar `docs/TEST_AUTOMATION_PLAN.md` com progresso da `#72`
+- Abrir PR em draft referenciando `#72`
+- PARE para confirmação antes de alterar documentação
 
 ## Critérios de Aceite
 - Documentação padrão criada/atualizada conforme checklist acima.
