@@ -192,8 +192,8 @@ Objetivo: elevar a cobertura unitária para ≥ 80%, ampliando a matriz de casos
   - [x] Automação local
     - [x] Script/Makefile com alvos `test.unit`, `test.integration`, `coverage`, `report`
   - [x] Fechada via PR #71 (merged em 2025-08-12T00:56:05Z)
-- [ ] #64 — Documentação e Cenários (sincronismo)
-  - [ ] Objetivo final: elevar a cobertura unitária para ≥ 80%, ampliando a matriz de casos e cobrindo ramos não exercitados
+- [x] #64 — Documentação e Cenários (sincronismo) — concluída
+   - [x] Objetivo final atingido: cobertura unitária ≥ 80% (global 83.35%), matriz ampliada e ramos críticos cobertos
   - [x] Incremento atual: `ConfigManager`
     - Novos testes: `tests/unit/config/test_config_manager_merge_and_nested_set.py`, `tests/unit/config/test_config_manager_validation_and_streaming.py`, `tests/unit/config/test_config_manager_save_errors.py`
     - Escopo: merge profundo com defaults; `get`/`set` aninhados; validação (timezone inválida, diretório inacessível, seções ausentes); `get_streaming_providers` por região; erros em `save_config` (mkdir/open)

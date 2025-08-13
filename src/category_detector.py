@@ -267,6 +267,7 @@ class CategoryDetector:
         best_category = "Unknown"
         
         # Try exact matching first
+        exact_match_found = False
         for category, variations in self.category_mappings.items():
             for variation in variations:
                 normalized_variation = self.normalize_text(variation)
@@ -276,6 +277,7 @@ class CategoryDetector:
                     best_category = category
                     best_score = 1.0
                     best_match = variation
+                    exact_match_found = True
                     break
                 
                 # Fuzzy matching
@@ -288,16 +290,18 @@ class CategoryDetector:
                 
                 max_score = max(similarity_scores)
                 
-                if max_score > best_score:
+                # Não sobrescrever um match exato já encontrado
+                if not exact_match_found and max_score > best_score:
                     best_score = max_score
                     best_category = category
                     best_match = variation
             
-            if best_score == 1.0:  # Perfect match found
+            # Só interrompe quando o match exato for encontrado
+            if exact_match_found:
                 break
         
         # Additional fuzzy matching with Jaro-Winkler
-        if best_score < 0.9:
+        if best_score < 0.9 and not exact_match_found:
             for category, variations in self.category_mappings.items():
                 for variation in variations:
                     normalized_variation = self.normalize_text(variation)
@@ -587,25 +591,27 @@ class CategoryDetector:
         category_results = []
         
         for event in events:
-            # Use existing detect_category method for each event
+            # Use existing detect_category with a two-step approach:
+            # 1) Tentar somente raw_category (prioriza match exato)
+            # 2) Se vazio/baixo, tentar combinar com nome para melhorar sinal
             raw_category = event.get('raw_category', '') or event.get('category', '')
             event_name = event.get('name', '')
-            
-            # Combine category and name for better detection
-            text_to_analyze = f"{raw_category} {event_name}".strip()
-            
-            if text_to_analyze:
-                detected_result = self.detect_category(text_to_analyze)
-                # detect_category returns a tuple (category, confidence, details)
-                if isinstance(detected_result, tuple) and len(detected_result) >= 2:
-                    detected_category = detected_result[0]
-                    confidence = detected_result[1]
-                else:
-                    detected_category = str(detected_result)
-                    confidence = 1.0
-            else:
-                detected_category = 'Unknown'
-                confidence = 0.0
+
+            detected_category = 'Unknown'
+            confidence = 0.0
+
+            if raw_category:
+                cat1, conf1, _meta1 = self.detect_category(raw_category)
+                detected_category, confidence = cat1, conf1
+
+            # Se não atingiu threshold (ou vazio), tenta combinar com nome
+            if (not raw_category or confidence < self.confidence_threshold) and (raw_category or event_name):
+                combined = f"{raw_category} {event_name}".strip()
+                if combined:
+                    cat2, conf2, _meta2 = self.detect_category(combined)
+                    # Escolhe o melhor por confiança
+                    if conf2 > confidence:
+                        detected_category, confidence = cat2, conf2
             
             # Return category information dictionary
             category_results.append({

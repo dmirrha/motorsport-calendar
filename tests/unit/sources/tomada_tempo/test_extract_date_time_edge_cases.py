@@ -47,3 +47,17 @@ class TestExtractTimeEdgeCases:
         assert source._extract_time("12:60") is None
         # minutos com 1 dígito não são aceitos nos padrões atuais
         assert source._extract_time("9h5") is None
+
+class TestAMPMAndOvernightBehavior:
+    def test_ampm_is_not_parsed_as_24h(self, source):
+        # AM/PM não é suportado: retornos devem ser None ou ignorar o sufixo
+        assert source._extract_time("10 PM") is None  # sem dois dígitos de minutos
+        assert source._extract_time("10PM") is None
+        # Quando há HH:MM seguido de AM/PM, o AM/PM é ignorado e mantém HH:MM
+        assert source._extract_time("10:30 PM") == "10:30"
+        assert source._extract_time("12:00 AM") == "12:00"
+        assert source._extract_time("12:00 PM") == "12:00"
+
+    def test_overnight_not_adjusted_by_time_only(self, source):
+        # A função de extração de hora não ajusta pernoite; valida apenas parsing
+        assert source._extract_time("00:15") == "00:15"
