@@ -187,6 +187,19 @@ def test_fixed_uuid(fixed_uuid):
 - Índice de cenários: `docs/tests/scenarios/SCENARIOS_INDEX.md`
 - Governança Fase 2: PR #87 (https://github.com/dmirrha/motorsport-calendar/pull/87) — épico #78
 
+### Integração — Snapshots ICS (Issue #86)
+
+- Local dos snapshots canônicos: `tests/snapshots/phase2/phase2_basic.ics`.
+- Normalização para comparação estável: `tests/utils/ical_snapshots.py` normaliza UID e remove campos voláteis, além de padronizar quebras de linha.
+  - UID: normalizado para token fixo (`UID:FIXED-UID`).
+  - Campos removidos: `DTSTAMP`, `CREATED`, `LAST-MODIFIED`, `SEQUENCE`, `PRODID`.
+  - Quebras de linha normalizadas para `\n`.
+- Execução dos testes de integração (básico fase 2):
+  - `pytest -m integration -q`
+  - `pytest -q tests/integration/test_phase2_basic.py`
+- Atualização de snapshot:
+  - Gere o ICS via teste e, se a mudança for intencional, atualize `tests/snapshots/phase2/phase2_basic.ics` com a versão normalizada (ver `compare_or_write_snapshot()` e `normalize_ics_text()` em `tests/utils/ical_snapshots.py`).
+
 ## Diretrizes
 
 - Centralize helpers/fixtures reutilizáveis em `tests/utils/` e/ou `tests/conftest.py`.

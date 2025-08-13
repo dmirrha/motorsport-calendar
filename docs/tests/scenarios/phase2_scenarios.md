@@ -8,11 +8,11 @@ Objetivo: mapear cenários integrados cobrindo fluxo coleta → processamento �
 - Dados: respostas estáticas com HTML mínimo e JSONs sintéticos.
 
 ## Cenários (status)
-- [ ] Integração básica com eventos simples (SUMMARY/DTSTART/DTEND/UID/URL/CATEGORIES)
+- [x] Integração básica com eventos simples (SUMMARY/DTSTART/DTEND/UID/URL/CATEGORIES)
 - [ ] Eventos cruzando meia-noite e múltiplos fusos
 - [ ] Casos com e sem `url`, `category`, `recurrence`
 - [ ] Deduplicação, ordenação e consistência de TZ
-- [ ] Snapshot `.ics` estável (ver Fase 1.2)
+- [x] Snapshot `.ics` estável (ver Fase 1.2)
 
 ## Referências
 - Plano: `docs/TEST_AUTOMATION_PLAN.md` (seção Fase 2)
@@ -22,3 +22,4 @@ Objetivo: mapear cenários integrados cobrindo fluxo coleta → processamento �
 
 - Épico: #78 — Testes Integrados e Validação de ICS
 - PR de governança: #87 (https://github.com/dmirrha/motorsport-calendar/pull/87)
+

@@ -39,6 +39,18 @@ Manutenção — Testes/Automação (issue #48, PR #55)
  - Smoke test `pytest -m integration -q -o addopts=""` executado localmente 3× (<30s): 0.84s, 0.68s, 0.71s
  - Arquivados artefatos da issue em `docs/issues/closed/issue-85-2025-08-13.{md,json}`
 
+### Integração — Fixtures e Snapshots ICS (Issue #86)
+
+- Estrutura para testes de integração com snapshots ICS estáveis:
+  - Fixtures: `tests/fixtures/integration/scenario_basic.json`
+  - Teste: `tests/integration/test_phase2_basic.py` (gera ICS e compara com snapshot normalizado)
+  - Utilitário: `tests/utils/ical_snapshots.py` (`normalize_ics_text`, `compare_or_write_snapshot`)
+  - Snapshot canônico: `tests/snapshots/phase2/phase2_basic.ics`
+- Normalização de snapshots:
+  - `UID` normalizado para token fixo; remoção de `DTSTAMP`, `CREATED`, `LAST-MODIFIED`, `SEQUENCE`, `PRODID`; quebras de linha unificadas para `\n`.
+- Estabilidade: teste de integração executado 3× localmente sem flakes (<2s cada) com `-o addopts=""` (gate de cobertura desativado no comando). Gate global permanece configurado no projeto.
+- Documentação sincronizada: `tests/README.md` (seção de snapshots) e `docs/tests/scenarios/phase2_scenarios.md` (cenário básico concluído).
+
 ### (movido para 0.5.10) Mocks/Fakes e Fixtures (Issue #79 — Fase 2)
 
  - Fase 1.1 — Checklist reorganizada por issues (#59–#64) com sincronismo automático entre plano (`docs/TEST_AUTOMATION_PLAN.md`) e issues (docs/issues/open/issue-<n>.{md,json}); rastreabilidade 58–64 adicionada.
