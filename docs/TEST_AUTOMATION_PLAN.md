@@ -192,8 +192,41 @@ Objetivo: elevar a cobertura unitária para ≥ 80%, ampliando a matriz de casos
   - [x] Automação local
     - [x] Script/Makefile com alvos `test.unit`, `test.integration`, `coverage`, `report`
   - [x] Fechada via PR #71 (merged em 2025-08-12T00:56:05Z)
-- [ ] #64 — Documentação e Cenários (sincronismo)
-  - [ ] Objetivo final: elevar a cobertura unitária para ≥ 80%, ampliando a matriz de casos e cobrindo ramos não exercitados
+- [x] #64 — Documentação e Cenários (sincronismo) — concluída
+   - [x] Objetivo final atingido: cobertura unitária ≥ 80% (global 83.35%), matriz ampliada e ramos críticos cobertos
+  - [x] Incremento atual: `ConfigManager`
+    - Novos testes: `tests/unit/config/test_config_manager_merge_and_nested_set.py`, `tests/unit/config/test_config_manager_validation_and_streaming.py`, `tests/unit/config/test_config_manager_save_errors.py`
+    - Escopo: merge profundo com defaults; `get`/`set` aninhados; validação (timezone inválida, diretório inacessível, seções ausentes); `get_streaming_providers` por região; erros em `save_config` (mkdir/open)
+    - Métricas: suíte **191 passed**; cobertura global **59.15%**; `src/config_manager.py` **83%**
+  - [x] Incremento atual: `CategoryDetector`
+    - Novos testes: `tests/unit/category/test_category_detector_normalize_more.py`, `tests/unit/category/test_category_detector_threshold_and_learning.py`, `tests/unit/category/test_category_detector_persistence.py`
+    - Escopo: normalização avançada; thresholds/aprendizado; persistência integrada com logger/config stub
+  - [x] Incremento atual: `TomadaTempo`
+    - Novos testes: `tests/unit/sources/tomada_tempo/test_tomada_tempo_parsing.py`
+    - Escopo: parsing determinístico cobrindo variações reais de HTML e formatos de horário
+  - [x] Incremento atual: `PayloadManager` e `ICalGenerator`
+    - Novos testes:
+      - `tests/unit/utils/test_payload_manager_errors.py`
+      - `tests/unit/ical/test_ical_generator_branches.py`
+    - Ajustes:
+      - Construtor de `ICalGenerator`: uso correto do parâmetro `config_manager` no teste
+      - `PayloadManager.save_payload`: exceção encapsulada validada como `IOError`
+    - Métricas (pós-incremento):
+      - Suíte: **205 passed**; cobertura global: **61.52%**
+      - `src/utils/payload_manager.py`: **90%**
+      - `src/ical_generator.py`: **93%**
+    - Próximos passos:
+      - Executar suíte 3× para confirmar zero flakes
+      - Sincronizar documentação correlata (`README.md`, `RELEASES.md`, `docs/issues/open/issue-64.{md,json}`)
+      - Manter PR #73 como draft na branch `chore/issue-64-coverage-80`
+  - [x] CHANGELOG/RELEASES atualizados
+  - [x] PR (draft) aberta — PR #73: https://github.com/dmirrha/motorsport-calendar/pull/73
+  - [x] Incremento atual: `Logger`
+    - Testes: `tests/unit/logger/test_logger_basic.py` e `tests/unit/logger/test_logger_misc.py` cobrindo configuração (handlers/formatters/níveis), rotação, emissão de níveis, `save_payload` (json/html/text) com exceções, `set_console_level`, `get_logger`, resumo/finalização de execução e helpers de domínio (category detection, duplicados, weekend, iCal, eventos por fonte), com fallbacks de config.
+    - Estratégia: sem I/O real (uso de `tmp_path`), monkeypatch para desabilitar `_cleanup_old_logs`/`_cleanup_rotated_logs`, handlers custom para captura de registros.
+    - Métricas: módulo `src/logger.py` **83%**; suíte **295 passed**; cobertura global **83.35%**; estabilidade **3×** (<30s).
+    - Versionamento: bump para `0.5.8`.
+    - Documentação sincronizada: `CHANGELOG.md`, `RELEASES.md`, `docs/issues/open/issue-64.{md,json}`, `docs/TEST_AUTOMATION_PLAN.md`.
 
 # Fase 1.2 — Fixtures “golden” para ICS (Snapshots)
 Objetivo: introduzir snapshots estáveis para validar a saída do `src/ical_generator.py`, garantindo regressão determinística.
@@ -339,6 +372,40 @@ Notas:
 1. Subir `--cov-fail-under` de 70% → 80% após estabilização da Fase 2.
 2. Paralelizar testes com `pytest -n auto` (quando estável e sem condições de corrida).
 3. Opcional: adicionar `pytest-rerunfailures` para flakies pontuais.
+
+ ## Backlog Prioritário — Issue #64 (trabalho 1 a 1)
+ Seguindo `.windsurf/rules/tester.md` e a diretriz qualidade-first, vamos atacar módulos que hoje estão abaixo da meta de 80% de cobertura, priorizando parsers/validadores/processadores. Marque cada item ao concluir.
+ 
+ - [x] P1 — `sources/tomada_tempo.py` (Concluído: cobertura 90% e 3× estável <30s; docs/PR sincronizados — refs #64, PR #73)
+   - Foco: `_extract_time`, `_extract_date`, `_extract_event_from_element`, `_extract_streaming_links`, `_extract_official_url`, `filter_weekend_events` (herdado).
+   - Casos: ISO vs BR (precedência), sem data (usar contexto), AM/PM (ignorado), overnight (sem ajuste na hora), separadores variados, HTML malformado.
+   - Caminho: `sources/tomada_tempo.py` | Tests: `tests/unit/sources/tomada_tempo/`
+
+ - [x] P2 — `src/category_detector.py` (Concluído: cobertura ~96% e 3× estável <30s; docs/PR sincronizados — refs #64, PR #73)
+  - Foco: fallback "Unknown", conflitos de regras (prioridade determinística), métricas/estatísticas (se expostas), persistência save/load (mock de FS).
+  - Caminho: `src/category_detector.py` | Tests sugeridos: `tests/unit/category/`
+
+- [x] P3 — `src/utils/error_codes.py` (Concluído: módulo >90% e 3× estável <30s; docs/PR sincronizados — refs #64, PR #73)
+  - Foco: mapeamentos específicos, mensagens de fallback para códigos desconhecidos, tipos inválidos.
+  - Caminho: `src/utils/error_codes.py` | Tests: `tests/unit/utils/test_error_codes.py`
+  - Métricas: suíte **267 passed**; cobertura global **68.04%**; estabilidade **3×** (<30s).
+
+- [x] P4 — `src/data_collector.py` (Concluído: módulo ~67% e 3× estável <30s; docs/PR sincronizados — versão 0.5.5; refs #64, PR #73)
+  - Foco mínimo de valor: fluxos críticos isolados com mocks (sem rede), erros comuns (timeout/404), validação de dados obrigatórios.
+  - Caminho: `src/data_collector.py` | Tests: `tests/unit/data_collector/`
+
+- [x] P5 — `src/ui_manager.py` (Concluído: módulo 100% e 3× estável <30s; docs/PR sincronizados — versão 0.5.6; refs #64, PR #73)
+  - Foco: comportamento básico sem I/O real, ramos de mensagens e estados simples.
+  - Caminho: `src/ui_manager.py` — 100% (3× estável)
+  - Tests: `tests/unit/ui/`
+
+- [x] P6 — `src/logger.py` (Concluído: módulo 83% e 3× estável <30s; docs/PR sincronizados — versão 0.5.8; refs #64, PR #73)
+  - Foco: configuração de handlers/formatters mais usados, ramos de nível de log.
+  - Caminho: `src/logger.py` | Tests: `tests/unit/logger/`
+
+Notas rápidas:
+- Critérios de qualidade: 3× sem flakes (<30s), documentação sincronizada (CHANGELOG, RELEASES, TEST_AUTOMATION_PLAN, docs/issues/open/issue-64.{md,json}).
+- Após cada incremento testado: atualizar PR draft #73 (branch `chore/issue-64-coverage-80`) referenciando a Issue #64.
 
 ## Referências
 - Guia de simplicidade: `.windsurf/rules/tester.md`.

@@ -167,8 +167,8 @@ def test_extract_time_missing_minutes_defaults_to_zero(source, text, expected):
 
 @pytest.mark.unit
 def test_extract_date_iso_and_weekday_variants(source):
-    # Precedência do padrão DD-MM-YY dentro de YYYY-MM-DD
-    assert source._extract_date("Evento em 2025-08-02") == "25/08/2002"
+    # Agora ISO completo tem precedência
+    assert source._extract_date("Evento em 2025-08-02") == "02/08/2025"
     # Weekday + dd/mm/yy com hífen e ano 2 dígitos
     assert source._extract_date("SÁBADO – 2/8/25") == "02/08/2025"
 
@@ -187,3 +187,36 @@ def test_extract_event_from_text_line_uses_context_on_missing_date(source):
     assert isinstance(ev, dict)
     assert ev["date"] == "01/08/2025"
     assert ev["from_context"] is True
+
+
+@pytest.mark.unit
+def test_extract_event_from_element_non_motorsport_returns_none(source):
+    html = '<div><span>Agenda Cultural – Exposição de Arte às 19:00</span></div>'
+    soup = BeautifulSoup(html, "html.parser")
+
+    ev = source._extract_event_from_element(soup.div, datetime(2025, 8, 1))
+
+    assert ev is None
+
+
+@pytest.mark.unit
+def test_filter_weekend_events_accepts_datetime_and_iso(source):
+    # Sexta a Domingo: 01-03/08/2025
+    import pytz
+    tz = pytz.timezone('America/Sao_Paulo')
+    target_date = tz.localize(datetime(2025, 8, 1))
+    weekend_start = target_date.replace(hour=0, minute=0, second=0, microsecond=0)
+    weekend_end = weekend_start + __import__("datetime").timedelta(days=2, hours=23, minutes=59, seconds=59)
+    target_weekend = (weekend_start, weekend_end)
+
+    events = [
+        {"name": "F1 P1", "date": tz.localize(datetime(2025, 8, 1)), "time": "10:00"},  # aware Friday
+        {"name": "F1 Qualy", "date": "2025-08-02", "time": "15:00"},      # ISO Saturday
+        {"name": "F1 GP", "date": "03/08/2025", "time": "14:00"},         # BR Sunday
+        {"name": "F1 Pós-corrida", "date": "04/08/2025", "time": "10:00"},# Monday (fora)
+    ]
+
+    result = source.filter_weekend_events(events, target_weekend)
+
+    names = [e["name"] for e in result]
+    assert names == ["F1 P1", "F1 Qualy", "F1 GP"]

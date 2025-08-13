@@ -30,6 +30,58 @@ Issue #61 (PR #68 — draft)
 - Escopo coberto: normalização (links/data/hora/categoria/local/país/sessão), deduplicação (threshold/tolerância/merge), pipeline (`process_events`), categorias (`_detect_categories`), weekend target (`_detect_target_weekend`), estatísticas e logs
 - Execução local direcionada com `--cov=src/event_processor.py` para aferição do alvo sem afetar gate global durante estabilização
 
+Issue #64 (concluída)
+
+- Elevação de qualidade dos testes (qualidade-first) — ConfigManager
+- Novos testes adicionados (determinísticos, isolados):
+  - `tests/unit/config/test_config_manager_merge_and_nested_set.py`
+  - `tests/unit/config/test_config_manager_validation_and_streaming.py`
+  - `tests/unit/config/test_config_manager_save_errors.py`
+- Escopo coberto: merge profundo com defaults, `get`/`set` com paths aninhados, validação (timezone inválida, diretório inacessível, seções ausentes), `get_streaming_providers` por região, e erros em `save_config` (mkdir/open) com rethrow e logs
+- Métricas atuais: **191 passed**; cobertura global: **59.15%**; `src/config_manager.py`: **83%**
+- Observação: sem duplicar testes existentes; alinhado ao guia `.windsurf/rules/tester.md` (determinismo <30s, isolamento de FS/TZ, oráculos claros)
+ - Incremento atual: `PayloadManager` e `ICalGenerator`
+   - Novos testes:
+     - `tests/unit/utils/test_payload_manager_errors.py`
+     - `tests/unit/ical/test_ical_generator_branches.py`
+   - Ajustes de testes:
+     - Construtor de `ICalGenerator`: uso correto do parâmetro `config_manager` no teste
+     - `PayloadManager.save_payload`: exceção encapsulada validada como `IOError`
+   - Métricas (pós-incremento):
+     - Suíte: **205 passed**; cobertura global: **61.52%**
+     - `src/utils/payload_manager.py`: **90%**
+     - `src/ical_generator.py`: **93%**
+  - Conclusão do P1 — `sources/tomada_tempo.py`: cobertura **90%** e **3×** execução estável (<30s); documentação sincronizada (`CHANGELOG.md`, `docs/TEST_AUTOMATION_PLAN.md`) e PR #73 atualizado com resumo.
+  - P2 — `src/category_detector.py`:
+     - Testes: persistência `save_learned_categories`/`load_learned_categories` (mock FS via `tmp_path`) e estatísticas `get_statistics`.
+     - Ajustes: prioridade determinística de matches exatos sobre fuzzy; no batch, tentar `raw_category` antes de combinar com `name`.
+     - Métricas: **258 passed**; cobertura global **67.78%**; módulo `category_detector` ~**96%**; estabilidade **3×** (<30s).
+     - Docs sincronizadas: `CHANGELOG.md`, `RELEASES.md`, `docs/TEST_AUTOMATION_PLAN.md`, `docs/issues/open/issue-64.{md,json}`. PR #73 (draft) atualizado.
+
+   - P3 — `src/utils/error_codes.py`:
+     - Testes: mapeamentos específicos em `get_error_suggestions`, fallback para códigos desconhecidos e tipos inválidos, extração de severidade em `get_error_severity` (Enum vs string via `.value`).
+     - Métricas: suíte **267 passed**; módulo `error_codes` > **90%**; cobertura global **68.04%**; estabilidade **3×** (<30s).
+     - Docs sincronizadas: `CHANGELOG.md`, `RELEASES.md`, `docs/TEST_AUTOMATION_PLAN.md`, `docs/issues/open/issue-64.{md,json}`; PR #73 (draft) atualizado.
+     - Versão: bump para `0.5.4`.
+
+   - P4 — `src/data_collector.py`:
+     - Testes mínimos com mocks (sem rede), cobrindo fluxos críticos, concorrência, remoção de fonte e estatísticas.
+     - Métricas: módulo ~**67%**; cobertura global **71.98%** (na época); estabilidade **3×** (<30s).
+     - Docs sincronizadas: `CHANGELOG.md`, `RELEASES.md`, `docs/TEST_AUTOMATION_PLAN.md`, `docs/issues/open/issue-64.{md,json}`; PR #73 (draft) atualizado.
+     - Versão: bump para `0.5.5`.
+
+    - P5 — `src/ui_manager.py`:
+      - Testes adicionados: `tests/unit/ui_manager/test_ui_manager_basic.py` e `tests/unit/ui_manager/test_ui_manager_more.py` cobrindo progressão de etapas, resumos, mensagens, geração de iCal e instruções de importação; respeito a flags de UI (cores/ícones/desabilitado) sem I/O real.
+      - Métricas: módulo **100%**; estabilidade **3×** (<30s).
+      - Docs sincronizadas: `CHANGELOG.md`, `RELEASES.md`, `docs/TEST_AUTOMATION_PLAN.md`, `docs/issues/open/issue-64.{md,json}`; PR #73 (draft) atualizado.
+      - Versão: bump para `0.5.6`.
+    - P6 — `src/logger.py`:
+      - Testes adicionados: `tests/unit/logger/test_logger_basic.py` e `tests/unit/logger/test_logger_misc.py` cobrindo inicialização/configuração (handlers/formatters/níveis), rotação, emissão de níveis, `save_payload` (json/html/text) incluindo exceções, `set_console_level`, `get_logger`, resumo/finalização de execução e helpers de domínio (category detection, remoção de duplicados, weekend, iCal, eventos por fonte) com fallbacks de config.
+      - Estratégia: isolamento total de I/O real (uso de `tmp_path`), monkeypatch para desabilitar limpezas `_cleanup_old_logs` e `_cleanup_rotated_logs`, e handlers custom para capturar registros.
+      - Métricas: módulo **83%**; suíte **295 passed**; estabilidade **3×** (<30s).
+      - Docs sincronizadas: `CHANGELOG.md`, `RELEASES.md`, `docs/TEST_AUTOMATION_PLAN.md`, `docs/issues/open/issue-64.{md,json}`; PR #73 (draft) atualizado.
+      - Versão: bump para `0.5.8`.
+
 Issue #59 (PR #66 — draft)
 
 - Testes unitários adicionais para `sources/tomada_tempo.py` (parsers e funções auxiliares)

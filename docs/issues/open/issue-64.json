@@ -7,14 +7,51 @@
   "epic": 58,
   "url": "https://github.com/dmirrha/motorsport-calendar/issues/64",
   "created_at": "2025-08-10T21:03:10Z",
-  "updated_at": "2025-08-10T21:07:19Z",
+  "updated_at": "2025-08-12T16:35:51Z",
   "tasks": [
     {"item": "Atualizar phase1_scenarios.md", "done": false},
     {"item": "Atualizar SCENARIOS_INDEX.md", "done": false},
     {"item": "Atualizar tests/README.md", "done": false},
-    {"item": "Atualizar TEST_AUTOMATION_PLAN.md", "done": false},
-    {"item": "Atualizar CHANGELOG/RELEASES", "done": false},
-    {"item": "Elevar cobertura unitária para ≥ 80%, ampliando a matriz de casos e cobrindo ramos não exercitados", "done": false}
+    {"item": "Atualizar TEST_AUTOMATION_PLAN.md", "done": true},
+    {"item": "Atualizar CHANGELOG/RELEASES", "done": true},
+    {"item": "Atualizar README.md (seção de testes)", "done": true},
+    {"item": "Executar suíte 3× localmente para confirmar zero flakes", "done": true},
+    {"item": "Elevar cobertura unitária para ≥ 80%, ampliando a matriz de casos e cobrindo ramos não exercitados", "done": true}
+  ],
+  "increments": [
+    {
+      "name": "P4 — DataCollector",
+      "module": "src/data_collector.py",
+      "coverage_module": 67,
+      "suite_passed": 272,
+      "coverage_global": 71.98,
+      "stable_runs": 3,
+      "duration_lt_30s": true,
+      "version": "0.5.5",
+      "docs_synced": true
+    },
+    {
+      "name": "P5 — UIManager",
+      "module": "src/ui_manager.py",
+      "coverage_module": 100,
+      "suite_passed": 285,
+      "coverage_global": 78.33,
+      "stable_runs": 3,
+      "duration_lt_30s": true,
+      "version": "0.5.6",
+      "docs_synced": true
+    },
+    {
+      "name": "P6 — Logger",
+      "module": "src/logger.py",
+      "coverage_module": 83,
+      "suite_passed": 295,
+      "coverage_global": 83.35,
+      "stable_runs": 3,
+      "duration_lt_30s": true,
+      "version": "0.5.8",
+      "docs_synced": true
+    }
   ],
   "acceptance": [
     "Documentação e rastreabilidade sincronizadas com as histórias da Fase 1.1"

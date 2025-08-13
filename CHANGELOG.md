@@ -42,6 +42,11 @@ e este projeto adere ao [Versionamento Semântico](https://semver.org/spec/v2.0.
   - Adicionada validação de tipos e valores nas configurações
   - Implementada documentação detalhada para todas as opções de configuração
 
+### Corrigido
+ - Issue #74 — PytestCollectionWarning: eliminada a coleta indevida de classe auxiliar em `tests/unit/sources/base_source/test_helpers_and_parsers.py` marcando `__test__ = False`.
+ - Issue #75 — TomadaTempo `_extract_date`: ajustada a precedência para priorizar ISO completo (`YYYY-MM-DD`/`YYYY/MM/DD`) e evitar matches parciais; testes atualizados em `tests/unit/sources/tomada_tempo/`.
+ - Issue #76 — BaseSource `logger=None`: remoção de fallback para `logging.getLogger(__name__)` e proteção de chamadas a métodos customizados via `getattr`, evitando `AttributeError`.
+
 ### Manutenção — Testes/Automação
  - Fase 0: revisão do ambiente de testes conforme plano
    - Python 3.11.5 e pip verificados
@@ -77,6 +82,30 @@ e este projeto adere ao [Versionamento Semântico](https://semver.org/spec/v2.0.
   - Remoção de hacks de `sys.path` nos testes (uso de `tests/conftest.py`)
   - Criado `tests/README.md` com convenções e estrutura
   - Suíte estável: `45 passed`; cobertura total: 28.75%
+  - Issue #64 — P1 (TomadaTempo): módulo `sources/tomada_tempo.py` com cobertura **90%** e **3×** execução estável (<30s). Documentação sincronizada (`docs/TEST_AUTOMATION_PLAN.md`, `RELEASES.md`) e PR #73 atualizado com o resumo do incremento.
+  - Issue #64 — P2 (CategoryDetector):
+    - Testes adicionados: persistência `save_learned_categories`/`load_learned_categories` com mock de filesystem (`tmp_path`) e estatísticas via `get_statistics`.
+    - Ajustes no algoritmo:
+      - `detect_category`: priorização determinística de matches exatos sobre fuzzy (evita fuzzy 1.0 sobrepor exato), atualização de stats e aprendizado controlado.
+      - `detect_categories_batch`: tenta primeiro `raw_category` isolado; só combina com `name` quando necessário.
+    - Métricas: módulo `src/category_detector.py` ~96% de cobertura; suíte **258 passed**, cobertura global **67.78%**; estabilidade confirmada **3×** (<30s).
+    - Documentação sincronizada: `docs/TEST_AUTOMATION_PLAN.md`, `CHANGELOG.md`, `RELEASES.md`, `docs/issues/open/issue-64.{md,json}`. PR #73 (draft) atualizado.
+
+  - Issue #64 — P3 (ErrorCodes):
+    - Testes adicionados: mapeamentos específicos em `get_error_suggestions`, fallback genérico para códigos desconhecidos e tipos inválidos, e equivalência Enum vs string (`.value`) em `get_error_severity`.
+    - Estabilidade: suíte **267 passed** em 3 execuções consecutivas (<30s em todas).
+    - Cobertura global atual: **68.04%**. Sem regressões.
+    - Documentação sincronizada: `docs/TEST_AUTOMATION_PLAN.md` (P3 marcado como concluído) e `docs/issues/open/issue-64.md` (incremento P3).
+  - Issue #64 — P5 (UIManager):
+    - Testes adicionados: `tests/unit/ui_manager/test_ui_manager_basic.py` e `tests/unit/ui_manager/test_ui_manager_more.py` cobrindo: progressão de etapas (`start_step_progress`/`show_step`), resumos (`show_event_summary`, `show_events_by_category`), mensagens (`show_success_message`, `show_error_message`, `show_warning_message`, `show_step_result`), geração de iCal (`show_ical_generation`) e instruções de importação (`show_import_instructions`).
+    - Estratégia: fakes de console/progresso (sem I/O real), asserts sobre contagem e conteúdo; respeito a flags de UI (cores/ícones/desabilitado).
+    - Métricas: `src/ui_manager.py` **100%**; diretório `ui_manager`: **13 testes**; estabilidade **3×** (<30s).
+    - Versionamento: bump para `0.5.6` em `src/__init__.py`.
+  - Issue #64 — P6 (Logger):
+    - Testes adicionados: `tests/unit/logger/test_logger_basic.py` e `tests/unit/logger/test_logger_misc.py` cobrindo inicialização/configuração (handlers/formatters/níveis), rotação de logs, emissão de níveis (success/error/warning/info/debug), `save_payload` (json/html/text) com exceções, `set_console_level`, `get_logger`, resumo/finalização de execução e helpers de domínio (category detection, remoção de duplicados, weekend, iCal, eventos por fonte) com fallbacks de config.
+    - Estratégia: isolamento total de I/O real (uso de `tmp_path`), monkeypatch para desabilitar limpezas `_cleanup_old_logs` e `_cleanup_rotated_logs`, e handlers custom para capturar registros.
+    - Métricas: módulo `src/logger.py` **83%**; suíte **295 passed**; estabilidade **3×** (<30s) nos testes de logger.
+    - Versionamento: bump para `0.5.8` em `src/__init__.py`.
   - Mocks essenciais (issue #48, PR #55):
     - Fixação de timezone (`America/Sao_Paulo`) e aleatoriedade (`random.seed(0)`)
     - Shims de rede: `sources.tomada_tempo.requests.get` e `sources.base_source.requests.Session`
@@ -121,11 +150,34 @@ e este projeto adere ao [Versionamento Semântico](https://semver.org/spec/v2.0.
        - `tests/unit/utils/test_payload_manager_extended.py`
        - `tests/unit/config/test_config_manager_basic.py`
      - Documentação sincronizada: `tests/README.md`, `docs/TEST_AUTOMATION_PLAN.md`, `README.md`, `CHANGELOG.md`, `RELEASES.md`, `docs/issues/open/issue-63.{md,json}`
- - Fase 1 — Alvos prioritários (issue #49, PR #56)
-   - Testes unitários para parsers de data/hora em `sources/tomada_tempo.py` e validações em `sources/base_source.py`
-   - Testes unitários para processadores/validadores em `src/event_processor.py` (`_is_event_valid`, `_filter_weekend_events`)
-   - Ajuste de casos de borda para refletir precedência atual dos padrões de data
-   - Testes adicionais: `ICalGenerator.generate_calendar`/`validate_calendar` e `SilentPeriodManager.log_filtering_summary`
+   - Issue #64 (PR — draft): elevação de qualidade dos testes (qualidade-first)
+     - Novos testes para `ConfigManager` (determinísticos, isolados):
+       - `tests/unit/config/test_config_manager_merge_and_nested_set.py`
+       - `tests/unit/config/test_config_manager_validation_and_streaming.py`
+       - `tests/unit/config/test_config_manager_save_errors.py`
+     - Escopo coberto: merge profundo com defaults, `get`/`set` com paths aninhados, validação (timezone inválida, diretório inacessível, seções ausentes), `get_streaming_providers` por região, e erros em `save_config` (mkdir/open) com rethrow e logs.
+     - Métricas atuais: **191 passed**; cobertura global: **59.15%**; `src/config_manager.py`: **83%**.
+     - Observação: sem duplicar testes existentes; alinhado ao guia `.windsurf/rules/tester.md` (determinismo <30s, isolamento de FS/TZ, oráculos claros).
+     - Incremento atual: `PayloadManager` e `ICalGenerator`
+       - Novos testes:
+         - `tests/unit/utils/test_payload_manager_errors.py`
+         - `tests/unit/ical/test_ical_generator_branches.py`
+       - Ajustes de testes:
+         - Construtor de `ICalGenerator`: uso correto do parâmetro `config_manager` no teste
+         - `PayloadManager.save_payload`: exceção encapsulada validada como `IOError`
+       - Métricas (pós-incremento):
+         - Suíte: **205 passed**; cobertura global: **61.52%**
+         - `src/utils/payload_manager.py`: **90%**
+         - `src/ical_generator.py`: **93%**
+       - Próximos passos:
+         - Rodar a suíte 3× localmente para confirmar zero flakes
+         - Atualizar documentação correlata (`README.md`, `RELEASES.md`, `docs/TEST_AUTOMATION_PLAN.md`, `docs/issues/open/issue-64.{md,json}`)
+         - Manter PR #73 como draft na branch `chore/issue-64-coverage-80`
+  - Fase 1 — Alvos prioritários (issue #49, PR #56)
+    - Testes unitários para parsers de data/hora em `sources/tomada_tempo.py` e validações em `sources/base_source.py`
+    - Testes unitários para processadores/validadores em `src/event_processor.py` (`_is_event_valid`, `_filter_weekend_events`)
+    - Ajuste de casos de borda para refletir precedência atual dos padrões de data
+    - Testes adicionais: `ICalGenerator.generate_calendar`/`validate_calendar` e `SilentPeriodManager.log_filtering_summary`
    - Validação: suíte estável `79 passed`; cobertura total 37.00% (2025-08-10)
 
 ### Corrigido
