@@ -44,7 +44,7 @@ Objetivo: Garantir documentação padrão, simples e completa para explicar a es
 - Criados/Atualizados: overview; SCENARIOS_INDEX; scenarios de Fase 0, 1 e 2
 - Matrizes de cenários adicionadas: Fase 0 e Fase 1 (ToDo/Doing/Done com refs a testes/PRs)
 - Rastreabilidade sincronizada: `docs/issues/open/issue-72.{md,json}` e este plano
- - CI: criado `./github/workflows/tests.yml` (Ubuntu, Python 3.11, cache pip, relatórios e artefatos); documentação atualizada em `README.md`, `tests/README.md`, `CHANGELOG.md`, `RELEASES.md`
+  - CI: criado `.github/workflows/tests.yml` (Ubuntu, Python 3.11, cache pip, relatórios e artefatos); documentação atualizada em `README.md`, `tests/README.md`, `CHANGELOG.md`, `RELEASES.md`
  - Status: Issue #72 concluída em 2025-08-13; PR #77 mergeada; Épico #58 finalizado.
 
 ## Encerramento do Épico #58 — Fase 1.1 (2025-08-13)
