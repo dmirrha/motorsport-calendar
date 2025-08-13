@@ -1,0 +1,15 @@
+{
+  "events": [
+    {
+      "name": "São Paulo GP",
+      "detected_category": "F1",
+      "session_type": "race",
+      "datetime": "2025-11-09T14:00:00-03:00",
+      "location": "Interlagos",
+      "country": "Brazil",
+      "official_url": "https://www.formula1.com/",
+      "source": "fixture",
+      "source_display_name": "Phase2 Fixture"
+    }
+  ]
+}
