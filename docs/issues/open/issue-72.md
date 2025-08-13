@@ -18,8 +18,8 @@ Consolidar e manter atualizadas as documentações de testes referentes às fase
 - [ ] Atualizar documentações obrigatórias a cada mudança testada:
   - [x] `CHANGELOG.md`, `RELEASES.md`, `docs/TEST_AUTOMATION_PLAN.md` (atualizados em 2025-08-09 após patch 0.5.2)
 - [ ] Processo de tracking
-  - [ ] Toda descoberta/melhoria gera itens no plano em formato checklist, e issues quando aplicável (via GH)
-  - [ ] Registrar no(s) arquivo(s) de cenários o status (ToDo/Doing/Done) e referência a PRs/Issues
+  - [x] Toda descoberta/melhoria gera itens no plano em formato checklist, e issues quando aplicável (via GH)
+  - [x] Registrar no(s) arquivo(s) de cenários o status (ToDo/Doing/Done) e referência a PRs/Issues
 
 ## PARE — Autorização
 - PR inicia em draft até validação deste plano.

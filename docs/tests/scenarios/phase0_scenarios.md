@@ -40,6 +40,15 @@ Observação: `.gitignore` já cobre esses artefatos (linhas: `.pytest_cache/`, 
 
 ---
 
+## Matriz de Cenários — Status
+- [x] Inventário de arquivos/pastas (fora de `tests/`) — via `scripts/tests_phase0_inventory.sh`
+- [x] Movimentar `./test_issue_3_fixes.py` para `tests/` (padrão `test_*.py`) — ref: `tests/regression/test_processing/test_issue_3_fixes.py`
+- [x] Remover artefatos versionados do índice do Git — conforme `.gitignore`
+- [x] Garantir `.gitkeep` em pastas de resultados (se necessário)
+- [x] Verificação pós-limpeza: descoberta Pytest apenas em `tests/` (`pytest -q`)
+- [x] Documentação e rastreio sincronizados — refs: Issue #72, PR #77
+- [ ] Adicionar workflow de testes no CI (`.github/workflows/tests.yml`) — pendente (planejado na fase apropriada do plano)
+
 ## Itens Derivados (a rastrear na Fase 0)
 - [x] Mover `./test_issue_3_fixes.py` para `tests/` e adequar nome (padrão `test_*.py`).
 - [x] Remover artefatos versionados do índice do Git (manter `.gitignore`):
@@ -50,7 +59,8 @@ Observação: `.gitignore` já cobre esses artefatos (linhas: `.pytest_cache/`, 
 
 Status:
 - Inventário executado via `scripts/tests_phase0_inventory.sh`. Relatório salvo em `test_results/inventory/phase0_inventory_20250809-081647.md`.
-- Aguardando execução da limpeza e movimentação conforme checklist da Fase 0.
+- Limpeza e movimentação concluídas conforme checklist da Fase 0.
+- Pendência: adicionar workflow de testes (`.github/workflows/tests.yml`) na fase apropriada.
 
 Rastreamento:
 - Sincronizado com Issue #72 e PR #77 (docs/tests) em 2025-08-12T23:26:51-03:00.
