@@ -20,7 +20,7 @@ Estabelecer uma estratégia simples e efetiva para implementar e evoluir testes 
 - Código: `src/motorsport_calendar/` e `sources/`
 - Testes: `tests/` (existente, amplo)
 - Artefatos: `test_results/`, `junit.xml`, `htmlcov/` (gerados)
-- CI: `.github/workflows/` (atualmente sem workflow de testes)
+- CI: `.github/workflows/tests.yml` (workflow de testes ativo: pytest + cobertura; artefatos junit/coverage/html)
 
 ## Diretrizes de Documentação e Rastreamento
 Objetivo: Garantir documentação padrão, simples e completa para explicar a estratégia de testes e permitir rastreabilidade fina das atividades, conforme `.windsurf/rules/tester.md` e políticas do projeto.
@@ -44,6 +44,7 @@ Objetivo: Garantir documentação padrão, simples e completa para explicar a es
 - Criados/Atualizados: overview; SCENARIOS_INDEX; scenarios de Fase 0, 1 e 2
 - Matrizes de cenários adicionadas: Fase 0 e Fase 1 (ToDo/Doing/Done com refs a testes/PRs)
 - Rastreabilidade sincronizada: `docs/issues/open/issue-72.{md,json}` e este plano
+ - CI: criado `./github/workflows/tests.yml` (Ubuntu, Python 3.11, cache pip, relatórios e artefatos); documentação atualizada em `README.md`, `tests/README.md`, `CHANGELOG.md`, `RELEASES.md`
 
 # Fase 0 — Limpeza do Repositório
 Objetivo: Remover legados e padronizar a base de testes antes de iniciar as fases seguintes, seguindo a simplicidade descrita em `.windsurf/rules/tester.md`.

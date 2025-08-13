@@ -4,7 +4,7 @@ Um script Python avançado para coleta automática de eventos de automobilismo d
 
 > Nota pós-rollback (0.5.1)
 >
-> A branch `main` foi revertida para o snapshot do commit `9362503` (PR #34). Algumas seções abaixo podem descrever funcionalidades que serão reintroduzidas em PRs futuros. O workflow de testes/CI não foi reativado neste momento. Consulte `RELEASES.md` para detalhes.
+- A branch `main` foi revertida para o snapshot do commit `9362503` (PR #34). Algumas seções abaixo podem descrever funcionalidades que serão reintroduzidas em PRs futuros. O workflow de testes/CI foi reativado via GitHub Actions (`.github/workflows/tests.yml`) em 2025-08-13. Consulte `RELEASES.md` para detalhes.
 
 ## 🎯 Características
 
