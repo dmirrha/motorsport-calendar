@@ -40,9 +40,20 @@ Notas:
 ## Próximos Passos (Unit)
 - Adicionar casos parametrizados para horas AM/PM e sem minutos.
 - Adicionar casos de categoria desconhecida e eventos sem local.
-- Introduzir fixtures JSON de eventos sintéticos (planejado) para validação unitária de normalização.
+ - Introduzir fixtures JSON de eventos sintéticos (planejado) para validação unitária de normalização.
+
+## Matriz de Cenários — Status
+- [x] Datas/horas 24h — ref: `tests/unit/sources/tomada_tempo/test_parse_calendar_page_fixtures.py`
+- [x] AM/PM — ref: `tests/unit/sources/tomada_tempo/test_parse_calendar_page_fixtures.py`
+- [x] Sem minutos — ref: `tests/unit/sources/tomada_tempo/test_parse_calendar_page_fixtures.py`
+- [x] Overnight — ref: `tests/unit/sources/tomada_tempo/test_parse_calendar_page_fixtures.py`
+- [x] Categoria fallback `Unknown` — ref: `tests/unit/sources/tomada_tempo/test_parse_calendar_page_fixtures.py`
+- [ ] Eventos sem local — ToDo (adicionar casos e asserts)
+- [ ] Locais/circuitos com e sem país — ToDo (adicionar matriz/fixtures)
+- [ ] Naive vs Aware (TZ `America/Sao_Paulo`) — movido para Fase 1.1
+- [ ] Itens iCal (PRODID, DTSTART/DTEND TZ, URL, CATEGORIES, RRULE) — cobrir na Fase 2
 
 ## Rastreamento
-- Status: documentos e fixtures mínimos criados.
-- Sincronizar checklists em `docs/TEST_AUTOMATION_PLAN.md` e `docs/issues/closed/issue-50.md`.
- - Sincronizado com Issue #72 e PR #77 (docs/tests) em 2025-08-12T23:26:51-03:00.
+ - Status: documentos e fixtures mínimos criados.
+ - Sincronizar checklists em `docs/TEST_AUTOMATION_PLAN.md` e `docs/issues/closed/issue-50.md`.
+  - Sincronizado com Issue #72 e PR #77 (docs/tests) em 2025-08-12T23:26:51-03:00.
