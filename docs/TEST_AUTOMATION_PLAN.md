@@ -20,23 +20,31 @@ Estabelecer uma estratégia simples e efetiva para implementar e evoluir testes 
 - Código: `src/motorsport_calendar/` e `sources/`
 - Testes: `tests/` (existente, amplo)
 - Artefatos: `test_results/`, `junit.xml`, `htmlcov/` (gerados)
-- CI: `.github/workflows/` (atualmente sem workflow de testes)
+- CI: `.github/workflows/tests.yml` (workflow de testes ativo: pytest + cobertura; artefatos junit/coverage/html)
 
 ## Diretrizes de Documentação e Rastreamento
 Objetivo: Garantir documentação padrão, simples e completa para explicar a estratégia de testes e permitir rastreabilidade fina das atividades, conforme `.windsurf/rules/tester.md` e políticas do projeto.
 
 ## Checklist — Documentação Padrão
-- [ ] Criar/atualizar visão geral de testes em `docs/tests/overview.md` (estratégia, escopo, como rodar local/CI, estrutura de pastas)
+- [x] Criar/atualizar visão geral de testes em `docs/tests/overview.md` (estratégia, escopo, como rodar local/CI, estrutura de pastas)
 - [x] Criar índice de cenários em `docs/tests/scenarios/SCENARIOS_INDEX.md` (links para cenários por fase)
-- [ ] Criar/atualizar mapeamento de cenários por fase:
-  - [ ] `docs/tests/scenarios/phase0_scenarios.md` (inventário e decisões de limpeza)
-  - [ ] `docs/tests/scenarios/phase1_scenarios.md` (parsers/validação/utils)
-  - [ ] `docs/tests/scenarios/phase2_scenarios.md` (fluxos de integração e iCal)
+- [x] Criar/atualizar mapeamento de cenários por fase:
+  - [x] `docs/tests/scenarios/phase0_scenarios.md` (inventário e decisões de limpeza)
+  - [x] `docs/tests/scenarios/phase1_scenarios.md` (parsers/validação/utils)
+  - [x] `docs/tests/scenarios/phase2_scenarios.md` (fluxos de integração e iCal)
 - [ ] Atualizar documentações obrigatórias a cada mudança testada:
   - [x] `CHANGELOG.md`, `RELEASES.md`, `docs/TEST_AUTOMATION_PLAN.md` (atualizados em 2025-08-09 após patch 0.5.2)
-- [ ] Processo de tracking
-  - [ ] Toda descoberta/melhoria gera itens no plano em formato checklist, e issues quando aplicável (via GH)
-  - [ ] Registrar no(s) arquivo(s) de cenários o status (ToDo/Doing/Done) e referência a PRs/Issues
+- [x] Processo de tracking
+  - [x] Toda descoberta/melhoria gera itens no plano em formato checklist, e issues quando aplicável (via GH)
+  - [x] Registrar no(s) arquivo(s) de cenários o status (ToDo/Doing/Done) e referência a PRs/Issues
+
+### Progresso — Issue #72
+- Branch: `chore/issue-72-docs-tests`
+- PR (draft): #77
+- Criados/Atualizados: overview; SCENARIOS_INDEX; scenarios de Fase 0, 1 e 2
+- Matrizes de cenários adicionadas: Fase 0 e Fase 1 (ToDo/Doing/Done com refs a testes/PRs)
+- Rastreabilidade sincronizada: `docs/issues/open/issue-72.{md,json}` e este plano
+ - CI: criado `./github/workflows/tests.yml` (Ubuntu, Python 3.11, cache pip, relatórios e artefatos); documentação atualizada em `README.md`, `tests/README.md`, `CHANGELOG.md`, `RELEASES.md`
 
 # Fase 0 — Limpeza do Repositório
 Objetivo: Remover legados e padronizar a base de testes antes de iniciar as fases seguintes, seguindo a simplicidade descrita em `.windsurf/rules/tester.md`.

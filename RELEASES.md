@@ -17,6 +17,13 @@ Manutenção — Testes/Automação (issue #48, PR #55)
   - `CHANGELOG.md` — registro em “Não Lançado”.
   - Suíte estável: `79 passed`; cobertura total: 37.00%
 
+- CI — Workflow de testes (Issue #72, PR #77 — draft)
+  - Adicionado `.github/workflows/tests.yml` para execução de `pytest` com cobertura no CI (Ubuntu, Python 3.11)
+  - Cache de pip por hash de `requirements*.txt`
+  - Relatórios: `junit.xml`, `coverage.xml`, `htmlcov/` enviados como artefatos
+  - Concurrency com `cancel-in-progress`
+  - Documentação atualizada: `README.md`, `tests/README.md`, `CHANGELOG.md`
+
 - Fase 1.1 — Checklist reorganizada por issues (#59–#64) com sincronismo automático entre plano (`docs/TEST_AUTOMATION_PLAN.md`) e issues (docs/issues/open/issue-<n>.{md,json}); rastreabilidade 58–64 adicionada.
 
 Issue #61 (PR #68 — draft)

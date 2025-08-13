@@ -107,6 +107,16 @@ Relatórios são gerados em:
 - Cobertura HTML: `htmlcov/`
 - Cobertura XML: `coverage.xml`
 
+### Integração Contínua (CI)
+
+O projeto executa a suíte de testes no GitHub Actions via workflow em `.github/workflows/tests.yml`:
+
+- Ambiente: `ubuntu-latest`, Python 3.11
+- Instalação: `requirements.txt` (+ `requirements-dev.txt` se existir)
+- Execução: `pytest` com cobertura em `src/` e `sources/`
+- Relatórios: `junit.xml`, `coverage.xml`, `htmlcov/` (enviados como artefatos)
+- Cache de pip habilitado por hash dos arquivos `requirements*.txt`
+
 ## Mocks e Isolamento
 
 - Timezone: fixture autouse define `America/Sao_Paulo` (em `tests/conftest.py`).

@@ -56,6 +56,16 @@ e este projeto adere ao [Versionamento Semântico](https://semver.org/spec/v2.0.
    - Limpeza: remoção do índice de artefatos gerados (`.pytest_cache/`, `test_results/`, `test_results_github/`, `pytest.log`, `junit.xml`, `report.html`)
    - Documentados cenários em `docs/tests/scenarios/phase0_scenarios.md`
    - Scripts adicionados: `scripts/tests_phase0_inventory.sh`, `scripts/tests_phase0_move_outside_tests.sh`, `scripts/tests_phase0_cleanup.sh`
+  - Issue #72 — Documentação de Testes (PR #77 — draft)
+    - Criados/atualizados:
+      - `docs/tests/overview.md`
+      - `docs/tests/scenarios/SCENARIOS_INDEX.md`
+      - `docs/tests/scenarios/phase0_scenarios.md`
+      - `docs/tests/scenarios/phase1_scenarios.md`
+      - `docs/tests/scenarios/phase2_scenarios.md`
+    - Matrizes de cenários adicionadas: Fase 0 e Fase 1 (ToDo/Doing/Done com referências a testes/PRs)
+    - Rastreabilidade sincronizada: `docs/issues/open/issue-72.{md,json}` e `docs/TEST_AUTOMATION_PLAN.md`
+    - CI — Workflow de testes criado em `.github/workflows/tests.yml` (Ubuntu, Python 3.11, cache de pip, pytest com cobertura em `src/` e `sources/`, relatórios `junit.xml`/`coverage.xml`/`htmlcov/`, upload de artefatos, concurrency/cancel-in-progress). Documentação atualizada em `README.md`, `tests/README.md` e `RELEASES.md`. Refs: Issue #72, PR #77.
 
   - Issue #61 (PR #68 — draft): cobertura de `src/event_processor.py`
     - Cobertura do arquivo: **83%** (meta ≥60% atingida)

@@ -9,14 +9,14 @@
   "created_at": "2025-08-12T01:14:20Z",
   "updated_at": "2025-08-12T01:14:20Z",
   "tasks": [
-    {"item": "Criar/atualizar visão geral de testes em docs/tests/overview.md (estratégia, escopo, como rodar local/CI, estrutura de pastas)", "done": false},
+    {"item": "Criar/atualizar visão geral de testes em docs/tests/overview.md (estratégia, escopo, como rodar local/CI, estrutura de pastas)", "done": true},
     {"item": "Criar índice de cenários em docs/tests/scenarios/SCENARIOS_INDEX.md (links para cenários por fase)", "done": true},
-    {"item": "Criar/atualizar mapeamento de cenários por fase: phase0_scenarios.md", "done": false},
-    {"item": "Criar/atualizar mapeamento de cenários por fase: phase1_scenarios.md", "done": false},
-    {"item": "Criar/atualizar mapeamento de cenários por fase: phase2_scenarios.md", "done": false},
+    {"item": "Criar/atualizar mapeamento de cenários por fase: phase0_scenarios.md", "done": true},
+    {"item": "Criar/atualizar mapeamento de cenários por fase: phase1_scenarios.md", "done": true},
+    {"item": "Criar/atualizar mapeamento de cenários por fase: phase2_scenarios.md", "done": true},
     {"item": "Atualizar documentações obrigatórias a cada mudança testada (CHANGELOG.md, RELEASES.md, docs/TEST_AUTOMATION_PLAN.md)", "done": false},
-    {"item": "Processo de tracking: gerar itens de plano (checklists) e issues quando aplicável (via GH)", "done": false},
-    {"item": "Processo de tracking: registrar nos arquivos de cenários status (ToDo/Doing/Done) e referência a PRs/Issues", "done": false}
+    {"item": "Processo de tracking: gerar itens de plano (checklists) e issues quando aplicável (via GH)", "done": true},
+    {"item": "Processo de tracking: registrar nos arquivos de cenários status (ToDo/Doing/Done) e referência a PRs/Issues", "done": true}
   ],
   "acceptance": [
     "Documentação padrão criada/atualizada conforme checklist",
