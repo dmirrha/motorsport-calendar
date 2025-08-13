@@ -57,6 +57,16 @@ e este projeto adere ao [Versionamento Semântico](https://semver.org/spec/v2.0.
    - Documentados cenários em `docs/tests/scenarios/phase0_scenarios.md`
    - Scripts adicionados: `scripts/tests_phase0_inventory.sh`, `scripts/tests_phase0_move_outside_tests.sh`, `scripts/tests_phase0_cleanup.sh`
 
+  - Issue #72 — Documentação de Testes (PR #77 — draft)
+    - Criados/atualizados:
+      - `docs/tests/overview.md`
+      - `docs/tests/scenarios/SCENARIOS_INDEX.md`
+      - `docs/tests/scenarios/phase0_scenarios.md`
+      - `docs/tests/scenarios/phase1_scenarios.md`
+      - `docs/tests/scenarios/phase2_scenarios.md`
+    - Matrizes de cenários adicionadas: Fase 0 e Fase 1 (ToDo/Doing/Done com referências a testes/PRs)
+    - Rastreabilidade sincronizada: `docs/issues/open/issue-72.{md,json}` e `docs/TEST_AUTOMATION_PLAN.md`
+
   - Issue #61 (PR #68 — draft): cobertura de `src/event_processor.py`
     - Cobertura do arquivo: **83%** (meta ≥60% atingida)
     - Novos testes unitários:
