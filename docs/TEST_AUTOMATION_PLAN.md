@@ -309,7 +309,10 @@ Objetivo: Validar fluxos entre componentes (coleta → processamento → iCal), 
   - [x] Link do épico: https://github.com/dmirrha/motorsport-calendar/issues/78
   - [x] Sincronismo de documentos: `README.md`, `docs/TEST_AUTOMATION_PLAN.md`, `CHANGELOG.md`, `RELEASES.md`
   - [x] PR de governança: #87 (https://github.com/dmirrha/motorsport-calendar/pull/87)
-  - [ ] Adicionar itens derivados como checklist nesta seção do plano
+  - [x] Adicionar itens derivados como checklist nesta seção do plano
+    - [x] `tests/README.md`: comandos `pytest -m integration` e referências a cenários Fase 2 e PR #87
+    - [x] `docs/tests/scenarios/phase2_scenarios.md`: referências ao épico #78 e PR #87
+    - [x] `docs/tests/overview.md`: referência à execução de integração e ao PR #87
   - [ ] Automação CI (final da Fase 2)
    - [ ] GitHub Actions: workflow para unit/integration com `pytest` + `pytest-cov`
    - [ ] Upload de artefatos (HTML/ XML) e envio ao Codecov
