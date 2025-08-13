@@ -1,0 +1,22 @@
+{
+  "id": 3318324966,
+  "number": 83,
+  "state": "open",
+  "title": "Fase 2 — Documentação e Rastreabilidade",
+  "milestone": null,
+  "epic": 78,
+  "url": "https://github.com/dmirrha/motorsport-calendar/issues/83",
+  "created_at": "2025-08-13T12:44:07Z",
+  "updated_at": "2025-08-13T12:44:07Z",
+  "tasks": [
+    {"item": "Atualizar docs/TEST_AUTOMATION_PLAN.md (Fase 2)", "done": false},
+    {"item": "Atualizar tests/README.md (-m integration)", "done": false},
+    {"item": "Atualizar docs/tests/scenarios/phase2_scenarios.md + SCENARIOS_INDEX.md", "done": false},
+    {"item": "CHANGELOG.md e RELEASES.md (entrada Fase 2)", "done": false}
+  ],
+  "acceptance": [
+    "Arquivos obrigatórios sincronizados",
+    "Referências cruzadas entre issues/PRs e docs",
+    "Checklist validado"
+  ]
+}

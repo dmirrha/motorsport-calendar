@@ -1,0 +1,22 @@
+{
+  "id": 3318324894,
+  "number": 82,
+  "state": "open",
+  "title": "Fase 2 — E2E Caminho Feliz com Snapshots ICS",
+  "milestone": null,
+  "epic": 78,
+  "url": "https://github.com/dmirrha/motorsport-calendar/issues/82",
+  "created_at": "2025-08-13T12:44:05Z",
+  "updated_at": "2025-08-13T12:44:05Z",
+  "tasks": [
+    {"item": "Teste E2E: coleta (mock) → processamento → geração de .ics", "done": false},
+    {"item": "Função de normalização de ICS (remover/estabilizar campos voláteis)", "done": false},
+    {"item": "Snapshot test: comparar saída atual com tests/snapshots/phase2/*.ics", "done": false},
+    {"item": "Registrar tempo de execução em log de teste", "done": false}
+  ],
+  "acceptance": [
+    "3× local sem flakes (<30s)",
+    "Snapshots estáveis e revisados",
+    "Cobertura do caminho feliz reportada no CI"
+  ]
+}

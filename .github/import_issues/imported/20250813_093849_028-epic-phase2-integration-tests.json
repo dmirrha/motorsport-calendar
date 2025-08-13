@@ -1,0 +1,12 @@
+{
+  "title": "Épico: Fase 2 — Testes Integrados e Validação de ICS",
+  "body": "028-epic-phase2-integration-tests.md",
+  "labels": ["testes"],
+  "assignees": [],
+  "milestone": null,
+  "metadata": {
+    "type": "epic",
+    "area": ["tests", "ci"],
+    "priority": "high"
+  }
+}

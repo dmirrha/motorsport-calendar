@@ -21,6 +21,7 @@ import json
 import shutil
 import base64
 import getpass
+import subprocess
 from pathlib import Path
 from datetime import datetime
 from cryptography.fernet import Fernet
@@ -74,20 +75,52 @@ def load_token(password: str) -> str:
         print(f"Erro ao carregar o token: {e}")
         return None
 
-def get_github_client():
-    """Inicializa e retorna o cliente da API do GitHub."""
-    # Tenta carregar da variável de ambiente primeiro
+def _keychain_service_name(owner: str, repo_name: str) -> str:
+    """Nome do serviço no Keychain para este repositório."""
+    return f"motorsport_calendar_github_token:{owner}/{repo_name}"
+
+def _read_keychain_token(service_name: str, account: str | None = None) -> str | None:
+    """Lê um token do macOS Keychain via 'security find-generic-password'."""
+    try:
+        cmd = ["security", "find-generic-password", "-s", service_name, "-w"]
+        if account:
+            cmd = ["security", "find-generic-password", "-a", account, "-s", service_name, "-w"]
+        result = subprocess.run(cmd, capture_output=True, text=True, check=True)
+        token = result.stdout.strip()
+        return token if token else None
+    except Exception:
+        return None
+
+def get_github_client(owner: str, repo_name: str):
+    """Inicializa e retorna o cliente da API do GitHub com prioridade:
+    1) Variável de ambiente GITHUB_TOKEN
+    2) macOS Keychain (serviço específico do repositório)
+    3) Cofre criptografado local (~/.config/github_importer/config.enc)
+    4) Token informado interativamente
+    """
+    # 1) Variável de ambiente
     token = os.getenv('GITHUB_TOKEN')
     if token:
         return Github(token)
-    
-    # Tenta carregar do arquivo de configuração
+
+    # 2) Keychain (serviço específico por repo)
+    service = _keychain_service_name(owner, repo_name)
+    account = os.getenv('USER') or None
+    token = _read_keychain_token(service, account=account)
+    if token:
+        return Github(token)
+
+    # 3) Cofre criptografado local
     print("Autenticação necessária para acessar a API do GitHub")
-    password = getpass.getpass("Digite sua senha de criptografia: ")
-    token = load_token(password)
-    
+    try:
+        password = getpass.getpass("Digite sua senha de criptografia: ")
+        token = load_token(password)
+    except Exception:
+        token = None
+
+    # 4) Interativo (fallback)
     if not token:
-        print("\nToken não encontrado ou senha incorreta.")
+        print("\nToken não encontrado no Keychain nem no cofre.")
         print("Por favor, forneça um token de acesso pessoal do GitHub com permissão 'repo'.")
         token = getpass.getpass("Token: ")
         save = input("Deseja salvar este token para uso futuro? (s/N): ").strip().lower()
@@ -95,7 +128,7 @@ def get_github_client():
             password_confirm = getpass.getpass("Crie uma senha para criptografar o token: ")
             save_token(token, password_confirm)
             print("Token salvo com sucesso!")
-    
+
     return Github(token)
 
 def parse_repo_identifier(identifier):
@@ -124,7 +157,7 @@ def import_issue(repo, issue_file):
                 with open(md_file, 'r', encoding='utf-8') as f:
                     body_content = f.read()
             else:
-                print(f"⚠️ Arquivo markdown não encontrado: {md_file}")
+                print(f" Arquivo markdown não encontrado: {md_file}")
         
         # Cria a issue no GitHub
         issue = repo.create_issue(
@@ -134,17 +167,17 @@ def import_issue(repo, issue_file):
             assignees=issue_data.get('assignees', [])
         )
         
-        print(f"✅ Issue criada com sucesso: {issue.html_url}")
+        print(f" Issue criada com sucesso: {issue.html_url}")
         return True
         
     except json.JSONDecodeError as e:
-        print(f"❌ Erro ao ler o arquivo JSON {issue_file}: {e}")
+        print(f" Erro ao ler o arquivo JSON {issue_file}: {e}")
         return False
     except GithubException as e:
-        print(f"❌ Erro ao criar issue no GitHub: {e.data.get('message', str(e))}")
+        print(f" Erro ao criar issue no GitHub: {e.data.get('message', str(e))}")
         return False
     except Exception as e:
-        print(f"❌ Erro inesperado ao processar {issue_file}: {str(e)}")
+        print(f" Erro inesperado ao processar {issue_file}: {str(e)}")
         return False
 
 def move_to_imported(issue_file):
@@ -172,7 +205,7 @@ def move_to_imported(issue_file):
             
         return True
     except Exception as e:
-        print(f"❌ Erro ao mover o(s) arquivo(s) {issue_file}: {str(e)}")
+        print(f" Erro ao mover o(s) arquivo(s) {issue_file}: {str(e)}")
         return False
 
 def main():
@@ -184,8 +217,8 @@ def main():
     repo_identifier = sys.argv[1]
     owner, repo_name = parse_repo_identifier(repo_identifier)
     
-    # Inicializa cliente do GitHub
-    g = get_github_client()
+    # Inicializa cliente do GitHub (usa Keychain específico por repositório, se disponível)
+    g = get_github_client(owner, repo_name)
     
     try:
         repo = g.get_repo(f"{owner}/{repo_name}")

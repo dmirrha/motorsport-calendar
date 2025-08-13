@@ -1,0 +1,22 @@
+{
+  "id": 3318325047,
+  "number": 84,
+  "state": "open",
+  "title": "Fase 2 — Deduplicação, Ordenação e Consistência",
+  "milestone": null,
+  "epic": 78,
+  "url": "https://github.com/dmirrha/motorsport-calendar/issues/84",
+  "created_at": "2025-08-13T12:44:08Z",
+  "updated_at": "2025-08-13T12:44:08Z",
+  "tasks": [
+    {"item": "Testar dedupe por chave de negócio (ex.: data + título + local)", "done": false},
+    {"item": "Ordenação cronológica consistente", "done": false},
+    {"item": "Consistência de timezone entre eventos", "done": false},
+    {"item": "Verificações de contagem e campos obrigatórios", "done": false}
+  ],
+  "acceptance": [
+    "Regras passam 3× local",
+    "Cobertura acrescentada nos relatórios do CI",
+    "Casos documentados em phase2_scenarios.md"
+  ]
+}

@@ -1,0 +1,22 @@
+{
+  "id": 3318324671,
+  "number": 79,
+  "state": "open",
+  "title": "Fase 2 — Mocks/Fakes de Coleta e Controle de Tempo",
+  "milestone": null,
+  "epic": 78,
+  "url": "https://github.com/dmirrha/motorsport-calendar/issues/79",
+  "created_at": "2025-08-13T12:44:01Z",
+  "updated_at": "2025-08-13T12:44:01Z",
+  "tasks": [
+    {"item": "Fake de coleta (HTTP → dados locais)", "done": false},
+    {"item": "Controle de tempo (freezegun/wrapper)", "done": false},
+    {"item": "Estabilizar aleatoriedade/UID", "done": false},
+    {"item": "Documentar uso nas fixtures/utilitários", "done": false}
+  ],
+  "acceptance": [
+    "Sem acesso a rede/FS externo",
+    "Execução determinística 3× local",
+    "Documentação em tests/README.md"
+  ]
+}
