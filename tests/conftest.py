@@ -135,3 +135,107 @@ def patch_requests_session(monkeypatch):
         return sess
 
     return _apply
+
+
+@pytest.fixture
+def freeze_datetime(monkeypatch):
+    """Congela ``datetime.now()/today()`` em módulos-chave do projeto.
+
+    Por padrão, aplica o patch em:
+    - ``src.logger.datetime``
+    - ``src.event_processor.datetime``
+    - ``src.utils.payload_manager.datetime``
+    - ``src.ical_generator.datetime``
+    - ``src.data_collector.datetime``
+    - ``motorsport_calendar.datetime``
+    - ``sources.base_source.datetime``
+    - ``sources.tomada_tempo.datetime``
+
+    Exemplo:
+        def test_something(freeze_datetime):
+            from datetime import datetime as _dt
+            freeze_datetime(dt=_dt(2024, 1, 1, 12, 0, 0))
+            # chamadas a datetime.now() nos módulos acima retornarão 2024-01-01 12:00:00
+
+    É possível customizar os alvos via parâmetro ``targets=[...]``.
+    """
+
+    def _freeze(*, targets=None, dt=None):
+        from datetime import datetime as _dt
+
+        fixed_dt = dt or _dt(2000, 1, 1, 0, 0, 0)
+
+        class _FrozenDateTime(_dt):
+            @classmethod
+            def now(cls, tz=None):
+                d = fixed_dt
+                if tz is not None:
+                    try:
+                        # Se o fixed_dt tiver tz, respeita e converte
+                        if d.tzinfo is not None:
+                            return d.astimezone(tz)
+                        # Caso contrário, tenta usar API de timezone (ex.: pytz)
+                        if hasattr(tz, "localize"):
+                            return tz.localize(d)
+                        return d.replace(tzinfo=tz)
+                    except Exception:
+                        return d
+                return d
+
+            @classmethod
+            def today(cls):
+                return cls.now()
+
+        default_targets = [
+            "src.logger.datetime",
+            "src.event_processor.datetime",
+            "src.utils.payload_manager.datetime",
+            "src.ical_generator.datetime",
+            "src.data_collector.datetime",
+            "motorsport_calendar.datetime",
+            "sources.base_source.datetime",
+            "sources.tomada_tempo.datetime",
+        ]
+
+        for t in (targets or default_targets):
+            monkeypatch.setattr(t, _FrozenDateTime, raising=False)
+
+        return fixed_dt
+
+    return _freeze
+
+
+@pytest.fixture
+def fixed_uuid(monkeypatch):
+    """Torna ``uuid.uuid4()`` determinístico.
+
+    Por padrão, retorna sempre ``00000000-0000-0000-0000-000000000000``.
+    É possível fornecer uma sequência customizada via ``sequence=[UUID(...), ...]``.
+
+    Exemplo:
+        def test_uuids(fixed_uuid):
+            import uuid
+            fixed_uuid()  # aplica padrão
+            assert str(uuid.uuid4()) == "00000000-0000-0000-0000-000000000000"
+    """
+
+    def _apply(sequence=None):
+        import uuid as _uuid
+
+        default_seq = [
+            _uuid.UUID("00000000-0000-0000-0000-000000000000"),
+        ]
+        seq = sequence or default_seq
+        iterator = iter(seq)
+
+        def _next_uuid():
+            try:
+                return next(iterator)
+            except StopIteration:
+                # Repete o último elemento para evitar StopIteration em chamadas extras
+                return seq[-1]
+
+        monkeypatch.setattr("uuid.uuid4", lambda: _next_uuid())
+        return seq
+
+    return _apply
