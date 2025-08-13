@@ -252,6 +252,14 @@ A suíte utiliza Pytest com cobertura via pytest-cov. O gate de cobertura global
   - Variáveis de ambiente com `monkeypatch.setenv`/`delenv`
 - Como rodar: consulte `tests/README.md` para comandos, estrutura e exemplos.
 
+### Fase 2 — Testes Integrados (Governança)
+
+- Épico: #78 — Testes Integrados e Validação de ICS
+- Sub-issues: #79–#86
+- Documentação sincronizada: `docs/TEST_AUTOMATION_PLAN.md`, `CHANGELOG.md`, `RELEASES.md`
+- Rastreabilidade: `docs/issues/open/issue-{78..86}.{md,json}`
+ - PR: #87 (https://github.com/dmirrha/motorsport-calendar/pull/87)
+
 Comandos rápidos (local):
 
 ```bash

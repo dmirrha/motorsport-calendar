@@ -31,6 +31,7 @@ Este diretório contém a suíte de testes do projeto. A descoberta de testes é
 - Execução rápida:
   - `pytest -q`
   - `pytest -m unit -q`
+  - `pytest -m integration -q` (testes de integração)
   
 - Com cobertura:
   - `pytest --cov=src --cov=sources \
@@ -51,7 +52,12 @@ Este diretório contém a suíte de testes do projeto. A descoberta de testes é
   # Foco em módulos críticos
   pytest -q tests/unit/utils/test_payload_manager*.py
   pytest -q tests/unit/ical/test_ical_generator*.py
-  
+
+  # Integração apenas (marcados com @pytest.mark.integration)
+  pytest -m integration -q
+  # Exemplos de filtros:
+  pytest -m "integration and not slow" -q
+
   # Checagem de estabilidade (zero flakes)
   for i in 1 2 3; do pytest -q; done
   ```
@@ -155,6 +161,12 @@ def test_timeout_session(patch_requests_session):
 - Cenários de rede:
   - `tests/unit/sources/base_source/test_make_request.py` (sucesso/timeout/HTTPError)
   - `tests/unit/sources/tomada_tempo/test_parse_calendar_page.py` (HTML válido/malformado)
+
+### Integração — Referências
+
+- Cenários Fase 2: `docs/tests/scenarios/phase2_scenarios.md`
+- Índice de cenários: `docs/tests/scenarios/SCENARIOS_INDEX.md`
+- Governança Fase 2: PR #87 (https://github.com/dmirrha/motorsport-calendar/pull/87) — épico #78
 
 ## Diretrizes
 

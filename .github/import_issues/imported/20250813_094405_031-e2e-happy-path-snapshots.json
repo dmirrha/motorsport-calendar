@@ -1,0 +1,8 @@
+{
+  "title": "Fase 2 — E2E Caminho Feliz com Snapshots ICS",
+  "body": "031-e2e-happy-path-snapshots.md",
+  "labels": ["testes"],
+  "assignees": [],
+  "milestone": null,
+  "metadata": {"type": "task", "parent_epic": "TBD"}
+}

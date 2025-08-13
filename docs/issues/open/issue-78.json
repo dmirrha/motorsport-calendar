@@ -1,0 +1,24 @@
+{
+  "id": 3318307993,
+  "number": 78,
+  "state": "open",
+  "title": "Épico: Fase 2 — Testes Integrados e Validação de ICS",
+  "milestone": null,
+  "epic": null,
+  "url": "https://github.com/dmirrha/motorsport-calendar/issues/78",
+  "created_at": "2025-08-13T12:38:49Z",
+  "updated_at": "2025-08-13T12:38:49Z",
+  "sub_issues": [85, 79, 86, 82, 80, 84, 81, 83],
+  "sequence": [85, 79, 86, 82, 80, 84, 81, 83],
+  "tasks": [
+    {"item": "Vincular sub-issues ao épico no GitHub", "done": true},
+    {"item": "Adicionar checklist das sub-issues no corpo do épico", "done": true},
+    {"item": "Criar docs/issues/open/issue-78..86.{md,json}", "done": false}
+  ],
+  "acceptance": [
+    "Suíte integration estável (3×, <30s)",
+    "Snapshots ICS determinísticos",
+    "Job CI dedicado com artefatos",
+    "Documentação sincronizada (CHANGELOG, RELEASES, TEST_AUTOMATION_PLAN, tests/README.md, docs/tests/scenarios)"
+  ]
+}

@@ -1,0 +1,8 @@
+{
+  "title": "Fase 2 — Mocks/Fakes de Coleta e Controle de Tempo",
+  "body": "034-mocks-fakes-network-time.md",
+  "labels": ["testes"],
+  "assignees": [],
+  "milestone": null,
+  "metadata": {"type": "task", "parent_epic": "TBD"}
+}

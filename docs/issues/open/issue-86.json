@@ -1,0 +1,22 @@
+{
+  "id": 3318325213,
+  "number": 86,
+  "state": "open",
+  "title": "Fase 2 — Fixtures e Cenários Integrados (HTML/JSON/ICS)",
+  "milestone": null,
+  "epic": 78,
+  "url": "https://github.com/dmirrha/motorsport-calendar/issues/86",
+  "created_at": "2025-08-13T12:44:11Z",
+  "updated_at": "2025-08-13T12:44:11Z",
+  "tasks": [
+    {"item": "tests/fixtures/integration/ com HTML/JSON mínimos e claros", "done": false},
+    {"item": "tests/snapshots/phase2/ para snapshots .ics", "done": false},
+    {"item": "Fixture utilitária para carregar cenário + normalizar ICS", "done": false},
+    {"item": "Documentar convenções de nomes e estrutura", "done": false}
+  ],
+  "acceptance": [
+    "Fixtures reutilizáveis e pequenas",
+    "Normalização cobre campos voláteis (ex.: DTSTAMP, UID)",
+    "Documentação em tests/README.md e docs/tests/scenarios/phase2_scenarios.md"
+  ]
+}

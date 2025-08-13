@@ -18,6 +18,7 @@ Objetivo: descrever a estratégia mínima de testes para o projeto, com foco em 
   - `pytest -q`
   - Relatório de cobertura com linhas faltantes: `pytest --cov --cov-report=term-missing`
   - Sem falha por cobertura: `pytest --cov --cov-fail-under=0`
+  - Integração: `pytest -m integration -q`
 - CI: segue configuração padrão do repositório (GitHub Actions) e critérios do épico/issue.
 
 ## Estrutura de pastas
@@ -27,3 +28,6 @@ Objetivo: descrever a estratégia mínima de testes para o projeto, com foco em 
 
 ## Cenários
 - Índice de cenários por fase: `docs/tests/scenarios/SCENARIOS_INDEX.md`
+
+## Referências
+- Governança Fase 2: PR #87 (https://github.com/dmirrha/motorsport-calendar/pull/87) — épico #78

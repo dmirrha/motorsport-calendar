@@ -1,0 +1,8 @@
+{
+  "title": "Fase 2 — Deduplicação, Ordenação e Consistência",
+  "body": "033-dedup-sort-consistency.md",
+  "labels": ["testes"],
+  "assignees": [],
+  "milestone": null,
+  "metadata": {"type": "task", "parent_epic": "TBD"}
+}

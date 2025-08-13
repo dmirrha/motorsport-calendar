@@ -19,3 +19,6 @@ Objetivo: mapear cenários integrados cobrindo fluxo coleta → processamento �
 - Overview: `docs/tests/overview.md`
 - Índice: `docs/tests/scenarios/SCENARIOS_INDEX.md`
 - Issue: #72
+
+- Épico: #78 — Testes Integrados e Validação de ICS
+- PR de governança: #87 (https://github.com/dmirrha/motorsport-calendar/pull/87)

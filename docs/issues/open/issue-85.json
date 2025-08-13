@@ -1,0 +1,22 @@
+{
+  "id": 3318325136,
+  "number": 85,
+  "state": "open",
+  "title": "Fase 2 — Infra de Testes de Integração e Markers",
+  "milestone": null,
+  "epic": 78,
+  "url": "https://github.com/dmirrha/motorsport-calendar/issues/85",
+  "created_at": "2025-08-13T12:44:10Z",
+  "updated_at": "2025-08-13T12:44:10Z",
+  "tasks": [
+    {"item": "Criar tests/integration/ e tests/integration/__init__.py", "done": false},
+    {"item": "Definir marker integration em pytest.ini", "done": false},
+    {"item": "Adicionar seleção -m \"integration\" na documentação (tests/README.md)", "done": false},
+    {"item": "Teste de fumaça em tests/integration/test_smoke.py", "done": false}
+  ],
+  "acceptance": [
+    "pytest -m integration executa e passa localmente (<30s)",
+    "CI reconhece o marker",
+    "Documentação atualizada"
+  ]
+}

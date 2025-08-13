@@ -1,0 +1,22 @@
+{
+  "id": 3318324730,
+  "number": 80,
+  "state": "open",
+  "title": "Fase 2 — Edge Cases: Overnight, Fusos Múltiplos e Campos Opcionais",
+  "milestone": null,
+  "epic": 78,
+  "url": "https://github.com/dmirrha/motorsport-calendar/issues/80",
+  "created_at": "2025-08-13T12:44:02Z",
+  "updated_at": "2025-08-13T12:44:02Z",
+  "tasks": [
+    {"item": "Overnight: evento cruzando dia (DTSTART/DTEND corretos)", "done": false},
+    {"item": "Fusos: validar TZs diferentes e conversões", "done": false},
+    {"item": "Opcionais: ausência de location/description/links sem quebrar ICS", "done": false},
+    {"item": "Asserções específicas por campo (UID, SUMMARY, DTSTART, DTEND, TZID)", "done": false}
+  ],
+  "acceptance": [
+    "Cenários reproduzíveis em tests/fixtures/integration/",
+    "Validações por campo passam 3× local",
+    "Documentação dos casos em docs/tests/scenarios/phase2_scenarios.md"
+  ]
+}

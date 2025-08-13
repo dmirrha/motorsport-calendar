@@ -1,0 +1,8 @@
+{
+  "title": "Fase 2 — CI: Job de Integração, Cobertura e Artefatos",
+  "body": "035-ci-integration-coverage-artifacts.md",
+  "labels": ["testes"],
+  "assignees": [],
+  "milestone": null,
+  "metadata": {"type": "task", "parent_epic": "TBD"}
+}

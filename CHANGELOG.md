@@ -18,6 +18,12 @@ e este projeto adere ao [Versionamento Semântico](https://semver.org/spec/v2.0.
 - CI/Workflow de testes não reintroduzido neste release.
 
 ## [Não Lançado]
+### Governança — Fase 2 (Testes Integrados e Validação de ICS)
+- Épico #78 e sub-issues #79–#86 registrados e vinculados (checklist no épico)
+- Documentação sincronizada: `docs/TEST_AUTOMATION_PLAN.md`, `README.md`, `RELEASES.md`, `CHANGELOG.md`
+- Rastreabilidade criada/atualizada: `docs/issues/open/issue-{78..86}.{md,json}`
+- README — seção "🧪 Testes": adicionada nota de Fase 2 (governança)
+- PR: #87 (https://github.com/dmirrha/motorsport-calendar/pull/87)
 ### Adicionado
 - **Documentação de Configuração**
   - Criado `CONFIGURATION_GUIDE.md` com documentação detalhada de todas as opções de configuração
