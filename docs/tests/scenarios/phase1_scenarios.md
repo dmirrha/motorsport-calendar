@@ -45,3 +45,4 @@ Notas:
 ## Rastreamento
 - Status: documentos e fixtures mínimos criados.
 - Sincronizar checklists em `docs/TEST_AUTOMATION_PLAN.md` e `docs/issues/closed/issue-50.md`.
+ - Sincronizado com Issue #72 e PR #77 (docs/tests) em 2025-08-12T23:26:51-03:00.

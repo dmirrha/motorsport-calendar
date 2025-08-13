@@ -29,8 +29,8 @@ Objetivo: Garantir documentação padrão, simples e completa para explicar a es
 - [x] Criar/atualizar visão geral de testes em `docs/tests/overview.md` (estratégia, escopo, como rodar local/CI, estrutura de pastas)
 - [x] Criar índice de cenários em `docs/tests/scenarios/SCENARIOS_INDEX.md` (links para cenários por fase)
 - [ ] Criar/atualizar mapeamento de cenários por fase:
-  - [ ] `docs/tests/scenarios/phase0_scenarios.md` (inventário e decisões de limpeza)
-  - [ ] `docs/tests/scenarios/phase1_scenarios.md` (parsers/validação/utils)
+  - [x] `docs/tests/scenarios/phase0_scenarios.md` (inventário e decisões de limpeza)
+  - [x] `docs/tests/scenarios/phase1_scenarios.md` (parsers/validação/utils)
   - [x] `docs/tests/scenarios/phase2_scenarios.md` (fluxos de integração e iCal)
 - [ ] Atualizar documentações obrigatórias a cada mudança testada:
   - [x] `CHANGELOG.md`, `RELEASES.md`, `docs/TEST_AUTOMATION_PLAN.md` (atualizados em 2025-08-09 após patch 0.5.2)

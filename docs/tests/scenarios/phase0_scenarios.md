@@ -41,13 +41,16 @@ Observação: `.gitignore` já cobre esses artefatos (linhas: `.pytest_cache/`, 
 ---
 
 ## Itens Derivados (a rastrear na Fase 0)
-- [ ] Mover `./test_issue_3_fixes.py` para `tests/` e adequar nome (padrão `test_*.py`).
-- [ ] Remover artefatos versionados do índice do Git (manter `.gitignore`):
-  - [ ] Remover diretórios: `.pytest_cache/`, `tests/**/test_results/`, `test_results/`, `test_results_github/` (do índice).
-  - [ ] Remover arquivos: `.coverage`, `.coverage.*`, `coverage.xml`, `junit.xml` (e variantes sob `tests/**/test_results/`, `test_results/`).
-  - [ ] Criar `.gitkeep` em `tests/test_results/` e/ou `test_results/` se necessário.
+- [x] Mover `./test_issue_3_fixes.py` para `tests/` e adequar nome (padrão `test_*.py`).
+- [x] Remover artefatos versionados do índice do Git (manter `.gitignore`):
+  - [x] Remover diretórios: `.pytest_cache/`, `tests/**/test_results/`, `test_results/`, `test_results_github/` (do índice).
+  - [x] Remover arquivos: `.coverage`, `.coverage.*`, `coverage.xml`, `junit.xml` (e variantes sob `tests/**/test_results/`, `test_results/`).
+  - [x] Criar `.gitkeep` em `tests/test_results/` e/ou `test_results/` se necessário.
 - [ ] Adicionar workflow de testes (`.github/workflows/tests.yml`) na fase apropriada (ver plano).
 
 Status:
 - Inventário executado via `scripts/tests_phase0_inventory.sh`. Relatório salvo em `test_results/inventory/phase0_inventory_20250809-081647.md`.
 - Aguardando execução da limpeza e movimentação conforme checklist da Fase 0.
+
+Rastreamento:
+- Sincronizado com Issue #72 e PR #77 (docs/tests) em 2025-08-12T23:26:51-03:00.
