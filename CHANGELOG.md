@@ -90,6 +90,22 @@ e este projeto adere ao [Versionamento Semântico](https://semver.org/spec/v2.0.
       - `detect_categories_batch`: tenta primeiro `raw_category` isolado; só combina com `name` quando necessário.
     - Métricas: módulo `src/category_detector.py` ~96% de cobertura; suíte **258 passed**, cobertura global **67.78%**; estabilidade confirmada **3×** (<30s).
     - Documentação sincronizada: `docs/TEST_AUTOMATION_PLAN.md`, `CHANGELOG.md`, `RELEASES.md`, `docs/issues/open/issue-64.{md,json}`. PR #73 (draft) atualizado.
+
+  - Issue #64 — P3 (ErrorCodes):
+    - Testes adicionados: mapeamentos específicos em `get_error_suggestions`, fallback genérico para códigos desconhecidos e tipos inválidos, e equivalência Enum vs string (`.value`) em `get_error_severity`.
+    - Estabilidade: suíte **267 passed** em 3 execuções consecutivas (<30s em todas).
+    - Cobertura global atual: **68.04%**. Sem regressões.
+    - Documentação sincronizada: `docs/TEST_AUTOMATION_PLAN.md` (P3 marcado como concluído) e `docs/issues/open/issue-64.md` (incremento P3).
+  - Issue #64 — P5 (UIManager):
+    - Testes adicionados: `tests/unit/ui_manager/test_ui_manager_basic.py` e `tests/unit/ui_manager/test_ui_manager_more.py` cobrindo: progressão de etapas (`start_step_progress`/`show_step`), resumos (`show_event_summary`, `show_events_by_category`), mensagens (`show_success_message`, `show_error_message`, `show_warning_message`, `show_step_result`), geração de iCal (`show_ical_generation`) e instruções de importação (`show_import_instructions`).
+    - Estratégia: fakes de console/progresso (sem I/O real), asserts sobre contagem e conteúdo; respeito a flags de UI (cores/ícones/desabilitado).
+    - Métricas: `src/ui_manager.py` **100%**; diretório `ui_manager`: **13 testes**; estabilidade **3×** (<30s).
+    - Versionamento: bump para `0.5.6` em `src/__init__.py`.
+  - Issue #64 — P6 (Logger):
+    - Testes adicionados: `tests/unit/logger/test_logger_basic.py` e `tests/unit/logger/test_logger_misc.py` cobrindo inicialização/configuração (handlers/formatters/níveis), rotação de logs, emissão de níveis (success/error/warning/info/debug), `save_payload` (json/html/text) com exceções, `set_console_level`, `get_logger`, resumo/finalização de execução e helpers de domínio (category detection, remoção de duplicados, weekend, iCal, eventos por fonte) com fallbacks de config.
+    - Estratégia: isolamento total de I/O real (uso de `tmp_path`), monkeypatch para desabilitar limpezas `_cleanup_old_logs` e `_cleanup_rotated_logs`, e handlers custom para capturar registros.
+    - Métricas: módulo `src/logger.py` **83%**; suíte **295 passed**; estabilidade **3×** (<30s) nos testes de logger.
+    - Versionamento: bump para `0.5.8` em `src/__init__.py`.
   - Mocks essenciais (issue #48, PR #55):
     - Fixação de timezone (`America/Sao_Paulo`) e aleatoriedade (`random.seed(0)`)
     - Shims de rede: `sources.tomada_tempo.requests.get` e `sources.base_source.requests.Session`

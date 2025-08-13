@@ -45,8 +45,8 @@ Meta de cobertura derivada (não-fim): atingir ≥ 80% quando a qualidade estive
 ## Progresso
 - [x] Branch criada
 - [x] PR (draft) aberta — PR #73: https://github.com/dmirrha/motorsport-calendar/pull/73
-- [x] Documentação atualizada
- - [x] Releases/Changelog atualizados
+ - [x] Documentação atualizada
+  - [x] Releases/Changelog atualizados
 
 ### Incremento atual: P2 — CategoryDetector (Concluído)
 
@@ -63,28 +63,89 @@ Meta de cobertura derivada (não-fim): atingir ≥ 80% quando a qualidade estive
 - Sincronismo de documentação/PR:
   - Atualizados: `CHANGELOG.md`, `RELEASES.md`, `docs/TEST_AUTOMATION_PLAN.md`, `docs/issues/open/issue-64.{md,json}`
   - PR #73 (draft) atualizado na branch `chore/issue-64-coverage-80`
+
+### Incremento atual: P6 — Logger (Concluído)
+
+- Testes adicionados:
+  - `tests/unit/logger/test_logger_basic.py`
+  - `tests/unit/logger/test_logger_misc.py`
+- Escopo coberto:
+  - Inicialização/configuração (handlers, formatters, níveis por saída), rotação de logs
+  - Emissão de níveis: success/error/warning/info/debug
+  - `save_payload` (json/html/text), incluindo caminhos de exceção
+  - `set_console_level`, `get_logger`, resumo/finalização de execução
+  - Helpers de domínio: category detection, remoção de duplicados, weekend, iCal, eventos por fonte (com fallbacks de config)
+- Estratégia:
+  - Isolamento total de I/O real (uso de `tmp_path`)
+  - Monkeypatch para desabilitar `_cleanup_old_logs` e `_cleanup_rotated_logs`
+  - Handlers custom para capturar registros e assertar conteúdo
+- Métricas:
+  - Módulo `src/logger.py`: **83%**
+  - Suíte: **295 passed**
+  - Cobertura global: **83.35%**
+  - Estabilidade confirmada **3×** (<30s)
+- Sincronismo de documentação/PR:
+  - Atualizados: `CHANGELOG.md`, `RELEASES.md`, `docs/TEST_AUTOMATION_PLAN.md`, `docs/issues/open/issue-64.{md,json}`
+  - Versão: bump para `0.5.8` em `src/__init__.py`
+  - PR #73 (draft) atualizado na branch `chore/issue-64-coverage-80`
 - Próximos passos:
   - P3 — `src/utils/error_codes.py`: cobrir mapeamentos, mensagens de fallback e tipos inválidos.
 
+### Incremento atual: P3 — ErrorCodes (Concluído)
+
+- Testes adicionados:
+  - `tests/unit/utils/test_error_codes.py` cobrindo mapeamentos específicos de `get_error_suggestions`, fallback para códigos desconhecidos e tipos inválidos, e extração de severidade em `get_error_severity` (Enum vs string via `.value`).
+- Métricas:
+  - Suíte: **267 passed**; cobertura global: **68.04%**
+  - Módulo `src/utils/error_codes.py`: > **90%** de cobertura
+  - Estabilidade confirmada **3×** (<30s)
+- Sincronismo de documentação/PR:
+  - Atualizados: `CHANGELOG.md`, `RELEASES.md`, `docs/TEST_AUTOMATION_PLAN.md`, `docs/issues/open/issue-64.{md,json}`
+  - PR #73 (draft) atualizado na branch `chore/issue-64-coverage-80`
+- Próximos passos:
+  - P4 — `src/data_collector.py`: cobrir fluxos críticos mínimos com mocks (sem rede), erros comuns (timeout/404) e validação de dados obrigatórios.
+
+### Incremento atual: P4 — DataCollector (Concluído)
+
+- Testes adicionados (sem rede real):
+  - Fluxos críticos com concorrência (coleta em paralelo) e cancelamento/remoção de fonte.
+  - Estatísticas e estados internos após coletas múltiplas.
+  - Erros comuns: timeout/404 com retry/backoff simulados e asserts de estado.
+- Métricas:
+  - Módulo `src/data_collector.py`: ~**67%**
+  - Suíte: **272–277 passed** (histórico); cobertura global: **~72%**
+  - Estabilidade confirmada **3×** (<30s)
+- Sincronismo de documentação/PR:
+  - Atualizados: `CHANGELOG.md`, `RELEASES.md`, `docs/TEST_AUTOMATION_PLAN.md`
+  - PR #73 (draft) atualizado na branch `chore/issue-64-coverage-80`
+
+### Incremento atual: P5 — UIManager (Concluído)
+
+- Testes adicionados:
+  - `tests/unit/ui_manager/test_ui_manager_basic.py`
+  - `tests/unit/ui_manager/test_ui_manager_more.py`
+- Escopo coberto:
+  - Progressão de etapas (`start_step_progress`/`show_step`), resumos de eventos, agrupamento por categoria.
+  - Mensagens: sucesso, erro, aviso e resultado de etapa.
+  - Geração de iCal e instruções de importação.
+  - Flags de UI: cores/ícones/desabilitado (sem I/O real via fakes de console/progresso).
+- Métricas:
+  - Módulo `src/ui_manager.py`: **100%**
+  - Diretório `ui_manager`: **13 testes**
+  - Estabilidade confirmada **3×** (<30s)
+- Sincronismo de documentação/PR:
+  - Atualizados: `CHANGELOG.md`, `RELEASES.md`, `docs/TEST_AUTOMATION_PLAN.md`
+  - PR #73 (draft) atualizado na branch `chore/issue-64-coverage-80`
+
 ### Prioridades — Módulos abaixo de 80% (12/08/2025)
 
-1) [Concluído] `sources/tomada_tempo.py` — 90% (3× estável)
-   - Foco: `filter_weekend_events`, `_extract_event_from_element`, `_extract_time`.
-   - Casos: datas ISO vs BR (precedência), eventos sem data, AM/PM, overnight, separadores variados, HTML malformado.
-
-2) `src/category_detector.py` — 69%
+1) `src/category_detector.py` — 69%
    - Foco: fallback "Unknown", conflitos de regras, métricas/estatísticas, persistência (save/load).
 
-3) `src/utils/error_codes.py` — 76%
+2) `src/utils/error_codes.py` — 76%
    - Foco: caminhos de erro e mapeamentos pouco exercitados.
 
-4) `src/data_collector.py` — 13%
-   - Foco: fluxos críticos mínimos isolados com mocks (adiar casos pesados).
+3) `src/data_collector.py` — 67%
+  - Foco: fluxos críticos mínimos isolados com mocks (adiar casos pesados).
 
-5) `src/ui_manager.py` — 13%
-   - Foco: comportamento básico sem I/O real.
-
-6) `src/logger.py` — 12%
-   - Foco: ramos de configuração e formatadores mais usados.
-
- - [ ] Cobertura unitária ≥ 80% (meta)
+ - [x] Cobertura unitária ≥ 80% (meta)

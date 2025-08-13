@@ -537,6 +537,11 @@ O projeto utiliza um sistema automatizado para gerenciar issues através de arqu
 3. [✨ Aprimoramento na Detecção de Categorias](https://github.com/dmirrha/motorsport-calendar/issues/2)
 4. [🔧 Melhoria no Tratamento de Erros e Logs](https://github.com/dmirrha/motorsport-calendar/issues/4)
 
+### ✅ Issues Concluídas
+
+- [#49 — Prioritários Fase 1](https://github.com/dmirrha/motorsport-calendar/issues/49) — PR #56 mergeada; issue fechada automaticamente. Rastreabilidade: `docs/issues/closed/issue-49.md`.
+- [#64 — Backlog Prioritário de Cobertura ≥80% (P1–P6)](https://github.com/dmirrha/motorsport-calendar/issues/64) — concluída com suíte estável 3× e documentação sincronizada; PR #73 atualizada.
+
 ### 🔄 Fluxo de Trabalho
 
 1. **Criar Nova Issue**:

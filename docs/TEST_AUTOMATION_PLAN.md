@@ -221,6 +221,12 @@ Objetivo: elevar a cobertura unitária para ≥ 80%, ampliando a matriz de casos
       - Manter PR #73 como draft na branch `chore/issue-64-coverage-80`
   - [x] CHANGELOG/RELEASES atualizados
   - [x] PR (draft) aberta — PR #73: https://github.com/dmirrha/motorsport-calendar/pull/73
+  - [x] Incremento atual: `Logger`
+    - Testes: `tests/unit/logger/test_logger_basic.py` e `tests/unit/logger/test_logger_misc.py` cobrindo configuração (handlers/formatters/níveis), rotação, emissão de níveis, `save_payload` (json/html/text) com exceções, `set_console_level`, `get_logger`, resumo/finalização de execução e helpers de domínio (category detection, duplicados, weekend, iCal, eventos por fonte), com fallbacks de config.
+    - Estratégia: sem I/O real (uso de `tmp_path`), monkeypatch para desabilitar `_cleanup_old_logs`/`_cleanup_rotated_logs`, handlers custom para captura de registros.
+    - Métricas: módulo `src/logger.py` **83%**; suíte **295 passed**; cobertura global **83.35%**; estabilidade **3×** (<30s).
+    - Versionamento: bump para `0.5.8`.
+    - Documentação sincronizada: `CHANGELOG.md`, `RELEASES.md`, `docs/issues/open/issue-64.{md,json}`, `docs/TEST_AUTOMATION_PLAN.md`.
 
 # Fase 1.2 — Fixtures “golden” para ICS (Snapshots)
 Objetivo: introduzir snapshots estáveis para validar a saída do `src/ical_generator.py`, garantindo regressão determinística.
@@ -379,21 +385,23 @@ Notas:
   - Foco: fallback "Unknown", conflitos de regras (prioridade determinística), métricas/estatísticas (se expostas), persistência save/load (mock de FS).
   - Caminho: `src/category_detector.py` | Tests sugeridos: `tests/unit/category/`
 
-- [ ] P3 — `src/utils/error_codes.py`
-   - Foco: mapeamentos específicos, mensagens de fallback para códigos desconhecidos, tipos inválidos.
-   - Caminho: `src/utils/error_codes.py` | Tests sugeridos: `tests/unit/utils/`
+- [x] P3 — `src/utils/error_codes.py` (Concluído: módulo >90% e 3× estável <30s; docs/PR sincronizados — refs #64, PR #73)
+  - Foco: mapeamentos específicos, mensagens de fallback para códigos desconhecidos, tipos inválidos.
+  - Caminho: `src/utils/error_codes.py` | Tests: `tests/unit/utils/test_error_codes.py`
+  - Métricas: suíte **267 passed**; cobertura global **68.04%**; estabilidade **3×** (<30s).
 
-- [ ] P4 — `src/data_collector.py`
+- [x] P4 — `src/data_collector.py` (Concluído: módulo ~67% e 3× estável <30s; docs/PR sincronizados — versão 0.5.5; refs #64, PR #73)
   - Foco mínimo de valor: fluxos críticos isolados com mocks (sem rede), erros comuns (timeout/404), validação de dados obrigatórios.
-  - Caminho: `src/data_collector.py` | Tests sugeridos: `tests/unit/data_collector/`
+  - Caminho: `src/data_collector.py` | Tests: `tests/unit/data_collector/`
 
-- [ ] P5 — `src/ui_manager.py`
+- [x] P5 — `src/ui_manager.py` (Concluído: módulo 100% e 3× estável <30s; docs/PR sincronizados — versão 0.5.6; refs #64, PR #73)
   - Foco: comportamento básico sem I/O real, ramos de mensagens e estados simples.
-  - Caminho: `src/ui_manager.py` | Tests sugeridos: `tests/unit/ui/`
+  - Caminho: `src/ui_manager.py` — 100% (3× estável)
+  - Tests: `tests/unit/ui/`
 
-- [ ] P6 — `src/logger.py`
+- [x] P6 — `src/logger.py` (Concluído: módulo 83% e 3× estável <30s; docs/PR sincronizados — versão 0.5.8; refs #64, PR #73)
   - Foco: configuração de handlers/formatters mais usados, ramos de nível de log.
-  - Caminho: `src/logger.py` | Tests sugeridos: `tests/unit/logger/`
+  - Caminho: `src/logger.py` | Tests: `tests/unit/logger/`
 
 Notas rápidas:
 - Critérios de qualidade: 3× sem flakes (<30s), documentação sincronizada (CHANGELOG, RELEASES, TEST_AUTOMATION_PLAN, docs/issues/open/issue-64.{md,json}).
