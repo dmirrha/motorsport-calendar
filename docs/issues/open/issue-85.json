@@ -9,10 +9,10 @@
   "created_at": "2025-08-13T12:44:10Z",
   "updated_at": "2025-08-13T12:44:10Z",
   "tasks": [
-    {"item": "Criar tests/integration/ e tests/integration/__init__.py", "done": false},
-    {"item": "Definir marker integration em pytest.ini", "done": false},
-    {"item": "Adicionar seleção -m \"integration\" na documentação (tests/README.md)", "done": false},
-    {"item": "Teste de fumaça em tests/integration/test_smoke.py", "done": false}
+    {"item": "Criar tests/integration/ (sem __init__.py, por convenção)", "done": true},
+    {"item": "Definir marker integration em pytest.ini (markers registrados)", "done": true},
+    {"item": "Adicionar seleção -m \"integration\" na documentação (tests/README.md)", "done": true},
+    {"item": "Teste de fumaça em tests/integration/test_smoke.py (3×, <30s)", "done": true}
   ],
   "acceptance": [
     "pytest -m integration executa e passa localmente (<30s)",

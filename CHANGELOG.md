@@ -24,6 +24,13 @@ e este projeto adere ao [Versionamento Semântico](https://semver.org/spec/v2.0.
 - Rastreabilidade criada/atualizada: `docs/issues/open/issue-{78..86}.{md,json}`
 - README — seção "🧪 Testes": adicionada nota de Fase 2 (governança)
 - PR: #87 (https://github.com/dmirrha/motorsport-calendar/pull/87)
+
+### Integração — Infra mínima e markers (Issue #85)
+- Criado diretório `tests/integration/` (sem `__init__.py`, por convenção)
+- Registrado marker `integration` em `pytest.ini` (markers registrados para evitar warnings)
+- Documentação atualizada: `tests/README.md`, `docs/tests/overview.md`, `docs/TEST_AUTOMATION_PLAN.md`
+- Smoke test `pytest -m integration -q -o addopts=""` executado localmente 3× (<30s): 0.84s, 0.68s, 0.71s
+
 ### Adicionado
 - **Documentação de Configuração**
   - Criado `CONFIGURATION_GUIDE.md` com documentação detalhada de todas as opções de configuração
