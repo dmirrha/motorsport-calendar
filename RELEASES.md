@@ -29,6 +29,7 @@ Manutenção — Testes/Automação (issue #48, PR #55)
 - Épico: #78; Sub-issues: #79–#86
 - Documentação sincronizada: `docs/TEST_AUTOMATION_PLAN.md`, `README.md`, `CHANGELOG.md`, `RELEASES.md`
 - Rastreabilidade: `docs/issues/open/issue-{78..86}.{md,json}`
+ - PR: #87 (https://github.com/dmirrha/motorsport-calendar/pull/87)
 
 - Fase 1.1 — Checklist reorganizada por issues (#59–#64) com sincronismo automático entre plano (`docs/TEST_AUTOMATION_PLAN.md`) e issues (docs/issues/open/issue-<n>.{md,json}); rastreabilidade 58–64 adicionada.
 
