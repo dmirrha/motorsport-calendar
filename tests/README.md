@@ -197,6 +197,7 @@ def test_fixed_uuid(fixed_uuid):
 - Cenários Fase 2: `docs/tests/scenarios/phase2_scenarios.md`
 - Índice de cenários: `docs/tests/scenarios/SCENARIOS_INDEX.md`
 - Governança Fase 2: PR #87 (https://github.com/dmirrha/motorsport-calendar/pull/87) — épico #78
+- Documentação/rastreabilidade atualizada: Issue #83 (`docs/issues/open/issue-83.{md,json}`)
 
 ### Integração — Snapshots ICS (Issue #86)
 

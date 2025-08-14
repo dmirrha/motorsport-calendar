@@ -3,6 +3,7 @@
 Referências:
 - Plano: `docs/TEST_AUTOMATION_PLAN.md`
 - Epic: #45 — Automação de testes
+- Rastreamento: Issue #83 — Documentação e Rastreabilidade
 
 ## Fase 0
 - Inventário e decisões: `docs/tests/scenarios/phase0_scenarios.md`

@@ -48,6 +48,17 @@ Objetivo: Garantir documentação padrão, simples e completa para explicar a es
   - CI: criado `.github/workflows/tests.yml` (Ubuntu, Python 3.11, cache pip, relatórios e artefatos); documentação atualizada em `README.md`, `tests/README.md`, `CHANGELOG.md`, `RELEASES.md`
  - Status: Issue #72 concluída em 2025-08-13; PR #77 mergeada; Épico #58 finalizado.
 
+### Progresso — Issue #83
+ - Branch: `tests/issue-83-docs-traceability`
+ - Atualizados nesta issue:
+   - `docs/issues/open/issue-83.{md,json}` (checklists e timestamps)
+   - `docs/TEST_AUTOMATION_PLAN.md` (esta seção)
+   - `tests/README.md` (referência Fase 2/Issue #83)
+   - `docs/tests/scenarios/phase2_scenarios.md` e `docs/tests/scenarios/SCENARIOS_INDEX.md` (referências)
+   - `CHANGELOG.md` (Unreleased) e `RELEASES.md` (Não Lançado)
+ - Observações: somente documentação/rastreabilidade; sem mudanças de funcionalidade ou de testes.
+ - Próximo passo: abrir PR referenciando “Closes #83” e atualizar o checklist da issue no GitHub.
+
 ## Encerramento do Épico #58 — Fase 1.1 (2025-08-13)
 
 - PRs principais: #55, #57, #66, #71, #73, #77

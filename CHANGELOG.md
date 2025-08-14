@@ -16,6 +16,15 @@ e este projeto adere ao [Versionamento Semântico](https://semver.org/spec/v2.0.
 - Adicionado job `integration` ao workflow `.github/workflows/tests.yml` executando `pytest -m integration` com cobertura (`pytest-cov`).
 - Artefatos publicados: `test_results_integration/junit.xml`, `coverage_integration.xml`, `htmlcov-integration/`.
 - Estratégia alinhada aos jobs existentes: Ubuntu, Python 3.11, cache de pip, `-c /dev/null` para ignorar gates globais via `pytest.ini`.
+### Documentação — Issue #83
+
+- Sincronização de documentação e rastreabilidade (sem mudanças de código/funcionalidade):
+  - `docs/issues/open/issue-83.{md,json}`
+  - `docs/TEST_AUTOMATION_PLAN.md` (seção “Progresso — Issue #83”)
+  - `tests/README.md` (referência de Fase 2/Issue #83)
+  - `docs/tests/scenarios/phase2_scenarios.md` e `docs/tests/scenarios/SCENARIOS_INDEX.md` (referências)
+  - `RELEASES.md` (seção “Não Lançado”)
+- Objetivo: garantir rastreabilidade entre issues/PRs e documentação padrão.
 
 ## [0.5.14] - 2025-08-14
 ### Integração — Edge cases ICS (Issue #80)
