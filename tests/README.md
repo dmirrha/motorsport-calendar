@@ -213,6 +213,26 @@ def test_fixed_uuid(fixed_uuid):
 - Nota: o aviso de marker `integration` ocorre apenas com `-c /dev/null`; no fluxo normal, os markers estão registrados em `pytest.ini`.
 - CI: o job `e2e_happy` no GitHub Actions executa exatamente este teste e publica artefatos dedicados.
 
+### Integração — Edge cases ICS (Issue #80)
+
+- Testes:
+  - `tests/integration/test_phase2_optionals.py`
+  - `tests/integration/test_phase2_overnight.py`
+  - `tests/integration/test_phase2_timezones.py`
+- Fixtures:
+  - `tests/fixtures/integration/scenario_optionals_missing.json`
+  - `tests/fixtures/integration/scenario_overnight.json`
+  - `tests/fixtures/integration/scenario_timezones.json`
+- Snapshots canônicos:
+  - `tests/snapshots/phase2/phase2_optionals.ics`
+  - `tests/snapshots/phase2/phase2_overnight.ics`
+  - `tests/snapshots/phase2/phase2_timezones.ics`
+- Normalização: `tests/utils/ical_snapshots.py` (UID fixo, remoção de campos voláteis, `\n`).
+- Execução:
+  - `pytest -m integration -q` (suíte de integração)
+  - `pytest -q tests/integration/test_phase2_*.py`
+- Atualização de snapshot: se a mudança for intencional, gere a saída e atualize o arquivo `.ics` correspondente após normalizar via utilitário (ver `compare_or_write_snapshot()` e `normalize_ics_text()`).
+
 ## Diretrizes
 
 - Centralize helpers/fixtures reutilizáveis em `tests/utils/` e/ou `tests/conftest.py`.
