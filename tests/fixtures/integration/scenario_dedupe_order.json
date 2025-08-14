@@ -1,0 +1,47 @@
+{
+  "events": [
+    {
+      "name": "FÓRMULA 1 – Treino Livre 1 – Hungaroring",
+      "date": "2025-08-02",
+      "time": "08:00",
+      "location": "Hungaroring",
+      "timezone": "America/Sao_Paulo",
+      "session_type": "practice",
+      "source": "TT",
+      "source_priority": 40,
+      "streaming_links": ["https://f1tv.com"]
+    },
+    {
+      "name": "F1 – Treino Livre 1 – Hungaroring",
+      "date": "2025-08-02",
+      "time": "08:20",
+      "location": "Hungaroring",
+      "timezone": "America/Sao_Paulo",
+      "session_type": "practice",
+      "source": "F1TV",
+      "source_priority": 90,
+      "streaming_links": ["https://f1tv.com"]
+    },
+    {
+      "name": "NASCAR CUP – Treino – Daytona",
+      "date": "2025-08-02",
+      "time": "10:30",
+      "location": "Daytona",
+      "timezone": "America/Sao_Paulo",
+      "session_type": "practice",
+      "source": "YT",
+      "source_priority": 50,
+      "streaming_links": ["https://youtube.com/@nascar"]
+    },
+    {
+      "name": "FÓRMULA 1 – Qualifying – Hungaroring",
+      "date": "2025-08-02",
+      "time": "13:00",
+      "location": "Hungaroring",
+      "timezone": "UTC",
+      "session_type": "qualifying",
+      "source": "F1TV",
+      "source_priority": 90
+    }
+  ]
+}

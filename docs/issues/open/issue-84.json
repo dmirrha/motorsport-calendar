@@ -9,10 +9,10 @@
   "created_at": "2025-08-13T12:44:08Z",
   "updated_at": "2025-08-13T12:44:08Z",
   "tasks": [
-    {"item": "Testar dedupe por chave de negócio (ex.: data + título + local)", "done": false},
-    {"item": "Ordenação cronológica consistente", "done": false},
-    {"item": "Consistência de timezone entre eventos", "done": false},
-    {"item": "Verificações de contagem e campos obrigatórios", "done": false}
+    {"item": "Testar dedupe por chave de negócio (ex.: data + título + local)", "done": true},
+    {"item": "Ordenação cronológica consistente", "done": true},
+    {"item": "Consistência de timezone entre eventos", "done": true},
+    {"item": "Verificações de contagem e campos obrigatórios", "done": true}
   ],
   "acceptance": [
     "Regras passam 3× local",

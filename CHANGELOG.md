@@ -105,6 +105,16 @@ e este projeto adere ao [Versionamento Semântico](https://semver.org/spec/v2.0.
 - Média: ~1.99s; Estabilidade: 3/3 passes (<30s). Sem flakes.
 - Observação: aviso de marker `integration` ocorre apenas com `-c /dev/null`; com `pytest.ini` normal os markers estão registrados.
 
+### Integração — Deduplicação, Ordenação e Consistência (Issue #84)
+
+- Teste: `tests/integration/test_phase2_dedupe_order_consistency.py`
+- Fixture: `tests/fixtures/integration/scenario_dedupe_order.json`
+- Snapshot: `tests/snapshots/phase2/phase2_dedupe_order_consistency.ics`
+- Normalização de snapshots via `tests/utils/ical_snapshots.py` (UID fixo; remoção de `DTSTAMP`, `CREATED`, `LAST-MODIFIED`, `SEQUENCE`, `PRODID`; `\n`).
+- Regras validadas: deduplicação por similaridade (nome/categoria/local) e tolerância de horário, ordenação por `DTSTART`, consistência de timezone conforme configuração.
+- Estabilidade: 3× local sem flakes (<30s) com snapshots estáveis.
+- Documentação sincronizada: `docs/issues/open/issue-84.{md,json}`, `docs/tests/scenarios/phase2_scenarios.md`, `tests/README.md`.
+
 ### (movido para 0.5.10) Mocks/Fakes e Fixtures (Issue #79 — Fase 2)
 
 ### Adicionado
