@@ -11,3 +11,36 @@ flags:
   unit: {}
   integration: {}
   e2e: {}
+
+component_management:
+  individual_components:
+    - component_id: core-processing
+      name: Core Processing
+      paths:
+        - src/event_processor.py
+        - src/category_detector.py
+        - src/silent_period.py
+    - component_id: calendar-generation
+      name: Calendar Generation
+      paths:
+        - src/ical_generator.py
+    - component_id: data-collection
+      name: Data Collection
+      paths:
+        - src/data_collector.py
+    - component_id: configuration
+      name: Configuration
+      paths:
+        - src/config_manager.py
+    - component_id: ui
+      name: UI
+      paths:
+        - src/ui_manager.py
+    - component_id: utils
+      name: Utils
+      paths:
+        - src/utils/
+    - component_id: logging
+      name: Logging
+      paths:
+        - src/logger.py

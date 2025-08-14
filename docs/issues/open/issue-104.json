@@ -1,0 +1,25 @@
+{
+  "id": "I_kwDOPWyu9M7GFqH0",
+  "number": 104,
+  "state": "open",
+  "title": "Configuração de componentes do Codecov",
+  "milestone": null,
+  "epic": null,
+  "url": "https://github.com/dmirrha/motorsport-calendar/issues/104",
+  "created_at": "2025-08-14T19:35:41Z",
+  "updated_at": "2025-08-14T19:35:41Z",
+  "tasks": [
+    {"item": "Entender por que a flag e2e não está reportando resultados no Codecov", "done": false},
+    {"item": "Entender como configurar o Codecov por componentes", "done": false},
+    {"item": "Realizar a configuração no codecov.yml (components)", "done": false},
+    {"item": "Realizar testes (CI + dashboard)", "done": false},
+    {"item": "Atualizar documentação (README, docs/TEST_AUTOMATION_PLAN.md, tests/README.md)", "done": false},
+    {"item": "Abrir PR referenciando 'Closes #104' e sincronizar checklist", "done": false}
+  ],
+  "acceptance": [
+    "Dashboard do Codecov exibe métricas por componente",
+    "Arquivo codecov.yml atualizado com seção components e mapeamentos",
+    "CI executa e uploads continuam passando (status 200) com flags unit/integration/e2e",
+    "Documentação atualizada com instruções de uso dos componentes"
+  ]
+}
