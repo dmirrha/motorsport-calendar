@@ -130,7 +130,9 @@ Badge do workflow (branch main):
 ![Tests](https://github.com/dmirrha/motorsport-calendar/actions/workflows/tests.yml/badge.svg?branch=main) [![codecov](https://codecov.io/gh/dmirrha/motorsport-calendar/branch/main/graph/badge.svg)](https://app.codecov.io/gh/dmirrha/motorsport-calendar)
 
 #### Relatórios de Cobertura no Codecov
-- Uploads informativos: realizados nos jobs `tests` (flag `unit`) e `integration` (flag `integration`).
+- Uploads informativos: realizados nos jobs `tests` (flag `unit`), `integration` (flag `integration`) e `e2e_happy` (flag `e2e`).
+- Autenticação: OIDC habilitado no `codecov/codecov-action@v4` (`use_oidc: true`), sem necessidade de token secreto.
+- Previsibilidade: varredura automática desabilitada (`disable_search: true`); apenas os arquivos especificados em `files` são enviados (`coverage.xml`, `coverage_integration.xml`, `coverage_e2e.xml`).
 - Acesso: https://app.codecov.io/gh/dmirrha/motorsport-calendar
 - Observação: nesta fase não há gates/status obrigatórios; falhas de upload não quebram o CI.
 

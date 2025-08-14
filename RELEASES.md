@@ -5,6 +5,8 @@ Este arquivo contém um registro acumulativo de todas as versões lançadas do p
 ## Não Lançado
 Documentação — Issue #83: documentação e rastreabilidade sincronizadas (sem mudanças de código/funcionalidade).
 
+- Integração — Codecov Hardening (Issue #103): OIDC habilitado nos uploads do Codecov (`use_oidc: true`), varredura automática desabilitada (`disable_search: true`), `codecov.yml` mínimo (statuses informativos `project`/`patch`, `comment: false`) e upload adicional do E2E (flag `e2e`). Documentação atualizada (`tests/README.md`, `docs/TEST_AUTOMATION_PLAN.md`).
+
 - Atualizados: `docs/issues/open/issue-83.{md,json}`, `docs/TEST_AUTOMATION_PLAN.md`, `tests/README.md`, `docs/tests/scenarios/phase2_scenarios.md`, `docs/tests/scenarios/SCENARIOS_INDEX.md`, `CHANGELOG.md`.
 - Branch: `tests/issue-83-docs-traceability`.
 

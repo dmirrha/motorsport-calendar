@@ -1,0 +1,19 @@
+coverage:
+  status:
+    project:
+      default:
+        informational: true
+    patch:
+      default:
+        informational: true
+comment: false
+flags:
+  unit:
+    paths:
+      - tests/unit
+  integration:
+    paths:
+      - tests/integration
+  e2e:
+    paths:
+      - tests/integration
