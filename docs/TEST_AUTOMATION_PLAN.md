@@ -363,8 +363,11 @@ jobs:
           if-no-files-found: ignore
       - name: E2E Happy Path
         run: |
-          pytest -m e2e_happy --cov=src --cov=sources --cov-report=term-missing:skip-covered \
-            --cov-report=xml:coverage_e2e.xml --cov-report=html:htmlcov-e2e \
+          pytest -q -c /dev/null tests/integration/test_phase2_e2e_happy.py -k happy \
+            --cov=src --cov=sources \
+            --cov-report=term-missing:skip-covered \
+            --cov-report=xml:coverage_e2e.xml \
+            --cov-report=html:htmlcov-e2e \
             --junitxml=test_results_e2e/junit.xml
       - name: Upload E2E coverage HTML
         uses: actions/upload-artifact@v4
