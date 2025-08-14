@@ -1,0 +1,25 @@
+{
+  "id": 3322751938,
+  "number": 103,
+  "state": "open",
+  "title": "Codecov hardening: OIDC, disable_search, codecov.yml e docs",
+  "milestone": null,
+  "epic": null,
+  "url": "https://github.com/dmirrha/motorsport-calendar/issues/103",
+  "created_at": "2025-08-14T16:04:59Z",
+  "updated_at": "2025-08-14T16:04:59Z",
+  "tasks": [
+    {"item": "Atualizar .github/workflows/tests.yml com use_oidc:true e disable_search:true nos passos de upload (jobs tests, integration e e2e_happy)", "done": true},
+    {"item": "Adicionar codecov.yml mínimo na raiz (statuses informativos, comment desativado; flags documentadas)", "done": true},
+    {"item": "Atualizar tests/README.md (acesso aos relatórios, flags unit/integration/e2e, nota sobre OIDC e disable_search)", "done": true},
+    {"item": "Atualizar docs/TEST_AUTOMATION_PLAN.md (seção Codecov: hardening aplicado, gates ainda pendentes)", "done": true},
+    {"item": "Validar novo run do CI com uploads bem-sucedidos (flags preservadas)", "done": false},
+    {"item": "Abrir PR referenciando 'Closes #103' e sincronizar checklist", "done": false}
+  ],
+  "acceptance": [
+    "Uploads continuam funcionando com flags unit/integration/e2e",
+    "Sem varredura automática; apenas arquivos especificados enviados",
+    "codecov.yml presente com statuses informativos e comment:false",
+    "Documentação atualizada (tests/README.md, docs/TEST_AUTOMATION_PLAN.md)"
+  ]
+}

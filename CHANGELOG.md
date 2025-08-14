@@ -11,6 +11,13 @@ e este projeto adere ao [Versionamento Semântico](https://semver.org/spec/v2.0.
 - Uploads informativos de cobertura adicionados ao workflow (`codecov/codecov-action@v4`) para os jobs `tests` (flag `unit`, `coverage.xml`) e `integration` (flag `integration`, `coverage_integration.xml`), com `fail_ci_if_error: false`.
 - Badge do Codecov adicionado ao `README.md`.
 - Documentação atualizada: `tests/README.md` (acesso Codecov), `docs/TEST_AUTOMATION_PLAN.md` (uploads concluídos; gates pendentes).
+### Integração — Codecov Hardening (Issue #103)
+
+- Segurança: habilitado OIDC no `codecov/codecov-action@v4` (`use_oidc: true`), eliminando necessidade de token secreto.
+- Previsibilidade: desabilitada a varredura automática de arquivos (`disable_search: true`); apenas arquivos explícitos são enviados.
+- Configuração mínima adicionada em `codecov.yml`: statuses informativos (`project`/`patch`) e `comment: false`.
+- Cobertura expandida: upload adicional no job `e2e_happy` (`coverage_e2e.xml`, flag `e2e`).
+- Documentação atualizada: `tests/README.md` e `docs/TEST_AUTOMATION_PLAN.md`.
 ### Integração — CI: Job de Integração (Issue #81)
 
 - Adicionado job `integration` ao workflow `.github/workflows/tests.yml` executando `pytest -m integration` com cobertura (`pytest-cov`).
