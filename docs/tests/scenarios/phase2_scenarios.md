@@ -11,7 +11,7 @@ Objetivo: mapear cenários integrados cobrindo fluxo coleta → processamento �
 - [x] Integração básica com eventos simples (SUMMARY/DTSTART/DTEND/UID/URL/CATEGORIES)
 - [x] Eventos cruzando meia-noite e múltiplos fusos
 - [ ] Casos com e sem `url`, `category`, `recurrence`
-- [ ] Deduplicação, ordenação e consistência de TZ
+- [x] Deduplicação, ordenação e consistência de TZ
 - [x] Snapshot `.ics` estável (ver Fase 1.2)
 
 ### E2E — Caminho Feliz (Issue #82)

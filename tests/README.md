@@ -233,6 +233,17 @@ def test_fixed_uuid(fixed_uuid):
   - `pytest -q tests/integration/test_phase2_*.py`
 - Atualização de snapshot: se a mudança for intencional, gere a saída e atualize o arquivo `.ics` correspondente após normalizar via utilitário (ver `compare_or_write_snapshot()` e `normalize_ics_text()`).
 
+### Integração — Deduplicação, Ordenação e Consistência de TZ (Issue #84)
+
+- Teste: `tests/integration/test_phase2_dedupe_order_consistency.py`
+- Fixture: `tests/fixtures/integration/scenario_dedupe_order.json`
+- Snapshot: `tests/snapshots/phase2/phase2_dedupe_order_consistency.ics`
+- Normalização: `tests/utils/ical_snapshots.py` (UID fixo; remove `DTSTAMP/CREATED/LAST-MODIFIED/SEQUENCE/PRODID`; quebras `\n`).
+- Execução:
+  - `pytest -q tests/integration/test_phase2_dedupe_order_consistency.py`
+  - `pytest -m integration -q -k dedupe`
+- Estabilidade: executar 3× localmente; esperado sem flakes e <30s.
+
 ## Diretrizes
 
 - Centralize helpers/fixtures reutilizáveis em `tests/utils/` e/ou `tests/conftest.py`.

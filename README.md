@@ -273,6 +273,9 @@ A suíte utiliza Pytest com cobertura via pytest-cov. O gate de cobertura global
 - Rastreabilidade: `docs/issues/open/issue-{78..86}.{md,json}`
  - PR: #87 (https://github.com/dmirrha/motorsport-calendar/pull/87)
 
+- Cenário concluído: Deduplicação, ordenação e consistência de TZ (Issue #84)
+  - Consulte `tests/README.md` → seção "Integração — Deduplicação, Ordenação e Consistência de TZ (Issue #84)" para comandos, fixtures e snapshot.
+
 Comandos rápidos (local):
 
 ```bash

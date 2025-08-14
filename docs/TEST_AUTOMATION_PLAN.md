@@ -279,12 +279,12 @@ Objetivo: introduzir snapshots estáveis para validar a saída do `src/ical_gene
 ## Critérios de aceite
 - Comparação por snapshot estável aprovada nos cenários definidos.
 - Testes determinísticos (sem flakiness por TZ/tempo/SO).
-  - [ ] Conjuntos para validar deduplicação, ordenação e consistência de TZ
-- [ ] Validações principais
-  - [ ] Contagem de eventos processados
-  - [ ] VEVENT: SUMMARY, DTSTART/DTEND, UID, URL, CATEGORIES, RRULE (quando aplicável)
-  - [ ] Consistência de timezone (naive → localized conforme config)
-  - [ ] Criar/atualizar `docs/tests/scenarios/phase2_scenarios.md` (fluxos, casos, status e links)
+  - [x] Conjuntos para validar deduplicação, ordenação e consistência de TZ
+- [x] Validações principais
+  - [x] Contagem de eventos processados
+  - [x] VEVENT: SUMMARY, DTSTART/DTEND, UID, URL, CATEGORIES, RRULE (quando aplicável)
+  - [x] Consistência de timezone (naive → localized conforme config)
+  - [x] Criar/atualizar `docs/tests/scenarios/phase2_scenarios.md` (fluxos, casos, status e links)
   - [x] Governança Fase 2: épico #78 e sub-issues #79–#86 criados
   - [x] Link do épico: https://github.com/dmirrha/motorsport-calendar/issues/78
   - [x] Sincronismo de documentos: `README.md`, `docs/TEST_AUTOMATION_PLAN.md`, `CHANGELOG.md`, `RELEASES.md`
@@ -319,6 +319,15 @@ Objetivo: introduzir snapshots estáveis para validar a saída do `src/ical_gene
 - Rastreabilidade: `docs/issues/open/issue-80.{md,json}` atualizados.
 - Versionamento: bump para `0.5.14` em `src/__init__.py`.
 - Próximos passos: criar branch remota `tests/issue-80-edge-cases`, abrir PR referenciando a Issue #80, atualizar checklist na issue com links/versão.
+
+### Progresso — Issue #84 (dedupe/ordem/TZ)
+
+- Teste de integração: `tests/integration/test_phase2_dedupe_order_consistency.py`
+- Fixture: `tests/fixtures/integration/scenario_dedupe_order.json`
+- Snapshot canônico: `tests/snapshots/phase2/phase2_dedupe_order_consistency.ics`
+- Normalização via `tests/utils/ical_snapshots.py` (UID fixo; remove `DTSTAMP/CREATED/LAST-MODIFIED/SEQUENCE/PRODID`; `\n`).
+- Estabilidade local: 3× sem flakes (<30s) com snapshot estável.
+- Documentação sincronizada: `docs/issues/open/issue-84.{md,json}`, `docs/tests/scenarios/phase2_scenarios.md`, `tests/README.md`, `CHANGELOG.md`, `RELEASES.md`.
 
 ## Execução Local — Guia Rápido
 - Instalação:

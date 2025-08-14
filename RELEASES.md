@@ -2,6 +2,17 @@
 
 Este arquivo contém um registro acumulativo de todas as versões lançadas do projeto, com notas detalhadas sobre as mudanças em cada versão.
 
+## Versão 0.5.15 (2025-08-14)
+Integração — Deduplicação, Ordenação e Consistência (Issue #84)
+
+- Teste: `tests/integration/test_phase2_dedupe_order_consistency.py`
+- Fixture: `tests/fixtures/integration/scenario_dedupe_order.json`
+- Snapshot: `tests/snapshots/phase2/phase2_dedupe_order_consistency.ics`
+- Normalização: `tests/utils/ical_snapshots.py` (UID fixo; remove `DTSTAMP/CREATED/LAST-MODIFIED/SEQUENCE/PRODID`; quebras `\n`).
+- Regras validadas: dedupe por similaridade (nome/categoria/local) com tolerância de horário, ordenação por `DTSTART`, consistência de TZ via configuração.
+- Estabilidade local: 3× sem flakes (<30s) com snapshot canônico estável.
+- Documentação sincronizada: `CHANGELOG.md`, `RELEASES.md`, `tests/README.md`, `docs/tests/scenarios/phase2_scenarios.md`, `docs/issues/open/issue-84.{md,json}`.
+
 ## Versão 0.5.14 (2025-08-14)
 Integração — Edge cases ICS (Issue #80)
 
