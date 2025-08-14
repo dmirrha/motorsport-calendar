@@ -6,6 +6,11 @@ O formato é baseado em [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)
 e este projeto adere ao [Versionamento Semântico](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
+### Integração — Codecov (Issue #98)
+
+- Uploads informativos de cobertura adicionados ao workflow (`codecov/codecov-action@v4`) para os jobs `tests` (flag `unit`, `coverage.xml`) e `integration` (flag `integration`, `coverage_integration.xml`), com `fail_ci_if_error: false`.
+- Badge do Codecov adicionado ao `README.md`.
+- Documentação atualizada: `tests/README.md` (acesso Codecov), `docs/TEST_AUTOMATION_PLAN.md` (uploads concluídos; gates pendentes).
 ### Integração — CI: Job de Integração (Issue #81)
 
 - Adicionado job `integration` ao workflow `.github/workflows/tests.yml` executando `pytest -m integration` com cobertura (`pytest-cov`).

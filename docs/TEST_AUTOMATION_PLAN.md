@@ -296,7 +296,8 @@ Objetivo: introduzir snapshots estáveis para validar a saída do `src/ical_gene
   - [ ] Automação CI (final da Fase 2)
    - [x] GitHub Actions: job `integration` com `pytest -m integration` + `pytest-cov`
    - [x] Upload de artefatos (HTML/XML) do job de integração
-   - [ ] Codecov: upload de `coverage.xml`, status check e badge no `README.md`
+   - [x] Codecov: uploads informativos (`coverage.xml` unit e `coverage_integration.xml`), badge no `README.md`
+   - [ ] Codecov: status checks/gates (project/patch) — pendente para fase futura
    - [x] Gatilhos em PRs e pushes (herdados do workflow `tests.yml`)
    - [ ] Gate por status de cobertura (pendente)
 

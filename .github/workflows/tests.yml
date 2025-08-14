@@ -61,6 +61,15 @@ jobs:
             coverage.xml
             htmlcov/
 
+      - name: Upload coverage to Codecov (unit)
+        if: always()
+        uses: codecov/codecov-action@v4
+        with:
+          files: coverage.xml
+          flags: unit
+          fail_ci_if_error: false
+          verbose: true
+
   e2e_happy:
     runs-on: ubuntu-latest
     permissions:
@@ -161,3 +170,12 @@ jobs:
             test_results_integration/junit.xml
             coverage_integration.xml
             htmlcov-integration/
+
+      - name: Upload coverage to Codecov (integration)
+        if: always()
+        uses: codecov/codecov-action@v4
+        with:
+          files: coverage_integration.xml
+          flags: integration
+          fail_ci_if_error: false
+          verbose: true

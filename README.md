@@ -1,5 +1,7 @@
 # 🏁 Motorsport Calendar Generator
 
+![Tests](https://github.com/dmirrha/motorsport-calendar/actions/workflows/tests.yml/badge.svg?branch=main) [![codecov](https://codecov.io/gh/dmirrha/motorsport-calendar/branch/main/graph/badge.svg)](https://app.codecov.io/gh/dmirrha/motorsport-calendar)
+
 Um script Python avançado para coleta automática de eventos de automobilismo de múltiplas fontes e geração de arquivos iCal para importação no Google Calendar. Desenvolvido para entusiastas de automobilismo que desejam acompanhar todas as corridas do fim de semana em um só lugar.
 
 > Nota pós-rollback (0.5.1)

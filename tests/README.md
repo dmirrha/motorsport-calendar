@@ -127,7 +127,12 @@ O projeto executa a suíte de testes no GitHub Actions via workflow em `.github/
 
 Badge do workflow (branch main):
 
-![Tests](https://github.com/dmirrha/motorsport-calendar/actions/workflows/tests.yml/badge.svg?branch=main)
+![Tests](https://github.com/dmirrha/motorsport-calendar/actions/workflows/tests.yml/badge.svg?branch=main) [![codecov](https://codecov.io/gh/dmirrha/motorsport-calendar/branch/main/graph/badge.svg)](https://app.codecov.io/gh/dmirrha/motorsport-calendar)
+
+#### Relatórios de Cobertura no Codecov
+- Uploads informativos: realizados nos jobs `tests` (flag `unit`) e `integration` (flag `integration`).
+- Acesso: https://app.codecov.io/gh/dmirrha/motorsport-calendar
+- Observação: nesta fase não há gates/status obrigatórios; falhas de upload não quebram o CI.
 
 ## Mocks e Isolamento
 
