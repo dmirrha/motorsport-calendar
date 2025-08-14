@@ -9,7 +9,7 @@ Objetivo: mapear cenários integrados cobrindo fluxo coleta → processamento �
 
 ## Cenários (status)
 - [x] Integração básica com eventos simples (SUMMARY/DTSTART/DTEND/UID/URL/CATEGORIES)
-- [ ] Eventos cruzando meia-noite e múltiplos fusos
+- [x] Eventos cruzando meia-noite e múltiplos fusos
 - [ ] Casos com e sem `url`, `category`, `recurrence`
 - [ ] Deduplicação, ordenação e consistência de TZ
 - [x] Snapshot `.ics` estável (ver Fase 1.2)
@@ -24,6 +24,23 @@ Objetivo: mapear cenários integrados cobrindo fluxo coleta → processamento �
 - Média: ~1.99s; Estabilidade: 3/3 passes (<30s). Sem flakes.
 - Observações: o aviso de marker `integration` só aparece ao ignorar o `pytest.ini`; no fluxo normal, os markers estão registrados.
  - CI: o job `e2e_happy` no GitHub Actions executa este teste com cobertura e publica artefatos dedicados (`coverage_e2e.xml`, `htmlcov-e2e/`, `test_results_e2e/junit.xml`).
+
+### Fase 2 — Edge Cases (Issue #80)
+- Fixtures:
+  - `tests/fixtures/integration/scenario_overnight.json`
+  - `tests/fixtures/integration/scenario_timezones.json`
+  - `tests/fixtures/integration/scenario_optionals_missing.json`
+- Testes:
+  - `tests/integration/test_phase2_overnight.py` → snapshot `tests/snapshots/phase2/phase2_overnight.ics`
+  - `tests/integration/test_phase2_timezones.py` → snapshot `tests/snapshots/phase2/phase2_timezones.ics`
+  - `tests/integration/test_phase2_optionals.py` → snapshot `tests/snapshots/phase2/phase2_optionals.ics`
+- Execuções locais (ignorando gate de cobertura com `-c /dev/null`):
+  - Overnight: 3/3 passes
+  - Timezones: 3/3 passes
+  - Opcionais: 3/3 passes
+- Notas:
+  - Para eventos com TZID, o parser `icalendar` pode retornar `datetime` ingênuo ao decodificar; validamos presença de `TZID` e componentes locais de hora/minuto.
+  - Para UTC, o ICS pode serializar com sufixo `Z` sem `TZID`; validamos horário local e duração.
 
 ## Referências
 - Plano: `docs/TEST_AUTOMATION_PLAN.md` (seção Fase 2)

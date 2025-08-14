@@ -1,0 +1,14 @@
+{
+  "events": [
+    {
+      "name": "WEC 6h São Paulo",
+      "detected_category": "WEC",
+      "session_type": "race",
+      "datetime": "2025-08-10T22:30:00-03:00",
+      "location": "Interlagos",
+      "country": "Brazil",
+      "source": "fixture",
+      "source_display_name": "Phase2 Fixture"
+    }
+  ]
+}
