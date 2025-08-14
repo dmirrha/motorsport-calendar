@@ -123,6 +123,11 @@ O projeto executa a suíte de testes no GitHub Actions via workflow em `.github/
 - Relatórios: `junit.xml`, `coverage.xml`, `htmlcov/` (enviados como artefatos)
 - Cache de pip habilitado por hash dos arquivos `requirements*.txt`
 - Job adicional: `e2e_happy` — executa apenas `tests/integration/test_phase2_e2e_happy.py` com cobertura, ignorando `pytest.ini` via `-c /dev/null`. Artefatos: `test_results_e2e/junit.xml`, `coverage_e2e.xml`, `htmlcov-e2e/`.
+- Job adicional: `integration` — executa a suíte marcada com `-m integration`, ignorando `pytest.ini` via `-c /dev/null` para evitar gates globais. Artefatos: `test_results_integration/junit.xml`, `coverage_integration.xml`, `htmlcov-integration/`.
+
+Badge do workflow (branch main):
+
+![Tests](https://github.com/dmirrha/motorsport-calendar/actions/workflows/tests.yml/badge.svg?branch=main)
 
 ## Mocks e Isolamento
 

@@ -107,6 +107,12 @@ Manutenção — Testes/Automação (issue #48, PR #55)
 
 ### (movido para 0.5.10) Mocks/Fakes e Fixtures (Issue #79 — Fase 2)
 
+### Integração — Job de Integração no CI (Issue #81)
+
+- Adicionado job `integration` ao workflow `.github/workflows/tests.yml` executando `pytest -m integration` com cobertura via `pytest-cov`.
+- Artefatos publicados: `test_results_integration/junit.xml`, `coverage_integration.xml`, `htmlcov-integration/`.
+- Estratégia consistente com jobs existentes (Ubuntu, Python 3.11, cache pip, `-c /dev/null` para ignorar gates globais).
+
  - Fase 1.1 — Checklist reorganizada por issues (#59–#64) com sincronismo automático entre plano (`docs/TEST_AUTOMATION_PLAN.md`) e issues (docs/issues/open/issue-<n>.{md,json}); rastreabilidade 58–64 adicionada.
 
 Issue #61 (PR #68 — draft)

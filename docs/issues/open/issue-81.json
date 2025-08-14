@@ -9,10 +9,10 @@
   "created_at": "2025-08-13T12:44:04Z",
   "updated_at": "2025-08-13T12:44:04Z",
   "tasks": [
-    {"item": "Job GitHub Actions executando pytest -m integration", "done": false},
-    {"item": "Upload de artefatos: junit.xml, coverage.xml, htmlcov-integration/", "done": false},
-    {"item": "Matriz/estratégia consistente com job unitário existente", "done": false},
-    {"item": "Badge/documentação em tests/README.md", "done": false}
+    {"item": "Job GitHub Actions executando pytest -m integration", "done": true},
+    {"item": "Upload de artefatos: junit.xml, coverage.xml, htmlcov-integration/", "done": true},
+    {"item": "Matriz/estratégia consistente com job unitário existente", "done": true},
+    {"item": "Badge/documentação em tests/README.md", "done": true}
   ],
   "acceptance": [
     "Job executa em PRs e main",
