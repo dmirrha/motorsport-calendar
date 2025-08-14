@@ -14,6 +14,17 @@ Objetivo: mapear cenários integrados cobrindo fluxo coleta → processamento �
 - [ ] Deduplicação, ordenação e consistência de TZ
 - [x] Snapshot `.ics` estável (ver Fase 1.2)
 
+### E2E — Caminho Feliz (Issue #82)
+- Teste: `tests/integration/test_phase2_e2e_happy.py`
+- Snapshot: `tests/snapshots/phase2/phase2_e2e_happy.ics` (normalizado via `tests/utils/ical_snapshots.py`)
+- Execuções locais (sem cobertura/gate; ignorando `pytest.ini` com `-c /dev/null`):
+  - Run 1: 1 passed in 1.95s
+  - Run 2: 1 passed in 2.02s
+  - Run 3: 1 passed in 2.00s
+- Média: ~1.99s; Estabilidade: 3/3 passes (<30s). Sem flakes.
+- Observações: o aviso de marker `integration` só aparece ao ignorar o `pytest.ini`; no fluxo normal, os markers estão registrados.
+ - CI: o job `e2e_happy` no GitHub Actions executa este teste com cobertura e publica artefatos dedicados (`coverage_e2e.xml`, `htmlcov-e2e/`, `test_results_e2e/junit.xml`).
+
 ## Referências
 - Plano: `docs/TEST_AUTOMATION_PLAN.md` (seção Fase 2)
 - Overview: `docs/tests/overview.md`

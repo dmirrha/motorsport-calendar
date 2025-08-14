@@ -122,6 +122,7 @@ O projeto executa a suíte de testes no GitHub Actions via workflow em `.github/
 - Execução: `pytest` com cobertura em `src/` e `sources/`
 - Relatórios: `junit.xml`, `coverage.xml`, `htmlcov/` (enviados como artefatos)
 - Cache de pip habilitado por hash dos arquivos `requirements*.txt`
+- Job adicional: `e2e_happy` — executa apenas `tests/integration/test_phase2_e2e_happy.py` com cobertura, ignorando `pytest.ini` via `-c /dev/null`. Artefatos: `test_results_e2e/junit.xml`, `coverage_e2e.xml`, `htmlcov-e2e/`.
 
 ## Mocks e Isolamento
 
@@ -199,6 +200,18 @@ def test_fixed_uuid(fixed_uuid):
   - `pytest -q tests/integration/test_phase2_basic.py`
 - Atualização de snapshot:
   - Gere o ICS via teste e, se a mudança for intencional, atualize `tests/snapshots/phase2/phase2_basic.ics` com a versão normalizada (ver `compare_or_write_snapshot()` e `normalize_ics_text()` em `tests/utils/ical_snapshots.py`).
+
+### Integração — E2E Caminho Feliz (Issue #82)
+- Teste: `tests/integration/test_phase2_e2e_happy.py`
+- Snapshot: `tests/snapshots/phase2/phase2_e2e_happy.ics`
+- Execução local (sem cobertura/gate; ignorando `pytest.ini`):
+  - Comando: `pytest -q -c /dev/null tests/integration/test_phase2_e2e_happy.py -k happy`
+  - Run 1: 1 passed in 1.95s
+  - Run 2: 1 passed in 2.02s
+  - Run 3: 1 passed in 2.00s
+- Média: ~1.99s; Estabilidade: 3/3 passes (<30s). Sem flakes.
+- Nota: o aviso de marker `integration` ocorre apenas com `-c /dev/null`; no fluxo normal, os markers estão registrados em `pytest.ini`.
+- CI: o job `e2e_happy` no GitHub Actions executa exatamente este teste e publica artefatos dedicados.
 
 ## Diretrizes
 

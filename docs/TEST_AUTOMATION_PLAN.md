@@ -21,6 +21,7 @@ Estabelecer uma estratégia simples e efetiva para implementar e evoluir testes 
 - Testes: `tests/` (existente, amplo)
 - Artefatos: `test_results/`, `junit.xml`, `htmlcov/` (gerados)
 - CI: `.github/workflows/tests.yml` (workflow de testes ativo: pytest + cobertura; artefatos junit/coverage/html)
+- Job adicional: `e2e_happy` executa apenas `tests/integration/test_phase2_e2e_happy.py` com cobertura, ignorando `pytest.ini` via `-c /dev/null`. Artefatos dedicados: `test_results_e2e/junit.xml`, `coverage_e2e.xml`, `htmlcov-e2e/`.
 
 ## Diretrizes de Documentação e Rastreamento
 Objetivo: Garantir documentação padrão, simples e completa para explicar a estratégia de testes e permitir rastreabilidade fina das atividades, conforme `.windsurf/rules/tester.md` e políticas do projeto.
@@ -359,6 +360,26 @@ jobs:
         with:
           name: junit
           path: test_results/junit.xml
+          if-no-files-found: ignore
+      - name: E2E Happy Path
+        run: |
+          pytest -q -c /dev/null tests/integration/test_phase2_e2e_happy.py -k happy \
+            --cov=src --cov=sources \
+            --cov-report=term-missing:skip-covered \
+            --cov-report=xml:coverage_e2e.xml \
+            --cov-report=html:htmlcov-e2e \
+            --junitxml=test_results_e2e/junit.xml
+      - name: Upload E2E coverage HTML
+        uses: actions/upload-artifact@v4
+        with:
+          name: htmlcov-e2e
+          path: htmlcov-e2e/
+          if-no-files-found: ignore
+      - name: Upload E2E JUnit report
+        uses: actions/upload-artifact@v4
+        with:
+          name: junit-e2e
+          path: test_results_e2e/junit.xml
           if-no-files-found: ignore
 ```
 Notas:

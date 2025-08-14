@@ -648,6 +648,12 @@ Notas:
 
 Para detalhes, veja `tests/README.md`.
 
+### CI — Job E2E Happy Path
+
+- Job dedicado no GitHub Actions: `e2e_happy`.
+- Executa somente `tests/integration/test_phase2_e2e_happy.py` com cobertura, ignorando `pytest.ini` via `-c /dev/null`.
+- Artefatos publicados: `test_results_e2e/junit.xml`, `coverage_e2e.xml`, `htmlcov-e2e/`.
+
 ## 📝 Licença
 
 Este projeto está sob a licença MIT. Veja o arquivo `LICENSE` para detalhes.

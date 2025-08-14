@@ -58,11 +58,14 @@ def _fixed_random_seed():
 
 class _DummyResponse:
     """Resposta mínima para simular `requests.Response`."""
-    def __init__(self, text="", status_code=200, json_data=None, raise_http_error=False):
+    def __init__(self, text="", status_code=200, json_data=None, raise_http_error=False, url=None, headers=None):
         self.text = text
         self.status_code = status_code
         self._json_data = json_data
         self._raise_http_error = raise_http_error
+        # Atributos esperados por usos no código
+        self.url = url
+        self.headers = headers or {}
 
     def json(self):
         if self._json_data is None:
@@ -81,23 +84,47 @@ class _DummySession:
         # `response_or_callable` pode ser _DummyResponse ou uma função(url, **kwargs) -> _DummyResponse
         self._response_or_callable = response_or_callable
         self._exception = exception_to_raise
+        # Compatível com BaseSource._setup_session (headers.update)
+        self.headers = {}
+    
+    # Compatível com BaseSource._setup_session (self.session.mount)
+    def mount(self, *_args, **_kwargs):  # no-op
+        return None
 
-    def get(self, url, **kwargs):
+    def _dispatch(self, url, **kwargs):
+        """Gera uma resposta sem depender de `request`.
+        
+        Evita recursão quando testes sobrescrevem `request()` para chamar `get()`.
+        """
         if self._exception:
             raise self._exception
         if callable(self._response_or_callable):
-            return self._response_or_callable(url, **kwargs)
-        return self._response_or_callable or _DummyResponse()
+            resp = self._response_or_callable(url, **kwargs)
+        else:
+            resp = self._response_or_callable or _DummyResponse()
+        # Garantir atributos mínimos
+        if getattr(resp, "url", None) is None:
+            resp.url = url
+        if getattr(resp, "headers", None) is None:
+            resp.headers = {}
+        return resp
+
+    # Compatível com BaseSource.make_request (self.session.request)
+    def request(self, method, url, **kwargs):
+        return self._dispatch(url, **kwargs)
+
+    def get(self, url, **kwargs):
+        return self._dispatch(url, **kwargs)
 
     def post(self, url, **kwargs):
-        return self.get(url, **kwargs)
+        return self._dispatch(url, **kwargs)
 
 
 @pytest.fixture
 def dummy_response():
     """Factory para criar `_DummyResponse` de forma concisa em testes."""
-    def _factory(text="", status_code=200, json_data=None, raise_http_error=False):
-        return _DummyResponse(text=text, status_code=status_code, json_data=json_data, raise_http_error=raise_http_error)
+    def _factory(text="", status_code=200, json_data=None, raise_http_error=False, url=None, headers=None):
+        return _DummyResponse(text=text, status_code=status_code, json_data=json_data, raise_http_error=raise_http_error, url=url, headers=headers)
     return _factory
 
 

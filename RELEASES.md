@@ -2,6 +2,16 @@
 
 Este arquivo contém um registro acumulativo de todas as versões lançadas do projeto, com notas detalhadas sobre as mudanças em cada versão.
 
+## Versão 0.5.13 (2025-08-13)
+Correções de `EventProcessor` e integração E2E com snapshots ICS (Issues #82, #86)
+
+- Correções na normalização do `EventProcessor` (campos/retornos, preservação de `display_name`).
+- Ajustes no `ICalGenerator` para preservação de siglas em `display_category` (F1/F2/F3/WEC/WRC/WSBK/NASCAR) e mapeamento consistente para `SUMMARY`, `CATEGORIES` e `X-MOTORSPORT-CATEGORY`.
+- Snapshots ICS estáveis (básico e E2E) após normalização via `tests/utils/ical_snapshots.py`.
+- Novo job de CI `e2e_happy` em `.github/workflows/tests.yml` executando somente o E2E caminho feliz com cobertura e artefatos dedicados (`coverage_e2e.xml`, `htmlcov-e2e/`, `test_results_e2e/junit.xml`).
+- Métricas locais: **339 passed**, **0 failed**; cobertura total **~91%**; E2E (3×): ~1.99s médio.
+- Documentação sincronizada: `CHANGELOG.md`, `RELEASES.md`, `tests/README.md`, `docs/TEST_AUTOMATION_PLAN.md`, `docs/tests/scenarios/phase2_scenarios.md`.
+
 ## Próximo (Não Lançado)
 Manutenção — Testes/Automação (issue #48, PR #55)
 
@@ -50,6 +60,18 @@ Manutenção — Testes/Automação (issue #48, PR #55)
   - `UID` normalizado para token fixo; remoção de `DTSTAMP`, `CREATED`, `LAST-MODIFIED`, `SEQUENCE`, `PRODID`; quebras de linha unificadas para `\n`.
 - Estabilidade: teste de integração executado 3× localmente sem flakes (<2s cada) com `-o addopts=""` (gate de cobertura desativado no comando). Gate global permanece configurado no projeto.
 - Documentação sincronizada: `tests/README.md` (seção de snapshots) e `docs/tests/scenarios/phase2_scenarios.md` (cenário básico concluído).
+
+### Integração — E2E Caminho Feliz (Issue #82)
+
+- Teste: `tests/integration/test_phase2_e2e_happy.py` (gera ICS e compara com snapshot normalizado)
+- Snapshot: `tests/snapshots/phase2/phase2_e2e_happy.ics`
+- Execução local (sem cobertura/gate; ignorando `pytest.ini`):
+  - Comando: `pytest -q -c /dev/null tests/integration/test_phase2_e2e_happy.py -k happy`
+  - Run 1: 1 passed in 1.95s
+  - Run 2: 1 passed in 2.02s
+  - Run 3: 1 passed in 2.00s
+- Média: ~1.99s; Estabilidade: 3/3 passes (<30s). Sem flakes.
+- Observação: aviso de marker `integration` ocorre apenas com `-c /dev/null`; com `pytest.ini` normal os markers estão registrados.
 
 ### (movido para 0.5.10) Mocks/Fakes e Fixtures (Issue #79 — Fase 2)
 

@@ -232,11 +232,15 @@ class EventProcessor:
         Returns:
             Normalized event dictionary or None if invalid
         """
+        # Preserve original name for display
+        original_name = event.get('name', '')
+
         # Create normalized event structure
         normalized = {
             'event_id': event.get('event_id', self._generate_event_id(event)),
-            'name': self._normalize_name(event.get('name', '')),
-            'raw_category': self._normalize_category(event.get('raw_category', '')),
+            'name': self._normalize_name(original_name),
+            'display_name': str(original_name).strip(),
+            'raw_category': self._normalize_category(event.get('raw_category', event.get('category', ''))),
             'detected_category': None,  # Will be filled by category detector
             'date': self._normalize_date(event.get('date')),
             'time': self._normalize_time(event.get('time')),
@@ -257,8 +261,8 @@ class EventProcessor:
         
         # Compute datetime from date and time
         normalized['datetime'] = self._compute_datetime(
-            normalized['date'], 
-            normalized['time'], 
+            normalized['date'],
+            normalized['time'],
             normalized['timezone']
         )
         
@@ -267,55 +271,43 @@ class EventProcessor:
             return None
         
         return normalized
-    
+
     def _normalize_name(self, name: str) -> str:
-        """Normalize event name."""
+        """Normalize event name: lowercase, unaccented, condensed spaces, common aliases."""
         if not name:
             return ""
-        
-        # Clean up the name
-        name = str(name).strip()
-        
-        # Remove extra whitespace
-        name = re.sub(r'\s+', ' ', name)
-        
-        # Common replacements
-        replacements = {
-            'GP': 'Grand Prix',
-            'F-1': 'F1',
-            'Formula-1': 'Formula 1',
-            'Fórmula-1': 'Formula 1',
-            'MotoGP': 'MotoGP',
-            'Moto GP': 'MotoGP'
-        }
-        
-        for old, new in replacements.items():
-            name = re.sub(rf'\b{re.escape(old)}\b', new, name, flags=re.IGNORECASE)
-        
-        return name
-    
+        s = unidecode(str(name)).lower().strip()
+        # Normalize dashes and multiple spaces
+        s = s.replace('–', '-')
+        s = re.sub(r'\s+', ' ', s)
+        # Common aliases
+        s = s.replace('formula1', 'formula 1').replace('formula-1', 'formula 1')
+        s = re.sub(r'\bf-?1\b', 'formula 1', s)
+        return s
+
     def _normalize_category(self, category: str) -> str:
-        """Normalize category name."""
+        """Normalize category to a canonical display form (e.g., 'Formula 1')."""
         if not category:
             return ""
-        
-        category = str(category).strip()
-        
-        # Common category normalizations
+        c = unidecode(str(category)).strip().lower()
         category_map = {
             'f1': 'Formula 1',
             'formula1': 'Formula 1',
             'formula-1': 'Formula 1',
-            'fórmula1': 'Formula 1',
-            'fórmula-1': 'Formula 1',
+            'formula 1': 'Formula 1',
             'f2': 'Formula 2',
+            'formula 2': 'Formula 2',
             'f3': 'Formula 3',
+            'formula 3': 'Formula 3',
             'motogp': 'MotoGP',
             'moto gp': 'MotoGP',
             'moto2': 'Moto2',
+            'moto 2': 'Moto2',
             'moto3': 'Moto3',
+            'moto 3': 'Moto3',
             'stockcar': 'Stock Car',
             'stock-car': 'Stock Car',
+            'stock car': 'Stock Car',
             'nascar': 'NASCAR',
             'indycar': 'IndyCar',
             'indy car': 'IndyCar',
@@ -324,11 +316,9 @@ class EventProcessor:
             'wrc': 'WRC',
             'formulae': 'Formula E',
             'formula-e': 'Formula E',
-            'fórmula-e': 'Formula E'
+            'formula e': 'Formula E',
         }
-        
-        category_lower = category.lower()
-        return category_map.get(category_lower, category)
+        return category_map.get(c, str(category).strip())
     
     def _normalize_date(self, date_value: Any) -> Optional[str]:
         """Normalize date to YYYY-MM-DD format."""
@@ -532,9 +522,11 @@ class EventProcessor:
             List of events with detected categories
         """
         if not self.category_detector:
-            # If no category detector, use raw categories
+            # If no category detector, use raw categories (fallback to 'category')
+            # and normalize to lowercase to align with test expectations.
             for event in events:
-                event['detected_category'] = event.get('raw_category', 'Unknown')
+                raw_cat = event.get('raw_category') or event.get('category') or 'Unknown'
+                event['detected_category'] = str(raw_cat).strip().lower() or 'unknown'
             return events
         
         if self.logger:

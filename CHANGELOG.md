@@ -5,6 +5,16 @@ Todas as mudanças notáveis neste projeto serão documentadas neste arquivo.
 O formato é baseado em [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 e este projeto adere ao [Versionamento Semântico](https://semver.org/spec/v2.0.0.html).
 
+## [0.5.13] - 2025-08-13
+### Correções e Integração (Issues #82, #86)
+
+- Correção de normalização no `EventProcessor` (campos e retorno de `_normalize_single_event`, preservação de `display_name`).
+- Ajuste no `ICalGenerator`: preservação de siglas para categoria de exibição (`F1`, `F2`, `F3`, `WEC`, `WRC`, `WSBK`, `NASCAR`); mapeamento consistente para `SUMMARY`, `CATEGORIES`, `X-MOTORSPORT-CATEGORY` e descrição.
+- Snapshots ICS estáveis (básico e E2E): divergências sanadas sem quebrar snapshots canônicos.
+- Job de CI dedicado `e2e_happy` no GitHub Actions para executar apenas o E2E caminho feliz com cobertura e artefatos próprios.
+- Suíte completa: **339 passed**, **0 failed**; cobertura total **~91.21%**.
+- Documentação sincronizada: `CHANGELOG.md`, `RELEASES.md`, `tests/README.md`, `docs/TEST_AUTOMATION_PLAN.md`.
+
 ## [0.5.10] - 2025-08-13
 ### Mocks/Fakes e Fixtures (Issue #79 — Fase 2)
 
@@ -61,6 +71,18 @@ e este projeto adere ao [Versionamento Semântico](https://semver.org/spec/v2.0.
   - `UID` normalizado para token fixo; remoção de `DTSTAMP`, `CREATED`, `LAST-MODIFIED`, `SEQUENCE`, `PRODID`; quebras de linha unificadas para `\n`.
 - Estabilidade: teste de integração executado 3× localmente sem flakes (<2s cada) com `-o addopts=""` (gate de cobertura desativado no comando). Gate global permanece configurado no projeto.
 - Documentação sincronizada: `tests/README.md` (seção de snapshots), `docs/tests/scenarios/phase2_scenarios.md` (cenário básico marcado como concluído).
+
+### Integração — E2E Caminho Feliz (Issue #82)
+
+- Teste: `tests/integration/test_phase2_e2e_happy.py` (gera ICS e compara com snapshot normalizado)
+- Snapshot: `tests/snapshots/phase2/phase2_e2e_happy.ics`
+- Execução local (sem cobertura/gate; ignorando `pytest.ini`):
+  - Comando: `pytest -q -c /dev/null tests/integration/test_phase2_e2e_happy.py -k happy`
+  - Run 1: 1 passed in 1.95s
+  - Run 2: 1 passed in 2.02s
+  - Run 3: 1 passed in 2.00s
+- Média: ~1.99s; Estabilidade: 3/3 passes (<30s). Sem flakes.
+- Observação: aviso de marker `integration` ocorre apenas com `-c /dev/null`; com `pytest.ini` normal os markers estão registrados.
 
 ### (movido para 0.5.10) Mocks/Fakes e Fixtures (Issue #79 — Fase 2)
 
