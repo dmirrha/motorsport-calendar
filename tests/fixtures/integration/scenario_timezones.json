@@ -1,0 +1,20 @@
+{
+  "events": [
+    {
+      "name": "Morning Session BR",
+      "detected_category": "F1",
+      "session_type": "practice",
+      "datetime": "2025-08-01T08:00:00-03:00",
+      "source": "fixture",
+      "source_display_name": "Phase2 Fixture"
+    },
+    {
+      "name": "Morning Session UK",
+      "detected_category": "F1",
+      "session_type": "practice",
+      "datetime": "2025-08-01T13:00:00+00:00",
+      "source": "fixture",
+      "source_display_name": "Phase2 Fixture"
+    }
+  ]
+}
