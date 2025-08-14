@@ -223,12 +223,13 @@ class ICalGenerator:
             ical_event.add('uid', f"{event_id}@motorsport-calendar")
             
             # Basic event info
-            event_name = event.get('name', 'Motorsport Event')
+            event_name = event.get('display_name') or event.get('name', 'Motorsport Event')
             category = event.get('detected_category', 'Unknown')
+            display_category = self._display_category(event)
             session_type = event.get('session_type', 'race').title()
             
             # Create title
-            title = f"{category} - {event_name}"
+            title = f"{display_category} - {event_name}"
             if session_type and session_type.lower() != 'race':
                 title += f" ({session_type})"
             
@@ -259,7 +260,7 @@ class ICalGenerator:
                 ical_event.add('location', location)
             
             # Categories
-            categories = [category]
+            categories = [display_category]
             if session_type and session_type.lower() != 'race':
                 categories.append(session_type)
             ical_event.add('categories', categories)
@@ -278,7 +279,7 @@ class ICalGenerator:
             self._add_reminders(ical_event)
             
             # Custom properties
-            ical_event.add('x-motorsport-category', category)
+            ical_event.add('x-motorsport-category', display_category)
             ical_event.add('x-motorsport-session', session_type)
             
             if event.get('source'):
@@ -336,7 +337,7 @@ class ICalGenerator:
         description_parts = []
         
         # Basic event info
-        category = event.get('detected_category', 'Unknown')
+        category = self._display_category(event)
         session_type = event.get('session_type', 'race').title()
         
         description_parts.append(f"🏁 {category} {session_type}")
@@ -380,6 +381,45 @@ class ICalGenerator:
             description_parts.append(f"\n⚠️ Category detection confidence: {confidence:.0%}")
         
         return '\n'.join(description_parts)
+
+    def _display_category(self, event: Dict[str, Any]) -> str:
+        """Return a display-friendly category string based on detected/raw category.
+
+        Rules:
+        - If provided category is an acronym/short code (e.g., 'F1', 'F2'), preserve it.
+        - Else, map known lowercased forms to title-case names.
+        - Else, fallback to title-casing the original string.
+        """
+        cat = event.get('detected_category') or event.get('raw_category') or 'Unknown'
+        cat_s = str(cat).strip()
+        # Preserve common acronyms if explicitly provided
+        acronyms = {'F1', 'F2', 'F3', 'WEC', 'WRC', 'WSBK', 'NASCAR'}
+        if cat_s in acronyms:
+            return cat_s
+
+        cat_l = cat_s.lower()
+        mapping = {
+            'formula 1': 'Formula 1',
+            'f1': 'Formula 1',
+            'formula e': 'Formula E',
+            'formule e': 'Formula E',
+            'formula-e': 'Formula E',
+            'motogp': 'MotoGP',
+            'moto gp': 'MotoGP',
+            'moto2': 'Moto2',
+            'moto 2': 'Moto2',
+            'moto3': 'Moto3',
+            'moto 3': 'Moto3',
+            'nascar': 'NASCAR',
+            'indycar': 'IndyCar',
+            'indy car': 'IndyCar',
+            'stock car': 'Stock Car',
+            'stock-car': 'Stock Car',
+            'wec': 'WEC',
+            'wrc': 'WRC',
+            'wsbk': 'WSBK',
+        }
+        return mapping.get(cat_l, cat_s.title())
     
     def _create_event_location(self, event: Dict[str, Any]) -> Optional[str]:
         """Create event location string."""

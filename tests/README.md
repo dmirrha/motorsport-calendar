@@ -122,6 +122,7 @@ O projeto executa a suíte de testes no GitHub Actions via workflow em `.github/
 - Execução: `pytest` com cobertura em `src/` e `sources/`
 - Relatórios: `junit.xml`, `coverage.xml`, `htmlcov/` (enviados como artefatos)
 - Cache de pip habilitado por hash dos arquivos `requirements*.txt`
+- Job adicional: `e2e_happy` — executa apenas `tests/integration/test_phase2_e2e_happy.py` com cobertura, ignorando `pytest.ini` via `-c /dev/null`. Artefatos: `test_results_e2e/junit.xml`, `coverage_e2e.xml`, `htmlcov-e2e/`.
 
 ## Mocks e Isolamento
 
@@ -210,6 +211,7 @@ def test_fixed_uuid(fixed_uuid):
   - Run 3: 1 passed in 2.00s
 - Média: ~1.99s; Estabilidade: 3/3 passes (<30s). Sem flakes.
 - Nota: o aviso de marker `integration` ocorre apenas com `-c /dev/null`; no fluxo normal, os markers estão registrados em `pytest.ini`.
+- CI: o job `e2e_happy` no GitHub Actions executa exatamente este teste e publica artefatos dedicados.
 
 ## Diretrizes
 

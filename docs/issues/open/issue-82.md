@@ -21,6 +21,12 @@ Implementar testes E2E do fluxo completo com comparação de snapshots `.ics`.
 - [x] Snapshots estáveis e revisados
 - [ ] Cobertura do caminho feliz reportada no CI
 
+## CI
+- Job dedicado adicionado ao workflow: `e2e_happy` em `.github/workflows/tests.yml`.
+- Executa `tests/integration/test_phase2_e2e_happy.py` com cobertura, ignorando `pytest.ini` via `-c /dev/null`.
+- Artefatos: `test_results_e2e/junit.xml`, `coverage_e2e.xml`, `htmlcov-e2e/`.
+- Status: aguardando primeiro run verde no GitHub Actions para marcar o critério de aceite de cobertura no CI.
+
 ## Plano de Resolução (PARE)
 1) Arquitetura do fluxo E2E (caminho feliz):
    - Coleta: `DataCollector.collect_events()` com rede mockada via `patch_requests_session`/`patch_requests_get` de `tests/conftest.py`.
@@ -52,4 +58,5 @@ Implementar testes E2E do fluxo completo com comparação de snapshots `.ics`.
 ## Progresso
 - [x] Teste E2E implementado
 - [x] Normalização e snapshots validados 3×
+- [x] Job `e2e_happy` configurado no CI com artefatos dedicados
 - [ ] Cobertura refletida no CI

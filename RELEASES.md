@@ -2,6 +2,16 @@
 
 Este arquivo contém um registro acumulativo de todas as versões lançadas do projeto, com notas detalhadas sobre as mudanças em cada versão.
 
+## Versão 0.5.13 (2025-08-13)
+Correções de `EventProcessor` e integração E2E com snapshots ICS (Issues #82, #86)
+
+- Correções na normalização do `EventProcessor` (campos/retornos, preservação de `display_name`).
+- Ajustes no `ICalGenerator` para preservação de siglas em `display_category` (F1/F2/F3/WEC/WRC/WSBK/NASCAR) e mapeamento consistente para `SUMMARY`, `CATEGORIES` e `X-MOTORSPORT-CATEGORY`.
+- Snapshots ICS estáveis (básico e E2E) após normalização via `tests/utils/ical_snapshots.py`.
+- Novo job de CI `e2e_happy` em `.github/workflows/tests.yml` executando somente o E2E caminho feliz com cobertura e artefatos dedicados (`coverage_e2e.xml`, `htmlcov-e2e/`, `test_results_e2e/junit.xml`).
+- Métricas locais: **339 passed**, **0 failed**; cobertura total **~91%**; E2E (3×): ~1.99s médio.
+- Documentação sincronizada: `CHANGELOG.md`, `RELEASES.md`, `tests/README.md`, `docs/TEST_AUTOMATION_PLAN.md`, `docs/tests/scenarios/phase2_scenarios.md`.
+
 ## Próximo (Não Lançado)
 Manutenção — Testes/Automação (issue #48, PR #55)
 
