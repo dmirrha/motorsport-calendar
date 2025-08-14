@@ -15,6 +15,7 @@ jobs:
     runs-on: ubuntu-latest
     permissions:
       contents: read
+      id-token: write
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -69,11 +70,14 @@ jobs:
           flags: unit
           fail_ci_if_error: false
           verbose: true
+          use_oidc: true
+          disable_search: true
 
   e2e_happy:
     runs-on: ubuntu-latest
     permissions:
       contents: read
+      id-token: write
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -120,11 +124,23 @@ jobs:
             test_results_e2e/junit.xml
             coverage_e2e.xml
             htmlcov-e2e/
+      
+      - name: Upload coverage to Codecov (e2e)
+        if: always()
+        uses: codecov/codecov-action@v4
+        with:
+          files: coverage_e2e.xml
+          flags: e2e
+          fail_ci_if_error: false
+          verbose: true
+          use_oidc: true
+          disable_search: true
   
   integration:
     runs-on: ubuntu-latest
     permissions:
       contents: read
+      id-token: write
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -179,3 +195,5 @@ jobs:
           flags: integration
           fail_ci_if_error: false
           verbose: true
+          use_oidc: true
+          disable_search: true
