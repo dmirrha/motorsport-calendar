@@ -12,10 +12,10 @@ Referências:
 Integrar a suíte `integration` ao CI com job dedicado, cobertura e artefatos.
 
 ## Tarefas
-- [ ] Job GitHub Actions executando `pytest -m integration`
-- [ ] Upload de artefatos: junit.xml, coverage.xml, htmlcov-integration/
-- [ ] Matriz/estratégia consistente com job unitário existente
-- [ ] Badge/documentação em `tests/README.md`
+- [x] Job GitHub Actions executando `pytest -m integration`
+- [x] Upload de artefatos: junit.xml, coverage.xml, htmlcov-integration/
+- [x] Matriz/estratégia consistente com job unitário existente
+- [x] Badge/documentação em `tests/README.md`
 
 ## Critérios de Aceite
 - [ ] Job executa em PRs e main
@@ -23,6 +23,7 @@ Integrar a suíte `integration` ao CI com job dedicado, cobertura e artefatos.
 - [ ] Gate de cobertura informado (não precisa falhar inicialmente)
 
 ## Progresso
-- [ ] Job criado e executando no CI
-- [ ] Artefatos publicados
-- [ ] Documentação sincronizada
+- [x] Job criado no workflow `tests.yml` (job `integration`)
+- [ ] Execução validada no CI (aguardando run da branch/PR)
+- [x] Artefatos configurados: `test_results_integration/junit.xml`, `coverage_integration.xml`, `htmlcov-integration/`
+- [x] Documentação sincronizada em `tests/README.md`

@@ -294,10 +294,11 @@ Objetivo: introduzir snapshots estáveis para validar a saída do `src/ical_gene
     - [x] `docs/tests/scenarios/phase2_scenarios.md`: referências ao épico #78 e PR #87
     - [x] `docs/tests/overview.md`: referência à execução de integração e ao PR #87
   - [ ] Automação CI (final da Fase 2)
-   - [ ] GitHub Actions: workflow para unit/integration com `pytest` + `pytest-cov`
-   - [ ] Upload de artefatos (HTML/ XML) e envio ao Codecov
+   - [x] GitHub Actions: job `integration` com `pytest -m integration` + `pytest-cov`
+   - [x] Upload de artefatos (HTML/XML) do job de integração
    - [ ] Codecov: upload de `coverage.xml`, status check e badge no `README.md`
-   - [ ] Gatilhos em PRs e pushes, gate por status de cobertura
+   - [x] Gatilhos em PRs e pushes (herdados do workflow `tests.yml`)
+   - [ ] Gate por status de cobertura (pendente)
 
 ### Progresso — Issue #80 (edge cases ICS)
 
