@@ -5,6 +5,27 @@ Todas as mudanças notáveis neste projeto serão documentadas neste arquivo.
 O formato é baseado em [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 e este projeto adere ao [Versionamento Semântico](https://semver.org/spec/v2.0.0.html).
 
+## [0.5.14] - 2025-08-14
+### Integração — Edge cases ICS (Issue #80)
+
+- Fixtures de integração adicionadas:
+  - `tests/fixtures/integration/scenario_optionals_missing.json`
+  - `tests/fixtures/integration/scenario_overnight.json`
+  - `tests/fixtures/integration/scenario_timezones.json`
+- Testes de integração correspondentes:
+  - `tests/integration/test_phase2_optionals.py`
+  - `tests/integration/test_phase2_overnight.py`
+  - `tests/integration/test_phase2_timezones.py`
+- Snapshots ICS canônicos:
+  - `tests/snapshots/phase2/phase2_optionals.ics`
+  - `tests/snapshots/phase2/phase2_overnight.ics`
+  - `tests/snapshots/phase2/phase2_timezones.ics`
+- Normalização de snapshots via `tests/utils/ical_snapshots.py` (UID fixo, remoção de campos voláteis, quebras de linha `\n`).
+- Estabilidade validada: cada teste executado 3× localmente, sem flakes (<30s por execução).
+- Documentação sincronizada: `CHANGELOG.md`, `RELEASES.md`, `tests/README.md`, `docs/TEST_AUTOMATION_PLAN.md`.
+- Rastreabilidade: `docs/issues/open/issue-80.{md,json}` atualizados.
+- Versionamento: bump para `0.5.14` em `src/__init__.py`.
+
 ## [0.5.13] - 2025-08-13
 ### Correções e Integração (Issues #82, #86)
 

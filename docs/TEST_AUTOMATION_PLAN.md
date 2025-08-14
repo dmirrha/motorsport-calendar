@@ -298,6 +298,28 @@ Objetivo: introduzir snapshots estáveis para validar a saída do `src/ical_gene
    - [ ] Upload de artefatos (HTML/ XML) e envio ao Codecov
    - [ ] Codecov: upload de `coverage.xml`, status check e badge no `README.md`
    - [ ] Gatilhos em PRs e pushes, gate por status de cobertura
+
+### Progresso — Issue #80 (edge cases ICS)
+
+- Fixtures de integração:
+  - `tests/fixtures/integration/scenario_optionals_missing.json`
+  - `tests/fixtures/integration/scenario_overnight.json`
+  - `tests/fixtures/integration/scenario_timezones.json`
+- Testes de integração:
+  - `tests/integration/test_phase2_optionals.py`
+  - `tests/integration/test_phase2_overnight.py`
+  - `tests/integration/test_phase2_timezones.py`
+- Snapshots canônicos:
+  - `tests/snapshots/phase2/phase2_optionals.ics`
+  - `tests/snapshots/phase2/phase2_overnight.ics`
+  - `tests/snapshots/phase2/phase2_timezones.ics`
+- Normalização via `tests/utils/ical_snapshots.py` (UID fixo, remoção de `DTSTAMP/CREATED/LAST-MODIFIED/SEQUENCE/PRODID`, quebras `\n`).
+- Estabilidade local: cada teste 3× sem flakes (<30s por execução; `-o addopts=""` quando necessário).
+- Documentação sincronizada: `CHANGELOG.md`, `RELEASES.md`, `tests/README.md`, este plano.
+- Rastreabilidade: `docs/issues/open/issue-80.{md,json}` atualizados.
+- Versionamento: bump para `0.5.14` em `src/__init__.py`.
+- Próximos passos: criar branch remota `tests/issue-80-edge-cases`, abrir PR referenciando a Issue #80, atualizar checklist na issue com links/versão.
+
 ## Execução Local — Guia Rápido
 - Instalação:
 ```

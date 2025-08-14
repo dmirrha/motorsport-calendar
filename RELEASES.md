@@ -2,6 +2,27 @@
 
 Este arquivo contém um registro acumulativo de todas as versões lançadas do projeto, com notas detalhadas sobre as mudanças em cada versão.
 
+## Versão 0.5.14 (2025-08-14)
+Integração — Edge cases ICS (Issue #80)
+
+- Fixtures de integração:
+  - `tests/fixtures/integration/scenario_optionals_missing.json`
+  - `tests/fixtures/integration/scenario_overnight.json`
+  - `tests/fixtures/integration/scenario_timezones.json`
+- Testes de integração:
+  - `tests/integration/test_phase2_optionals.py`
+  - `tests/integration/test_phase2_overnight.py`
+  - `tests/integration/test_phase2_timezones.py`
+- Snapshots ICS canônicos:
+  - `tests/snapshots/phase2/phase2_optionals.ics`
+  - `tests/snapshots/phase2/phase2_overnight.ics`
+  - `tests/snapshots/phase2/phase2_timezones.ics`
+- Normalização de snapshots via `tests/utils/ical_snapshots.py` (UID fixo, remoção de campos voláteis, `\n`).
+- Estabilidade: cada teste executado 3× localmente, sem flakes (<30s por execução).
+- Documentação sincronizada: `CHANGELOG.md`, `RELEASES.md`, `tests/README.md`, `docs/TEST_AUTOMATION_PLAN.md`.
+- Rastreabilidade: `docs/issues/open/issue-80.{md,json}` atualizados.
+- Versionamento: bump para `0.5.14` em `src/__init__.py`.
+
 ## Versão 0.5.13 (2025-08-13)
 Correções de `EventProcessor` e integração E2E com snapshots ICS (Issues #82, #86)
 
