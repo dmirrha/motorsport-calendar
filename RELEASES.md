@@ -51,6 +51,18 @@ Manutenção — Testes/Automação (issue #48, PR #55)
 - Estabilidade: teste de integração executado 3× localmente sem flakes (<2s cada) com `-o addopts=""` (gate de cobertura desativado no comando). Gate global permanece configurado no projeto.
 - Documentação sincronizada: `tests/README.md` (seção de snapshots) e `docs/tests/scenarios/phase2_scenarios.md` (cenário básico concluído).
 
+### Integração — E2E Caminho Feliz (Issue #82)
+
+- Teste: `tests/integration/test_phase2_e2e_happy.py` (gera ICS e compara com snapshot normalizado)
+- Snapshot: `tests/snapshots/phase2/phase2_e2e_happy.ics`
+- Execução local (sem cobertura/gate; ignorando `pytest.ini`):
+  - Comando: `pytest -q -c /dev/null tests/integration/test_phase2_e2e_happy.py -k happy`
+  - Run 1: 1 passed in 1.95s
+  - Run 2: 1 passed in 2.02s
+  - Run 3: 1 passed in 2.00s
+- Média: ~1.99s; Estabilidade: 3/3 passes (<30s). Sem flakes.
+- Observação: aviso de marker `integration` ocorre apenas com `-c /dev/null`; com `pytest.ini` normal os markers estão registrados.
+
 ### (movido para 0.5.10) Mocks/Fakes e Fixtures (Issue #79 — Fase 2)
 
  - Fase 1.1 — Checklist reorganizada por issues (#59–#64) com sincronismo automático entre plano (`docs/TEST_AUTOMATION_PLAN.md`) e issues (docs/issues/open/issue-<n>.{md,json}); rastreabilidade 58–64 adicionada.
