@@ -14,6 +14,11 @@ O formato é baseado em [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)
 e este projeto adere ao [Versionamento Semântico](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
+### Documentação — Issue #105 (Plano — Fase 3)
+
+- Reabertura da issue e inclusão do Plano — Fase 3, alinhado a `.windsurf/rules/tester.md` (sem mudanças de código).
+- Docs sincronizadas: `docs/issues/open/issue-105.{md,json}`; CHANGELOG/RELEASES atualizados.
+
 ### Integração — Codecov (Issue #98)
 
 - Uploads informativos de cobertura adicionados ao workflow (`codecov/codecov-action@v4`) para os jobs `tests` (flag `unit`, `coverage.xml`) e `integration` (flag `integration`, `coverage_integration.xml`), com `fail_ci_if_error: false`.
