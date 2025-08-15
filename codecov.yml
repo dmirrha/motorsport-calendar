@@ -44,3 +44,7 @@ component_management:
       name: Logging
       paths:
         - src/logger.py
+    - component_id: sources
+      name: Data Sources
+      paths:
+        - sources/

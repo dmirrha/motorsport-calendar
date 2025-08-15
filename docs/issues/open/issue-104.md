@@ -24,13 +24,15 @@ Configurar componentes no Codecov para visualizar cobertura por áreas do sistem
 - `utils`: `src/utils/`
 - `logging`: `src/logger.py`
 
+Atualização: incluído componente adicional `sources` (paths: `sources/`) para cobrir arquivos referenciados por relatórios de cobertura (especialmente e2e/integration), evitando itens "unassigned".
+
 Nota: A sintaxe exata no `codecov.yml` será confirmada na documentação oficial antes do commit (evitar configurações depre­cadas). A ideia é usar o bloco de “components”/“component_management” com lista de componentes e seus `paths`.
 
 ## Tarefas
-- [ ] Entender como configurar o Codecov por componentes (confirmar sintaxe atual na doc)
-- [ ] Realizar a configuração no `codecov.yml` (adicionar componentes)
+- [x] Entender como configurar o Codecov por componentes (confirmar sintaxe atual na doc)
+- [x] Realizar a configuração no `codecov.yml` (adicionar componentes, incluindo `sources/`)
 - [ ] Executar o CI e validar no dashboard (slug `/github`) a separação por componentes
-- [ ] Atualizar documentação (README, `docs/TEST_AUTOMATION_PLAN.md`, `tests/README.md`)
+- [x] Atualizar documentação (README, `docs/TEST_AUTOMATION_PLAN.md`, `tests/README.md`) — links ajustados para `/github`; seção de Components e Test Analytics adicionada
 - [ ] Abrir PR referenciando “Closes #104” e sincronizar checklist
 
 ## Critérios de Aceite
@@ -42,6 +44,7 @@ Nota: A sintaxe exata no `codecov.yml` será confirmada na documentação oficia
 ## Riscos e Observações
 - Configurações antigas de `paths` por flag estavam incorretas; manteremos flags sem `paths` e adicionaremos componentes por diretórios de código-fonte.
 - `disable_search: true` permanece; componentes agregam cobertura por path dos arquivos-fonte já presentes nos relatórios.
+ - Test Analytics configurado via `codecov/test-results-action@v1` (envio de `junit.xml` por job). Requer `CODECOV_TOKEN` em GitHub Secrets.
 
 ## Plano de Validação
 1) Abrir PR a partir da branch `chore/issue-104` com o `codecov.yml` atualizado.

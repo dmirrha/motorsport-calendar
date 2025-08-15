@@ -87,6 +87,9 @@ logs/*.log
 .cache/
 .pytest_cache/
 
+# Local temp directory
+tmp/
+
 # Jupyter Notebooks (if used for testing)
 .ipynb_checkpoints/
 
@@ -95,17 +98,20 @@ htmlcov/
 .coverage
 .coverage.*
 coverage.xml
+coverage_*.xml
 *.cover
 .hypothesis/
 pytest.log
 report.html
 junit.xml
+htmlcov-*/
 
 # Test artifacts and results
 tests/regression/test_data/output/
 test_results/
 test_results_github/
 tests/**/test_results/
+test_results_*/
 
 # Environment variables
 .env
@@ -113,3 +119,4 @@ tests/**/test_results/
 .env.development
 .env.test
 .env.production
+
