@@ -14,6 +14,13 @@ Documentação — Issue #83: documentação e rastreabilidade sincronizadas (se
 - Atualizados: `docs/issues/open/issue-83.{md,json}`, `docs/TEST_AUTOMATION_PLAN.md`, `tests/README.md`, `docs/tests/scenarios/phase2_scenarios.md`, `docs/tests/scenarios/SCENARIOS_INDEX.md`, `CHANGELOG.md`.
 - Branch: `tests/issue-83-docs-traceability`.
 
+- Integração — Fase 3 IT1 (Issue #105)
+  - Teste adicionado: `tests/integration/test_phase3_data_collector_concurrent.py` — valida concorrência de coleta, agregação parcial e estatísticas do `DataCollector` sem rede real (mocks via `tests/conftest.py`).
+  - Execução local (integration): `21 passed, 3 skipped, 1 xfailed` em ~6.4s; cobertura consolidada (~48% global no run de integração).
+  - Cobertura específica (integration): `src/data_collector.py` ~62% linhas. Próximo: backoff e partial aggregation dedicados.
+  - Versionamento: bump para `0.5.17` aplicado em `src/__init__.py`.
+  - Documentação: `CHANGELOG.md` e `docs/issues/open/issue-105.md` atualizados.
+
 - CI — Cobertura visível por job (Issue #105)
 
   - `.github/workflows/tests.yml` atualizado para melhorar a visibilidade da cobertura por job:
@@ -26,6 +33,8 @@ Documentação — Issue #83: documentação e rastreabilidade sincronizadas (se
     - Testes de integração adicionados para módulos prioritários: `src/utils/config_validator.py`, `src/config_manager.py`, `src/silent_period.py`, `src/category_detector.py`.
     - Total: 13 testes, 0 skips; execução local estável.
     - Cobertura aproximada (integration): `config_validator` ~58%, `config_manager` ~70%, `silent_period` ~65%, `category_detector` ~52%.
+    - Baseline: cobertura global 91,27% (Codecov, commit `2096dd8`, branch `chore/issue-105`).
+    - Documentação sincronizada: `docs/issues/open/issue-105.{md,json}`, `CHANGELOG.md`, `RELEASES.md`.
     - Baseline (local): Integration ~40%; E2E (happy) ~40%.
     - Documentação sincronizada: `docs/issues/open/issue-105.{md,json}`, `CHANGELOG.md`.
 

@@ -25,6 +25,10 @@ e este projeto adere ao [Versionamento Semântico](https://semver.org/spec/v2.0.
 - Planejado: `tests/integration/test_phase3_tomada_tempo_parsing_variants.py`, `tests/integration/test_phase3_data_collector_backoff_and_partial.py`.
 - Metas: elevar integração rumo a 75–80% mantendo CI <30s; 3× execuções sem flakes.
 - Versionamento: bump para `0.5.16` aplicado em `src/__init__.py`.
+- Teste adicionado: `tests/integration/test_phase3_data_collector_concurrent.py` — valida concorrência de coleta, agregação parcial e estatísticas do `DataCollector` sem rede real (mocks via `tests/conftest.py`).
+- Execução local (integration): `21 passed, 3 skipped, 1 xfailed` em ~6.4s; cobertura consolidada (~48% global no run de integração).
+- Cobertura específica (integration): `src/data_collector.py` ~62% linhas. Próximo: backoff e partial aggregation dedicados.
+- Versionamento: bump para `0.5.17` aplicado em `src/__init__.py`.
 - Documentação: `RELEASES.md` e `docs/issues/open/issue-105.md` atualizados; pedido de confirmação registrado.
 
 ### Integração — Codecov (Issue #98)
