@@ -7,7 +7,7 @@
   "epic": null,
   "url": "https://github.com/dmirrha/motorsport-calendar/issues/105",
   "created_at": "2025-08-14T19:39:14Z",
-  "updated_at": "2025-08-15T16:28:18Z",
+  "updated_at": "2025-08-15T17:43:46Z",
   "tasks": [
     {"item": "Montar plano de priorização para novos cenários de testes integrados", "done": true},
     {"item": "Aprovação do plano da Fase 2 (~80% de cobertura de integração)", "done": true},
@@ -16,7 +16,13 @@
     {"item": "Iniciar implementação incremental dos testes da Fase 2 (novos cenários e orquestração)", "done": true},
     {"item": "Validar cobertura de integração ≥ 80% e estabilidade (2× execuções locais)", "done": false},
     {"item": "Atualizar documentação (CHANGELOG.md, RELEASES.md) conforme progresso", "done": true},
-    {"item": "Abrir PR da Fase 2 referenciando #105", "done": true}
+    {"item": "Abrir PR da Fase 2 referenciando #105", "done": true},
+    {"item": "Reabrir a issue e publicar o Plano — Fase 3 no GitHub", "done": true},
+    {"item": "Sincronizar docs locais (issue-105.md/json) com o Plano — Fase 3", "done": true},
+    {"item": "Criar branch chore/issue-105-phase3-plan e abrir PR de housekeeping", "done": false},
+    {"item": "Executar Fase 3 — Iteração 1 (parsers/collector)", "done": false},
+    {"item": "Executar Fase 3 — Iteração 2 (processor/ical)", "done": false},
+    {"item": "Executar Fase 3 — Iteração 3 (silent/config/utils)", "done": false}
   ],
   "acceptance": [
     "Cobertura de testes integrados global ≥ 80%",

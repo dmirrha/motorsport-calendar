@@ -3,6 +3,8 @@
 Este arquivo contém um registro acumulativo de todas as versões lançadas do projeto, com notas detalhadas sobre as mudanças em cada versão.
 
 ## Não Lançado
+Documentação — Issue #105: reabertura e inclusão do Plano — Fase 3 (alinhado a `.windsurf/rules/tester.md`), sem mudanças de código. Docs sincronizadas: `docs/issues/open/issue-105.{md,json}`; `CHANGELOG.md` e `RELEASES.md` atualizados.
+
 Documentação — Issue #83: documentação e rastreabilidade sincronizadas (sem mudanças de código/funcionalidade).
 
 - Integração — Codecov Hardening (Issue #103): OIDC habilitado nos uploads do Codecov (`use_oidc: true`), varredura automática desabilitada (`disable_search: true`), `codecov.yml` mínimo (statuses informativos `project`/`patch`, `comment: false`) e upload adicional do E2E (flag `e2e`). Documentação atualizada (`tests/README.md`, `docs/TEST_AUTOMATION_PLAN.md`).

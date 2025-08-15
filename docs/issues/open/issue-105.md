@@ -14,7 +14,7 @@ Aumentar a cobertura de testes integrados para >80%, de forma equalizada entre o
 - Título: Aumentar a cobertura de testes integrados para >80%
 - URL: https://github.com/dmirrha/motorsport-calendar/issues/105
 - Criada em: 2025-08-14T19:39:14Z
-- Atualizada em: 2025-08-14T22:50:54Z
+- Atualizada em: 2025-08-15T17:43:46Z
 
 ## Atualizações recentes
 - 2025-08-15: Plano da Fase 2 aprovado (objetivo ~80% integração).
@@ -23,6 +23,7 @@ Aumentar a cobertura de testes integrados para >80%, de forma equalizada entre o
 - 2025-08-15: Aberta PR #109 (Draft) para a Fase 2 — https://github.com/dmirrha/motorsport-calendar/pull/109.
 
 - 2025-08-15: Adicionados testes de integração (Lote 2): `tests/integration/test_phase2_orchestration_silent_manager.py` e `tests/integration/test_phase2_config_manager.py`; execução local determinística com `pytest -q -c /dev/null`; avisos de marker `integration` esperados nesse modo (sem avisos quando usando `pytest.ini`).
+ - 2025-08-15: Issue reaberta para a Fase 3; Plano — Fase 3 registrado neste documento e na issue do GitHub.
 ### Corpo da Issue
 ## 🚀 Descrição da Feature
 Aumentar a cobertura de testes integrados para >80%
@@ -228,6 +229,39 @@ Seguindo `/.windsurf/rules/tester.md`: pytest puro, mocks simples, determinismo 
   - `tests/integration/test_phase2_config_manager.py`: merge profundo com defaults e persistência (save/load) usando arquivos temporários.
 - Execução local: determinística, rápida e isolada com `pytest -q -c /dev/null` para evitar gates globais; marker `integration` registrado em `pytest.ini` (sem warnings quando não se usa `-c /dev/null`).
 - Próximos alvos (conforme plano): `sources/tomada_tempo.py`, `src/data_collector.py`, `src/event_processor.py`, `src/ical_generator.py`.
+
+## Plano — Fase 3 (incremental, simples e determinístico)
+
+Alinhado a `.windsurf/rules/tester.md` (pytest puro, mocks simples, foco no essencial, execuções <30s, 3× estáveis).
+
+### Alvos de maior impacto
+- `sources/tomada_tempo.py`: variantes de HTML, campos ausentes e erros de parsing.
+- `src/event_processor.py`: dedupe/ordenação/TZ em bordas adicionais.
+- `src/data_collector.py`: resiliência (timeouts/404/malformed) com agregação parcial.
+- `src/ical_generator.py`: toggles/opcionais/overnight refletidos no ICS final.
+- `src/utils/config_validator.py` e `src/config_manager.py`: variantes de merge e coerções.
+- `src/silent_period.py`: múltiplas janelas e cruzando DST.
+
+### Testes propostos (mínimo viável)
+- `tests/integration/test_phase3_tomada_tempo_parsing_variants.py`
+- `tests/integration/test_phase3_data_collector_backoff_and_partial.py`
+- `tests/integration/test_phase3_event_processor_merge_order_tz_edges.py`
+- `tests/integration/test_phase3_ical_generation_options_minimal.py`
+- `tests/integration/test_phase3_config_manager_overrides_and_types.py`
+- `tests/integration/test_phase3_silent_periods_multi_windows_dst.py`
+
+### Critérios de aceite
+- Cobertura Integration ≥ 75–80% e E2E ≥ 70–75%.
+- Execuções locais determinísticas (<30s), 3× sem flakes.
+- Sem dependência de rede; uso de fixtures/mocks simples.
+
+### Comando recomendado (integração)
+```bash
+pytest -q -c /dev/null tests/integration \
+  --cov=src --cov=sources \
+  --cov-report=term:skip-covered \
+  --cov-report=xml:coverage_integration.xml
+```
 
 ## Checklist de execução (sincronizado com GitHub)
 - [x] Baseline: disparar workflow "Tests" (workflow_dispatch) na branch `chore/issue-105` e registrar percentuais Integration/E2E (Codecov flags + Components) — global 91,27% (Codecov, commit `2096dd8`).
