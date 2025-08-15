@@ -19,6 +19,14 @@ e este projeto adere ao [Versionamento Semântico](https://semver.org/spec/v2.0.
 - Reabertura da issue e inclusão do Plano — Fase 3, alinhado a `.windsurf/rules/tester.md` (sem mudanças de código).
 - Docs sincronizadas: `docs/issues/open/issue-105.{md,json}`; CHANGELOG/RELEASES atualizados.
 
+### Integração — Fase 3 IT1 (Issue #105)
+
+- Foco: parsers (`sources/tomada_tempo.py`) e coletor (`src/data_collector.py`) com cenários mínimos determinísticos.
+- Planejado: `tests/integration/test_phase3_tomada_tempo_parsing_variants.py`, `tests/integration/test_phase3_data_collector_backoff_and_partial.py`.
+- Metas: elevar integração rumo a 75–80% mantendo CI <30s; 3× execuções sem flakes.
+- Versionamento: bump para `0.5.16` aplicado em `src/__init__.py`.
+- Documentação: `RELEASES.md` e `docs/issues/open/issue-105.md` atualizados; pedido de confirmação registrado.
+
 ### Integração — Codecov (Issue #98)
 
 - Uploads informativos de cobertura adicionados ao workflow (`codecov/codecov-action@v4`) para os jobs `tests` (flag `unit`, `coverage.xml`) e `integration` (flag `integration`, `coverage_integration.xml`), com `fail_ci_if_error: false`.
