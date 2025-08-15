@@ -1,23 +1,26 @@
 {
-  "id": "I_kwDOPWyu9M7GFsD7",
+  "id": 3323379963,
   "number": 105,
   "state": "open",
   "title": "Aumentar a cobertura de testes integrados para >80%",
+  "milestone": null,
+  "epic": null,
   "url": "https://github.com/dmirrha/motorsport-calendar/issues/105",
   "created_at": "2025-08-14T19:39:14Z",
-  "updated_at": "2025-08-14T22:50:54Z",
-  "author": "dmirrha",
-  "labels": ["enhancement"],
+  "updated_at": "2025-08-15T16:28:18Z",
   "tasks": [
-    {"item": "Executar baseline dos testes Integrados e E2E e registrar cobertura global e por componente/flag", "done": true},
     {"item": "Montar plano de priorização para novos cenários de testes integrados", "done": true},
-    {"item": "Solicitar aprovação do plano", "done": false},
-    {"item": "Implementar cenários e elevar cobertura integrada para ≥ 80%", "done": false}
+    {"item": "Aprovação do plano da Fase 2 (~80% de cobertura de integração)", "done": true},
+    {"item": "Criar branch feat/issue-105-phase2-integration-80", "done": true},
+    {"item": "Atualizar documentação local de rastreabilidade (issue-105.md/json) com aprovação e branch", "done": true},
+    {"item": "Iniciar implementação incremental dos testes da Fase 2 (novos cenários e orquestração)", "done": true},
+    {"item": "Validar cobertura de integração ≥ 80% e estabilidade (2× execuções locais)", "done": false},
+    {"item": "Atualizar documentação (CHANGELOG.md, RELEASES.md) conforme progresso", "done": true},
+    {"item": "Abrir PR da Fase 2 referenciando #105", "done": true}
   ],
   "acceptance": [
-    "Cobertura global de testes integrados ≥ 80%",
-    "Evolução equilibrada por módulos/componentes",
-    "CI passando e uploads/analytics corretos no Codecov (/github)",
-    "Documentação atualizada (README, CHANGELOG, RELEASES, tests/README)"
+    "Cobertura de testes integrados global ≥ 80%",
+    "CI verde com uploads/analytics corretos no Codecov (flags + components)",
+    "Documentação atualizada e rastreabilidade sincronizada (issue-105.md/json, CHANGELOG.md, RELEASES.md)"
   ]
 }

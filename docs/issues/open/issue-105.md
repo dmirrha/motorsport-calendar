@@ -16,8 +16,14 @@ Aumentar a cobertura de testes integrados para >80%, de forma equalizada entre o
 - Criada em: 2025-08-14T19:39:14Z
 - Atualizada em: 2025-08-14T22:50:54Z
 
+## Atualizações recentes
+- 2025-08-15: Plano da Fase 2 aprovado (objetivo ~80% integração).
+- 2025-08-15: Criada branch de trabalho `feat/issue-105-phase2-integration-80` para implementação.
+- 2025-08-15: PR #108 mergeada (documentação do Lote 1).
+- 2025-08-15: Aberta PR #109 (Draft) para a Fase 2 — https://github.com/dmirrha/motorsport-calendar/pull/109.
+
+- 2025-08-15: Adicionados testes de integração (Lote 2): `tests/integration/test_phase2_orchestration_silent_manager.py` e `tests/integration/test_phase2_config_manager.py`; execução local determinística com `pytest -q -c /dev/null`; avisos de marker `integration` esperados nesse modo (sem avisos quando usando `pytest.ini`).
 ### Corpo da Issue
-```
 ## 🚀 Descrição da Feature
 Aumentar a cobertura de testes integrados para >80%
 
@@ -45,16 +51,49 @@ Testes Integrados com cobertura global acima de 80%
 
 ## Dados coletados (baseline)
 - Cobertura integrada (global): 91,27% (Codecov, commit `2096dd8` na branch `chore/issue-105`).
-- Cobertura por componente: disponível no Codecov Components (não consolidado neste documento).
-- Módulos mais críticos (baixa cobertura): a coletar.
-- Uploads confirmados no Codecov (coverage + test analytics) para `unit`, `integration` e `e2e` via OIDC/flags corretas.
+  - Cobertura por componente: disponível no Codecov Components (não consolidado neste documento).
+  - Módulos mais críticos (baixa cobertura): a coletar.
+  - Uploads confirmados no Codecov (coverage + test analytics) para `unit`, `integration` e `e2e` via OIDC/flags corretas.
+
+### Cobertura consolidada (último run — workflow "Tests", branch `chore/issue-105`)
+ - Run ID: `16990132568`
+ - Jobs: `tests=48167303257`, `integration=48167303272`, `e2e_happy=48167303255`
+ - Percentuais:
+   - tests (unit): **91.15%** (TOTAL 91%)
+   - integration: **37%** (TOTAL 37%)
+   - e2e_happy: **36%** (TOTAL 36%)
+ - Fonte: linhas "TOTAL ... %" dos logs salvos em `logs/jobs/` e resumo do job no GitHub Actions.
+
+### O que são “Integration” e “E2E” neste projeto
+ - Integration: testes que exercitam o pipeline por componentes (coleta → processamento → geração) com dependências externas controladas (mocks simples quando necessário). Medem a integração entre módulos reais (sem isolar lógica interna), executados no job `integration` do workflow (`.github/workflows/tests.yml`) e enviados ao Codecov com a flag `integration`.
+ - E2E: fluxo ponta a ponta mínimo e realista do pipeline (entrada → saída/artefatos), priorizando comportamento do sistema como um todo. São mantidos em `tests/integration/` (não há pasta separada `tests/e2e`), executados no job `e2e_happy` e enviados ao Codecov com a flag `e2e`.
+
+### Plano de ações para aumentar a cobertura (Integration/E2E)
+ - Ações imediatas (próximos commits):
+   - Fortalecer Integration nos alvos prioritários:
+     - `sources/tomada_tempo.py` (parsing HTML/JSON instável; campos ausentes; normalização) — `test_phase2_sources_parsing_errors.py`.
+     - `src/data_collector.py` (retries/backoff; agregação parcial; warnings sem crash) — `test_phase2_data_collector_resilience.py`.
+     - `src/event_processor.py` (dedupe/ordem/TZ) — `test_phase2_processor_dedupe_order_tz.py`.
+     - `src/ical_generator.py` (TZIDs, overnight, opcionais) — `test_phase2_ical_options_and_edges.py`.
+     - `src/config_manager.py`/`src/utils/config_validator.py` (variantes/erros claros) — `test_phase2_config_variants_streaming.py`.
+     - `src/silent_period.py` (filtros/ventanas silenciosas) — `test_phase2_silent_periods_filters.py`.
+   - Ampliar E2E além do happy path:
+     - Resiliência de coleta e entradas malformadas — `test_phase2_e2e_resilience.py`.
+     - Dedupe cross-fonte e bordas TZ/DST — `test_phase2_e2e_dedupe_cross_source.py`, `test_phase2_e2e_tz_dst_boundary.py`.
+     - Config inválida/ausente (fail-fast controlado) — `test_phase2_e2e_invalid_config.py`.
+ - Metas de curto prazo:
+   - Elevar Integration para ~50–55% e E2E para ~50% mantendo tempo de CI <30s.
+   - Atingir 70–80% em iterações subsequentes, priorizando qualidade e simplicidade (sem perseguir 100%).
+ - Critérios de qualidade:
+   - Zero flakes (3× execuções estáveis), asserts objetivos e determinísticos.
+   - Codecov com flags/componentes corretos; resumo de cobertura no `GITHUB_STEP_SUMMARY`.
 
 ## Plano de resolução (proposto)
-1) Executar baseline dos testes Integrados e E2E na branch de trabalho e registrar percentuais global e por componente (usar Codecov Components/flags).
-2) Priorizar módulos críticos (parsers, processadores, validadores) conforme as regras do tester (`.windsurf/rules/tester.md`).
-3) Implementar cenários integrados mínimos e efetivos (mocks simples quando necessário).
-4) Rodar CI, validar evolução de cobertura e ajustar até atingir >80% global para Integrados.
-5) Atualizar documentação (README/tests/RELEASES/CHANGELOG) e preparar PR mencionando a issue (#105).
+  1) Executar baseline dos testes Integrados e E2E na branch de trabalho e registrar percentuais global e por componente (usar Codecov Components/flags).
+  2) Priorizar módulos críticos (parsers, processadores, validadores) conforme as regras do tester (`.windsurf/rules/tester.md`).
+  3) Implementar cenários integrados mínimos e efetivos (mocks simples quando necessário).
+  4) Rodar CI, validar evolução de cobertura e ajustar até atingir >80% global para Integrados.
+  5) Atualizar documentação (README/tests/RELEASES/CHANGELOG) e preparar PR mencionando a issue (#105).
 
 ## Plano de priorização (proposta para aprovação)
 - Componentes por prioridade:
@@ -166,6 +205,29 @@ Seguindo `/.windsurf/rules/tester.md`: pytest puro, mocks simples, determinismo 
 - Asserts mínimos de logs/warnings quando agregam valor.
 - Validar flags/components no Codecov (slug `/github`).
 - Atualizar documentação: `CHANGELOG.md`, `RELEASES.md`, `tests/README.md`, `docs/TEST_AUTOMATION_PLAN.md`.
+
+## Progresso recente — Lote 1 (integração)
+- Testes de integração criados para os módulos prioritários:
+  - `tests/integration/test_config_validator_integration.py`
+  - `tests/integration/test_config_manager_integration.py`
+  - `tests/integration/test_silent_period_integration.py`
+  - `tests/integration/test_category_detector_integration.py`
+- Execução: 13 testes passando (Lote 1), sem falhas/flakes.
+- Sumário da suíte de integração: 18 passed, 4 skipped (pytest -m integration).
+- Cobertura aproximada por módulo (integration):
+  - `src/utils/config_validator.py`: ~58%
+  - `src/config_manager.py`: ~70%
+  - `src/silent_period.py`: ~65%
+  - `src/category_detector.py`: ~52%
+- Próximos passos: ampliar cenários para `sources/`, `data_collector`, `event_processor` e `ical_generator`; manter markers/flags no CI e atualizar docs relacionadas.
+
+## Progresso recente — Lote 2 (integração)
+
+- Testes adicionados:
+  - `tests/integration/test_phase2_orchestration_silent_manager.py`: integra `SilentPeriodManager` + `ConfigManager`; valida filtro em período silencioso cruzando a meia-noite (22:00→06:00) e metadados/estatísticas.
+  - `tests/integration/test_phase2_config_manager.py`: merge profundo com defaults e persistência (save/load) usando arquivos temporários.
+- Execução local: determinística, rápida e isolada com `pytest -q -c /dev/null` para evitar gates globais; marker `integration` registrado em `pytest.ini` (sem warnings quando não se usa `-c /dev/null`).
+- Próximos alvos (conforme plano): `sources/tomada_tempo.py`, `src/data_collector.py`, `src/event_processor.py`, `src/ical_generator.py`.
 
 ## Checklist de execução (sincronizado com GitHub)
 - [x] Baseline: disparar workflow "Tests" (workflow_dispatch) na branch `chore/issue-105` e registrar percentuais Integration/E2E (Codecov flags + Components) — global 91,27% (Codecov, commit `2096dd8`).

@@ -27,6 +27,13 @@ Documentação — Issue #83: documentação e rastreabilidade sincronizadas (se
     - Baseline (local): Integration ~40%; E2E (happy) ~40%.
     - Documentação sincronizada: `docs/issues/open/issue-105.{md,json}`, `CHANGELOG.md`.
 
+- Integração — Lote 2 (Issue #105):
+    - Novos testes de integração:
+      - `tests/integration/test_phase2_orchestration_silent_manager.py`: orquestração entre `SilentPeriodManager` e `ConfigManager`, cobrindo período silencioso cruzando a meia-noite (sex/sáb 22:00→06:00), verificação de metadados e estatísticas.
+      - `tests/integration/test_phase2_config_manager.py`: complementos para `ConfigManager` (merge profundo com defaults e persistência save/load usando arquivos temporários).
+    - Execução local: ambos passam de forma determinística usando `pytest -q -c /dev/null` (evita gates globais); aviso de marker `integration` esperado nesse modo e inexistente quando usando `pytest.ini`.
+    - Próximos: ampliar cenários para `sources/tomada_tempo.py`, `src/data_collector.py`, `src/event_processor.py` e `src/ical_generator.py` conforme plano da issue #105.
+
 ## Versão 0.5.15 (2025-08-14)
 Integração — Deduplicação, Ordenação e Consistência (Issue #84)
 
