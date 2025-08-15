@@ -1,3 +1,11 @@
+-### Integração — Codecov Components e Tests Analytics (Issue #104)
+
+- Componentes no `codecov.yml`: adicionado componente `sources` para cobrir arquivos em `sources/` (evita cobertura "unassigned").
+- Tests Analytics: passos `codecov/test-results-action@v1` adicionados aos jobs `tests` (flag `unit`), `e2e_happy` (flag `e2e`) e `integration` (flag `integration`) com `if: always()` e `CODECOV_TOKEN` via Secrets.
+- Workflow: `pytest` com `-o junit_family=legacy` para compatibilidade de nomes no JUnit.
+- Links: corrigidos para slug `/github` no Codecov em `README.md` e `tests/README.md`.
+- Documentação: `docs/TEST_AUTOMATION_PLAN.md` atualizado com Components + Tests Analytics; `docs/issues/open/issue-104.{md,json}` sincronizados.
+- Higiene: `.gitignore` ampliado para `tmp/`, `coverage_*.xml`, `htmlcov-*/`, `test_results_*/`.
 # Changelog
 
 Todas as mudanças notáveis neste projeto serão documentadas neste arquivo.

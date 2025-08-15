@@ -127,13 +127,15 @@ O projeto executa a suíte de testes no GitHub Actions via workflow em `.github/
 
 Badge do workflow (branch main):
 
-![Tests](https://github.com/dmirrha/motorsport-calendar/actions/workflows/tests.yml/badge.svg?branch=main) [![codecov](https://codecov.io/gh/dmirrha/motorsport-calendar/branch/main/graph/badge.svg)](https://app.codecov.io/gh/dmirrha/motorsport-calendar)
+![Tests](https://github.com/dmirrha/motorsport-calendar/actions/workflows/tests.yml/badge.svg?branch=main) [![codecov](https://codecov.io/gh/dmirrha/motorsport-calendar/branch/main/graph/badge.svg)](https://app.codecov.io/github/dmirrha/motorsport-calendar)
 
 #### Relatórios de Cobertura no Codecov
 - Uploads informativos: realizados nos jobs `tests` (flag `unit`), `integration` (flag `integration`) e `e2e_happy` (flag `e2e`).
 - Autenticação: OIDC habilitado no `codecov/codecov-action@v4` (`use_oidc: true`), sem necessidade de token secreto.
 - Previsibilidade: varredura automática desabilitada (`disable_search: true`); apenas os arquivos especificados em `files` são enviados (`coverage.xml`, `coverage_integration.xml`, `coverage_e2e.xml`).
-- Acesso: https://app.codecov.io/gh/dmirrha/motorsport-calendar
+- Acesso: https://app.codecov.io/github/dmirrha/motorsport-calendar
+  - Components: cobertura agregada por componentes lógicos definidos em `codecov.yml` (ex.: `core-processing`, `calendar-generation`, `data-collection`, `configuration`, `ui`, `utils`, `logging`, `sources`).
+  - Tests Analytics: resultados JUnit enviados por job via `codecov/test-results-action@v1` para análise de testes (flakiness, timings, etc.).
 - Observação: nesta fase não há gates/status obrigatórios; falhas de upload não quebram o CI.
 
 ## Mocks e Isolamento

@@ -23,6 +23,7 @@ Estabelecer uma estratégia simples e efetiva para implementar e evoluir testes 
 - CI: `.github/workflows/tests.yml` (workflow de testes ativo: pytest + cobertura; artefatos junit/coverage/html)
 - Job adicional: `e2e_happy` executa apenas `tests/integration/test_phase2_e2e_happy.py` com cobertura, ignorando `pytest.ini` via `-c /dev/null`. Artefatos dedicados: `test_results_e2e/junit.xml`, `coverage_e2e.xml`, `htmlcov-e2e/`.
  - Codecov — Hardening (Issue #103): uploads informativos com OIDC (`use_oidc: true`), busca desabilitada (`disable_search: true`), `codecov.yml` mínimo (statuses informativos `project`/`patch`, `comment: false`), flags: `unit`, `integration` e `e2e`.
+ - Codecov — Components e Test Analytics (Issue #104): componentes mapeados em `codecov.yml` (inclui `sources/`) para agregação por área; habilitado Test Analytics via `codecov/test-results-action@v1` com upload de `junit.xml` por job (`tests`, `integration`, `e2e_happy`). Requer `CODECOV_TOKEN` como segredo. Dashboard com slug `/github`: https://app.codecov.io/github/dmirrha/motorsport-calendar
 
 ## Diretrizes de Documentação e Rastreamento
 Objetivo: Garantir documentação padrão, simples e completa para explicar a estratégia de testes e permitir rastreabilidade fina das atividades, conforme `.windsurf/rules/tester.md` e políticas do projeto.

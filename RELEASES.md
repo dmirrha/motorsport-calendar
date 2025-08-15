@@ -7,6 +7,8 @@ Documentação — Issue #83: documentação e rastreabilidade sincronizadas (se
 
 - Integração — Codecov Hardening (Issue #103): OIDC habilitado nos uploads do Codecov (`use_oidc: true`), varredura automática desabilitada (`disable_search: true`), `codecov.yml` mínimo (statuses informativos `project`/`patch`, `comment: false`) e upload adicional do E2E (flag `e2e`). Documentação atualizada (`tests/README.md`, `docs/TEST_AUTOMATION_PLAN.md`).
 
+- Integração — Codecov Components e Tests Analytics (Issue #104): componentes no `codecov.yml` (inclui `sources/` para evitar cobertura "unassigned"); habilitado Tests Analytics via `codecov/test-results-action@v1` com uploads por job (`tests`/`unit`, `integration`, `e2e_happy`/`e2e`) e `if: always()`; ajustado `pytest` com `-o junit_family=legacy`; links do Codecov corrigidos para slug `/github`; `.gitignore` ampliado para `tmp/`, `coverage_*.xml`, `htmlcov-*/`, `test_results_*/`; documentação atualizada (`README.md`, `tests/README.md`, `docs/TEST_AUTOMATION_PLAN.md`, `docs/issues/open/issue-104.{md,json}`).
+
 - Atualizados: `docs/issues/open/issue-83.{md,json}`, `docs/TEST_AUTOMATION_PLAN.md`, `tests/README.md`, `docs/tests/scenarios/phase2_scenarios.md`, `docs/tests/scenarios/SCENARIOS_INDEX.md`, `CHANGELOG.md`.
 - Branch: `tests/issue-83-docs-traceability`.
 

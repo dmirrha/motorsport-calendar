@@ -51,7 +51,8 @@ jobs:
             --cov-report=term-missing:skip-covered \
             --cov-report=xml:coverage.xml \
             --cov-report=html \
-            --junitxml=test_results/junit.xml
+            --junitxml=test_results/junit.xml \
+            -o junit_family=legacy
 
       - name: Upload artifacts
         if: always()
@@ -63,6 +64,17 @@ jobs:
             coverage.xml
             htmlcov/
 
+      - name: Upload test results to Codecov (unit)
+        if: always()
+        uses: codecov/test-results-action@v1
+        with:
+          files: test_results/junit.xml
+          flags: unit
+          use_oidc: true
+          disable_search: true
+          fail_ci_if_error: false
+          verbose: true
+
       - name: Upload coverage to Codecov (unit)
         if: always()
         uses: codecov/codecov-action@v4
@@ -73,6 +85,14 @@ jobs:
           verbose: true
           use_oidc: true
           disable_search: true
+
+      - name: Upload test results to Codecov (Tests Analytics)
+        if: always()
+        uses: codecov/test-results-action@v1
+        with:
+          token: ${{ secrets.CODECOV_TOKEN }}
+          files: test_results/junit.xml
+          flags: unit
 
   e2e_happy:
     runs-on: ubuntu-latest
@@ -114,7 +134,8 @@ jobs:
             --cov-report=term-missing:skip-covered \
             --cov-report=xml:coverage_e2e.xml \
             --cov-report=html:htmlcov-e2e \
-            --junitxml=test_results_e2e/junit.xml
+            --junitxml=test_results_e2e/junit.xml \
+            -o junit_family=legacy
 
       - name: Upload E2E artifacts
         if: always()
@@ -125,6 +146,17 @@ jobs:
             test_results_e2e/junit.xml
             coverage_e2e.xml
             htmlcov-e2e/
+
+      - name: Upload test results to Codecov (e2e)
+        if: always()
+        uses: codecov/test-results-action@v1
+        with:
+          files: test_results_e2e/junit.xml
+          flags: e2e
+          use_oidc: true
+          disable_search: true
+          fail_ci_if_error: false
+          verbose: true
       
       - name: Upload coverage to Codecov (e2e)
         if: always()
@@ -136,6 +168,14 @@ jobs:
           verbose: true
           use_oidc: true
           disable_search: true
+      
+      - name: Upload E2E test results to Codecov (Tests Analytics)
+        if: always()
+        uses: codecov/test-results-action@v1
+        with:
+          token: ${{ secrets.CODECOV_TOKEN }}
+          files: test_results_e2e/junit.xml
+          flags: e2e
   
   integration:
     runs-on: ubuntu-latest
@@ -176,7 +216,8 @@ jobs:
             --cov-report=term-missing:skip-covered \
             --cov-report=xml:coverage_integration.xml \
             --cov-report=html:htmlcov-integration \
-            --junitxml=test_results_integration/junit.xml
+            --junitxml=test_results_integration/junit.xml \
+            -o junit_family=legacy
 
       - name: Upload integration artifacts
         if: always()
@@ -188,6 +229,17 @@ jobs:
             coverage_integration.xml
             htmlcov-integration/
 
+      - name: Upload test results to Codecov (integration)
+        if: always()
+        uses: codecov/test-results-action@v1
+        with:
+          files: test_results_integration/junit.xml
+          flags: integration
+          use_oidc: true
+          disable_search: true
+          fail_ci_if_error: false
+          verbose: true
+
       - name: Upload coverage to Codecov (integration)
         if: always()
         uses: codecov/codecov-action@v4
@@ -198,3 +250,11 @@ jobs:
           verbose: true
           use_oidc: true
           disable_search: true
+
+      - name: Upload integration test results to Codecov (Tests Analytics)
+        if: always()
+        uses: codecov/test-results-action@v1
+        with:
+          token: ${{ secrets.CODECOV_TOKEN }}
+          files: test_results_integration/junit.xml
+          flags: integration
