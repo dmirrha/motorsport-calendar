@@ -19,6 +19,8 @@ Aumentar a cobertura de testes integrados para >80%, de forma equalizada entre o
 ## Atualizações recentes
 - 2025-08-15: Plano da Fase 2 aprovado (objetivo ~80% integração).
 - 2025-08-15: Criada branch de trabalho `feat/issue-105-phase2-integration-80` para implementação.
+- 2025-08-15: PR #108 mergeada (documentação do Lote 1).
+- 2025-08-15: Aberta PR #109 (Draft) para a Fase 2 — https://github.com/dmirrha/motorsport-calendar/pull/109.
 
 ### Corpo da Issue
 ## 🚀 Descrição da Feature

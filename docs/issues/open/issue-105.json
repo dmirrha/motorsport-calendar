@@ -16,7 +16,7 @@
     {"item": "Iniciar implementação incremental dos testes da Fase 2 (novos cenários e orquestração)", "done": false},
     {"item": "Validar cobertura de integração ≥ 80% e estabilidade (2× execuções locais)", "done": false},
     {"item": "Atualizar documentação (CHANGELOG.md, RELEASES.md) conforme progresso", "done": false},
-    {"item": "Abrir PR da Fase 2 referenciando #105", "done": false}
+    {"item": "Abrir PR da Fase 2 referenciando #105", "done": true}
   ],
   "acceptance": [
     "Cobertura de testes integrados global ≥ 80%",
