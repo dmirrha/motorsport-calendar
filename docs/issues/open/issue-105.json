@@ -1,0 +1,26 @@
+{
+  "id": 3323379963,
+  "number": 105,
+  "state": "open",
+  "title": "Aumentar a cobertura de testes integrados para >80%",
+  "milestone": null,
+  "epic": null,
+  "url": "https://github.com/dmirrha/motorsport-calendar/issues/105",
+  "created_at": "2025-08-14T19:39:14Z",
+  "updated_at": "2025-08-15T16:28:18Z",
+  "tasks": [
+    {"item": "Montar plano de priorização para novos cenários de testes integrados", "done": true},
+    {"item": "Aprovação do plano da Fase 2 (~80% de cobertura de integração)", "done": true},
+    {"item": "Criar branch feat/issue-105-phase2-integration-80", "done": true},
+    {"item": "Atualizar documentação local de rastreabilidade (issue-105.md/json) com aprovação e branch", "done": true},
+    {"item": "Iniciar implementação incremental dos testes da Fase 2 (novos cenários e orquestração)", "done": false},
+    {"item": "Validar cobertura de integração ≥ 80% e estabilidade (2× execuções locais)", "done": false},
+    {"item": "Atualizar documentação (CHANGELOG.md, RELEASES.md) conforme progresso", "done": false},
+    {"item": "Abrir PR da Fase 2 referenciando #105", "done": false}
+  ],
+  "acceptance": [
+    "Cobertura de testes integrados global ≥ 80%",
+    "CI verde com uploads/analytics corretos no Codecov (flags + components)",
+    "Documentação atualizada e rastreabilidade sincronizada (issue-105.md/json, CHANGELOG.md, RELEASES.md)"
+  ]
+}
