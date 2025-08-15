@@ -22,6 +22,7 @@ Aumentar a cobertura de testes integrados para >80%, de forma equalizada entre o
 - 2025-08-15: PR #108 mergeada (documentação do Lote 1).
 - 2025-08-15: Aberta PR #109 (Draft) para a Fase 2 — https://github.com/dmirrha/motorsport-calendar/pull/109.
 
+- 2025-08-15: Adicionados testes de integração (Lote 2): `tests/integration/test_phase2_orchestration_silent_manager.py` e `tests/integration/test_phase2_config_manager.py`; execução local determinística com `pytest -q -c /dev/null`; avisos de marker `integration` esperados nesse modo (sem avisos quando usando `pytest.ini`).
 ### Corpo da Issue
 ## 🚀 Descrição da Feature
 Aumentar a cobertura de testes integrados para >80%
@@ -219,6 +220,14 @@ Seguindo `/.windsurf/rules/tester.md`: pytest puro, mocks simples, determinismo 
   - `src/silent_period.py`: ~65%
   - `src/category_detector.py`: ~52%
 - Próximos passos: ampliar cenários para `sources/`, `data_collector`, `event_processor` e `ical_generator`; manter markers/flags no CI e atualizar docs relacionadas.
+
+## Progresso recente — Lote 2 (integração)
+
+- Testes adicionados:
+  - `tests/integration/test_phase2_orchestration_silent_manager.py`: integra `SilentPeriodManager` + `ConfigManager`; valida filtro em período silencioso cruzando a meia-noite (22:00→06:00) e metadados/estatísticas.
+  - `tests/integration/test_phase2_config_manager.py`: merge profundo com defaults e persistência (save/load) usando arquivos temporários.
+- Execução local: determinística, rápida e isolada com `pytest -q -c /dev/null` para evitar gates globais; marker `integration` registrado em `pytest.ini` (sem warnings quando não se usa `-c /dev/null`).
+- Próximos alvos (conforme plano): `sources/tomada_tempo.py`, `src/data_collector.py`, `src/event_processor.py`, `src/ical_generator.py`.
 
 ## Checklist de execução (sincronizado com GitHub)
 - [x] Baseline: disparar workflow "Tests" (workflow_dispatch) na branch `chore/issue-105` e registrar percentuais Integration/E2E (Codecov flags + Components) — global 91,27% (Codecov, commit `2096dd8`).

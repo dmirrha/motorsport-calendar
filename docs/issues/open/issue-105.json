@@ -13,9 +13,9 @@
     {"item": "Aprovação do plano da Fase 2 (~80% de cobertura de integração)", "done": true},
     {"item": "Criar branch feat/issue-105-phase2-integration-80", "done": true},
     {"item": "Atualizar documentação local de rastreabilidade (issue-105.md/json) com aprovação e branch", "done": true},
-    {"item": "Iniciar implementação incremental dos testes da Fase 2 (novos cenários e orquestração)", "done": false},
+    {"item": "Iniciar implementação incremental dos testes da Fase 2 (novos cenários e orquestração)", "done": true},
     {"item": "Validar cobertura de integração ≥ 80% e estabilidade (2× execuções locais)", "done": false},
-    {"item": "Atualizar documentação (CHANGELOG.md, RELEASES.md) conforme progresso", "done": false},
+    {"item": "Atualizar documentação (CHANGELOG.md, RELEASES.md) conforme progresso", "done": true},
     {"item": "Abrir PR da Fase 2 referenciando #105", "done": true}
   ],
   "acceptance": [

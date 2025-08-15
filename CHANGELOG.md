@@ -40,6 +40,13 @@ e este projeto adere ao [Versionamento Semântico](https://semver.org/spec/v2.0.
 - Cobertura aproximada (integration): `config_validator` ~58%, `config_manager` ~70%, `silent_period` ~65%, `category_detector` ~52%.
 - Baseline (local): Integration ~40%; E2E (happy) ~40%.
 - Documentação sincronizada: `docs/issues/open/issue-105.{md,json}`, `RELEASES.md`.
+### Integração — Lote 2 (Issue #105)
+
+- Novos testes de integração focados em orquestração e configuração:
+  - `tests/integration/test_phase2_orchestration_silent_manager.py`: valida a integração entre `SilentPeriodManager` e `ConfigManager`, filtrando eventos em período silencioso que cruza a meia-noite (sex/sáb 22:00→06:00) e verificando metadados/estatísticas.
+  - `tests/integration/test_phase2_config_manager.py`: complementos para `ConfigManager` cobrindo merge profundo com defaults e persistência (save/load) com arquivos temporários.
+- Execução local: ambos passam de forma determinística usando configuração mínima do pytest (`-c /dev/null`) para evitar gates globais; aviso de marker `integration` é esperado nesse modo e não ocorre quando usando `pytest.ini`.
+- Próximos passos: ampliar cenários de integração para `sources/tomada_tempo.py`, `src/data_collector.py`, `src/event_processor.py` e `src/ical_generator.py` conforme plano da issue #105.
 ### Integração — CI: Job de Integração (Issue #81)
 
 - Adicionado job `integration` ao workflow `.github/workflows/tests.yml` executando `pytest -m integration` com cobertura (`pytest-cov`).
