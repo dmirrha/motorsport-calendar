@@ -548,3 +548,5 @@ Esta é a versão inicial do projeto, contendo toda a funcionalidade básica par
 - Impacto: Geração de iCal sem erros; 75 eventos processados.
 - Arquivo: `output/motorsport_events_20250808.ics`
 - Notas: Garantir timezone na configuração do projeto.
+
+## Patch: testes de integração (parsing/resiliência) adicionados para elevar cobertura Integration/E2E (#105)

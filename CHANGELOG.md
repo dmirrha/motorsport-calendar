@@ -445,3 +445,4 @@ Nota: Este arquivo é gerado automaticamente. Para adicionar uma nova entrada, u
 - Ajuste em `src/event_processor.py`: normalização e localização de `target_weekend` (datetime/tupla) para timezone da configuração.
 - `_detect_target_weekend()` usando `datetime.now(tz)`.
 - Pipeline validado; iCal gerado sem erros de timezone.
+- test(integration): adicionar parsing TomadaTempoSource e resiliência DataCollector; sem rede; <1s (#105)
