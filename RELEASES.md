@@ -12,6 +12,21 @@ Documentação — Issue #83: documentação e rastreabilidade sincronizadas (se
 - Atualizados: `docs/issues/open/issue-83.{md,json}`, `docs/TEST_AUTOMATION_PLAN.md`, `tests/README.md`, `docs/tests/scenarios/phase2_scenarios.md`, `docs/tests/scenarios/SCENARIOS_INDEX.md`, `CHANGELOG.md`.
 - Branch: `tests/issue-83-docs-traceability`.
 
+- CI — Cobertura visível por job (Issue #105)
+
+  - `.github/workflows/tests.yml` atualizado para melhorar a visibilidade da cobertura por job:
+    - `pytest`: `--cov-report=term:skip-covered` para imprimir sumário de cobertura no console.
+    - Passo pós-`pytest` por job (unit/e2e/integration): extração do atributo `line-rate` dos XMLs (`coverage*.xml`) via `grep/sed/awk`, impressão no log, publicação no `$GITHUB_STEP_SUMMARY` e exposição como output do step (`steps.coverage_*/outputs.percent`).
+  - Baseline: cobertura global 91,27% (Codecov, commit `2096dd8`, branch `chore/issue-105`).
+  - Documentação sincronizada: `docs/issues/open/issue-105.{md,json}`, `CHANGELOG.md`, `RELEASES.md`.
+
+- Integração — Lote 1 (Issue #105):
+    - Testes de integração adicionados para módulos prioritários: `src/utils/config_validator.py`, `src/config_manager.py`, `src/silent_period.py`, `src/category_detector.py`.
+    - Total: 13 testes, 0 skips; execução local estável.
+    - Cobertura aproximada (integration): `config_validator` ~58%, `config_manager` ~70%, `silent_period` ~65%, `category_detector` ~52%.
+    - Baseline (local): Integration ~40%; E2E (happy) ~40%.
+    - Documentação sincronizada: `docs/issues/open/issue-105.{md,json}`, `CHANGELOG.md`.
+
 ## Versão 0.5.15 (2025-08-14)
 Integração — Deduplicação, Ordenação e Consistência (Issue #84)
 
@@ -540,3 +555,5 @@ Esta é a versão inicial do projeto, contendo toda a funcionalidade básica par
 - Impacto: Geração de iCal sem erros; 75 eventos processados.
 - Arquivo: `output/motorsport_events_20250808.ics`
 - Notas: Garantir timezone na configuração do projeto.
+
+## Patch: testes de integração (parsing/resiliência) adicionados para elevar cobertura Integration/E2E (#105)
