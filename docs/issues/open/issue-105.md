@@ -97,6 +97,32 @@ Testes Integrados com cobertura global acima de 80%
   - Iteração 2: calendar-generation + configuration.
   - Iteração 3: utils + logging e hardenings.
 
+### Fase 0 — Alvos prioritários (proposta)
+- 1) HTTP/Resiliência de coleta — `src/data_collector.py` e `sources/base_source.py`
+  - Erros comuns: timeout, 404, 429, conteúdo vazio/malformed; retries/backoff simples; headers/UA básicos.
+  - Testes-alvo: `tests/integration/test_phase2_data_collector_resilience.py` e `tests/integration/test_phase2_sources_parsing_errors.py`.
+- 2) Parser de fonte principal — `sources/tomada_tempo.py`
+  - Parsing HTML/JSON instável; campos ausentes; normalização para payload intermediário.
+  - Teste-alvo: `tests/integration/test_phase2_sources_parsing_errors.py`.
+- 3) Processamento/Dedup/Ordenação/TZ — `src/event_processor.py`
+  - Deduplicação estável; ordenação determinística; bordas TZ/DST.
+  - Teste-alvo: `tests/integration/test_phase2_processor_dedupe_order_tz.py`.
+- 4) Geração ICS e casos de borda — `src/ical_generator.py`
+  - DTSTART/DTEND; TZIDs; propriedades opcionais; encoding seguro.
+  - Teste-alvo: `tests/integration/test_phase2_ical_options_and_edges.py`.
+- 5) Períodos silenciosos e filtros — `src/silent_period.py`
+  - Aplicação correta de filtros/silent windows no pipeline final.
+  - Teste-alvo: `tests/integration/test_phase2_silent_periods_filters.py`.
+- 6) Configuração/variantes — `src/config_manager.py` e `src/utils/config_validator.py`
+  - Carregamento de env/flags; comportamento por variante; erros claros quando inválido.
+  - Teste-alvo: `tests/integration/test_phase2_config_variants_streaming.py`.
+- 7) E2E robustez — fluxo ponta-a-ponta
+  - Mistura de 404/timeout/malformed → ICS válido (subset) com warnings.
+  - Teste-alvo: `tests/integration/test_phase2_e2e_resilience.py`.
+- 8) E2E dedupe entre fontes e bordas TZ/DST
+  - Consistência de ordenação e dedupe cross-source; bordas de fuso/DST.
+  - Testes-alvo: `tests/integration/test_phase2_e2e_dedupe_cross_source.py`, `tests/integration/test_phase2_e2e_tz_dst_boundary.py`.
+
 ## Critérios de aceite
 - Cobertura de testes integrados global ≥ 80%.
 - Cobertura dos módulos prioritários aumentada de forma balanceada.
