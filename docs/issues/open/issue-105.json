@@ -10,7 +10,7 @@
   "labels": ["enhancement"],
   "tasks": [
     {"item": "Executar baseline dos testes Integrados e E2E e registrar cobertura global e por componente/flag", "done": true},
-    {"item": "Montar plano de priorização para novos cenários de testes integrados", "done": false},
+    {"item": "Montar plano de priorização para novos cenários de testes integrados", "done": true},
     {"item": "Solicitar aprovação do plano", "done": false},
     {"item": "Implementar cenários e elevar cobertura integrada para ≥ 80%", "done": false}
   ],

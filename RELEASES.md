@@ -20,6 +20,13 @@ Documentação — Issue #83: documentação e rastreabilidade sincronizadas (se
   - Baseline: cobertura global 91,27% (Codecov, commit `2096dd8`, branch `chore/issue-105`).
   - Documentação sincronizada: `docs/issues/open/issue-105.{md,json}`, `CHANGELOG.md`, `RELEASES.md`.
 
+- Integração — Lote 1 (Issue #105):
+    - Testes de integração adicionados para módulos prioritários: `src/utils/config_validator.py`, `src/config_manager.py`, `src/silent_period.py`, `src/category_detector.py`.
+    - Total: 13 testes, 0 skips; execução local estável.
+    - Cobertura aproximada (integration): `config_validator` ~58%, `config_manager` ~70%, `silent_period` ~65%, `category_detector` ~52%.
+    - Baseline (local): Integration ~40%; E2E (happy) ~40%.
+    - Documentação sincronizada: `docs/issues/open/issue-105.{md,json}`, `CHANGELOG.md`.
+
 ## Versão 0.5.15 (2025-08-14)
 Integração — Deduplicação, Ordenação e Consistência (Issue #84)
 

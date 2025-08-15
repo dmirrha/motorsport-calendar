@@ -33,6 +33,13 @@ e este projeto adere ao [Versionamento Semântico](https://semver.org/spec/v2.0.
   - Passo pós-`pytest` por job (unit/e2e/integration): extração do atributo `line-rate` dos XMLs (`coverage*.xml`) via `grep/sed/awk`, impressão no log, publicação no `$GITHUB_STEP_SUMMARY` e exposição como output do step (`steps.coverage_*/outputs.percent`).
 - Baseline: cobertura global 91,27% (Codecov, commit `2096dd8`, branch `chore/issue-105`).
 - Documentação sincronizada: `docs/issues/open/issue-105.{md,json}`.
+### Integração — Lote 1 (Issue #105)
+
+- Testes de integração adicionados para módulos prioritários: `src/utils/config_validator.py`, `src/config_manager.py`, `src/silent_period.py`, `src/category_detector.py`.
+- Total: 13 testes, 0 skips; execução local estável.
+- Cobertura aproximada (integration): `config_validator` ~58%, `config_manager` ~70%, `silent_period` ~65%, `category_detector` ~52%.
+- Baseline (local): Integration ~40%; E2E (happy) ~40%.
+- Documentação sincronizada: `docs/issues/open/issue-105.{md,json}`, `RELEASES.md`.
 ### Integração — CI: Job de Integração (Issue #81)
 
 - Adicionado job `integration` ao workflow `.github/workflows/tests.yml` executando `pytest -m integration` com cobertura (`pytest-cov`).
