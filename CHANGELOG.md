@@ -26,6 +26,13 @@ e este projeto adere ao [Versionamento Semântico](https://semver.org/spec/v2.0.
 - Configuração mínima adicionada em `codecov.yml`: statuses informativos (`project`/`patch`) e `comment: false`.
 - Cobertura expandida: upload adicional no job `e2e_happy` (`coverage_e2e.xml`, flag `e2e`).
 - Documentação atualizada: `tests/README.md` e `docs/TEST_AUTOMATION_PLAN.md`.
+### CI — Cobertura visível por job (Issue #105)
+
+- `.github/workflows/tests.yml` atualizado para melhorar a visibilidade da cobertura por job:
+  - `pytest`: `--cov-report=term:skip-covered` para imprimir sumário de cobertura no console.
+  - Passo pós-`pytest` por job (unit/e2e/integration): extração do atributo `line-rate` dos XMLs (`coverage*.xml`) via `grep/sed/awk`, impressão no log, publicação no `$GITHUB_STEP_SUMMARY` e exposição como output do step (`steps.coverage_*/outputs.percent`).
+- Baseline: cobertura global 91,27% (Codecov, commit `2096dd8`, branch `chore/issue-105`).
+- Documentação sincronizada: `docs/issues/open/issue-105.{md,json}`.
 ### Integração — CI: Job de Integração (Issue #81)
 
 - Adicionado job `integration` ao workflow `.github/workflows/tests.yml` executando `pytest -m integration` com cobertura (`pytest-cov`).

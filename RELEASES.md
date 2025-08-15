@@ -12,6 +12,14 @@ Documentação — Issue #83: documentação e rastreabilidade sincronizadas (se
 - Atualizados: `docs/issues/open/issue-83.{md,json}`, `docs/TEST_AUTOMATION_PLAN.md`, `tests/README.md`, `docs/tests/scenarios/phase2_scenarios.md`, `docs/tests/scenarios/SCENARIOS_INDEX.md`, `CHANGELOG.md`.
 - Branch: `tests/issue-83-docs-traceability`.
 
+- CI — Cobertura visível por job (Issue #105)
+
+  - `.github/workflows/tests.yml` atualizado para melhorar a visibilidade da cobertura por job:
+    - `pytest`: `--cov-report=term:skip-covered` para imprimir sumário de cobertura no console.
+    - Passo pós-`pytest` por job (unit/e2e/integration): extração do atributo `line-rate` dos XMLs (`coverage*.xml`) via `grep/sed/awk`, impressão no log, publicação no `$GITHUB_STEP_SUMMARY` e exposição como output do step (`steps.coverage_*/outputs.percent`).
+  - Baseline: cobertura global 91,27% (Codecov, commit `2096dd8`, branch `chore/issue-105`).
+  - Documentação sincronizada: `docs/issues/open/issue-105.{md,json}`, `CHANGELOG.md`, `RELEASES.md`.
+
 ## Versão 0.5.15 (2025-08-14)
 Integração — Deduplicação, Ordenação e Consistência (Issue #84)
 
