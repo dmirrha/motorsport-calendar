@@ -68,6 +68,7 @@ Testes — Cobertura Pontual (CategoryDetector e DataCollector):
  - Integração — Fase 4: TomadaTempo (Issue #105)
    - Planejamento e stubs criados na PR #110: `docs/tests/scenarios/phase4_scenarios.md`, `tests/integration/test_phase4_tomada_tempo_end_to_end_snapshot.py`, `tests/integration/test_phase4_tomada_tempo_errors.py`, e estrutura `tests/snapshots/phase4/`.
    - Próximos passos: adicionar fixtures HTML (AM/PM, sem minutos, overnight, malformado), implementar E2E → ICS com snapshot canônico e testes de erros; executar 3× localmente (<30s) e registrar estabilidade.
+   - Fixtures HTML adicionadas para TomadaTempo: `tests/fixtures/html/tomada_tempo_weekend_minimal.html`, `..._alt_header.html`, `..._no_minutes.html`, `..._overnight.html`, `..._edge_cases.html`, e `..._malformed.html` (novo). Documentação atualizada em `docs/tests/scenarios/phase4_scenarios.md` com a seção “Fixtures HTML”.
 
 ## Versão 0.5.16 (2025-08-17)
 Integração — Fase 3: CategoryDetector Variants (Issue #105)

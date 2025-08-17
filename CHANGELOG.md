@@ -59,8 +59,20 @@ e este projeto adere ao [Versionamento Semântico](https://semver.org/spec/v2.0.
 
 - Teste adicionado: `tests/integration/test_phase3_event_processor_merge_dedup.py` — valida merge/deduplicação entre duas fontes com prioridades distintas, unificação de `streaming_links`, preservação de `official_url` mais relevante e escolha pela maior `source_priority`; inclui asserts de `processing_stats` do `EventProcessor`. Determinístico, sem I/O externo.
 - Teste adicionado: `tests/integration/test_phase3_ical_generator_basic.py` — gera um VEVENT mínimo com timezone `America/Sao_Paulo` em diretório temporário (`tmp_path`), valida o `.ics` via `ICalGenerator.validate_calendar()` e usa lembretes determinísticos.
-- Execução local: ambos passam com `pytest -q -c /dev/null`; tempo <3s; sem flakes.
-- Versionamento: bump para `0.5.18` aplicado em `src/__init__.py`.
+  - Execução local: ambos passam com `pytest -q -c /dev/null`; tempo <3s; sem flakes.
+  - Versionamento: bump para `0.5.18` aplicado em `src/__init__.py`.
+ 
+### Integração — Fase 4 (Issue #105)
+
+- Fixtures HTML criadas para o parser TomadaTempo:
+  - `tests/fixtures/html/tomada_tempo_weekend_minimal.html`
+  - `tests/fixtures/html/tomada_tempo_weekend_alt_header.html`
+  - `tests/fixtures/html/tomada_tempo_weekend_no_minutes.html`
+  - `tests/fixtures/html/tomada_tempo_weekend_overnight.html`
+  - `tests/fixtures/html/tomada_tempo_weekend_edge_cases.html`
+  - `tests/fixtures/html/tomada_tempo_weekend_malformed.html` (novo)
+- Documentação atualizada: `docs/tests/scenarios/phase4_scenarios.md` com seção “Fixtures HTML”.
+- Rastreabilidade: PR #110; próximos passos (S2): implementar E2E → ICS com snapshot e testes de erros.
 
 ### Integração — Codecov (Issue #98)
 
