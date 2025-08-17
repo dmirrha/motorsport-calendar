@@ -7,6 +7,10 @@ Documentação — Issue #105: reabertura e inclusão do Plano — Fase 3 (alinh
 
 Documentação — Issue #83: documentação e rastreabilidade sincronizadas (sem mudanças de código/funcionalidade).
 
+Testes — Cobertura Pontual (CategoryDetector e DataCollector):
+- CategoryDetector: novo teste unitário cobrindo branches faltantes em `src/category_detector.py` (normalização vazia, mapeamentos custom e aprendizado a partir de arquivo salvo). Arquivo: `tests/unit/category/test_category_detector_additional_coverage.py`. Resultado: 100% no run focado.
+- DataCollector: novo teste unitário para caminho de timeout na coleta concorrente, cobrindo estatísticas e erro do futuro não concluído. Arquivo: `tests/unit/data_collector/test_data_collector_timeout_not_done.py`. Resultado: 100% no run focado.
+
 - Integração — Codecov Hardening (Issue #103): OIDC habilitado nos uploads do Codecov (`use_oidc: true`), varredura automática desabilitada (`disable_search: true`), `codecov.yml` mínimo (statuses informativos `project`/`patch`, `comment: false`) e upload adicional do E2E (flag `e2e`). Documentação atualizada (`tests/README.md`, `docs/TEST_AUTOMATION_PLAN.md`).
 
 - Integração — Codecov Components e Tests Analytics (Issue #104): componentes no `codecov.yml` (inclui `sources/` para evitar cobertura "unassigned"); habilitado Tests Analytics via `codecov/test-results-action@v1` com uploads por job (`tests`/`unit`, `integration`, `e2e_happy`/`e2e`) e `if: always()`; ajustado `pytest` com `-o junit_family=legacy`; links do Codecov corrigidos para slug `/github`; `.gitignore` ampliado para `tmp/`, `coverage_*.xml`, `htmlcov-*/`, `test_results_*/`; documentação atualizada (`README.md`, `tests/README.md`, `docs/TEST_AUTOMATION_PLAN.md`, `docs/issues/open/issue-104.{md,json}`).
@@ -20,6 +24,24 @@ Documentação — Issue #83: documentação e rastreabilidade sincronizadas (se
   - Cobertura específica (integration): `src/data_collector.py` ~62% linhas. Próximo: backoff e partial aggregation dedicados.
   - Versionamento: bump para `0.5.17` aplicado em `src/__init__.py`.
   - Documentação: `CHANGELOG.md` e `docs/issues/open/issue-105.md` atualizados.
+
+- Correções — TomadaTempo (Fallback de datas em texto)
+  - Corrigido fallback do `TomadaTempoSource` para normalizar datas extraídas do contexto/linhas de programação para o formato ISO `YYYY-MM-DD`.
+  - Afeta `sources/tomada_tempo.py`: datas inferidas pelo contexto agora são convertidas para ISO antes de compor os eventos.
+  - Testes: `tests/integration/test_phase3_tomada_tempo_integration.py::test_integration_programming_text_only_fallback` aprovado com `-c /dev/null`; arquivo completo e suíte `-m integration` sem regressões.
+  - Rastreabilidade: Issue #105 (Fase 3 — IT1).
+
+- Integração — Fase 3 IT2 (Issue #105)
+  - Teste adicionado: `tests/integration/test_phase3_category_detector_integration_simple.py` — valida matches básicos (F1, F2, MotoGP, WEC) e filtragem por confiança do `CategoryDetector` usando eventos simulados (sem I/O externo).
+  - Correção: `src/category_detector.py` — `detect_category()` passa a retornar metadata consistente com chave `category_type` mesmo quando `raw_text` está vazio, evitando `KeyError` em `batch_detect_categories`.
+  - Execução local (integration): testes passam de forma determinística; cobertura do módulo `src/category_detector.py` elevou de ~52% para ~57% no run de integração.
+  - Documentação sincronizada: `CHANGELOG.md` e `RELEASES.md` atualizados; rastreabilidade em Issue #105.
+
+- Integração — Fase 3 IT3 (Issue #105)
+  - Teste adicionado: `tests/integration/test_phase3_event_processor_merge_dedup.py` — valida merge/deduplicação entre duas fontes com prioridades distintas, unificação de `streaming_links`, preservação de `official_url` mais relevante e seleção pela maior `source_priority`; inclui asserts de `processing_stats` do `EventProcessor`. Determinístico, sem I/O externo.
+  - Teste adicionado: `tests/integration/test_phase3_ical_generator_basic.py` — gera um VEVENT mínimo com timezone `America/Sao_Paulo` em diretório temporário (`tmp_path`), valida o `.ics` via `ICalGenerator.validate_calendar()` e usa lembretes determinísticos.
+  - Execução local: ambos passam com `pytest -q -c /dev/null`; tempo <3s; sem flakes.
+  - Versionamento: bump para `0.5.18` aplicado em `src/__init__.py`.
 
 - CI — Cobertura visível por job (Issue #105)
 
