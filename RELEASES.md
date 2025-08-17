@@ -9,8 +9,15 @@ Documentação — Issue #83: documentação e rastreabilidade sincronizadas (se
 
 - Integração — Codecov Components e Tests Analytics (Issue #104): componentes no `codecov.yml` (inclui `sources/` para evitar cobertura "unassigned"); habilitado Tests Analytics via `codecov/test-results-action@v1` com uploads por job (`tests`/`unit`, `integration`, `e2e_happy`/`e2e`) e `if: always()`; ajustado `pytest` com `-o junit_family=legacy`; links do Codecov corrigidos para slug `/github`; `.gitignore` ampliado para `tmp/`, `coverage_*.xml`, `htmlcov-*/`, `test_results_*/`; documentação atualizada (`README.md`, `tests/README.md`, `docs/TEST_AUTOMATION_PLAN.md`, `docs/issues/open/issue-104.{md,json}`).
 
-- Atualizados: `docs/issues/open/issue-83.{md,json}`, `docs/TEST_AUTOMATION_PLAN.md`, `tests/README.md`, `docs/tests/scenarios/phase2_scenarios.md`, `docs/tests/scenarios/SCENARIOS_INDEX.md`, `CHANGELOG.md`.
-- Branch: `tests/issue-83-docs-traceability`.
+ - Atualizados: `docs/issues/open/issue-83.{md,json}`, `docs/TEST_AUTOMATION_PLAN.md`, `tests/README.md`, `docs/tests/scenarios/phase2_scenarios.md`, `docs/tests/scenarios/SCENARIOS_INDEX.md`, `CHANGELOG.md`.
+ - Branch: `tests/issue-83-docs-traceability`.
+
+ - Integração — PayloadManager
+
+   - Teste: `tests/integration/test_phase2_payload_manager.py`
+   - Escopo: serialização de payloads (JSON/HTML/binário), compressão `gzip`, limpeza por idade e por quantidade (retenção), e estatísticas agregadas por fonte.
+   - Estabilidade: execução local estável, sem flakes observados.
+   - Métricas: suíte completa com **366 passed**, **5 skipped**; cobertura global consolidada em **~91.75%** (visível no Codecov por job/flag).
 
 - CI — Cobertura visível por job (Issue #105)
 
@@ -31,8 +38,15 @@ Documentação — Issue #83: documentação e rastreabilidade sincronizadas (se
     - Novos testes de integração:
       - `tests/integration/test_phase2_orchestration_silent_manager.py`: orquestração entre `SilentPeriodManager` e `ConfigManager`, cobrindo período silencioso cruzando a meia-noite (sex/sáb 22:00→06:00), verificação de metadados e estatísticas.
       - `tests/integration/test_phase2_config_manager.py`: complementos para `ConfigManager` (merge profundo com defaults e persistência save/load usando arquivos temporários).
-    - Execução local: ambos passam de forma determinística usando `pytest -q -c /dev/null` (evita gates globais); aviso de marker `integration` esperado nesse modo e inexistente quando usando `pytest.ini`.
+    - Execução local: ambos passam de forma determinística usando `pytest -q -c /dev/null` (evita gates globais); aviso de marker `integration` esperado nesse modo e inexistente quando usando `pytest.ini`).
     - Próximos: ampliar cenários para `sources/tomada_tempo.py`, `src/data_collector.py`, `src/event_processor.py` e `src/ical_generator.py` conforme plano da issue #105.
+
+ - Fix — ICS: ordenação determinística de eventos (Issue #84)
+
+   - `src/ical_generator.py`: `generate_calendar` passou a ordenar VEVENTs por `datetime` convertido para UTC (fallback para naive) e por `display_name`/`name` para desempates, garantindo estabilidade do `.ics`.
+   - Snapshot atualizado: `tests/snapshots/phase2/phase2_dedupe_order_consistency.ics` reordenado para refletir a nova ordem determinística.
+   - Teste: `tests/integration/test_phase2_dedupe_order_consistency.py` executado 3× localmente sem cobertura/gates (`-c /dev/null`), sem flakes.
+   - Documentação sincronizada: `CHANGELOG.md`, `docs/tests/overview.md`, `docs/tests/scenarios/phase2_scenarios.md`.
 
 ## Versão 0.5.15 (2025-08-14)
 Integração — Deduplicação, Ordenação e Consistência (Issue #84)

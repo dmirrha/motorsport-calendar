@@ -62,6 +62,21 @@ e este projeto adere ao [Versionamento Semântico](https://semver.org/spec/v2.0.
   - `RELEASES.md` (seção “Não Lançado”)
 - Objetivo: garantir rastreabilidade entre issues/PRs e documentação padrão.
 
+### Integração — PayloadManager
+
+- Teste de integração adicionado: `tests/integration/test_phase2_payload_manager.py`.
+- Escopo: serialização de payloads (JSON/HTML/binário), compressão `gzip`, limpeza por idade e por quantidade (retenção), e estatísticas agregadas por fonte.
+- Estabilidade: execução local estável, sem flakes observados.
+- Métricas: suíte completa com **366 passed**, **5 skipped**; cobertura global consolidada em **~91.75%** (visível no Codecov por job/flag).
+- Documentação sincronizada: `RELEASES.md`, `docs/tests/overview.md`, `docs/tests/scenarios/phase2_scenarios.md`.
+
+### Fix — ICS: ordenação determinística de eventos (Issue #84)
+
+- `src/ical_generator.py`: `generate_calendar` agora ordena os VEVENTs de forma determinística por `datetime` convertido para UTC (com fallback para naive) e por `display_name`/`name` para desempates.
+- Snapshot atualizado: `tests/snapshots/phase2/phase2_dedupe_order_consistency.ics` reordenado para refletir a nova ordem (VEVENTs estáveis).
+- Teste: `tests/integration/test_phase2_dedupe_order_consistency.py` executado 3× localmente sem cobertura/gates (`-c /dev/null`), sem flakes.
+ - Documentação sincronizada: `RELEASES.md`, `docs/tests/overview.md`, `docs/tests/scenarios/phase2_scenarios.md`.
+
 ## [0.5.14] - 2025-08-14
 ### Integração — Edge cases ICS (Issue #80)
 
