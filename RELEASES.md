@@ -15,8 +15,15 @@ Testes — Cobertura Pontual (CategoryDetector e DataCollector):
 
 - Integração — Codecov Components e Tests Analytics (Issue #104): componentes no `codecov.yml` (inclui `sources/` para evitar cobertura "unassigned"); habilitado Tests Analytics via `codecov/test-results-action@v1` com uploads por job (`tests`/`unit`, `integration`, `e2e_happy`/`e2e`) e `if: always()`; ajustado `pytest` com `-o junit_family=legacy`; links do Codecov corrigidos para slug `/github`; `.gitignore` ampliado para `tmp/`, `coverage_*.xml`, `htmlcov-*/`, `test_results_*/`; documentação atualizada (`README.md`, `tests/README.md`, `docs/TEST_AUTOMATION_PLAN.md`, `docs/issues/open/issue-104.{md,json}`).
 
-- Atualizados: `docs/issues/open/issue-83.{md,json}`, `docs/TEST_AUTOMATION_PLAN.md`, `tests/README.md`, `docs/tests/scenarios/phase2_scenarios.md`, `docs/tests/scenarios/SCENARIOS_INDEX.md`, `CHANGELOG.md`.
-- Branch: `tests/issue-83-docs-traceability`.
+ - Atualizados: `docs/issues/open/issue-83.{md,json}`, `docs/TEST_AUTOMATION_PLAN.md`, `tests/README.md`, `docs/tests/scenarios/phase2_scenarios.md`, `docs/tests/scenarios/SCENARIOS_INDEX.md`, `CHANGELOG.md`.
+ - Branch: `tests/issue-83-docs-traceability`.
+
+ - Integração — PayloadManager
+
+   - Teste: `tests/integration/test_phase2_payload_manager.py`
+   - Escopo: serialização de payloads (JSON/HTML/binário), compressão `gzip`, limpeza por idade e por quantidade (retenção), e estatísticas agregadas por fonte.
+   - Estabilidade: execução local estável, sem flakes observados.
+   - Métricas: suíte completa com **366 passed**, **5 skipped**; cobertura global consolidada em **~91.75%** (visível no Codecov por job/flag).
 
 - Integração — Fase 3 IT1 (Issue #105)
   - Teste adicionado: `tests/integration/test_phase3_data_collector_concurrent.py` — valida concorrência de coleta, agregação parcial e estatísticas do `DataCollector` sem rede real (mocks via `tests/conftest.py`).
@@ -81,6 +88,13 @@ Integração — Fase 3: CategoryDetector Variants (Issue #105)
   - Roundtrip de persistência: `save_learned_categories` → `load_learned_categories` preserva dados.
 - Estabilidade local: 11/11 testes passando, 3 execuções consecutivas, zero flakes; tempo total ~0.6–0.72s.
 - Documentação sincronizada: `CHANGELOG.md` (Unreleased), `docs/tests/scenarios/SCENARIOS_INDEX.md`, `docs/tests/scenarios/phase3_scenarios.md`.
+
+ - Fix — ICS: ordenação determinística de eventos (Issue #84)
+
+   - `src/ical_generator.py`: `generate_calendar` passou a ordenar VEVENTs por `datetime` convertido para UTC (fallback para naive) e por `display_name`/`name` para desempates, garantindo estabilidade do `.ics`.
+   - Snapshot atualizado: `tests/snapshots/phase2/phase2_dedupe_order_consistency.ics` reordenado para refletir a nova ordem determinística.
+   - Teste: `tests/integration/test_phase2_dedupe_order_consistency.py` executado 3× localmente sem cobertura/gates (`-c /dev/null`), sem flakes.
+   - Documentação sincronizada: `CHANGELOG.md`, `docs/tests/overview.md`, `docs/tests/scenarios/phase2_scenarios.md`.
 
 ## Versão 0.5.15 (2025-08-14)
 Integração — Deduplicação, Ordenação e Consistência (Issue #84)

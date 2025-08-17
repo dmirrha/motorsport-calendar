@@ -35,5 +35,17 @@ Objetivo: descrever a estratégia mínima de testes para o projeto, com foco em 
 - CategoryDetector: teste adicional cobrindo branches previamente não exercitados em `src/category_detector.py` (normalização vazia, mapeamentos custom e aprendizado a partir de arquivo salvo). Arquivo: `tests/unit/category/test_category_detector_additional_coverage.py`. Resultado: 100% no run focado.
 - DataCollector: teste unitário para o caminho de timeout na coleta concorrente, garantindo marcação de erro e atualização de estatísticas. Arquivo: `tests/unit/data_collector/test_data_collector_timeout_not_done.py`. Resultado: 100% no run focado.
 
+## Determinismo de ICS e snapshots
+- Ordenação de eventos: VEVENTs ordenados determinísticamente por `datetime` (convertido para UTC; fallback para naive) e, em seguida, por `display_name`/`name` para desempate.
+- Streaming links: `streaming_links` ordenados alfabeticamente e limitados a 3 na descrição do evento.
+- Normalização de snapshots: UID fixo; remoção de `DTSTAMP`, `CREATED`, `LAST-MODIFIED`, `SEQUENCE`, `PRODID`; quebras de linha `\n`.
+- Estabilidade: cada cenário deve passar 3× localmente sem flakes e em <30s.
+
+## Integração — PayloadManager (Fase 2)
+- Teste: `tests/integration/test_phase2_payload_manager.py`
+- Escopo: serialização de payloads (JSON/HTML/binário), compressão `gzip`, limpeza por idade e por quantidade (retenção), e estatísticas agregadas por fonte.
+- Estabilidade: execução local estável, sem flakes observados.
+- Cobertura: suíte consolidada ~**91.75%** (visível no Codecov por job/flag).
+
 ## Referências
 - Governança Fase 2: PR #87 (https://github.com/dmirrha/motorsport-calendar/pull/87) — épico #78

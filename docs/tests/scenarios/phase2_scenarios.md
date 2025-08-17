@@ -14,6 +14,13 @@ Objetivo: mapear cenários integrados cobrindo fluxo coleta → processamento �
 - [x] Deduplicação, ordenação e consistência de TZ
 - [x] Snapshot `.ics` estável (ver Fase 1.2)
 
+### Fase 2 — Deduplicação e Ordenação (Issue #84)
+- Teste: `tests/integration/test_phase2_dedupe_order_consistency.py`
+- Snapshot: `tests/snapshots/phase2/phase2_dedupe_order_consistency.ics`
+- Regra de ordenação determinística no ICS: VEVENTs ordenados por `datetime` convertido para UTC (com fallback para datetime naive) e, em seguida, por `display_name`/`name` para desempate (implementado em `src/ical_generator.py::ICalGenerator.generate_calendar`).
+- Normalização de snapshots: via `tests/utils/ical_snapshots.py` (UID fixo; remoção de `DTSTAMP`, `CREATED`, `LAST-MODIFIED`, `SEQUENCE`, `PRODID`; quebras `\n`).
+- Estabilidade: executado 3× localmente (com `-c /dev/null` para ignorar gates) sem flakes e <30s.
+
 ### E2E — Caminho Feliz (Issue #82)
 - Teste: `tests/integration/test_phase2_e2e_happy.py`
 - Snapshot: `tests/snapshots/phase2/phase2_e2e_happy.ics` (normalizado via `tests/utils/ical_snapshots.py`)
@@ -41,6 +48,13 @@ Objetivo: mapear cenários integrados cobrindo fluxo coleta → processamento �
 - Notas:
   - Para eventos com TZID, o parser `icalendar` pode retornar `datetime` ingênuo ao decodificar; validamos presença de `TZID` e componentes locais de hora/minuto.
   - Para UTC, o ICS pode serializar com sufixo `Z` sem `TZID`; validamos horário local e duração.
+
+### Fase 2 — PayloadManager
+- Teste: `tests/integration/test_phase2_payload_manager.py`
+- Snapshot: não aplicável (validação por conteúdo/arquivos gerados).
+- Escopo: serialização (JSON/HTML/binário), compressão `gzip`, limpeza por idade/quantidade (retenção) e estatísticas agregadas por fonte.
+- Estabilidade: execução local estável, sem flakes.
+- Cobertura: suíte consolidada ~**91.75%** (Codecov por job/flag).
 
 ## Referências
 - Plano: `docs/TEST_AUTOMATION_PLAN.md` (seção Fase 2)
