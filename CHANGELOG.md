@@ -14,6 +14,13 @@ O formato é baseado em [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)
 e este projeto adere ao [Versionamento Semântico](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
+### Fix — ICS: Streaming links ordenados e limitados (determinismo)
+
+- Em `src/ical_generator.py`, `ICalGenerator._create_event_description()` agora normaliza (`strip`), remove duplicados, ordena alfabeticamente e limita aos 3 primeiros os `streaming_links` antes de renderizar na `DESCRIPTION`.
+- Motivo: garantir determinismo/estabilidade e corrigir a falha do teste de integração `tests/integration/test_phase2_ical_options_and_edges.py::test_edges_streaming_sorted_and_limited_with_alarms` (ordenação/limite dos links de streaming na descrição do evento, incluindo o link `https://b.example/beta`).
+- Validação: `pytest -m integration` passou localmente (31 passed, 4 skipped, 1 xfailed), cobertura 53.15% (>45%).
+- Rastreabilidade: PRs #110/#112; Issue #105.
+
 ### Documentação — Issue #105 (Plano — Fase 3)
 
 - Reabertura da issue e inclusão do Plano — Fase 3, alinhado a `.windsurf/rules/tester.md` (sem mudanças de código).

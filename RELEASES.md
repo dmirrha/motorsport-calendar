@@ -3,6 +3,12 @@
 Este arquivo contém um registro acumulativo de todas as versões lançadas do projeto, com notas detalhadas sobre as mudanças em cada versão.
 
 ## Não Lançado
+Fix — ICS: Streaming links ordenados e limitados (determinismo)
+
+- `src/ical_generator.py`: `_create_event_description` agora normaliza (`strip`), remove duplicados, ordena alfabeticamente e limita aos 3 primeiros os `streaming_links` antes de renderizar na `DESCRIPTION`.
+- Teste de integração validado: `tests/integration/test_phase2_ical_options_and_edges.py::test_edges_streaming_sorted_and_limited_with_alarms` com `pytest -m integration` (31 passed, 4 skipped, 1 xfailed); cobertura 53.15% (>45%).
+- Rastreabilidade: PRs #110/#112; Issue #105.
+
 Documentação — Issue #105: reabertura e inclusão do Plano — Fase 3 (alinhado a `.windsurf/rules/tester.md`), sem mudanças de código. Docs sincronizadas: `docs/issues/open/issue-105.{md,json}`; `CHANGELOG.md` e `RELEASES.md` atualizados.
 
 Documentação — Issue #83: documentação e rastreabilidade sincronizadas (sem mudanças de código/funcionalidade).
