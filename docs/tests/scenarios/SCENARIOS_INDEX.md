@@ -13,3 +13,9 @@ Referências:
 
 ## Fase 2 (Integração)
 - Cenários e fluxos: `docs/tests/scenarios/phase2_scenarios.md`
+ 
+## Fase 3 (Integração)
+- CategoryDetector Variants: `docs/tests/scenarios/phase3_scenarios.md`
+ 
+## Fase 4 (Integração)
+- TomadaTempo E2E + Erros: `docs/tests/scenarios/phase4_scenarios.md`

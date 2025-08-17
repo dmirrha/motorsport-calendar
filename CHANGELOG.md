@@ -95,7 +95,17 @@ e este projeto adere ao [Versionamento Semântico](https://semver.org/spec/v2.0.
   - `tests/integration/test_phase2_orchestration_silent_manager.py`: valida a integração entre `SilentPeriodManager` e `ConfigManager`, filtrando eventos em período silencioso que cruza a meia-noite (sex/sáb 22:00→06:00) e verificando metadados/estatísticas.
   - `tests/integration/test_phase2_config_manager.py`: complementos para `ConfigManager` cobrindo merge profundo com defaults e persistência (save/load) com arquivos temporários.
 - Execução local: ambos passam de forma determinística usando configuração mínima do pytest (`-c /dev/null`) para evitar gates globais; aviso de marker `integration` é esperado nesse modo e não ocorre quando usando `pytest.ini`.
-- Próximos passos: ampliar cenários de integração para `sources/tomada_tempo.py`, `src/data_collector.py`, `src/event_processor.py` e `src/ical_generator.py` conforme plano da issue #105.
+  - Próximos passos: ampliar cenários de integração para `sources/tomada_tempo.py`, `src/data_collector.py`, `src/event_processor.py` e `src/ical_generator.py` conforme plano da issue #105.
+### Integração — Fase 3: CategoryDetector Variants (Issue #105)
+
+- Teste: `tests/integration/test_phase3_category_detector_variants.py`.
+- Cenários cobertos:
+  - Tolerância a ruído/acentos para categorias conhecidas (ex.: `F1`, `WEC`).
+  - Fallback combinatório em `detect_categories_batch` (prioriza `raw_category`; combina com `name` apenas quando necessário).
+  - Aprendizado habilitado adiciona variações e persiste (save) corretamente.
+  - Roundtrip de persistência: `save_learned_categories` → `load_learned_categories` preserva dados.
+- Execução/estabilidade: 11/11 testes passando, 3 execuções consecutivas, zero flakes; tempo total ~0.6–0.72s.
+- Documentação sincronizada: `docs/tests/scenarios/SCENARIOS_INDEX.md`, `docs/tests/scenarios/phase3_scenarios.md`.
 ### Integração — CI: Job de Integração (Issue #81)
 
 - Adicionado job `integration` ao workflow `.github/workflows/tests.yml` executando `pytest -m integration` com cobertura (`pytest-cov`).

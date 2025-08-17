@@ -63,7 +63,23 @@ Testes — Cobertura Pontual (CategoryDetector e DataCollector):
       - `tests/integration/test_phase2_orchestration_silent_manager.py`: orquestração entre `SilentPeriodManager` e `ConfigManager`, cobrindo período silencioso cruzando a meia-noite (sex/sáb 22:00→06:00), verificação de metadados e estatísticas.
       - `tests/integration/test_phase2_config_manager.py`: complementos para `ConfigManager` (merge profundo com defaults e persistência save/load usando arquivos temporários).
     - Execução local: ambos passam de forma determinística usando `pytest -q -c /dev/null` (evita gates globais); aviso de marker `integration` esperado nesse modo e inexistente quando usando `pytest.ini`.
-    - Próximos: ampliar cenários para `sources/tomada_tempo.py`, `src/data_collector.py`, `src/event_processor.py` e `src/ical_generator.py` conforme plano da issue #105.
+  - Próximos: ampliar cenários para `sources/tomada_tempo.py`, `src/data_collector.py`, `src/event_processor.py` e `src/ical_generator.py` conforme plano da issue #105.
+
+ - Integração — Fase 4: TomadaTempo (Issue #105)
+   - Planejamento e stubs criados na PR #110: `docs/tests/scenarios/phase4_scenarios.md`, `tests/integration/test_phase4_tomada_tempo_end_to_end_snapshot.py`, `tests/integration/test_phase4_tomada_tempo_errors.py`, e estrutura `tests/snapshots/phase4/`.
+   - Próximos passos: adicionar fixtures HTML (AM/PM, sem minutos, overnight, malformado), implementar E2E → ICS com snapshot canônico e testes de erros; executar 3× localmente (<30s) e registrar estabilidade.
+
+## Versão 0.5.16 (2025-08-17)
+Integração — Fase 3: CategoryDetector Variants (Issue #105)
+
+- Teste: `tests/integration/test_phase3_category_detector_variants.py`
+- Cenários cobertos:
+  - Tolerância a ruído/acentos para categorias conhecidas (ex.: `F1`, `WEC`).
+  - Fallback combinatório em `detect_categories_batch` (prioriza `raw_category`; combina com `name` apenas quando necessário).
+  - Aprendizado habilitado adiciona variações e persiste (save) corretamente.
+  - Roundtrip de persistência: `save_learned_categories` → `load_learned_categories` preserva dados.
+- Estabilidade local: 11/11 testes passando, 3 execuções consecutivas, zero flakes; tempo total ~0.6–0.72s.
+- Documentação sincronizada: `CHANGELOG.md` (Unreleased), `docs/tests/scenarios/SCENARIOS_INDEX.md`, `docs/tests/scenarios/phase3_scenarios.md`.
 
 ## Versão 0.5.15 (2025-08-14)
 Integração — Deduplicação, Ordenação e Consistência (Issue #84)
