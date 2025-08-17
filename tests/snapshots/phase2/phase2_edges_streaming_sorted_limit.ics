@@ -1,0 +1,37 @@
+BEGIN:VCALENDAR
+VERSION:2.0
+CALSCALE:GREGORIAN
+METHOD:PUBLISH
+X-WR-CALDESC:Weekend motorsport events calendar
+X-WR-CALNAME:Motorsport Events
+X-APPLE-CALENDAR-COLOR:#FF6B35
+X-WR-TIMEZONE:America/Sao_Paulo
+BEGIN:VEVENT
+SUMMARY:F1 - São Paulo GP
+DTSTART;TZID="UTC-03:00":20251109T140000
+DTEND;TZID="UTC-03:00":20251109T160000
+UID:FIXED-UID
+CATEGORIES:F1
+DESCRIPTION:🏁 F1 Race\n📍 Interlagos - Brazil\n\n🔴 Streaming:\n•
+  https://a.example/alpha\n• https://b.example/beta\n• https://m.exampl
+ e/mid\n\n🔗 More info: https://www.formula1.com/\n\n📊 Source: Phase2
+ Fixture
+LOCATION:Interlagos\, Brazil
+PRIORITY:1
+STATUS:CONFIRMED
+TRANSP:OPAQUE
+X-MOTORSPORT-CATEGORY:F1
+X-MOTORSPORT-SESSION:Race
+X-MOTORSPORT-SOURCE:fixture
+BEGIN:VALARM
+ACTION:DISPLAY
+DESCRIPTION:Motorsport Event Reminder
+TRIGGER:-PT30M
+END:VALARM
+BEGIN:VALARM
+ACTION:DISPLAY
+DESCRIPTION:Motorsport Event Reminder
+TRIGGER:-PT1H
+END:VALARM
+END:VEVENT
+END:VCALENDAR
