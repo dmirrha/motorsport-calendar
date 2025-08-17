@@ -18,11 +18,55 @@ e este projeto adere ao [Versionamento Semântico](https://semver.org/spec/v2.0.
 
 - Reabertura da issue e inclusão do Plano — Fase 3, alinhado a `.windsurf/rules/tester.md` (sem mudanças de código).
 - Docs sincronizadas: `docs/issues/open/issue-105.{md,json}`; CHANGELOG/RELEASES atualizados.
+ 
+### Testes — Cobertura Pontual (CategoryDetector e DataCollector)
+
+- CategoryDetector:
+  - Teste adicional cobrindo branches ausentes em `src/category_detector.py` (normalização vazia, adição de mapping custom e aprendizado de categorias a partir de arquivo salvo).
+  - Arquivo: `tests/unit/category/test_category_detector_additional_coverage.py`.
+  - Resultado: cobertura focada do arquivo atingiu 100% no run direcionado.
+- DataCollector:
+  - Teste para o caminho de timeout na coleta concorrente, exercitando marcação de erro e estatísticas (ramo anteriormente não coberto).
+  - Arquivo: `tests/unit/data_collector/test_data_collector_timeout_not_done.py`.
+  - Resultado: cobertura focada do arquivo atingiu 100% no run direcionado; cenário determinístico, sem I/O real.
+
+### Integração — Fase 3 IT1 (Issue #105)
+
+- Foco: parsers (`sources/tomada_tempo.py`) e coletor (`src/data_collector.py`) com cenários mínimos determinísticos.
+- Planejado: `tests/integration/test_phase3_tomada_tempo_parsing_variants.py`, `tests/integration/test_phase3_data_collector_backoff_and_partial.py`.
+- Metas: elevar integração rumo a 75–80% mantendo CI <30s; 3× execuções sem flakes.
+- Versionamento: bump para `0.5.16` aplicado em `src/__init__.py`.
+- Teste adicionado: `tests/integration/test_phase3_data_collector_concurrent.py` — valida concorrência de coleta, agregação parcial e estatísticas do `DataCollector` sem rede real (mocks via `tests/conftest.py`).
+ - Execução local (integration): `21 passed, 3 skipped, 1 xfailed` em ~6.4s; cobertura consolidada (~48% global no run de integração).
+ - Cobertura específica (integration): `src/data_collector.py` ~62% linhas. Próximo: backoff e partial aggregation dedicados.
+ - Versionamento: bump para `0.5.17` aplicado em `src/__init__.py`.
+ - Documentação: `RELEASES.md` e `docs/issues/open/issue-105.md` atualizados; pedido de confirmação registrado.
+### Correções — TomadaTempo (Fallback de datas em texto)
+
+- Corrigido fallback do `TomadaTempoSource` para normalizar datas capturadas de linhas de programação em texto para o formato ISO `YYYY-MM-DD`.
+- Afeta `sources/tomada_tempo.py`: datas extraídas do contexto agora são convertidas para ISO antes de popular os eventos.
+- Testes:
+  - `tests/integration/test_phase3_tomada_tempo_integration.py::test_integration_programming_text_only_fallback` passa com `-c /dev/null`.
+  - Execução completa do arquivo `test_phase3_tomada_tempo_integration.py` e da suíte `-m integration` sem regressões.
+- Rastreabilidade: Issue #105 (Fase 3 — IT1).
+### Integração — Fase 3 IT2 (Issue #105)
+
+- Teste adicionado: `tests/integration/test_phase3_category_detector_integration_simple.py` — valida matches básicos (F1, F2, MotoGP, WEC) e filtragem por confiança do `CategoryDetector` usando eventos simulados (sem I/O externo).
+- Correção: `src/category_detector.py` — `detect_category()` passa a retornar metadata consistente com chave `category_type` mesmo quando `raw_text` está vazio, evitando `KeyError` em `batch_detect_categories`.
+- Execução local (integration): testes passam de forma determinística; cobertura do módulo `src/category_detector.py` elevou de ~52% para ~57% no run de integração.
+- Documentação sincronizada: `CHANGELOG.md` e `RELEASES.md` atualizados; rastreabilidade em Issue #105.
+### Integração — Fase 3 IT3 (Issue #105)
+
+- Teste adicionado: `tests/integration/test_phase3_event_processor_merge_dedup.py` — valida merge/deduplicação entre duas fontes com prioridades distintas, unificação de `streaming_links`, preservação de `official_url` mais relevante e escolha pela maior `source_priority`; inclui asserts de `processing_stats` do `EventProcessor`. Determinístico, sem I/O externo.
+- Teste adicionado: `tests/integration/test_phase3_ical_generator_basic.py` — gera um VEVENT mínimo com timezone `America/Sao_Paulo` em diretório temporário (`tmp_path`), valida o `.ics` via `ICalGenerator.validate_calendar()` e usa lembretes determinísticos.
+- Execução local: ambos passam com `pytest -q -c /dev/null`; tempo <3s; sem flakes.
+- Versionamento: bump para `0.5.18` aplicado em `src/__init__.py`.
 
 ### Integração — Codecov (Issue #98)
 
 - Uploads informativos de cobertura adicionados ao workflow (`codecov/codecov-action@v4`) para os jobs `tests` (flag `unit`, `coverage.xml`) e `integration` (flag `integration`, `coverage_integration.xml`), com `fail_ci_if_error: false`.
 - Badge do Codecov adicionado ao `README.md`.
+- Documentação: `tests/README.md` (acesso Codecov), `docs/TEST_AUTOMATION_PLAN.md` (uploads concluídos; gates pendentes).
 - Documentação atualizada: `tests/README.md` (acesso Codecov), `docs/TEST_AUTOMATION_PLAN.md` (uploads concluídos; gates pendentes).
 ### Integração — Codecov Hardening (Issue #103)
 
