@@ -1,0 +1,17 @@
+[run]
+# Garante que os paths no XML sejam relativos ao repositório (evita "Unusable report" no Codecov)
+relative_files = True
+branch = True
+source =
+    src
+    sources
+
+[report]
+show_missing = True
+precision = 2
+exclude_lines =
+    if __name__ == .__main__.
+    pragma: no cover
+
+[xml]
+output = coverage.xml
