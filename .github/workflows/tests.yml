@@ -47,6 +47,7 @@ jobs:
         run: |
           mkdir -p test_results
           pytest \
+            --cov-config=.coveragerc \
             --cov=src --cov=sources \
             --cov-report=term-missing:skip-covered \
             --cov-report=xml:coverage.xml \
@@ -75,8 +76,20 @@ jobs:
           fail_ci_if_error: false
           verbose: true
 
-      - name: Upload coverage to Codecov (unit)
+      - name: Upload coverage to Codecov (unit) [try 1]
+        id: codecov_unit_try1
         if: always()
+        continue-on-error: true
+        uses: codecov/codecov-action@v4
+        with:
+          files: ${{ github.workspace }}/coverage.xml
+          flags: unit
+          fail_ci_if_error: true
+          verbose: true
+          use_oidc: true
+
+      - name: Upload coverage to Codecov (unit) [retry if failed]
+        if: ${{ always() && steps.codecov_unit_try1.outcome == 'failure' }}
         uses: codecov/codecov-action@v4
         with:
           files: ${{ github.workspace }}/coverage.xml
@@ -128,6 +141,7 @@ jobs:
         run: |
           mkdir -p test_results_e2e
           pytest -q -c /dev/null \
+            --cov-config=.coveragerc \
             tests/integration/test_phase2_e2e_*.py \
             --cov=src/data_collector.py \
             --cov=src/event_processor.py \
@@ -168,8 +182,20 @@ jobs:
           wc -c coverage_e2e.xml || true
           head -n 5 coverage_e2e.xml || true
 
-      - name: Upload coverage to Codecov (e2e)
+      - name: Upload coverage to Codecov (e2e) [try 1]
+        id: codecov_e2e_try1
         if: always()
+        continue-on-error: true
+        uses: codecov/codecov-action@v4
+        with:
+          files: ${{ github.workspace }}/coverage_e2e.xml
+          flags: e2e
+          fail_ci_if_error: true
+          verbose: true
+          use_oidc: true
+
+      - name: Upload coverage to Codecov (e2e) [retry if failed]
+        if: ${{ always() && steps.codecov_e2e_try1.outcome == 'failure' }}
         uses: codecov/codecov-action@v4
         with:
           files: ${{ github.workspace }}/coverage_e2e.xml
@@ -221,6 +247,7 @@ jobs:
         run: |
           mkdir -p test_results_integration
           pytest -q -c /dev/null -m integration \
+            --cov-config=.coveragerc \
             --cov=src/config_manager.py \
             --cov=src/silent_period.py \
             --cov=src/category_detector.py \
@@ -264,8 +291,20 @@ jobs:
           wc -c coverage_integration.xml || true
           head -n 5 coverage_integration.xml || true
 
-      - name: Upload coverage to Codecov (integration)
+      - name: Upload coverage to Codecov (integration) [try 1]
+        id: codecov_integration_try1
         if: always()
+        continue-on-error: true
+        uses: codecov/codecov-action@v4
+        with:
+          files: ${{ github.workspace }}/coverage_integration.xml
+          flags: integration
+          fail_ci_if_error: true
+          verbose: true
+          use_oidc: true
+
+      - name: Upload coverage to Codecov (integration) [retry if failed]
+        if: ${{ always() && steps.codecov_integration_try1.outcome == 'failure' }}
         uses: codecov/codecov-action@v4
         with:
           files: ${{ github.workspace }}/coverage_integration.xml
