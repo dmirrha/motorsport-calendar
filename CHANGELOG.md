@@ -27,6 +27,15 @@ e este projeto adere ao [Versionamento Semântico](https://semver.org/spec/v2.0.
   - Caso ausente, gerar via `python -m coverage xml -i -o <arquivo>` (garante artefato para upload no Codecov com `disable_search: true`).
   - Logs mantidos no workflow para facilitar diagnóstico.
 
+## [0.5.22] - 2025-08-18
+### Integração — TomadaTempo IT1 (Issue #105, PR #119)
+
+- Parser `sources/tomada_tempo.py`: cobertura de variantes essenciais com cenários determinísticos.
+- Casos cobertos: caminho feliz; campos opcionais ausentes tratados com segurança; tolerância a HTML malformado com fallbacks (sem crash).
+- Testes de integração: execução local estável da suíte `pytest -m integration`; cobertura consolidada ~48% no run; 3× sem flakes.
+- Documentação sincronizada: `RELEASES.md` e `docs/tests/overview.md`.
+- Versionamento: bump para `0.5.22` aplicado em `src/__init__.py`.
+
 ## [0.5.21] - 2025-08-18
 ### CI/Codecov — Cobertura e uploads restritos a XML
 

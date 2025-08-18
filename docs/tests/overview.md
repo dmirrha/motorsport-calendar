@@ -34,6 +34,7 @@ Objetivo: descrever a estratégia mínima de testes para o projeto, com foco em 
 ## Atualizações recentes
 - CategoryDetector: teste adicional cobrindo branches previamente não exercitados em `src/category_detector.py` (normalização vazia, mapeamentos custom e aprendizado a partir de arquivo salvo). Arquivo: `tests/unit/category/test_category_detector_additional_coverage.py`. Resultado: 100% no run focado.
 - DataCollector: teste unitário para o caminho de timeout na coleta concorrente, garantindo marcação de erro e atualização de estatísticas. Arquivo: `tests/unit/data_collector/test_data_collector_timeout_not_done.py`. Resultado: 100% no run focado.
+- TomadaTempo IT1 (Issue #105): integração mínima determinística do parser `sources/tomada_tempo.py` cobrindo caminho feliz, campos opcionais ausentes e HTML malformado com fallbacks (sem crash). Testes: `tests/integration/test_phase3_tomada_tempo_integration.py`, `tests/integration/test_phase3_tomada_tempo_parsing_variants.py`. Métricas recentes: ~48% de cobertura no run de integração; execuções estáveis (ex.: 23 passed, 3 skipped, 1 xfailed).
 
 ## Determinismo de ICS e snapshots
 - Ordenação de eventos: VEVENTs ordenados determinísticamente por `datetime` (convertido para UTC; fallback para naive) e, em seguida, por `display_name`/`name` para desempate.

@@ -19,7 +19,16 @@
    - Caso ausente, gerar via `python -m coverage xml -i -o <arquivo>` para garantir artefato consistente.
    - Uploads explicitamente apontando para os XMLs esperados com `disable_search: true` para evitar arquivos indevidos.
 
- ## Versão 0.5.21 (2025-08-18)
+## Versão 0.5.22 (2025-08-18)
+
+Integração — TomadaTempo IT1 (Issue #105, PR #119)
+
+- Escopo: robustez do parser `sources/tomada_tempo.py` em cenários determinísticos cobrindo caminho feliz, campos opcionais ausentes e tolerância a HTML malformado (com fallbacks, sem crash).
+- Testes de integração: suíte estável localmente com `pytest -m integration`; métricas observadas ~48% de cobertura no run; múltiplas execuções sem flakes. Em ciclos recentes: 23 passed, 3 skipped, 1 xfailed.
+- Documentação sincronizada: `CHANGELOG.md` e `docs/tests/overview.md` atualizados.
+- Versionamento: bump para `0.5.22` em `src/__init__.py`.
+
+## Versão 0.5.21 (2025-08-18)
 
  CI/Codecov — Cobertura e uploads restritos a XML
 
