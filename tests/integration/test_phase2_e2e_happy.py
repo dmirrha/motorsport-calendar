@@ -9,7 +9,6 @@ from src.ical_generator import ICalGenerator
 from tests.utils.ical_snapshots import compare_or_write_snapshot
 
 
-@pytest.mark.integration
 def test_phase2_e2e_happy(freeze_datetime, fixed_uuid, patch_requests_session, dummy_response, tmp_path):
     """
     E2E caminho feliz: coleta TomadaTempo -> processa -> gera/valida ICS -> snapshot estável.
