@@ -14,6 +14,8 @@ O formato é baseado em [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)
 e este projeto adere ao [Versionamento Semântico](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
+
+## [0.5.19] - 2025-08-18
 ### Fix — ICS: Streaming links ordenados e limitados (determinismo)
 
 - Em `src/ical_generator.py`, `ICalGenerator._create_event_description()` agora normaliza (`strip`), remove duplicados, ordena alfabeticamente e limita aos 3 primeiros os `streaming_links` antes de renderizar na `DESCRIPTION`.
@@ -26,6 +28,12 @@ e este projeto adere ao [Versionamento Semântico](https://semver.org/spec/v2.0.
 - Reabertura da issue e inclusão do Plano — Fase 3, alinhado a `.windsurf/rules/tester.md` (sem mudanças de código).
 - Docs sincronizadas: `docs/issues/open/issue-105.{md,json}`; CHANGELOG/RELEASES atualizados.
  
+### CI/Tests — Cobertura por flags e separação E2E vs Integration
+
+- Workflow `.github/workflows/tests.yml`: confirmados escopos de cobertura focados por job (`integration` e `e2e`) e execução dos E2E via padrão `tests/integration/test_phase2_e2e_*.py` com flag `e2e` no Codecov.
+- Testes: removido marcador indevido `@pytest.mark.integration` de `tests/integration/test_phase2_e2e_happy.py` para impedir execução no job `integration`.
+- Documentação: `docs/tests/overview.md` atualizado para tornar explícito que testes E2E não devem usar o marcador `integration`, pois são executados em job separado (`e2e`) no CI.
+
 ### Testes — Cobertura Pontual (CategoryDetector e DataCollector)
 
 - CategoryDetector:

@@ -123,14 +123,17 @@ jobs:
           if [ -f requirements-dev.txt ]; then pip install -r requirements-dev.txt; fi
           pip install pytest pytest-cov
 
-      - name: Run E2E happy with coverage (no gate)
+      - name: Run all E2E with coverage (no gate)
         env:
           TZ: America/Sao_Paulo
         run: |
           mkdir -p test_results_e2e
           pytest -q -c /dev/null \
-            tests/integration/test_phase2_e2e_happy.py -k happy \
-            --cov=src --cov=sources \
+            tests/integration/test_phase2_e2e_*.py \
+            --cov=src/data_collector.py \
+            --cov=src/event_processor.py \
+            --cov=src/ical_generator.py \
+            --cov=sources/tomada_tempo.py \
             --cov-report=term-missing:skip-covered \
             --cov-report=xml:coverage_e2e.xml \
             --cov-report=html:htmlcov-e2e \
@@ -212,7 +215,14 @@ jobs:
         run: |
           mkdir -p test_results_integration
           pytest -q -c /dev/null -m integration \
-            --cov=src --cov=sources \
+            --cov=src/config_manager.py \
+            --cov=src/silent_period.py \
+            --cov=src/category_detector.py \
+            --cov=src/ical_generator.py \
+            --cov=src/event_processor.py \
+            --cov=src/data_collector.py \
+            --cov=sources/base_source.py \
+            --cov=sources/tomada_tempo.py \
             --cov-report=term-missing:skip-covered \
             --cov-report=xml:coverage_integration.xml \
             --cov-report=html:htmlcov-integration \

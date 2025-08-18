@@ -49,3 +49,15 @@ Objetivo: descrever a estratégia mínima de testes para o projeto, com foco em 
 
 ## Referências
 - Governança Fase 2: PR #87 (https://github.com/dmirrha/motorsport-calendar/pull/87) — épico #78
+
+## Atualização CI — Cobertura por flags (integration/e2e)
+- Job `integration`: executa `pytest -m integration` com cobertura focada em módulos principais do fluxo (ex.: `src/config_manager.py`, `src/silent_period.py`, `src/category_detector.py`, `src/ical_generator.py`, `src/event_processor.py`, `src/data_collector.py`, `sources/base_source.py`, `sources/tomada_tempo.py`). Objetivo: refletir cobertura efetiva da suíte de integração sem diluir o denominador.
+- Job `e2e`: executa todos os `tests/integration/test_phase2_e2e_*.py` com cobertura focada no pipeline E2E (`src/data_collector.py`, `src/event_processor.py`, `src/ical_generator.py`, `sources/tomada_tempo.py`). Antes rodava apenas `-k happy`.
+- Testes de integração relevantes receberam `pytestmark = pytest.mark.integration` para inclusão no job `integration` (ex.: `test_phase2_basic.py`, `test_phase2_optionals.py`, `test_phase2_overnight.py`, `test_phase2_timezones.py`).
+- Observação: testes E2E não devem usar o marcador `integration`; são executados separadamente pelo job `e2e` no CI.
+
+### Política de marcadores (automática)
+- Teste de política: `tests/policy/test_markers_policy.py` valida que:
+  - Arquivos E2E (`tests/integration/test_phase2_e2e_*.py`) NÃO contêm `pytest.mark.integration`.
+  - Arquivos de integração não-E2E em `tests/integration/` CONTÊM `pytest.mark.integration`.
+- Objetivo: evitar regressões que baguncem o escopo dos jobs `integration` e `e2e` no CI.

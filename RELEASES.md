@@ -3,6 +3,9 @@
 Este arquivo contém um registro acumulativo de todas as versões lançadas do projeto, com notas detalhadas sobre as mudanças em cada versão.
 
 ## Não Lançado
+
+## Versão 0.5.19 (2025-08-18)
+
 Fix — ICS: Streaming links ordenados e limitados (determinismo)
 
 - `src/ical_generator.py`: `_create_event_description` agora normaliza (`strip`), remove duplicados, ordena alfabeticamente e limita aos 3 primeiros os `streaming_links` antes de renderizar na `DESCRIPTION`.
@@ -12,6 +15,12 @@ Fix — ICS: Streaming links ordenados e limitados (determinismo)
 Documentação — Issue #105: reabertura e inclusão do Plano — Fase 3 (alinhado a `.windsurf/rules/tester.md`), sem mudanças de código. Docs sincronizadas: `docs/issues/open/issue-105.{md,json}`; `CHANGELOG.md` e `RELEASES.md` atualizados.
 
 Documentação — Issue #83: documentação e rastreabilidade sincronizadas (sem mudanças de código/funcionalidade).
+
+CI/Tests — Cobertura por flags e separação E2E vs Integration
+
+- Workflow `.github/workflows/tests.yml`: confirmada a cobertura focada por job (`integration` e `e2e`) e execução dos E2E via padrão `tests/integration/test_phase2_e2e_*.py` com flag `e2e` no Codecov.
+- Testes: removido marcador indevido `@pytest.mark.integration` de `tests/integration/test_phase2_e2e_happy.py` para evitar inclusão no job `integration`.
+- Documentação: `docs/tests/overview.md` atualizado para deixar explícito que testes E2E não devem usar o marcador `integration`, pois são executados em job separado (`e2e`) no CI.
 
 Testes — Cobertura Pontual (CategoryDetector e DataCollector):
 - CategoryDetector: novo teste unitário cobrindo branches faltantes em `src/category_detector.py` (normalização vazia, mapeamentos custom e aprendizado a partir de arquivo salvo). Arquivo: `tests/unit/category/test_category_detector_additional_coverage.py`. Resultado: 100% no run focado.

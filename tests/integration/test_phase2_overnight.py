@@ -8,6 +8,7 @@ from icalendar import Calendar
 from src.ical_generator import ICalGenerator
 from tests.utils.ical_snapshots import compare_or_write_snapshot
 
+pytestmark = pytest.mark.integration
 
 @pytest.fixture()
 def overnight_event() -> dict:
