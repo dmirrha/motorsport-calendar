@@ -1,18 +1,27 @@
 # Notas de Versão
+ 
+ Este arquivo contém um registro acumulativo de todas as versões lançadas do projeto, com notas detalhadas sobre as mudanças em cada versão.
+ 
+ ## Não Lançado
+ CI/Tests — Cobertura por flags (ajuste unit/integration/e2e)
+ 
+ - Job `unit`: passa a excluir explicitamente testes `integration` e o conjunto `tests/integration/test_phase2_e2e_*.py` para evitar diluição do denominador das flags (`-m "not integration"` e `-k "not test_phase2_e2e_"`).
+ - Job `integration`: mantém `pytest -m integration` com cobertura focada em módulos do fluxo principal (src/ e sources/ relevantes), refletindo melhor a suíte no Codecov (flag `integration`).
+ - Job `e2e`: executa todos os `tests/integration/test_phase2_e2e_*.py` (não apenas `-k happy`) com cobertura focada no pipeline end‑to‑end (flag `e2e`).
+ - Documentação: `docs/tests/overview.md` e `CHANGELOG.md` atualizados com a separação de escopos e política de marcadores.
 
-Este arquivo contém um registro acumulativo de todas as versões lançadas do projeto, com notas detalhadas sobre as mudanças em cada versão.
+ CI/Codecov — Geração garantida de XML (e2e/integration)
+ 
+ - Removido `-c /dev/null` dos comandos `pytest` nos jobs `e2e_happy` e `integration` para respeitar o `pytest.ini` (plugins/opções globais e cobertura padrão).
+ - Adicionado `--cov-fail-under=0` nesses jobs para neutralizar o gate global apenas para e2e/integration, mantendo o gate no job `unit`.
+ - Passos de verificação e fallback adicionados antes do upload ao Codecov:
+   - Verificação dos arquivos `coverage_e2e.xml`/`coverage_integration.xml` (`ls -l`, `wc -c`, `head`).
+   - Caso ausente, gerar via `python -m coverage xml -i -o <arquivo>` para garantir artefato consistente.
+   - Uploads explicitamente apontando para os XMLs esperados com `disable_search: true` para evitar arquivos indevidos.
 
-## Não Lançado
-CI/Tests — Cobertura por flags (ajuste unit/integration/e2e)
+ ## Versão 0.5.21 (2025-08-18)
 
-- Job `unit`: passa a excluir explicitamente testes `integration` e o conjunto `tests/integration/test_phase2_e2e_*.py` para evitar diluição do denominador das flags (`-m "not integration"` e `-k "not test_phase2_e2e_"`).
-- Job `integration`: mantém `pytest -m integration` com cobertura focada em módulos do fluxo principal (src/ e sources/ relevantes), refletindo melhor a suíte no Codecov (flag `integration`).
-- Job `e2e`: executa todos os `tests/integration/test_phase2_e2e_*.py` (não apenas `-k happy`) com cobertura focada no pipeline end‑to‑end (flag `e2e`).
-- Documentação: `docs/tests/overview.md` e `CHANGELOG.md` atualizados com a separação de escopos e política de marcadores.
-
-## Versão 0.5.21 (2025-08-18)
-
-CI/Codecov — Cobertura e uploads restritos a XML
+ CI/Codecov — Cobertura e uploads restritos a XML
 
 - Workflow `.github/workflows/tests.yml`:
   - Desabilitada a busca automática do Codecov (`disable_search: true`) em todos os uploads (unit/e2e/integration) para impedir inclusão de arquivos não relacionados.

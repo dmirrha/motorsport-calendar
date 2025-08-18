@@ -163,7 +163,7 @@ jobs:
           TZ: America/Sao_Paulo
         run: |
           mkdir -p test_results_e2e
-          pytest -q -c /dev/null \
+          pytest -q \
             --cov-config=.coveragerc \
             tests/integration/test_phase2_e2e_*.py \
             --cov=src/data_collector.py \
@@ -173,6 +173,7 @@ jobs:
             --cov-report=term-missing:skip-covered \
             --cov-report=xml:coverage_e2e.xml \
             --cov-report=html:htmlcov-e2e \
+            --cov-fail-under=0 \
             --junitxml=test_results_e2e/junit.xml \
             -o junit_family=legacy
 
@@ -204,6 +205,16 @@ jobs:
           ls -l coverage_e2e.xml || true
           wc -c coverage_e2e.xml || true
           head -n 5 coverage_e2e.xml || true
+
+      - name: Generate coverage XML if missing (e2e)
+        if: always()
+        run: |
+          if [ ! -f coverage_e2e.xml ]; then
+            echo "coverage_e2e.xml não encontrado. Gerando via 'coverage xml'..."
+            python -m coverage xml -i -o coverage_e2e.xml || true
+          fi
+          echo "Após fallback:"
+          ls -l coverage_e2e.xml || true
 
       - name: Upload coverage to Codecov (e2e) [try 1]
         id: codecov_e2e_try1
@@ -282,7 +293,7 @@ jobs:
           TZ: America/Sao_Paulo
         run: |
           mkdir -p test_results_integration
-          pytest -q -c /dev/null -m integration \
+          pytest -q -m integration \
             --cov-config=.coveragerc \
             --cov=src/config_manager.py \
             --cov=src/silent_period.py \
@@ -295,6 +306,7 @@ jobs:
             --cov-report=term-missing:skip-covered \
             --cov-report=xml:coverage_integration.xml \
             --cov-report=html:htmlcov-integration \
+            --cov-fail-under=0 \
             --junitxml=test_results_integration/junit.xml \
             -o junit_family=legacy
 
@@ -326,6 +338,16 @@ jobs:
           ls -l coverage_integration.xml || true
           wc -c coverage_integration.xml || true
           head -n 5 coverage_integration.xml || true
+
+      - name: Generate coverage XML if missing (integration)
+        if: always()
+        run: |
+          if [ ! -f coverage_integration.xml ]; then
+            echo "coverage_integration.xml não encontrado. Gerando via 'coverage xml'..."
+            python -m coverage xml -i -o coverage_integration.xml || true
+          fi
+          echo "Após fallback:"
+          ls -l coverage_integration.xml || true
 
       - name: Upload coverage to Codecov (integration) [try 1]
         id: codecov_integration_try1
