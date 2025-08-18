@@ -79,12 +79,11 @@ jobs:
         if: always()
         uses: codecov/codecov-action@v4
         with:
-          files: coverage.xml
+          files: ${{ github.workspace }}/coverage.xml
           flags: unit
           fail_ci_if_error: false
           verbose: true
           use_oidc: true
-          disable_search: true
 
       - name: Upload test results to Codecov (Tests Analytics)
         if: always()
@@ -161,16 +160,23 @@ jobs:
           fail_ci_if_error: false
           verbose: true
       
+      - name: Verify coverage file (e2e)
+        if: always()
+        run: |
+          echo "Verificando coverage_e2e.xml"
+          ls -l coverage_e2e.xml || true
+          wc -c coverage_e2e.xml || true
+          head -n 5 coverage_e2e.xml || true
+
       - name: Upload coverage to Codecov (e2e)
         if: always()
         uses: codecov/codecov-action@v4
         with:
-          files: coverage_e2e.xml
+          files: ${{ github.workspace }}/coverage_e2e.xml
           flags: e2e
           fail_ci_if_error: false
           verbose: true
           use_oidc: true
-          disable_search: true
       
       - name: Upload E2E test results to Codecov (Tests Analytics)
         if: always()
@@ -250,16 +256,23 @@ jobs:
           fail_ci_if_error: false
           verbose: true
 
+      - name: Verify coverage file (integration)
+        if: always()
+        run: |
+          echo "Verificando coverage_integration.xml"
+          ls -l coverage_integration.xml || true
+          wc -c coverage_integration.xml || true
+          head -n 5 coverage_integration.xml || true
+
       - name: Upload coverage to Codecov (integration)
         if: always()
         uses: codecov/codecov-action@v4
         with:
-          files: coverage_integration.xml
+          files: ${{ github.workspace }}/coverage_integration.xml
           flags: integration
           fail_ci_if_error: false
           verbose: true
           use_oidc: true
-          disable_search: true
 
       - name: Upload integration test results to Codecov (Tests Analytics)
         if: always()
