@@ -55,6 +55,7 @@ Objetivo: descrever a estratégia mínima de testes para o projeto, com foco em 
 - Job `e2e`: executa todos os `tests/integration/test_phase2_e2e_*.py` com cobertura focada no pipeline E2E (`src/data_collector.py`, `src/event_processor.py`, `src/ical_generator.py`, `sources/tomada_tempo.py`). Antes rodava apenas `-k happy`.
 - Testes de integração relevantes receberam `pytestmark = pytest.mark.integration` para inclusão no job `integration` (ex.: `test_phase2_basic.py`, `test_phase2_optionals.py`, `test_phase2_overnight.py`, `test_phase2_timezones.py`).
 - Observação: testes E2E não devem usar o marcador `integration`; são executados separadamente pelo job `e2e` no CI.
+- Job `unit`: exclui explicitamente `integration` e o conjunto `test_phase2_e2e_*` via `-m "not integration"` e `-k "not test_phase2_e2e_"` para evitar diluição do denominador de cobertura das flags.
 
 ### Política de marcadores (automática)
 - Teste de política: `tests/policy/test_markers_policy.py` valida que:
