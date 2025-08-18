@@ -14,6 +14,11 @@ O formato é baseado em [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)
 e este projeto adere ao [Versionamento Semântico](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
+### CI/Tests — Cobertura por flags (ajuste unit/integration/e2e)
+- Job `unit`: passa a excluir explicitamente testes `integration` e `test_phase2_e2e_*` para evitar diluição da cobertura por flag (`-m "not integration"` e `-k "not test_phase2_e2e_"`).
+- Job `integration`: mantém `pytest -m integration` com cobertura focada em módulos do fluxo principal (src/ e sources/ relevantes) para refletir melhor a suíte de integração no Codecov (flag `integration`).
+- Job `e2e`: executa todos os `tests/integration/test_phase2_e2e_*.py` (não apenas `-k happy`) com cobertura focada no pipeline end‑to‑end (flag `e2e`).
+- Documentação: `docs/tests/overview.md` atualizado descrevendo a separação de escopos e a política de marcadores.
 
 ## [0.5.21] - 2025-08-18
 ### CI/Codecov — Cobertura e uploads restritos a XML
