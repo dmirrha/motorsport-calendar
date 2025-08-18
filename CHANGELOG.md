@@ -7,7 +7,6 @@
 - Documentação: `docs/TEST_AUTOMATION_PLAN.md` atualizado com Components + Tests Analytics; `docs/issues/open/issue-104.{md,json}` sincronizados.
 - Higiene: `.gitignore` ampliado para `tmp/`, `coverage_*.xml`, `htmlcov-*/`, `test_results_*/`.
 # Changelog
-
 Todas as mudanças notáveis neste projeto serão documentadas neste arquivo.
 
 O formato é baseado em [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
