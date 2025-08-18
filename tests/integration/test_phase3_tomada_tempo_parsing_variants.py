@@ -75,3 +75,32 @@ def test_tomada_tempo_happy_path(monkeypatch):
     for e in events:
         assert e.get("date") is not None
         assert isinstance(e.get("streaming_links"), list)
+
+
+def test_tomada_tempo_missing_fields(monkeypatch):
+    # Arrange
+    programming_html = _read_fixture("programming_missing_fields.html")
+    src = TomadaTempoSource()
+
+    link_text = "PROGRAMAÇÃO DA TV E INTERNET — 01/08/2025"
+    href = "/programacao-01-08-2025"
+    main_html = _build_main_page(link_text, href)
+
+    _patch_make_request(monkeypatch, src, main_html, programming_html, href)
+
+    target_date = _make_target_friday()
+
+    # Act
+    events = src.collect_events(target_date)
+
+    # Assert
+    assert isinstance(events, list)
+    assert len(events) == 2
+    # Campos essenciais
+    for e in events:
+        assert e.get("date") is not None
+        assert isinstance(e.get("streaming_links"), list)
+    # Pelo menos um evento sem links e um sem localidade
+    assert any(e for e in events if e.get("streaming_links") == [])
+    assert any(e for e in events if e.get("location") in (None, ""))
+
