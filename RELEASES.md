@@ -3,14 +3,58 @@
 Este arquivo contém um registro acumulativo de todas as versões lançadas do projeto, com notas detalhadas sobre as mudanças em cada versão.
 
 ## Não Lançado
+Fix — ICS: Streaming links ordenados e limitados (determinismo)
+
+- `src/ical_generator.py`: `_create_event_description` agora normaliza (`strip`), remove duplicados, ordena alfabeticamente e limita aos 3 primeiros os `streaming_links` antes de renderizar na `DESCRIPTION`.
+- Teste de integração validado: `tests/integration/test_phase2_ical_options_and_edges.py::test_edges_streaming_sorted_and_limited_with_alarms` com `pytest -m integration` (31 passed, 4 skipped, 1 xfailed); cobertura 53.15% (>45%).
+- Rastreabilidade: PRs #110/#112; Issue #105.
+
+Documentação — Issue #105: reabertura e inclusão do Plano — Fase 3 (alinhado a `.windsurf/rules/tester.md`), sem mudanças de código. Docs sincronizadas: `docs/issues/open/issue-105.{md,json}`; `CHANGELOG.md` e `RELEASES.md` atualizados.
+
 Documentação — Issue #83: documentação e rastreabilidade sincronizadas (sem mudanças de código/funcionalidade).
+
+Testes — Cobertura Pontual (CategoryDetector e DataCollector):
+- CategoryDetector: novo teste unitário cobrindo branches faltantes em `src/category_detector.py` (normalização vazia, mapeamentos custom e aprendizado a partir de arquivo salvo). Arquivo: `tests/unit/category/test_category_detector_additional_coverage.py`. Resultado: 100% no run focado.
+- DataCollector: novo teste unitário para caminho de timeout na coleta concorrente, cobrindo estatísticas e erro do futuro não concluído. Arquivo: `tests/unit/data_collector/test_data_collector_timeout_not_done.py`. Resultado: 100% no run focado.
 
 - Integração — Codecov Hardening (Issue #103): OIDC habilitado nos uploads do Codecov (`use_oidc: true`), varredura automática desabilitada (`disable_search: true`), `codecov.yml` mínimo (statuses informativos `project`/`patch`, `comment: false`) e upload adicional do E2E (flag `e2e`). Documentação atualizada (`tests/README.md`, `docs/TEST_AUTOMATION_PLAN.md`).
 
 - Integração — Codecov Components e Tests Analytics (Issue #104): componentes no `codecov.yml` (inclui `sources/` para evitar cobertura "unassigned"); habilitado Tests Analytics via `codecov/test-results-action@v1` com uploads por job (`tests`/`unit`, `integration`, `e2e_happy`/`e2e`) e `if: always()`; ajustado `pytest` com `-o junit_family=legacy`; links do Codecov corrigidos para slug `/github`; `.gitignore` ampliado para `tmp/`, `coverage_*.xml`, `htmlcov-*/`, `test_results_*/`; documentação atualizada (`README.md`, `tests/README.md`, `docs/TEST_AUTOMATION_PLAN.md`, `docs/issues/open/issue-104.{md,json}`).
 
-- Atualizados: `docs/issues/open/issue-83.{md,json}`, `docs/TEST_AUTOMATION_PLAN.md`, `tests/README.md`, `docs/tests/scenarios/phase2_scenarios.md`, `docs/tests/scenarios/SCENARIOS_INDEX.md`, `CHANGELOG.md`.
-- Branch: `tests/issue-83-docs-traceability`.
+ - Atualizados: `docs/issues/open/issue-83.{md,json}`, `docs/TEST_AUTOMATION_PLAN.md`, `tests/README.md`, `docs/tests/scenarios/phase2_scenarios.md`, `docs/tests/scenarios/SCENARIOS_INDEX.md`, `CHANGELOG.md`.
+ - Branch: `tests/issue-83-docs-traceability`.
+
+ - Integração — PayloadManager
+
+   - Teste: `tests/integration/test_phase2_payload_manager.py`
+   - Escopo: serialização de payloads (JSON/HTML/binário), compressão `gzip`, limpeza por idade e por quantidade (retenção), e estatísticas agregadas por fonte.
+   - Estabilidade: execução local estável, sem flakes observados.
+   - Métricas: suíte completa com **366 passed**, **5 skipped**; cobertura global consolidada em **~91.75%** (visível no Codecov por job/flag).
+
+- Integração — Fase 3 IT1 (Issue #105)
+  - Teste adicionado: `tests/integration/test_phase3_data_collector_concurrent.py` — valida concorrência de coleta, agregação parcial e estatísticas do `DataCollector` sem rede real (mocks via `tests/conftest.py`).
+  - Execução local (integration): `21 passed, 3 skipped, 1 xfailed` em ~6.4s; cobertura consolidada (~48% global no run de integração).
+  - Cobertura específica (integration): `src/data_collector.py` ~62% linhas. Próximo: backoff e partial aggregation dedicados.
+  - Versionamento: bump para `0.5.17` aplicado em `src/__init__.py`.
+  - Documentação: `CHANGELOG.md` e `docs/issues/open/issue-105.md` atualizados.
+
+- Correções — TomadaTempo (Fallback de datas em texto)
+  - Corrigido fallback do `TomadaTempoSource` para normalizar datas extraídas do contexto/linhas de programação para o formato ISO `YYYY-MM-DD`.
+  - Afeta `sources/tomada_tempo.py`: datas inferidas pelo contexto agora são convertidas para ISO antes de compor os eventos.
+  - Testes: `tests/integration/test_phase3_tomada_tempo_integration.py::test_integration_programming_text_only_fallback` aprovado com `-c /dev/null`; arquivo completo e suíte `-m integration` sem regressões.
+  - Rastreabilidade: Issue #105 (Fase 3 — IT1).
+
+- Integração — Fase 3 IT2 (Issue #105)
+  - Teste adicionado: `tests/integration/test_phase3_category_detector_integration_simple.py` — valida matches básicos (F1, F2, MotoGP, WEC) e filtragem por confiança do `CategoryDetector` usando eventos simulados (sem I/O externo).
+  - Correção: `src/category_detector.py` — `detect_category()` passa a retornar metadata consistente com chave `category_type` mesmo quando `raw_text` está vazio, evitando `KeyError` em `batch_detect_categories`.
+  - Execução local (integration): testes passam de forma determinística; cobertura do módulo `src/category_detector.py` elevou de ~52% para ~57% no run de integração.
+  - Documentação sincronizada: `CHANGELOG.md` e `RELEASES.md` atualizados; rastreabilidade em Issue #105.
+
+- Integração — Fase 3 IT3 (Issue #105)
+  - Teste adicionado: `tests/integration/test_phase3_event_processor_merge_dedup.py` — valida merge/deduplicação entre duas fontes com prioridades distintas, unificação de `streaming_links`, preservação de `official_url` mais relevante e seleção pela maior `source_priority`; inclui asserts de `processing_stats` do `EventProcessor`. Determinístico, sem I/O externo.
+  - Teste adicionado: `tests/integration/test_phase3_ical_generator_basic.py` — gera um VEVENT mínimo com timezone `America/Sao_Paulo` em diretório temporário (`tmp_path`), valida o `.ics` via `ICalGenerator.validate_calendar()` e usa lembretes determinísticos.
+  - Execução local: ambos passam com `pytest -q -c /dev/null`; tempo <3s; sem flakes.
+  - Versionamento: bump para `0.5.18` aplicado em `src/__init__.py`.
 
 - CI — Cobertura visível por job (Issue #105)
 
@@ -32,7 +76,31 @@ Documentação — Issue #83: documentação e rastreabilidade sincronizadas (se
       - `tests/integration/test_phase2_orchestration_silent_manager.py`: orquestração entre `SilentPeriodManager` e `ConfigManager`, cobrindo período silencioso cruzando a meia-noite (sex/sáb 22:00→06:00), verificação de metadados e estatísticas.
       - `tests/integration/test_phase2_config_manager.py`: complementos para `ConfigManager` (merge profundo com defaults e persistência save/load usando arquivos temporários).
     - Execução local: ambos passam de forma determinística usando `pytest -q -c /dev/null` (evita gates globais); aviso de marker `integration` esperado nesse modo e inexistente quando usando `pytest.ini`.
-    - Próximos: ampliar cenários para `sources/tomada_tempo.py`, `src/data_collector.py`, `src/event_processor.py` e `src/ical_generator.py` conforme plano da issue #105.
+  - Próximos: ampliar cenários para `sources/tomada_tempo.py`, `src/data_collector.py`, `src/event_processor.py` e `src/ical_generator.py` conforme plano da issue #105.
+
+ - Integração — Fase 4: TomadaTempo (Issue #105)
+   - Planejamento e stubs criados na PR #110: `docs/tests/scenarios/phase4_scenarios.md`, `tests/integration/test_phase4_tomada_tempo_end_to_end_snapshot.py`, `tests/integration/test_phase4_tomada_tempo_errors.py`, e estrutura `tests/snapshots/phase4/`.
+   - Próximos passos: adicionar fixtures HTML (AM/PM, sem minutos, overnight, malformado), implementar E2E → ICS com snapshot canônico e testes de erros; executar 3× localmente (<30s) e registrar estabilidade.
+   - Fixtures HTML adicionadas para TomadaTempo: `tests/fixtures/html/tomada_tempo_weekend_minimal.html`, `..._alt_header.html`, `..._no_minutes.html`, `..._overnight.html`, `..._edge_cases.html`, e `..._malformed.html` (novo). Documentação atualizada em `docs/tests/scenarios/phase4_scenarios.md` com a seção “Fixtures HTML”.
+
+## Versão 0.5.16 (2025-08-17)
+Integração — Fase 3: CategoryDetector Variants (Issue #105)
+
+- Teste: `tests/integration/test_phase3_category_detector_variants.py`
+- Cenários cobertos:
+  - Tolerância a ruído/acentos para categorias conhecidas (ex.: `F1`, `WEC`).
+  - Fallback combinatório em `detect_categories_batch` (prioriza `raw_category`; combina com `name` apenas quando necessário).
+  - Aprendizado habilitado adiciona variações e persiste (save) corretamente.
+  - Roundtrip de persistência: `save_learned_categories` → `load_learned_categories` preserva dados.
+- Estabilidade local: 11/11 testes passando, 3 execuções consecutivas, zero flakes; tempo total ~0.6–0.72s.
+- Documentação sincronizada: `CHANGELOG.md` (Unreleased), `docs/tests/scenarios/SCENARIOS_INDEX.md`, `docs/tests/scenarios/phase3_scenarios.md`.
+
+ - Fix — ICS: ordenação determinística de eventos (Issue #84)
+
+   - `src/ical_generator.py`: `generate_calendar` passou a ordenar VEVENTs por `datetime` convertido para UTC (fallback para naive) e por `display_name`/`name` para desempates, garantindo estabilidade do `.ics`.
+   - Snapshot atualizado: `tests/snapshots/phase2/phase2_dedupe_order_consistency.ics` reordenado para refletir a nova ordem determinística.
+   - Teste: `tests/integration/test_phase2_dedupe_order_consistency.py` executado 3× localmente sem cobertura/gates (`-c /dev/null`), sem flakes.
+   - Documentação sincronizada: `CHANGELOG.md`, `docs/tests/overview.md`, `docs/tests/scenarios/phase2_scenarios.md`.
 
 ## Versão 0.5.15 (2025-08-14)
 Integração — Deduplicação, Ordenação e Consistência (Issue #84)

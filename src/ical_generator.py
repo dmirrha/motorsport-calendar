@@ -360,8 +360,13 @@ class ICalGenerator:
         if self.include_streaming_links:
             streaming_links = event.get('streaming_links', [])
             if streaming_links:
+                # Normalize, sort alphabetically and limit to top-3 to ensure determinism
+                links = [str(x).strip() for x in streaming_links if x]
+                # Remove duplicates and sort
+                links = sorted(set(links))
+                top_links = links[:3]
                 description_parts.append("\n🔴 Streaming:")
-                for link in streaming_links[:3]:  # Limit to 3 links
+                for link in top_links:
                     description_parts.append(f"• {link}")
         
         # Official URL
