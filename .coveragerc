@@ -18,6 +18,13 @@ sources =
 [report]
 show_missing = True
 skip_covered = True
+precision = 2
 omit =
     tests/*
     */__init__.py
+exclude_lines =
+    if __name__ == .__main__.
+    pragma: no cover
+
+[xml]
+output = coverage.xml

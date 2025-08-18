@@ -4,6 +4,17 @@ Este arquivo contém um registro acumulativo de todas as versões lançadas do p
 
 ## Não Lançado
 
+## Versão 0.5.21 (2025-08-18)
+
+CI/Codecov — Cobertura e uploads restritos a XML
+
+- Workflow `.github/workflows/tests.yml`:
+  - Desabilitada a busca automática do Codecov (`disable_search: true`) em todos os uploads (unit/e2e/integration) para impedir inclusão de arquivos não relacionados.
+  - Uploads explicitamente apontando para `coverage.xml`, `coverage_e2e.xml` e `coverage_integration.xml` com flags (`unit`, `e2e`, `integration`).
+  - Escopo de cobertura de E2E e Integration ampliado para `--cov=src` e `--cov=sources` para garantir geração dos XMLs esperados.
+- Sem impacto funcional no runtime; mudanças limitadas ao pipeline de CI.
+- Versionamento: bump para `0.5.21` em `src/__init__.py`.
+
 ## Versão 0.5.19 (2025-08-18)
 
 Fix — ICS: Streaming links ordenados e limitados (determinismo)
@@ -23,6 +34,7 @@ CI/Tests — Cobertura por flags e separação E2E vs Integration
 - Documentação: `docs/tests/overview.md` atualizado para deixar explícito que testes E2E não devem usar o marcador `integration`, pois são executados em job separado (`e2e`) no CI.
 
 Testes — Cobertura Pontual (CategoryDetector e DataCollector):
+
 - CategoryDetector: novo teste unitário cobrindo branches faltantes em `src/category_detector.py` (normalização vazia, mapeamentos custom e aprendizado a partir de arquivo salvo). Arquivo: `tests/unit/category/test_category_detector_additional_coverage.py`. Resultado: 100% no run focado.
 - DataCollector: novo teste unitário para caminho de timeout na coleta concorrente, cobrindo estatísticas e erro do futuro não concluído. Arquivo: `tests/unit/data_collector/test_data_collector_timeout_not_done.py`. Resultado: 100% no run focado.
 
@@ -65,6 +77,31 @@ Testes — Cobertura Pontual (CategoryDetector e DataCollector):
   - Execução local: ambos passam com `pytest -q -c /dev/null`; tempo <3s; sem flakes.
   - Versionamento: bump para `0.5.18` aplicado em `src/__init__.py`.
 
+- Integração — Fase 3 IT1 (Issue #105)
+  - Teste adicionado: `tests/integration/test_phase3_data_collector_concurrent.py` — valida concorrência de coleta, agregação parcial e estatísticas do `DataCollector` sem rede real (mocks via `tests/conftest.py`).
+  - Execução local (integration): `21 passed, 3 skipped, 1 xfailed` em ~6.4s; cobertura consolidada (~48% global no run de integração).
+  - Cobertura específica (integration): `src/data_collector.py` ~62% linhas. Próximo: backoff e partial aggregation dedicados.
+  - Versionamento: bump para `0.5.17` aplicado em `src/__init__.py`.
+  - Documentação: `CHANGELOG.md` e `docs/issues/open/issue-105.md` atualizados.
+
+- Correções — TomadaTempo (Fallback de datas em texto)
+  - Corrigido fallback do `TomadaTempoSource` para normalizar datas extraídas do contexto/linhas de programação para o formato ISO `YYYY-MM-DD`.
+  - Afeta `sources/tomada_tempo.py`: datas inferidas pelo contexto agora são convertidas para ISO antes de compor os eventos.
+  - Testes: `tests/integration/test_phase3_tomada_tempo_integration.py::test_integration_programming_text_only_fallback` aprovado com `-c /dev/null`; arquivo completo e suíte `-m integration` sem regressões.
+  - Rastreabilidade: Issue #105 (Fase 3 — IT1).
+
+- Integração — Fase 3 IT2 (Issue #105)
+  - Teste adicionado: `tests/integration/test_phase3_category_detector_integration_simple.py` — valida matches básicos (F1, F2, MotoGP, WEC) e filtragem por confiança do `CategoryDetector` usando eventos simulados (sem I/O externo).
+  - Correção: `src/category_detector.py` — `detect_category()` passa a retornar metadata consistente com chave `category_type` mesmo quando `raw_text` está vazio, evitando `KeyError` em `batch_detect_categories`.
+  - Execução local (integration): testes passam de forma determinística; cobertura do módulo `src/category_detector.py` elevou de ~52% para ~57% no run de integração.
+  - Documentação sincronizada: `CHANGELOG.md` e `RELEASES.md` atualizados; rastreabilidade em Issue #105.
+
+- Integração — Fase 3 IT3 (Issue #105)
+  - Teste adicionado: `tests/integration/test_phase3_event_processor_merge_dedup.py` — valida merge/deduplicação entre duas fontes com prioridades distintas, unificação de `streaming_links`, preservação de `official_url` mais relevante e seleção pela maior `source_priority`; inclui asserts de `processing_stats` do `EventProcessor`. Determinístico, sem I/O externo.
+  - Teste adicionado: `tests/integration/test_phase3_ical_generator_basic.py` — gera um VEVENT mínimo com timezone `America/Sao_Paulo` em diretório temporário (`tmp_path`), valida o `.ics` via `ICalGenerator.validate_calendar()` e usa lembretes determinísticos.
+  - Execução local: ambos passam com `pytest -q -c /dev/null`; tempo <3s; sem flakes.
+  - Versionamento: bump para `0.5.18` aplicado em `src/__init__.py`.
+
 - CI — Cobertura visível por job (Issue #105)
 
   - `.github/workflows/tests.yml` atualizado para melhorar a visibilidade da cobertura por job:
@@ -77,6 +114,8 @@ Testes — Cobertura Pontual (CategoryDetector e DataCollector):
     - Testes de integração adicionados para módulos prioritários: `src/utils/config_validator.py`, `src/config_manager.py`, `src/silent_period.py`, `src/category_detector.py`.
     - Total: 13 testes, 0 skips; execução local estável.
     - Cobertura aproximada (integration): `config_validator` ~58%, `config_manager` ~70%, `silent_period` ~65%, `category_detector` ~52%.
+    - Baseline: cobertura global 91,27% (Codecov, commit `2096dd8`, branch `chore/issue-105`).
+    - Documentação sincronizada: `docs/issues/open/issue-105.{md,json}`, `CHANGELOG.md`, `RELEASES.md`.
     - Baseline (local): Integration ~40%; E2E (happy) ~40%.
     - Documentação sincronizada: `docs/issues/open/issue-105.{md,json}`, `CHANGELOG.md`.
 
@@ -110,6 +149,19 @@ Integração — Fase 3: CategoryDetector Variants (Issue #105)
    - Snapshot atualizado: `tests/snapshots/phase2/phase2_dedupe_order_consistency.ics` reordenado para refletir a nova ordem determinística.
    - Teste: `tests/integration/test_phase2_dedupe_order_consistency.py` executado 3× localmente sem cobertura/gates (`-c /dev/null`), sem flakes.
    - Documentação sincronizada: `CHANGELOG.md`, `docs/tests/overview.md`, `docs/tests/scenarios/phase2_scenarios.md`.
+
+## Versão 0.5.16 (2025-08-15)
+Integração — Fase 3, Iteração 1 (IT1) — Planejamento e sincronização (Issue #105)
+
+- Escopo planejado (IT1):
+  - Parsers da fonte `TomadaTempo` (`sources/tomada_tempo.py`): variantes de HTML/JSON e normalização.
+  - Coletor (`src/data_collector.py`): backoff simples, agregação parcial e warnings sem crash.
+- Testes planejados:
+  - `tests/integration/test_phase3_tomada_tempo_parsing_variants.py`
+  - `tests/integration/test_phase3_data_collector_backoff_and_partial.py`
+- Qualidade/meta: Integration rumo a 75–80% mantendo CI <30s; 3× execuções sem flakes.
+- Versionamento: bump de versão aplicado para `0.5.16` em `src/__init__.py`.
+- Documentação: `CHANGELOG.md` ([Unreleased]) e `docs/issues/open/issue-105.md` atualizados com o plano e pedido de confirmação para iniciar a IT1.
 
 ## Versão 0.5.15 (2025-08-14)
 Integração — Deduplicação, Ordenação e Consistência (Issue #84)

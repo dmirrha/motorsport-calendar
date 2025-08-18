@@ -76,6 +76,14 @@ jobs:
           fail_ci_if_error: false
           verbose: true
 
+      - name: Verify coverage file (unit)
+        if: always()
+        run: |
+          echo "Verificando coverage.xml"
+          ls -l coverage.xml || true
+          wc -c coverage.xml || true
+          head -n 5 coverage.xml || true
+
       - name: Upload coverage to Codecov (unit) [try 1]
         id: codecov_unit_try1
         if: always()
@@ -84,6 +92,7 @@ jobs:
         with:
           files: ${{ github.workspace }}/coverage.xml
           flags: unit
+          disable_search: true
           fail_ci_if_error: true
           verbose: true
           use_oidc: true
@@ -94,6 +103,18 @@ jobs:
         with:
           files: ${{ github.workspace }}/coverage.xml
           flags: unit
+          disable_search: true
+          fail_ci_if_error: true
+          verbose: true
+          use_oidc: true
+
+      - name: Upload coverage to Codecov (unit) [retry if failed]
+        if: ${{ always() && steps.codecov_unit_try1.outcome == 'failure' }}
+        uses: codecov/codecov-action@v4
+        with:
+          files: coverage.xml
+          flags: unit
+          disable_search: true
           fail_ci_if_error: false
           verbose: true
           use_oidc: true
@@ -143,10 +164,9 @@ jobs:
           pytest -q -c /dev/null \
             --cov-config=.coveragerc \
             tests/integration/test_phase2_e2e_*.py \
-            --cov=src/data_collector.py \
-            --cov=src/event_processor.py \
-            --cov=src/ical_generator.py \
-            --cov=sources/tomada_tempo.py \
+            --cov-config=.coveragerc \
+            --cov=src \
+            --cov=sources \
             --cov-report=term-missing:skip-covered \
             --cov-report=xml:coverage_e2e.xml \
             --cov-report=html:htmlcov-e2e \
@@ -190,6 +210,7 @@ jobs:
         with:
           files: ${{ github.workspace }}/coverage_e2e.xml
           flags: e2e
+          disable_search: true
           fail_ci_if_error: true
           verbose: true
           use_oidc: true
@@ -200,6 +221,18 @@ jobs:
         with:
           files: ${{ github.workspace }}/coverage_e2e.xml
           flags: e2e
+          disable_search: true
+          fail_ci_if_error: true
+          verbose: true
+          use_oidc: true
+
+      - name: Upload coverage to Codecov (e2e) [retry if failed]
+        if: ${{ always() && steps.codecov_e2e_try1.outcome == 'failure' }}
+        uses: codecov/codecov-action@v4
+        with:
+          files: coverage_e2e.xml
+          flags: e2e
+          disable_search: true
           fail_ci_if_error: false
           verbose: true
           use_oidc: true
@@ -248,14 +281,8 @@ jobs:
           mkdir -p test_results_integration
           pytest -q -c /dev/null -m integration \
             --cov-config=.coveragerc \
-            --cov=src/config_manager.py \
-            --cov=src/silent_period.py \
-            --cov=src/category_detector.py \
-            --cov=src/ical_generator.py \
-            --cov=src/event_processor.py \
-            --cov=src/data_collector.py \
-            --cov=sources/base_source.py \
-            --cov=sources/tomada_tempo.py \
+            --cov=src \
+            --cov=sources \
             --cov-report=term-missing:skip-covered \
             --cov-report=xml:coverage_integration.xml \
             --cov-report=html:htmlcov-integration \
@@ -299,6 +326,7 @@ jobs:
         with:
           files: ${{ github.workspace }}/coverage_integration.xml
           flags: integration
+          disable_search: true
           fail_ci_if_error: true
           verbose: true
           use_oidc: true
@@ -309,6 +337,18 @@ jobs:
         with:
           files: ${{ github.workspace }}/coverage_integration.xml
           flags: integration
+          disable_search: true
+          fail_ci_if_error: true
+          verbose: true
+          use_oidc: true
+
+      - name: Upload coverage to Codecov (integration) [retry if failed]
+        if: ${{ always() && steps.codecov_integration_try1.outcome == 'failure' }}
+        uses: codecov/codecov-action@v4
+        with:
+          files: coverage_integration.xml
+          flags: integration
+          disable_search: true
           fail_ci_if_error: false
           verbose: true
           use_oidc: true
