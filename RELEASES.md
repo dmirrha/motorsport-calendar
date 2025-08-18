@@ -4,6 +4,17 @@ Este arquivo contém um registro acumulativo de todas as versões lançadas do p
 
 ## Não Lançado
 
+## Versão 0.5.21 (2025-08-18)
+
+CI/Codecov — Cobertura e uploads restritos a XML
+
+- Workflow `.github/workflows/tests.yml`:
+  - Desabilitada a busca automática do Codecov (`disable_search: true`) em todos os uploads (unit/e2e/integration) para impedir inclusão de arquivos não relacionados.
+  - Uploads explicitamente apontando para `coverage.xml`, `coverage_e2e.xml` e `coverage_integration.xml` com flags (`unit`, `e2e`, `integration`).
+  - Escopo de cobertura de E2E e Integration ampliado para `--cov=src` e `--cov=sources` para garantir geração dos XMLs esperados.
+- Sem impacto funcional no runtime; mudanças limitadas ao pipeline de CI.
+- Versionamento: bump para `0.5.21` em `src/__init__.py`.
+
 ## Versão 0.5.19 (2025-08-18)
 
 Fix — ICS: Streaming links ordenados e limitados (determinismo)

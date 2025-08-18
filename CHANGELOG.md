@@ -15,6 +15,16 @@ e este projeto adere ao [Versionamento Semântico](https://semver.org/spec/v2.0.
 
 ## [Unreleased]
 
+## [0.5.21] - 2025-08-18
+### CI/Codecov — Cobertura e uploads restritos a XML
+
+- Workflow `.github/workflows/tests.yml`:
+  - Desabilitada a busca automática do Codecov (`disable_search: true`) em todos os uploads (unit/e2e/integration) para impedir inclusão de arquivos não relacionados (ex.: JSON em `.github/import_issues/`).
+  - Uploads agora apontam explicitamente para `coverage.xml`, `coverage_e2e.xml` e `coverage_integration.xml` por flag (`unit`, `e2e`, `integration`).
+  - Escopo de cobertura dos jobs E2E/Integration ampliado para `--cov=src` e `--cov=sources`, garantindo geração consistente dos XMLs esperados.
+- Sem impacto funcional no runtime do pacote; mudanças limitadas ao CI.
+- Versionamento: bump para `0.5.21` em `src/__init__.py`.
+
 ## [0.5.19] - 2025-08-18
 ### Fix — ICS: Streaming links ordenados e limitados (determinismo)
 
