@@ -242,15 +242,29 @@ Alinhado a `.windsurf/rules/tester.md` (pytest puro, mocks simples, foco no esse
 - `src/utils/config_validator.py` e `src/config_manager.py`: variantes de merge e coerções.
 - `src/silent_period.py`: múltiplas janelas e cruzando DST.
 
-### Testes propostos (mínimo viável)
-- `tests/integration/test_phase3_tomada_tempo_parsing_variants.py`
-- `tests/integration/test_phase3_data_collector_backoff_and_partial.py`
-- `tests/integration/test_phase3_event_processor_merge_order_tz_edges.py`
-- `tests/integration/test_phase3_ical_generation_options_minimal.py`
-- `tests/integration/test_phase3_config_manager_overrides_and_types.py`
-- `tests/integration/test_phase3_silent_periods_multi_windows_dst.py`
-
-### Critérios de aceite
+  ### Testes propostos (mínimo viável)
+  - `tests/integration/test_phase3_tomada_tempo_parsing_variants.py`
+  - `tests/integration/test_phase3_data_collector_backoff_and_partial.py`
+  - `tests/integration/test_phase3_event_processor_merge_order_tz_edges.py`
+  - `tests/integration/test_phase3_ical_generation_options_minimal.py`
+  - `tests/integration/test_phase3_config_manager_overrides_and_types.py`
+  - `tests/integration/test_phase3_silent_periods_multi_windows_dst.py`
+  
+  ## Progresso — Fase 3 — Iteração 1 (IT1)
+  
+  - Escopo planejado (IT1):
+    - Parsers da fonte `TomadaTempo` (`sources/tomada_tempo.py`): variantes de HTML/JSON e normalização.
+    - Coletor (`src/data_collector.py`): backoff simples, agregação parcial e warnings sem crash.
+  - Testes-alvo (IT1):
+    - `tests/integration/test_phase3_tomada_tempo_parsing_variants.py`
+    - `tests/integration/test_phase3_data_collector_backoff_and_partial.py`
+  - Qualidade/meta: Integration rumo a 75–80% mantendo CI <30s; 3× execuções sem flakes.
+  - Versionamento: bump aplicado para `0.5.16` em `src/__init__.py`.
+  
+  ### Pedido de confirmação
+  Autorize o início da IT1 conforme escopo e testes-alvo acima. Após sua confirmação, criarei a branch de trabalho e abrirei um PR de housekeeping mencionando esta issue (#105) para dar início às implementações.
+  
+  ### Critérios de aceite
 - Cobertura Integration ≥ 75–80% e E2E ≥ 70–75%.
 - Execuções locais determinísticas (<30s), 3× sem flakes.
 - Sem dependência de rede; uso de fixtures/mocks simples.

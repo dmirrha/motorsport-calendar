@@ -122,6 +122,19 @@ Integração — Fase 3: CategoryDetector Variants (Issue #105)
    - Teste: `tests/integration/test_phase2_dedupe_order_consistency.py` executado 3× localmente sem cobertura/gates (`-c /dev/null`), sem flakes.
    - Documentação sincronizada: `CHANGELOG.md`, `docs/tests/overview.md`, `docs/tests/scenarios/phase2_scenarios.md`.
 
+## Versão 0.5.16 (2025-08-15)
+Integração — Fase 3, Iteração 1 (IT1) — Planejamento e sincronização (Issue #105)
+
+- Escopo planejado (IT1):
+  - Parsers da fonte `TomadaTempo` (`sources/tomada_tempo.py`): variantes de HTML/JSON e normalização.
+  - Coletor (`src/data_collector.py`): backoff simples, agregação parcial e warnings sem crash.
+- Testes planejados:
+  - `tests/integration/test_phase3_tomada_tempo_parsing_variants.py`
+  - `tests/integration/test_phase3_data_collector_backoff_and_partial.py`
+- Qualidade/meta: Integration rumo a 75–80% mantendo CI <30s; 3× execuções sem flakes.
+- Versionamento: bump de versão aplicado para `0.5.16` em `src/__init__.py`.
+- Documentação: `CHANGELOG.md` ([Unreleased]) e `docs/issues/open/issue-105.md` atualizados com o plano e pedido de confirmação para iniciar a IT1.
+
 ## Versão 0.5.15 (2025-08-14)
 Integração — Deduplicação, Ordenação e Consistência (Issue #84)
 
