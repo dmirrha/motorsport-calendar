@@ -10,6 +10,16 @@ CI/Tests — Cobertura por flags (ajuste unit/integration/e2e)
 - Job `e2e`: executa todos os `tests/integration/test_phase2_e2e_*.py` (não apenas `-k happy`) com cobertura focada no pipeline end‑to‑end (flag `e2e`).
 - Documentação: `docs/tests/overview.md` e `CHANGELOG.md` atualizados com a separação de escopos e política de marcadores.
 
+
+CI/Codecov — Geração garantida de XML (e2e/integration)
+
+- Removido `-c /dev/null` dos comandos `pytest` nos jobs `e2e_happy` e `integration` para respeitar o `pytest.ini` (plugins/opções globais e cobertura padrão).
+- Adicionado `--cov-fail-under=0` nesses jobs para neutralizar o gate global apenas para e2e/integration, mantendo o gate no job `unit`.
+- Passos de verificação e fallback adicionados antes do upload ao Codecov:
+  - Verificação dos arquivos `coverage_e2e.xml`/`coverage_integration.xml` (`ls -l`, `wc -c`, `head`).
+  - Caso ausente, gerar via `python -m coverage xml -i -o <arquivo>` para garantir artefato consistente.
+  - Uploads explicitamente apontando para os XMLs esperados com `disable_search: true` para evitar arquivos indevidos.
+
 ## Versão 0.5.21 (2025-08-18)
 
 CI/Codecov — Cobertura e uploads restritos a XML

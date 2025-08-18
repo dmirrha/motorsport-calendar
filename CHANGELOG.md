@@ -20,6 +20,14 @@ e este projeto adere ao [Versionamento Semântico](https://semver.org/spec/v2.0.
 - Job `e2e`: executa todos os `tests/integration/test_phase2_e2e_*.py` (não apenas `-k happy`) com cobertura focada no pipeline end‑to‑end (flag `e2e`).
 - Documentação: `docs/tests/overview.md` atualizado descrevendo a separação de escopos e a política de marcadores.
 
+### CI/Codecov — Geração garantida de XML (e2e/integration)
+- Removido `-c /dev/null` dos comandos `pytest` nos jobs `e2e_happy` e `integration` para não ignorar o `pytest.ini` (plugins/opções globais).
+- Adicionado `--cov-fail-under=0` apenas nesses jobs para neutralizar o gate global (45%) sem afetar o job `unit`.
+- Adicionados passos de verificação e fallback pós-`pytest`:
+  - Verificação do arquivo (`ls -l`, `wc -c`, `head`) de `coverage_e2e.xml`/`coverage_integration.xml`.
+  - Caso ausente, gerar via `python -m coverage xml -i -o <arquivo>` (garante artefato para upload no Codecov com `disable_search: true`).
+  - Logs mantidos no workflow para facilitar diagnóstico.
+
 ## [0.5.21] - 2025-08-18
 ### CI/Codecov — Cobertura e uploads restritos a XML
 
