@@ -1,0 +1,23 @@
+[run]
+relative_files = True
+branch = True
+source =
+    src
+    sources
+
+[paths]
+src =
+    src
+    /home/runner/work/motorsport-calendar/motorsport-calendar/src
+    **/motorsport-calendar/src
+sources =
+    sources
+    /home/runner/work/motorsport-calendar/motorsport-calendar/sources
+    **/motorsport-calendar/sources
+
+[report]
+show_missing = True
+skip_covered = True
+omit =
+    tests/*
+    */__init__.py
