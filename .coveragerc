@@ -1,14 +1,27 @@
 [run]
-# Garante que os paths no XML sejam relativos ao repositório (evita "Unusable report" no Codecov)
 relative_files = True
 branch = True
 source =
     src
     sources
 
+[paths]
+src =
+    src
+    /home/runner/work/motorsport-calendar/motorsport-calendar/src
+    **/motorsport-calendar/src
+sources =
+    sources
+    /home/runner/work/motorsport-calendar/motorsport-calendar/sources
+    **/motorsport-calendar/sources
+
 [report]
 show_missing = True
+skip_covered = True
 precision = 2
+omit =
+    tests/*
+    */__init__.py
 exclude_lines =
     if __name__ == .__main__.
     pragma: no cover

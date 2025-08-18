@@ -90,7 +90,18 @@ jobs:
         continue-on-error: true
         uses: codecov/codecov-action@v4
         with:
-          files: coverage.xml
+          files: ${{ github.workspace }}/coverage.xml
+          flags: unit
+          disable_search: true
+          fail_ci_if_error: true
+          verbose: true
+          use_oidc: true
+
+      - name: Upload coverage to Codecov (unit) [retry if failed]
+        if: ${{ always() && steps.codecov_unit_try1.outcome == 'failure' }}
+        uses: codecov/codecov-action@v4
+        with:
+          files: ${{ github.workspace }}/coverage.xml
           flags: unit
           disable_search: true
           fail_ci_if_error: true
@@ -151,6 +162,7 @@ jobs:
         run: |
           mkdir -p test_results_e2e
           pytest -q -c /dev/null \
+            --cov-config=.coveragerc \
             tests/integration/test_phase2_e2e_*.py \
             --cov-config=.coveragerc \
             --cov=src \
@@ -196,7 +208,18 @@ jobs:
         continue-on-error: true
         uses: codecov/codecov-action@v4
         with:
-          files: coverage_e2e.xml
+          files: ${{ github.workspace }}/coverage_e2e.xml
+          flags: e2e
+          disable_search: true
+          fail_ci_if_error: true
+          verbose: true
+          use_oidc: true
+
+      - name: Upload coverage to Codecov (e2e) [retry if failed]
+        if: ${{ always() && steps.codecov_e2e_try1.outcome == 'failure' }}
+        uses: codecov/codecov-action@v4
+        with:
+          files: ${{ github.workspace }}/coverage_e2e.xml
           flags: e2e
           disable_search: true
           fail_ci_if_error: true
@@ -301,7 +324,18 @@ jobs:
         continue-on-error: true
         uses: codecov/codecov-action@v4
         with:
-          files: coverage_integration.xml
+          files: ${{ github.workspace }}/coverage_integration.xml
+          flags: integration
+          disable_search: true
+          fail_ci_if_error: true
+          verbose: true
+          use_oidc: true
+
+      - name: Upload coverage to Codecov (integration) [retry if failed]
+        if: ${{ always() && steps.codecov_integration_try1.outcome == 'failure' }}
+        uses: codecov/codecov-action@v4
+        with:
+          files: ${{ github.workspace }}/coverage_integration.xml
           flags: integration
           disable_search: true
           fail_ci_if_error: true
