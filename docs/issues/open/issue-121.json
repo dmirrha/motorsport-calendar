@@ -30,15 +30,15 @@
     }
   },
   "tasks": [
-    {"item": "Planejar e detalhar cenários (datas/TZ, multi-day, entities, duplicatas, streaming>3, locais ausentes)", "done": false},
-    {"item": "Criar fixtures HTML em tests/fixtures/html/tomada_tempo/", "done": false},
-    {"item": "Implementar testes: dates_tz", "done": false},
-    {"item": "Implementar testes: entities_and_duplicates", "done": false},
-    {"item": "Implementar testes: streaming_constraints", "done": false},
-    {"item": "Implementar testes: multiday_and_location", "done": false},
-    {"item": "Rodar pytest -m integration 3× local, validar estabilidade e >=80%", "done": false},
-    {"item": "Atualizar documentação (CHANGELOG, RELEASES, docs/tests/overview.md)", "done": false},
-    {"item": "Abrir PR e referenciar esta issue", "done": false}
+    {"item": "Planejar e detalhar cenários (datas/TZ, multi-day, entities, duplicatas, streaming>3, locais ausentes)", "done": true},
+    {"item": "Criar fixtures HTML em tests/fixtures/html/tomada_tempo/", "done": true},
+    {"item": "Implementar testes: dates_tz", "done": true},
+    {"item": "Implementar testes: entities_and_duplicates", "done": true},
+    {"item": "Implementar testes: streaming_constraints", "done": true},
+    {"item": "Implementar testes: multiday_and_location", "done": true},
+    {"item": "Rodar pytest -m integration 3× local, validar estabilidade e >=80%", "done": true},
+    {"item": "Atualizar documentação (CHANGELOG, RELEASES, docs/tests/overview.md)", "done": true},
+    {"item": "Abrir PR e referenciar esta issue", "done": true}
   ],
   "acceptance": [
     "Cobertura de testes de integração >= 80%",

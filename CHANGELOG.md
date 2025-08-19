@@ -27,6 +27,12 @@ e este projeto adere ao [Versionamento Semântico](https://semver.org/spec/v2.0.
   - Caso ausente, gerar via `python -m coverage xml -i -o <arquivo>` (garante artefato para upload no Codecov com `disable_search: true`).
   - Logs mantidos no workflow para facilitar diagnóstico.
 
+### CI/Docs — Helper Makefile ci.pr-run
+
+- Adicionado alvo `ci.pr-run` no Makefile para atualizar a branch do PR com `main` e disparar o workflow `Tests` via GitHub CLI (`gh`).
+- Documentação: seções em `README.md` e `docs/tests/overview.md` com pré-requisitos e uso: `make ci.pr-run BRANCH=<branch> [WORKFLOW=Tests]`.
+- Comportamento: executa fetch/checkout/merge/push, aciona o workflow e retorna à branch original; imprime logs no terminal.
+
 ## [0.5.23] - 2025-08-19
 ### Integração — TomadaTempo IT2 (Issue #121, PR #122)
     

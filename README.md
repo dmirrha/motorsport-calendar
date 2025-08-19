@@ -652,6 +652,19 @@ Notas:
   - `tests/unit/sources/tomada_tempo/test_parse_calendar_page.py`
 
 Para detalhes, veja `tests/README.md`.
+ 
+ ### CI — Helper Make para PRs (ci.pr-run)
+ - Objetivo: manter sua branch de PR atualizada com `main` e disparar o workflow `Tests` no GitHub Actions.
+ - Pré-requisitos: working tree limpo; GitHub CLI autenticado (`gh auth login`).
+ - Uso:
+   ```bash
+   make ci.pr-run BRANCH=<sua-branch>
+   # exemplo
+   make ci.pr-run BRANCH=chore/it2-tomadatempo-coverage-80
+   ```
+ - Variáveis opcionais:
+   - `WORKFLOW=.github/workflows/tests.yml` (padrão)
+ - O alvo executa: `git fetch` → `checkout` → `merge --no-edit origin/main` → `push` → `gh workflow run` → `gh run watch` → volta para a branch original.
 
 ### CI — Job E2E Happy Path
 

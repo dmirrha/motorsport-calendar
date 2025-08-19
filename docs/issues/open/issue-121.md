@@ -69,12 +69,12 @@ Alcançar cobertura de testes de integração ≥ 80% com foco na fonte `TomadaT
 - PR: descritivo, com checklist e links para artefatos (coverage/Codecov, HTML fixtures).
 
 ## 📋 Checklist de Execução
-- [ ] Planejar e detalhar cenários (datas/TZ, multi-day, entities, duplicatas, streaming>3, locais ausentes)
-- [ ] Criar fixtures HTML em `tests/fixtures/html/tomada_tempo/`
-- [ ] Implementar testes: `dates_tz`
-- [ ] Implementar testes: `entities_and_duplicates`
-- [ ] Implementar testes: `streaming_constraints`
-- [ ] Implementar testes: `multiday_and_location`
-- [ ] Rodar `pytest -m integration` 3× local, validar estabilidade e ≥80%
-- [ ] Atualizar documentação (CHANGELOG, RELEASES, docs/tests/overview.md)
-- [ ] Abrir PR e referenciar esta issue
+- [x] Planejar e detalhar cenários (datas/TZ, multi-day, entities, duplicatas, streaming>3, locais ausentes)
+- [x] Criar fixtures HTML em `tests/fixtures/html/tomada_tempo/`
+- [x] Implementar testes: `dates_tz`
+- [x] Implementar testes: `entities_and_duplicates`
+- [x] Implementar testes: `streaming_constraints`
+- [x] Implementar testes: `multiday_and_location`
+- [x] Rodar `pytest -m integration` 3× local, validar estabilidade e ≥80%
+- [x] Atualizar documentação (CHANGELOG, RELEASES, docs/tests/overview.md)
+- [x] Abrir PR e referenciar esta issue
