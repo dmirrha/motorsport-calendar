@@ -19,6 +19,12 @@
    - Caso ausente, gerar via `python -m coverage xml -i -o <arquivo>` para garantir artefato consistente.
    - Uploads explicitamente apontando para os XMLs esperados com `disable_search: true` para evitar arquivos indevidos.
 
+CI/Docs — Helper Makefile ci.pr-run
+
+- Adicionado alvo `ci.pr-run` no Makefile para atualizar a branch do PR com `main` e disparar o workflow `Tests` via GitHub CLI (`gh`).
+- Documentação: `README.md` e `docs/tests/overview.md` com pré-requisitos e uso: `make ci.pr-run BRANCH=<branch> [WORKFLOW=Tests]`.
+- Comportamento: executa fetch/checkout/merge/push, aciona o workflow e retorna à branch original; imprime logs no terminal.
+
 ## Versão 0.5.23 (2025-08-19)
     
 Integração — TomadaTempo IT2 (Issue #121, PR #122)
