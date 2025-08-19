@@ -9,7 +9,7 @@
  - Job `integration`: mantém `pytest -m integration` com cobertura focada em módulos do fluxo principal (src/ e sources/ relevantes), refletindo melhor a suíte no Codecov (flag `integration`).
  - Job `e2e`: executa todos os `tests/integration/test_phase2_e2e_*.py` (não apenas `-k happy`) com cobertura focada no pipeline end‑to‑end (flag `e2e`).
  - Documentação: `docs/tests/overview.md` e `CHANGELOG.md` atualizados com a separação de escopos e política de marcadores.
-
+ 
  CI/Codecov — Geração garantida de XML (e2e/integration)
  
  - Removido `-c /dev/null` dos comandos `pytest` nos jobs `e2e_happy` e `integration` para respeitar o `pytest.ini` (plugins/opções globais e cobertura padrão).
@@ -18,6 +18,22 @@
    - Verificação dos arquivos `coverage_e2e.xml`/`coverage_integration.xml` (`ls -l`, `wc -c`, `head`).
    - Caso ausente, gerar via `python -m coverage xml -i -o <arquivo>` para garantir artefato consistente.
    - Uploads explicitamente apontando para os XMLs esperados com `disable_search: true` para evitar arquivos indevidos.
+
+## Versão 0.5.23 (2025-08-19)
+    
+Integração — TomadaTempo IT2 (Issue #121, PR #122)
+    
+- Parser `sources/tomada_tempo.py`:
+  - `_parse_event_from_li` retorna `None` quando não houver horário e nem `<strong>` (alinha ao contrato dos testes).
+  - Suporte ampliado a formatos de horário: "às 09", "10 horas e 45", "14h 05" (variações com/sem minutos e conectivos).
+  - `response.url` agora é passado para `_parse_calendar_page` em `_collect_from_categories` (contexto de data).
+  - `BaseSource.normalize_event_data`: expostos `category` e `raw_text` para asserts de integração.
+- Fixtures/Tests:
+  - Fixtures avançadas em `tests/fixtures/html/tomada_tempo/` (entities, multiday, timezone/DST, duplicates, streaming overflow, missing location).
+  - Testes: `tests/integration/test_it2_tomada_tempo_dates_tz.py`, `..._entities_and_duplicates.py`, `..._streaming_constraints.py`, `..._multiday_and_location.py`.
+- Métricas locais (referência): suíte completa ~391 passed, 8 skipped, 1 xfailed, 1 xpassed; cobertura de `sources/tomada_tempo.py` ~88%.
+- Branch: `chore/it2-tomadatempo-coverage-80`.
+- Versionamento: `src/__init__.py` atualizado para `0.5.23`.
 
 ## Versão 0.5.22 (2025-08-18)
 

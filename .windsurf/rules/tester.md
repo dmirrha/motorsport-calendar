@@ -1,5 +1,5 @@
 ---
-trigger: manual
+trigger: always_on
 ---
 
 # Prompt para Agente Especialista em Automação de Testes - Projeto Python Web Scraping
