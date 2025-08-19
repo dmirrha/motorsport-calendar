@@ -71,6 +71,19 @@ Objetivo: descrever a estratégia mínima de testes para o projeto, com foco em 
     - `WORKFLOW=.github/workflows/tests.yml` (default)
   - O alvo realiza: `git fetch` → `checkout` → `merge --no-edit origin/main` → `push` → `gh workflow run` → `gh run watch` → volta para sua branch original.
 
+### CI — Helper Make para PRs
+- Objetivo: manter a branch da PR atualizada com `main` e disparar o workflow `Tests`.
+- Pré-requisitos: working tree limpo; GitHub CLI autenticado (`gh auth login`).
+- Uso:
+  ```bash
+  make ci.pr-run BRANCH=<sua-branch>
+  # exemplo
+  make ci.pr-run BRANCH=chore/it2-tomadatempo-coverage-80
+  ```
+  - Variáveis opcionais:
+    - `WORKFLOW=.github/workflows/tests.yml` (default)
+  - O alvo realiza: `git fetch` → `checkout` → `merge --no-edit origin/main` → `push` → `gh workflow run` → `gh run watch` → volta para sua branch original.
+
 ## Estrutura de pastas
 - `tests/unit/`: testes unitários por módulo.
 - `tests/fixtures/`: insumos estáticos (ex.: `ical/` com snapshots canônicos).

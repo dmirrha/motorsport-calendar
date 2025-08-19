@@ -47,6 +47,12 @@ Testes — Unitários (CategoryDetector, Logger) e ajuste de stubs (DataCollecto
   - Ajuste dos stubs para compatibilidade com `BaseSource` via `MinimalBase` (atributos essenciais antes de `super().__init__()` e sessão de rede neutralizada), evitando falhas silenciosas em `add_source()`.
   - Arquivo ajustado: `tests/unit/test_data_collector.py`. Suíte unit estável.
 
+CI/Docs — Helper Makefile ci.pr-run
+
+- Adicionado alvo `ci.pr-run` no Makefile para atualizar a branch do PR com `main` e disparar o workflow `Tests` via GitHub CLI (`gh`).
+- Documentação: `README.md` e `docs/tests/overview.md` com pré-requisitos e uso: `make ci.pr-run BRANCH=<branch> [WORKFLOW=Tests]`.
+- Comportamento: executa fetch/checkout/merge/push, aciona o workflow e retorna à branch original; imprime logs no terminal.
+
 ## Versão 0.5.23 (2025-08-19)
     
 Integração — TomadaTempo IT2 (Issue #121, PR #122)
