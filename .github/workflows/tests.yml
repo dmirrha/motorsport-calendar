@@ -509,9 +509,9 @@ jobs:
             exit 0
           fi
           head_ref="${{ github.head_ref || github.ref_name }}"
-          pr=$(gh pr list --state open --head "$head_ref" --json number --jq '.[0].number' || true)
+          pr=$(gh pr list -R "${{ github.repository }}" --state open --head "$head_ref" --json number --jq '.[0].number' || true)
           if [ -z "$pr" ]; then
-            pr=$(gh pr list --state all --search "${{ github.sha }}" --json number --jq '.[0].number' || true)
+            pr=$(gh pr list -R "${{ github.repository }}" --state all --search "${{ github.sha }}" --json number --jq '.[0].number' || true)
           fi
           if [ -z "$pr" ]; then
             echo "Nenhuma PR encontrada para esta execução." > pr_missing.txt
