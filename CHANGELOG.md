@@ -19,24 +19,6 @@ e este projeto adere ao [Versionamento Semântico](https://semver.org/spec/v2.0.
 - Job `e2e`: executa todos os `tests/integration/test_phase2_e2e_*.py` (não apenas `-k happy`) com cobertura focada no pipeline end‑to‑end (flag `e2e`).
 - Documentação: `docs/tests/overview.md` atualizado descrevendo a separação de escopos e a política de marcadores.
 
-### Integração — TomadaTempo IT2 (Issue #121)
-
-- Fixtures HTML criadas para cenários avançados em `tests/fixtures/html/tomada_tempo/`:
-  - `programming_entities.html`
-  - `programming_multiday.html`
-  - `programming_timezone_dst.html`
-  - `programming_duplicates.html`
-  - `programming_streaming_overflow.html`
-  - `programming_missing_location.html`
-- Testes de integração adicionados em `tests/integration/`:
-  - `test_it2_tomada_tempo_dates_tz.py`
-  - `test_it2_tomada_tempo_entities_and_duplicates.py`
-  - `test_it2_tomada_tempo_streaming_constraints.py`
-  - `test_it2_tomada_tempo_multiday_and_location.py`
-- Execução isolada dos novos testes: 5 passed, 1 xfailed (esperado).
-- Branch de trabalho: `chore/it2-tomadatempo-coverage-80`.
-- Objetivo: elevar cobertura de integração da fonte TomadaTempo para ≥80% (baseline a ser medido na suíte completa com cobertura).
-
 ### CI/Codecov — Geração garantida de XML (e2e/integration)
 - Removido `-c /dev/null` dos comandos `pytest` nos jobs `e2e_happy` e `integration` para não ignorar o `pytest.ini` (plugins/opções globais).
 - Adicionado `--cov-fail-under=0` apenas nesses jobs para neutralizar o gate global (45%) sem afetar o job `unit`.
@@ -44,6 +26,21 @@ e este projeto adere ao [Versionamento Semântico](https://semver.org/spec/v2.0.
   - Verificação do arquivo (`ls -l`, `wc -c`, `head`) de `coverage_e2e.xml`/`coverage_integration.xml`.
   - Caso ausente, gerar via `python -m coverage xml -i -o <arquivo>` (garante artefato para upload no Codecov com `disable_search: true`).
   - Logs mantidos no workflow para facilitar diagnóstico.
+
+## [0.5.23] - 2025-08-19
+### Integração — TomadaTempo IT2 (Issue #121, PR #122)
+    
+- Parser `sources/tomada_tempo.py`:
+  - Retorna `None` em `_parse_event_from_li` quando não houver horário e nem tag `<strong>` (contrato dos testes).
+  - Ampliado suporte a formatos de horário: "às 09", "10 horas e 45", "14h 05" (variações com/sem minutos e conectivos).
+  - Passado `response.url` para `_parse_calendar_page` em `_collect_from_categories` para melhor contexto de data.
+  - `BaseSource.normalize_event_data`: expostos campos `category` e `raw_text` para asserts de integração.
+- Fixtures/Tests:
+  - Fixtures avançadas em `tests/fixtures/html/tomada_tempo/` (entities, multiday, timezone/DST, duplicates, streaming overflow, missing location).
+  - Novos testes de integração: `test_it2_tomada_tempo_dates_tz.py`, `..._entities_and_duplicates.py`, `..._streaming_constraints.py`, `..._multiday_and_location.py`.
+- Métricas locais (referência): suíte completa ~391 passed, 8 skipped, 1 xfailed, 1 xpassed; cobertura do módulo `sources/tomada_tempo.py` ~88%.
+- Branch: `chore/it2-tomadatempo-coverage-80`.
+- Versionamento: bump para `0.5.23` aplicado em `src/__init__.py`.
 
 ## [0.5.22] - 2025-08-18
 ### Integração — TomadaTempo IT1 (Issue #105, PR #119)
