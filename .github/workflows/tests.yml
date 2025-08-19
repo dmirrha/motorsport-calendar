@@ -121,14 +121,6 @@ jobs:
           verbose: true
           use_oidc: true
 
-      - name: Upload test results to Codecov (Tests Analytics)
-        if: always()
-        uses: codecov/test-results-action@v1
-        with:
-          token: ${{ secrets.CODECOV_TOKEN }}
-          files: test_results/junit.xml
-          flags: unit
-
   e2e_happy:
     runs-on: ubuntu-latest
     permissions:
@@ -251,14 +243,6 @@ jobs:
           verbose: true
           use_oidc: true
       
-      - name: Upload E2E test results to Codecov (Tests Analytics)
-        if: always()
-        uses: codecov/test-results-action@v1
-        with:
-          token: ${{ secrets.CODECOV_TOKEN }}
-          files: test_results_e2e/junit.xml
-          flags: e2e
-  
   integration:
     runs-on: ubuntu-latest
     permissions:
@@ -383,14 +367,6 @@ jobs:
           fail_ci_if_error: false
           verbose: true
           use_oidc: true
-
-      - name: Upload integration test results to Codecov (Tests Analytics)
-        if: always()
-        uses: codecov/test-results-action@v1
-        with:
-          token: ${{ secrets.CODECOV_TOKEN }}
-          files: test_results_integration/junit.xml
-          flags: integration
 
   post_pr_comment:
     name: Post PR comment (coverage and status)
