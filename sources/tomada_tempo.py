@@ -433,20 +433,30 @@ class TomadaTempoSource(BaseSource):
         try:
             # Extract time (e.g., "04:55", "08:30")
             event_time = self._extract_time(li_text)
+            # Pre-fetch strong tags (used to decide fallback behavior)
+            strong_tags = li_element.find_all('strong')
             
             # Extract category/name (e.g., "FÓRMULA 1", "NASCAR CUP")
             category_match = re.search(r'(\d{1,2}[:\.]\d{2})\s*[–-]?\s*([^–-]+?)(?:\s*[–-]|$)', li_text)
             if category_match:
                 event_name = category_match.group(2).strip()
-            else:
+            elif strong_tags:
                 # Fallback: try to extract from strong tags
-                strong_tags = li_element.find_all('strong')
-                if strong_tags:
-                    event_name = strong_tags[0].get_text(strip=True)
-                    # Remove time from the beginning if present
-                    event_name = re.sub(r'^\d{1,2}[:\.]\d{2}\s*[–-]?\s*', '', event_name)
+                event_name = strong_tags[0].get_text(strip=True)
+                # Remove time from the beginning if present
+                event_name = re.sub(r'^\d{1,2}[:\.]\d{2}\s*[–-]?\s*', '', event_name)
+            elif event_time:
+                # Robust fallback only when there is a time present in the text
+                tokens = [t.strip() for t in re.split(r'\s*[–-]\s*', li_text) if t.strip()]
+                if tokens:
+                    first = tokens[0]
+                    time_like = re.search(r'^\s*(?:\d{1,2}[:\.]\d{2}|\d{1,2}\s*h\s*\d{0,2}|às\s*\d{1,2}(?::\d{2})?|\d{1,2}\s*horas?(?:\s*e\s*\d{2})?)\s*$', first, re.IGNORECASE)
+                    event_name = (tokens[1] if len(tokens) > 1 and time_like else first)
                 else:
                     return None
+            else:
+                # No time and no <strong>: respect unit tests -> return None
+                return None
             
             # Clean up event name
             event_name = event_name.strip(' –-')
@@ -914,7 +924,7 @@ class TomadaTempoSource(BaseSource):
                 url = urljoin(self.get_base_url(), page)
                 response = self.make_request(url)
                 if response:
-                    page_events = self._parse_calendar_page(response.text, target_date)
+                    page_events = self._parse_calendar_page(response.text, target_date, response.url)
                     events.extend(page_events)
             except Exception as e:
                 if self.logger:

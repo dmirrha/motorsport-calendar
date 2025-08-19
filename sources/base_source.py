@@ -286,6 +286,7 @@ class BaseSource(ABC):
         normalized = {
             'event_id': self._generate_event_id(raw_event),
             'name': (raw_event.get('name') or '').strip(),
+            'category': (raw_event.get('category') or '').strip(),
             'raw_category': (raw_event.get('category') or '').strip(),
             'date': raw_event.get('date'),
             'time': raw_event.get('time'),
@@ -298,6 +299,7 @@ class BaseSource(ABC):
             'source': self.source_name,
             'source_display_name': self.source_display_name,
             'collected_at': datetime.now().isoformat(),
+            'raw_text': raw_event.get('raw_text'),
             'raw_data': raw_event  # Keep original data for debugging
         }
         
