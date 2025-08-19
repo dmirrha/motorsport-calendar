@@ -20,8 +20,43 @@ Objetivo: descrever a estratégia mínima de testes para o projeto, com foco em 
   - Somente integração: `make test.integration`
   - Cobertura no terminal (linhas faltantes): `pytest --cov --cov-report=term-missing -q`
   - Abrir relatório HTML (macOS): `open htmlcov/index.html`
-- Sem falha por cobertura (override local): `PYTEST_ADDOPTS="--cov-fail-under=0" pytest`
-- CI: GitHub Actions (`.github/workflows/tests.yml`) usando as mesmas opções do `pytest.ini`.
+  - Sem falha por cobertura (override local): `PYTEST_ADDOPTS="--cov-fail-under=0" pytest`
+  - CI: GitHub Actions (`.github/workflows/tests.yml`) usando as mesmas opções do `pytest.ini`.
+
+## Métricas — Cobertura por suíte (medição local em 2025-08-19)
+- Unit: **65.75%** — artefatos: `.coverage.unit`, `reports/coverage.unit.xml`, HTML em `htmlcov-unit/`
+- Integration: **52.90%** — artefatos: `.coverage.integration`, `reports/coverage.integration.xml`, HTML em `htmlcov-integration/`
+- E2E: **31.10%** — artefatos: `.coverage.e2e`, `reports/coverage.e2e.xml`, HTML em `htmlcov-e2e/`
+
+- Comandos executados:
+  - Unit:
+    ```bash
+    COVERAGE_FILE=.coverage.unit \
+    pytest -m unit \
+      --cov=src --cov=sources \
+      --cov-report=term-missing \
+      --cov-report=xml:reports/coverage.unit.xml \
+      --cov-report=html:htmlcov-unit \
+      --cov-fail-under=0
+    ```
+  - Integration (exclui placeholders):
+    ```bash
+    COVERAGE_FILE=.coverage.integration \
+    pytest -m integration -k "not placeholder" \
+      --cov=src --cov=sources \
+      --cov-report=xml:reports/coverage.integration.xml \
+      --cov-report=html:htmlcov-integration \
+      --cov-fail-under=0
+    ```
+  - E2E (exclui placeholders):
+    ```bash
+    COVERAGE_FILE=.coverage.e2e \
+    pytest -k "e2e and not placeholder" \
+      --cov=src --cov=sources \
+      --cov-report=xml:reports/coverage.e2e.xml \
+      --cov-report=html:htmlcov-e2e \
+      --cov-fail-under=0
+    ```
 
 ### CI — Helper Make para PRs
 - Objetivo: manter a branch da PR atualizada com `main` e disparar o workflow `Tests`.
@@ -48,6 +83,8 @@ Objetivo: descrever a estratégia mínima de testes para o projeto, com foco em 
 - CategoryDetector: teste adicional cobrindo branches previamente não exercitados em `src/category_detector.py` (normalização vazia, mapeamentos custom e aprendizado a partir de arquivo salvo). Arquivo: `tests/unit/category/test_category_detector_additional_coverage.py`. Resultado: 100% no run focado.
 - DataCollector: teste unitário para o caminho de timeout na coleta concorrente, garantindo marcação de erro e atualização de estatísticas. Arquivo: `tests/unit/data_collector/test_data_collector_timeout_not_done.py`. Resultado: 100% no run focado.
 - TomadaTempo IT1 (Issue #105): integração mínima determinística do parser `sources/tomada_tempo.py` cobrindo caminho feliz, campos opcionais ausentes e HTML malformado com fallbacks (sem crash). Testes: `tests/integration/test_phase3_tomada_tempo_integration.py`, `tests/integration/test_phase3_tomada_tempo_parsing_variants.py`. Métricas recentes: ~48% de cobertura no run de integração; execuções estáveis (ex.: 23 passed, 3 skipped, 1 xfailed).
+ - Logger: testes unitários cobrindo inicialização/configuração (handlers, formatters e níveis), rotação com limpeza desabilitada nos testes, emissão por nível e helpers de domínio. Arquivos: `tests/unit/logger/test_logger_basic.py`, `tests/unit/logger/test_logger_misc.py`. Resultado: módulo ~83%, 3× sem flakes (<30s).
+ - DataCollector (stubs): ajustes para compatibilidade com `BaseSource` via `MinimalBase` (inicializa atributos essenciais antes de `super().__init__()` e neutraliza rede), evitando falhas silenciosas em `add_source()`. Arquivo ajustado: `tests/unit/test_data_collector.py`. Suíte unit estável e determinística.
 
 ## Determinismo de ICS e snapshots
 - Ordenação de eventos: VEVENTs ordenados determinísticamente por `datetime` (convertido para UTC; fallback para naive) e, em seguida, por `display_name`/`name` para desempate.

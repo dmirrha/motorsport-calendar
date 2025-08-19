@@ -33,6 +33,26 @@ e este projeto adere ao [Versionamento Semântico](https://semver.org/spec/v2.0.
 - Documentação: seções em `README.md` e `docs/tests/overview.md` com pré-requisitos e uso: `make ci.pr-run BRANCH=<branch> [WORKFLOW=Tests]`.
 - Comportamento: executa fetch/checkout/merge/push, aciona o workflow e retorna à branch original; imprime logs no terminal.
 
+### Métricas — Cobertura por suíte (medição local em 2025-08-19)
+- Unit: 65.75%
+- Integration: 52.90%
+- E2E: 31.10%
+
+- Detalhes e comandos de medição documentados em `docs/tests/overview.md`.
+
+### Testes — Unitários (CategoryDetector, Logger) e ajuste de stubs (DataCollector)
+- CategoryDetector:
+  - Teste adicional cobrindo branches ausentes (normalização vazia, mapping custom, aprendizado/persistência).
+  - Arquivo: `tests/unit/category/test_category_detector_additional_coverage.py`.
+  - Resultado: 100% no run focado; determinístico.
+- Logger:
+  - Testes para inicialização/configuração (handlers/formatters/níveis), rotação com limpeza desabilitada nos testes, emissão por nível e helpers de domínio.
+  - Arquivos: `tests/unit/logger/test_logger_basic.py`, `tests/unit/logger/test_logger_misc.py`.
+  - Resultado: ~83% do módulo; 3× sem flakes (<30s).
+- DataCollector (stubs):
+  - Ajuste dos stubs para compatibilidade com `BaseSource` via `MinimalBase` (atributos essenciais antes de `super().__init__()` e sessão de rede neutralizada), evitando falhas silenciosas em `add_source()`.
+  - Arquivo ajustado: `tests/unit/test_data_collector.py`. Suíte unit estável.
+
 ## [0.5.23] - 2025-08-19
 ### Integração — TomadaTempo IT2 (Issue #121, PR #122)
     
