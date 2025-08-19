@@ -19,6 +19,24 @@
    - Caso ausente, gerar via `python -m coverage xml -i -o <arquivo>` para garantir artefato consistente.
    - Uploads explicitamente apontando para os XMLs esperados com `disable_search: true` para evitar arquivos indevidos.
 
+Integração — TomadaTempo IT2 (Issue #121)
+
+- Fixtures HTML criadas em `tests/fixtures/html/tomada_tempo/` para cenários avançados:
+  - `programming_entities.html`
+  - `programming_multiday.html`
+  - `programming_timezone_dst.html`
+  - `programming_duplicates.html`
+  - `programming_streaming_overflow.html`
+  - `programming_missing_location.html`
+- Testes de integração adicionados em `tests/integration/`:
+  - `test_it2_tomada_tempo_dates_tz.py`
+  - `test_it2_tomada_tempo_entities_and_duplicates.py`
+  - `test_it2_tomada_tempo_streaming_constraints.py`
+  - `test_it2_tomada_tempo_multiday_and_location.py`
+- Execução isolada dos novos testes: 5 passed, 1 xfailed (esperado).
+- Branch de trabalho: `chore/it2-tomadatempo-coverage-80`.
+- Meta: elevar cobertura de integração da fonte TomadaTempo para ≥80% (baseline medido via suíte completa com cobertura).
+
 ## Versão 0.5.22 (2025-08-18)
 
 Integração — TomadaTempo IT1 (Issue #105, PR #119)

@@ -4,7 +4,7 @@ Motorsport Calendar - Core Modules
 This package contains the core modules for the Motorsport Calendar application.
 """
 
-__version__ = "0.5.21"
+__version__ = "0.5.22"
 __author__ = "Daniel Mirrha"
 __email__ = "dmirrha@gmail.com"
 

@@ -1,0 +1,15 @@
+{
+  "title": "TomadaTempo IT2 — Cobertura de Integração ≥ 80%",
+  "body": "106-tomadatempo-it2-coverage-80.md",
+  "labels": ["enhancement"],
+  "assignees": [],
+  "milestone": null,
+  "state": "open",
+  "metadata": {
+    "created_at": "2025-08-18T19:44:36-03:00",
+    "priority": "high",
+    "type": "planning",
+    "components": ["sources/tomada_tempo", "tests/integration", "tests/fixtures"],
+    "related_issues": [105]
+  }
+}
