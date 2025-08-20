@@ -245,7 +245,7 @@ class EventProcessor:
             'date': self._normalize_date(event.get('date')),
             'time': self._normalize_time(event.get('time')),
             'datetime': None,  # Will be computed from date/time
-            'timezone': event.get('timezone', 'America/Sao_Paulo'),
+            'timezone': (event.get('timezone') or (self.config.get_timezone() if self.config else 'America/Sao_Paulo')),
             'location': self._normalize_location(event.get('location', '')),
             'country': self._normalize_country(event.get('country', '')),
             'session_type': self._normalize_session_type(event.get('session_type', 'race')),
@@ -404,7 +404,12 @@ class EventProcessor:
             
             # Add timezone
             if parsed_dt.tzinfo is None:
-                tz = pytz.timezone(timezone_str)
+                # Fallback robusto para timezone vazio ou inválido
+                tz_name = timezone_str or (self.config.get_timezone() if self.config else 'America/Sao_Paulo')
+                try:
+                    tz = pytz.timezone(tz_name)
+                except Exception:
+                    tz = pytz.timezone('America/Sao_Paulo')
                 parsed_dt = tz.localize(parsed_dt)
             
             return parsed_dt

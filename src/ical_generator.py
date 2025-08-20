@@ -44,6 +44,8 @@ class ICalGenerator:
         # Output settings
         self.output_directory = "output"
         self.filename_template = "motorsport_events_{date}.ics"
+        # Sorting behavior (enable by default for deterministic ICS ordering)
+        self.enforce_sort = True
         
         # Generation statistics
         self.generation_stats = {
@@ -88,6 +90,8 @@ class ICalGenerator:
         output_config = ical_config.get('output', {})
         self.output_directory = output_config.get('directory', self.output_directory)
         self.filename_template = output_config.get('filename_template', self.filename_template)
+        # Sorting behavior
+        self.enforce_sort = ical_config.get('enforce_sort', self.enforce_sort)
     
     def generate_calendar(self, events: List[Dict[str, Any]], 
                          output_filename: Optional[str] = None) -> str:
@@ -122,6 +126,23 @@ class ICalGenerator:
         # Add events to calendar
         events_added = 0
         events_skipped = 0
+        
+        # Ensure deterministic ordering by start datetime (timezone-aware) if enabled
+        # Tie-breakers: detected_category, display/display_name, and source_priority (desc)
+        if self.enforce_sort:
+            try:
+                events = sorted(
+                    events,
+                    key=lambda e: (
+                        e.get('datetime') or datetime.max.replace(tzinfo=pytz.UTC),
+                        str(e.get('detected_category') or ''),
+                        str(e.get('display_name') or e.get('name') or ''),
+                        -int(e.get('source_priority', 0)),
+                    ),
+                )
+            except Exception:
+                # Fallback: keep original order if sorting fails
+                pass
         
         for event in events:
             try:
@@ -530,8 +551,17 @@ class ICalGenerator:
         """Generate output filename based on events."""
         # Use the first event's date for filename
         if events:
-            first_event = events[0]
-            event_date = first_event.get('date', datetime.now().strftime('%Y%m%d'))
+            # Prefer earliest event by datetime to ensure deterministic filename
+            try:
+                earliest_event = min(
+                    (e for e in events if e.get('datetime')),
+                    key=lambda e: e['datetime'],
+                )
+            except ValueError:
+                # No event with datetime; fallback to first
+                earliest_event = events[0]
+
+            event_date = earliest_event.get('date', datetime.now().strftime('%Y%m%d'))
             
             # Convert date format if needed
             if isinstance(event_date, str) and '-' in event_date:

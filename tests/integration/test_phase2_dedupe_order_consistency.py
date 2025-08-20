@@ -75,11 +75,8 @@ def test_phase2_dedupe_order_consistency(freeze_datetime):
             assert hasattr(dt, "tzinfo") and dt.tzinfo is not None, "DTSTART deve ser timezone-aware"
             dtstarts.append(dt)
 
-    # 5) Ordenação — esperado crescente por horário; se falhar, marcar xfail (seguindo plano)
-    try:
-        assert dtstarts == sorted(dtstarts)
-    except AssertionError:
-        pytest.xfail("ICS não garante ordenação de eventos antes da escrita; follow-up para ordenar.")
+    # 5) Ordenação — esperado crescente por horário (ordenção determinística habilitada)
+    assert dtstarts == sorted(dtstarts)
 
     # 6) Performance
     dt = time.monotonic() - t0

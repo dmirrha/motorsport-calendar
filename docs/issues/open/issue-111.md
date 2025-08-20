@@ -36,5 +36,5 @@ A flag `retry_failed_sources` é carregada em `src/data_collector.py` (no `__ini
 - [x] Integrar defaults no ConfigManager e invocar validação
 - [x] Atualizar config exemplo (config/config.example.json)
 - [x] Atualizar docs (CONFIGURATION_GUIDE, CHANGELOG, RELEASES, DATA_SOURCES)
-- [ ] Rodar suíte completa de testes com coverage
-- [ ] Abrir PR referenciando #111 e monitorar CI
+- [x] Rodar suíte completa de testes com coverage
+- [x] Abrir PR referenciando #111 e monitorar CI
