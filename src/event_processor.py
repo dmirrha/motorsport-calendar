@@ -763,7 +763,9 @@ class EventProcessor:
                 e.get('source_priority', 50),
                 len(e.get('streaming_links', [])),
                 len(e.get('name', '')),
-                bool(e.get('official_url', ''))
+                bool(e.get('official_url', '')),
+                # Deterministic final tie-breaker to ensure stability across runs
+                str(e.get('event_id', ''))
             ),
             reverse=True
         )

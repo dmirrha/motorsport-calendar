@@ -3,7 +3,8 @@
 GitHub Issues Importer
 
 Este script importa automaticamente issues do GitHub a partir de arquivos JSON
-no diretório atual e os move para uma pasta de 'imported' após a importação.
+no diretório atual e, após a criação no GitHub, sincroniza os arquivos locais
+renomeando-os com o número real da issue e movendo-os para a pasta 'imported'.
 
 Requisitos:
 - Python 3.6+
@@ -22,6 +23,7 @@ import shutil
 import base64
 import getpass
 import subprocess
+import argparse
 from pathlib import Path
 from datetime import datetime
 from cryptography.fernet import Fernet
@@ -91,7 +93,7 @@ def _read_keychain_token(service_name: str, account: str | None = None) -> str |
     except Exception:
         return None
 
-def get_github_client(owner: str, repo_name: str):
+def get_github_client(owner: str, repo_name: str, allow_interactive: bool = True):
     """Inicializa e retorna o cliente da API do GitHub com prioridade:
     1) Variável de ambiente GITHUB_TOKEN
     2) macOS Keychain (serviço específico do repositório)
@@ -110,26 +112,31 @@ def get_github_client(owner: str, repo_name: str):
     if token:
         return Github(token)
 
-    # 3) Cofre criptografado local
-    print("Autenticação necessária para acessar a API do GitHub")
-    try:
-        password = getpass.getpass("Digite sua senha de criptografia: ")
-        token = load_token(password)
-    except Exception:
-        token = None
+    if allow_interactive:
+        # 3) Cofre criptografado local
+        print("Autenticação necessária para acessar a API do GitHub")
+        try:
+            password = getpass.getpass("Digite sua senha de criptografia: ")
+            token = load_token(password)
+        except Exception:
+            token = None
 
-    # 4) Interativo (fallback)
-    if not token:
-        print("\nToken não encontrado no Keychain nem no cofre.")
-        print("Por favor, forneça um token de acesso pessoal do GitHub com permissão 'repo'.")
-        token = getpass.getpass("Token: ")
-        save = input("Deseja salvar este token para uso futuro? (s/N): ").strip().lower()
-        if save == 's':
-            password_confirm = getpass.getpass("Crie uma senha para criptografar o token: ")
-            save_token(token, password_confirm)
-            print("Token salvo com sucesso!")
+        # 4) Interativo (fallback)
+        if not token:
+            print("\nToken não encontrado no Keychain nem no cofre.")
+            print("Por favor, forneça um token de acesso pessoal do GitHub com permissão 'repo'.")
+            token = getpass.getpass("Token: ")
+            save = input("Deseja salvar este token para uso futuro? (s/N): ").strip().lower()
+            if save == 's':
+                password_confirm = getpass.getpass("Crie uma senha para criptografar o token: ")
+                save_token(token, password_confirm)
+                print("Token salvo com sucesso!")
 
-    return Github(token)
+        return Github(token)
+    else:
+        print("❌ Token não encontrado em GITHUB_TOKEN nem no Keychain (modo não interativo).")
+        print("   Configure a variável GITHUB_TOKEN ou salve o token no Keychain para prosseguir.")
+        sys.exit(1)
 
 def parse_repo_identifier(identifier):
     """Analisa o identificador do repositório no formato 'owner/repo'."""
@@ -140,14 +147,38 @@ def parse_repo_identifier(identifier):
         sys.exit(1)
     return parts[0], parts[1]
 
+def find_existing_issue_by_title(repo, title: str):
+    """Procura uma issue existente (aberta ou fechada) com título exatamente igual."""
+    try:
+        # Busca em 'open' primeiro por performance, depois 'closed'
+        for state in ('open', 'closed'):
+            for issue in repo.get_issues(state=state):
+                if issue.title == title:
+                    return issue
+        return None
+    except GithubException as e:
+        print(f" Aviso: falha ao procurar issue existente por título: {e.data.get('message', str(e))}")
+        return None
+
 def import_issue(repo, issue_file):
-    """Importa uma única issue para o repositório."""
+    """Importa uma única issue para o repositório.
+
+    Retorna:
+        Issue | None: objeto Issue (PyGithub) criado em caso de sucesso; None caso contrário.
+    """
     try:
         with open(issue_file, 'r', encoding='utf-8') as f:
             issue_data = json.load(f)
         
         print(f"\nImportando: {issue_file}")
-        print(f"Título: {issue_data.get('title')}")
+        title = issue_data.get('title')
+        print(f"Título: {title}")
+
+        # Verifica se já existe uma issue com o mesmo título (evita duplicação)
+        existing = find_existing_issue_by_title(repo, title)
+        if existing is not None:
+            print(f" Issue já existe no GitHub: #{existing.number} — {existing.html_url}")
+            return existing
         
         # Lê o conteúdo do arquivo markdown se especificado
         body_content = issue_data['body']
@@ -168,16 +199,91 @@ def import_issue(repo, issue_file):
         )
         
         print(f" Issue criada com sucesso: {issue.html_url}")
-        return True
+        return issue
         
     except json.JSONDecodeError as e:
         print(f" Erro ao ler o arquivo JSON {issue_file}: {e}")
-        return False
+        return None
     except GithubException as e:
         print(f" Erro ao criar issue no GitHub: {e.data.get('message', str(e))}")
-        return False
+        return None
     except Exception as e:
         print(f" Erro inesperado ao processar {issue_file}: {str(e)}")
+        return None
+
+def _build_imported_names(issue_file: Path, issue_number: int) -> tuple[Path, Path | None, str]:
+    """Gera nomes de destino (JSON e MD) em 'imported/' usando o número real da issue.
+
+    Retorna (dest_json_path, dest_md_path_or_none, new_base_name).
+    """
+    imported_dir = Path('imported')
+    imported_dir.mkdir(exist_ok=True)
+
+    stem = issue_file.stem  # ex: "107-xfails-ics-tomadatempo"
+    parts = stem.split('-', 1)
+    slug = parts[1] if len(parts) == 2 else parts[0]
+    new_base = f"{issue_number}-{slug}"
+
+    dest_json = imported_dir / f"{new_base}.json"
+
+    # Caso exista um .md com o mesmo prefixo ou especificado pelo campo body
+    md_candidate = issue_file.with_suffix('.md')
+    dest_md = imported_dir / f"{new_base}.md" if md_candidate.exists() else None
+
+    return dest_json, dest_md, new_base
+
+def sync_local_files_to_issue_number(issue_file: Path, issue, original_body_field: str | None = None) -> bool:
+    """Sincroniza os arquivos locais após a importação, renomeando-os com o número da issue.
+
+    - Atualiza o JSON com campos 'github_issue_number' e 'github_issue_url'.
+    - Renomeia/move JSON e MD (se existir) para 'imported/<numero>-<slug>.*'.
+    - Ajusta o campo 'body' do JSON para apontar para o novo MD, se aplicável.
+    """
+    try:
+        issue_number = issue.number
+        issue_url = getattr(issue, 'html_url', None)
+
+        # Carrega JSON original
+        with open(issue_file, 'r', encoding='utf-8') as f:
+            data = json.load(f)
+
+        dest_json, dest_md, new_base = _build_imported_names(issue_file, issue_number)
+
+        # Detecta MD de origem: via 'body' que referencia arquivo .md, se existir
+        md_path = None
+        body_field = data.get('body')
+        if isinstance(body_field, str) and body_field.endswith('.md'):
+            candidate = issue_file.parent / body_field
+            if candidate.exists():
+                md_path = candidate
+
+        # Atualiza campos de sincronismo
+        data['github_issue_number'] = issue_number
+        if issue_url:
+            data['github_issue_url'] = issue_url
+        data['state'] = 'open'
+        # Se houver MD, ajuste o body para o novo nome
+        if dest_md is not None:
+            data['body'] = dest_md.name
+
+        # Escreve JSON atualizado diretamente no destino
+        with open(dest_json, 'w', encoding='utf-8') as f:
+            json.dump(data, f, ensure_ascii=False, indent=2)
+
+        # Move/renomeia MD se existir
+        if md_path and dest_md is not None:
+            shutil.move(str(md_path), str(dest_md))
+
+        # Remove o JSON original após sucesso
+        issue_file.unlink(missing_ok=False)
+
+        if dest_md is not None:
+            print(f"Arquivos sincronizados: {dest_json} e {dest_md}")
+        else:
+            print(f"Arquivo sincronizado: {dest_json}")
+        return True
+    except Exception as e:
+        print(f" Erro ao sincronizar arquivos locais para a issue #{getattr(issue, 'number', '?')}: {e}")
         return False
 
 def move_to_imported(issue_file):
@@ -209,16 +315,19 @@ def move_to_imported(issue_file):
         return False
 
 def main():
-    if len(sys.argv) != 2:
-        print(f"Uso: {sys.argv[0]} <owner>/<repo>")
-        sys.exit(1)
-    
+    parser = argparse.ArgumentParser(description="Importa issues do diretório 'open/' para o GitHub com sincronismo local.")
+    parser.add_argument("repo", help="<owner>/<repo>")
+    parser.add_argument("--yes", "-y", action="store_true", help="não pedir confirmação para importar")
+    parser.add_argument("--non-interactive", dest="non_interactive", action="store_true", help="não interagir para autenticação; falha se não houver token")
+    parser.add_argument("--only", nargs="+", help="nome(s) de arquivo .json específicos em .github/import_issues/open/ a serem importados")
+    args = parser.parse_args()
+
     # Configuração
-    repo_identifier = sys.argv[1]
+    repo_identifier = args.repo
     owner, repo_name = parse_repo_identifier(repo_identifier)
     
     # Inicializa cliente do GitHub (usa Keychain específico por repositório, se disponível)
-    g = get_github_client(owner, repo_name)
+    g = get_github_client(owner, repo_name, allow_interactive=(not args.non_interactive))
     
     try:
         repo = g.get_repo(f"{owner}/{repo_name}")
@@ -229,6 +338,13 @@ def main():
     
     # Encontra todos os arquivos JSON de issues no diretório open
     issue_files = list(Path('open').glob('*.json'))
+    if args.only:
+        names = set(args.only)
+        filtered = [p for p in issue_files if p.name in names]
+        missing = names - {p.name for p in filtered}
+        if missing:
+            print(f"Aviso: arquivos não encontrados em 'open/': {', '.join(sorted(missing))}")
+        issue_files = filtered
     
     if not issue_files:
         print("Nenhum arquivo de issue encontrado no diretório 'open'.")
@@ -239,17 +355,19 @@ def main():
     for i, file in enumerate(issue_files, 1):
         print(f"{i}. {file.name}")
     
-    # Confirmação do usuário
-    confirm = input("\nDeseja continuar com a importação? (s/N): ").strip().lower()
-    if confirm != 's':
-        print("Importação cancelada.")
-        return
+    # Confirmação do usuário (pula se --yes)
+    if not args.yes:
+        confirm = input("\nDeseja continuar com a importação? (s/N): ").strip().lower()
+        if confirm != 's':
+            print("Importação cancelada.")
+            return
     
     # Processa cada arquivo de issue
     success_count = 0
     for issue_file in issue_files:
-        if import_issue(repo, issue_file):
-            if move_to_imported(issue_file):
+        created_issue = import_issue(repo, issue_file)
+        if created_issue is not None:
+            if sync_local_files_to_issue_number(issue_file, created_issue):
                 success_count += 1
     
     # Resumo

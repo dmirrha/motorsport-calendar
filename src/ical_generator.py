@@ -138,6 +138,7 @@ class ICalGenerator:
                         str(e.get('detected_category') or ''),
                         str(e.get('display_name') or e.get('name') or ''),
                         -int(e.get('source_priority', 0)),
+                        str(e.get('event_id') or ''),
                     ),
                 )
             except Exception:
