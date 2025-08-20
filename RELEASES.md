@@ -33,6 +33,52 @@ Métricas — Cobertura por suíte (medição local em 2025-08-19)
 
 Detalhes e comandos de medição documentados em `docs/tests/overview.md`.
 
+Auditoria — Suíte de Testes (2025-08-19)
+
+- Relatório completo: `docs/tests/audit/TEST_AUDIT_2025-08-19.md`.
+- Pontos fortes: governança de markers com teste de política (`tests/policy/test_markers_policy.py`); fixtures determinísticas (TZ/tempo/UUID/rede); snapshots ICS com normalização (`tests/utils/ical_snapshots.py`); CI robusto com Codecov por flags/components.
+- Lacunas: xfails pendentes (orden. ICS e dedupe TomadaTempo), ausência de property/mutation testing, falta de `pytest-timeout`/`pytest-randomly`, sem job de flakiness, gates de cobertura baixos e sem “patch gate”.
+- Métricas (2025-08-19): cobertura global consolidada ~91.75% (Codecov); por suíte (local) — Unit 65.75%, Integration 52.90%, E2E 31.10%.
+- Recomendações P0: adicionar `pytest-timeout` e `pytest-randomly`; resolver xfails (ordenar ICS e ajustar dedupe TomadaTempo); habilitar patch coverage gate (≥85%) inicialmente informativo; criar job noturno para flakiness (rodar suíte 3× com timings).
+- Próximos passos: abrir issues específicas para cada recomendação e sincronizar documentação (CHANGELOG, RELEASES, tests/README, README, REQUIREMENTS, CONFIGURATION_GUIDE).
+
+Coletor — Retry por Fonte (Issue #111)
+
+- Novas chaves em `data_sources`:
+  - `retry_failed_sources` (boolean, padrão: `true`)
+  - `max_retries` (inteiro, padrão: `1`)
+  - `retry_backoff_seconds` (float, padrão: `0.5`)
+- Compatibilidade: `retry_attempts` (legado) continua suportado; se as novas chaves estiverem presentes, elas têm precedência.
+- Documentação: `docs/CONFIGURATION_GUIDE.md` atualizado; `config/config.example.json` contém as chaves.
+
+Testes — Unitários (CategoryDetector, Logger) e ajuste de stubs (DataCollector)
+
+- CategoryDetector:
+  - Teste adicional cobrindo branches ausentes (normalização vazia, mapping custom, aprendizado/persistência).
+  - Arquivo: `tests/unit/category/test_category_detector_additional_coverage.py`.
+  - Resultado: 100% no run focado; determinístico.
+- Logger:
+  - Testes para inicialização/configuração (handlers/formatters/níveis), rotação com limpeza desabilitada nos testes, emissão por nível e helpers de domínio.
+  - Arquivos: `tests/unit/logger/test_logger_basic.py`, `tests/unit/logger/test_logger_misc.py`.
+  - Resultado: ~83% do módulo; 3× sem flakes (<30s).
+- DataCollector (stubs):
+  - Ajuste dos stubs para compatibilidade com `BaseSource` via `MinimalBase` (atributos essenciais antes de `super().__init__()` e sessão de rede neutralizada), evitando falhas silenciosas em `add_source()`.
+  - Arquivo ajustado: `tests/unit/test_data_collector.py`. Suíte unit estável.
+
+CI/Docs — Helper Makefile ci.pr-run
+
+- Adicionado alvo `ci.pr-run` no Makefile para atualizar a branch do PR com `main` e disparar o workflow `Tests` via GitHub CLI (`gh`).
+- Documentação: `README.md` e `docs/tests/overview.md` com pré-requisitos e uso: `make ci.pr-run BRANCH=<branch> [WORKFLOW=Tests]`.
+- Comportamento: executa fetch/checkout/merge/push, aciona o workflow e retorna à branch original; imprime logs no terminal.
+
+Métricas — Cobertura por suíte (medição local em 2025-08-19)
+
+- Unit: 65.75%
+- Integration: 52.90%
+- E2E: 31.10%
+
+Detalhes e comandos de medição documentados em `docs/tests/overview.md`.
+
 Coletor — Retry por Fonte (Issue #111)
 
 - Novas chaves em `data_sources`:

@@ -113,8 +113,9 @@ Objetivo: descrever a estratégia mínima de testes para o projeto, com foco em 
 
 ## Referências
 - Governança Fase 2: PR #87 (https://github.com/dmirrha/motorsport-calendar/pull/87) — épico #78
+- Relatório de Auditoria da Suíte de Testes (2025-08-19): docs/tests/audit/TEST_AUDIT_2025-08-19.md — pontuações, evidências, lacunas e plano P0–P2.
 
-## Atualização CI — Cobertura por flags (integration/e2e)
+### Atualização CI — Cobertura por flags (integration/e2e)
 - Job `integration`: executa `pytest -m integration` com cobertura focada em módulos principais do fluxo (ex.: `src/config_manager.py`, `src/silent_period.py`, `src/category_detector.py`, `src/ical_generator.py`, `src/event_processor.py`, `src/data_collector.py`, `sources/base_source.py`, `sources/tomada_tempo.py`). Objetivo: refletir cobertura efetiva da suíte de integração sem diluir o denominador.
 - Job `e2e`: executa todos os `tests/integration/test_phase2_e2e_*.py` com cobertura focada no pipeline E2E (`src/data_collector.py`, `src/event_processor.py`, `src/ical_generator.py`, `sources/tomada_tempo.py`). Antes rodava apenas `-k happy`.
 - Testes de integração relevantes receberam `pytestmark = pytest.mark.integration` para inclusão no job `integration` (ex.: `test_phase2_basic.py`, `test_phase2_optionals.py`, `test_phase2_overnight.py`, `test_phase2_timezones.py`).

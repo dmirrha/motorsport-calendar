@@ -65,6 +65,14 @@ e este projeto adere ao [Versionamento Semântico](https://semver.org/spec/v2.0.
   - Ajuste dos stubs para compatibilidade com `BaseSource` via `MinimalBase` (atributos essenciais antes de `super().__init__()` e sessão de rede neutralizada), evitando falhas silenciosas em `add_source()`.
   - Arquivo ajustado: `tests/unit/test_data_collector.py`. Suíte unit estável.
 
+### Auditoria — Suíte de Testes (2025-08-19)
+- Relatório: `docs/tests/audit/TEST_AUDIT_2025-08-19.md` — avaliação formal da qualidade dos testes (unit/integration), CI/CD e governança.
+- Pontos fortes: políticas de markers e teste de política (`tests/policy/test_markers_policy.py`), fixtures determinísticas (TZ/tempo/UUID/rede), snapshots ICS com normalização, pipeline CI com Codecov por flags e components.
+- Lacunas: xfails pendentes (ordenação ICS e dedupe TomadaTempo), ausência de property/mutation testing, falta de `pytest-timeout`/`pytest-randomly`, sem job de flakiness no CI, gates de cobertura baixos e sem patch gate.
+- Métricas: cobertura global consolidada ~91.75% (Codecov); por suíte (medição local em 2025-08-19): Unit 65.75%, Integration 52.90%, E2E 31.10%.
+- Recomendações P0: adicionar `pytest-timeout` e `pytest-randomly`; resolver xfails (ordenar ICS e ajustar dedupe TomadaTempo); habilitar patch coverage gate (≥85%) inicialmente informativo; preparar job nightly de flakiness (rodar 3× e coletar timings/Test Analytics).
+- Próximos passos: abrir issues para cada recomendação e sincronizar documentação (CHANGELOG, RELEASES, README, REQUIREMENTS, CONFIGURATION_GUIDE, tests/README).
+
 ## [0.5.23] - 2025-08-19
 ### Integração — TomadaTempo IT2 (Issue #121, PR #122)
     

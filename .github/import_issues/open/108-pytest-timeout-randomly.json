@@ -1,0 +1,15 @@
+{
+  "title": "P0: Adicionar pytest-timeout e pytest-randomly para estabilidade e ordem não determinística",
+  "body": "108-pytest-timeout-randomly.md",
+  "labels": ["enhancement", "testing", "ci", "needs-triage", "priority: P0"],
+  "assignees": [],
+  "milestone": null,
+  "state": "open",
+  "metadata": {
+    "created_at": "2025-08-20T00:00:00-03:00",
+    "priority": "P0",
+    "type": "testing",
+    "components": ["pytest", "ci"],
+    "related_issues": []
+  }
+}
