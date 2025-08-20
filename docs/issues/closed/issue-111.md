@@ -63,7 +63,8 @@ A flag `retry_failed_sources` é carregada em `src/data_collector.py` (no `__ini
 - [x] Adicionar/ajustar testes unitários determinísticos de retry.
 - [x] Atualizar `config/config.example.json` com novas chaves/valores padrão.
 - [x] Atualizar documentação: `CHANGELOG.md`, `RELEASES.md`, `README.md`, `CONFIGURATION_GUIDE.md`, `CONTRIBUTING.md`, `REQUIREMENTS.md`, `PROJECT_STRUCTURE.md`, `DATA_SOURCES.md`.
-- [ ] Abrir PR referenciando a issue #111.
+- [x] Abrir PR referenciando a issue #111 (PR #135).
+- [x] Merge na main e publicação da release v0.6.0.
 
 ## Solução implementada
 
@@ -86,7 +87,6 @@ A flag `retry_failed_sources` é carregada em `src/data_collector.py` (no `__ini
 
 ## Próximos passos
 
-- Abrir PR referenciando a Issue #111, anexando este arquivo como corpo do PR.
-- Aguardar CI e revisão.
+- Concluído: PR #135 mergeado e release v0.6.0 publicada.
 
 Closes #111
