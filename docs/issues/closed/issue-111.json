@@ -1,0 +1,26 @@
+{
+  "id": 3327335218,
+  "number": 111,
+  "state": "open",
+  "title": "Implementar retry por fonte no DataCollector (flag retry_failed_sources sem efeito)",
+  "milestone": null,
+  "epic": null,
+  "url": "https://github.com/dmirrha/motorsport-calendar/issues/111",
+  "created_at": "2025-08-16T14:38:15Z",
+  "updated_at": "2025-08-16T14:38:15Z",
+  "tasks": [
+    {"item": "Criar branch feat/issue-111-datacollector-retry", "done": true},
+    {"item": "Registrar rastreabilidade local (issue-111.md/json) com dados do GitHub", "done": true},
+    {"item": "Aguardar confirmação para iniciar implementação", "done": true},
+    {"item": "Implementar retry por fonte em src/data_collector.py", "done": true},
+    {"item": "Adicionar testes determinísticos (sucesso após retry; falha após esgotar)", "done": true},
+    {"item": "Atualizar config/config.example.json com novas chaves de retry", "done": true},
+    {"item": "Atualizar documentação (CHANGELOG/RELEASES/README/CONFIGURATION_GUIDE/CONTRIBUTING/REQUIREMENTS/PROJECT_STRUCTURE/DATA_SOURCES)", "done": true},
+    {"item": "Abrir PR referenciando a issue #111", "done": false}
+  ],
+  "acceptance": [
+    "Retry por fonte funcional e configurável",
+    "Testes determinísticos cobrindo sucesso após retry e falha após esgotar retries",
+    "Documentação e exemplos de configuração atualizados"
+  ]
+}
