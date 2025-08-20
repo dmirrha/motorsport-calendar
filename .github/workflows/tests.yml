@@ -41,6 +41,40 @@ jobs:
           if [ -f requirements-dev.txt ]; then pip install -r requirements-dev.txt; fi
           pip install pytest pytest-cov
 
+      - name: Log pytest/plugins versions and seed
+        run: |
+          python - <<'PY'
+          import configparser
+          from importlib.metadata import version, PackageNotFoundError
+          def v(p):
+              try:
+                  return version(p)
+              except PackageNotFoundError:
+                  return "not installed"
+          cfg = configparser.ConfigParser()
+          seed = "N/D"
+          timeout = "N/D"
+          timeout_method = "N/D"
+          try:
+              cfg.read("pytest.ini")
+              if cfg.has_section("pytest"):
+                  seed = cfg["pytest"].get("randomly-seed", seed)
+                  timeout = cfg["pytest"].get("timeout", timeout)
+                  timeout_method = cfg["pytest"].get("timeout_method", timeout_method)
+          except Exception:
+              pass
+          print("Pytest/Plugins:")
+          print(f"  pytest={v('pytest')}")
+          print(f"  pytest-cov={v('pytest-cov')}")
+          print(f"  pytest-timeout={v('pytest-timeout')}")
+          print(f"  pytest-randomly={v('pytest-randomly')}")
+          print("Config (determinismo):")
+          print(f"  randomly-seed={seed}")
+          print(f"  timeout={timeout} (method={timeout_method})")
+          PY
+          echo "--- pytest --version --plugins ---"
+          pytest --version --plugins
+
       - name: Run tests
         env:
           TZ: America/Sao_Paulo
@@ -149,6 +183,40 @@ jobs:
           pip install -r requirements.txt
           if [ -f requirements-dev.txt ]; then pip install -r requirements-dev.txt; fi
           pip install pytest pytest-cov
+
+      - name: Log pytest/plugins versions and seed
+        run: |
+          python - <<'PY'
+          import configparser
+          from importlib.metadata import version, PackageNotFoundError
+          def v(p):
+              try:
+                  return version(p)
+              except PackageNotFoundError:
+                  return "not installed"
+          cfg = configparser.ConfigParser()
+          seed = "N/D"
+          timeout = "N/D"
+          timeout_method = "N/D"
+          try:
+              cfg.read("pytest.ini")
+              if cfg.has_section("pytest"):
+                  seed = cfg["pytest"].get("randomly-seed", seed)
+                  timeout = cfg["pytest"].get("timeout", timeout)
+                  timeout_method = cfg["pytest"].get("timeout_method", timeout_method)
+          except Exception:
+              pass
+          print("Pytest/Plugins:")
+          print(f"  pytest={v('pytest')}")
+          print(f"  pytest-cov={v('pytest-cov')}")
+          print(f"  pytest-timeout={v('pytest-timeout')}")
+          print(f"  pytest-randomly={v('pytest-randomly')}")
+          print("Config (determinismo):")
+          print(f"  randomly-seed={seed}")
+          print(f"  timeout={timeout} (method={timeout_method})")
+          PY
+          echo "--- pytest --version --plugins ---"
+          pytest --version --plugins
 
       - name: Run all E2E with coverage (no gate)
         env:
@@ -271,6 +339,40 @@ jobs:
           pip install -r requirements.txt
           if [ -f requirements-dev.txt ]; then pip install -r requirements-dev.txt; fi
           pip install pytest pytest-cov
+
+      - name: Log pytest/plugins versions and seed
+        run: |
+          python - <<'PY'
+          import configparser
+          from importlib.metadata import version, PackageNotFoundError
+          def v(p):
+              try:
+                  return version(p)
+              except PackageNotFoundError:
+                  return "not installed"
+          cfg = configparser.ConfigParser()
+          seed = "N/D"
+          timeout = "N/D"
+          timeout_method = "N/D"
+          try:
+              cfg.read("pytest.ini")
+              if cfg.has_section("pytest"):
+                  seed = cfg["pytest"].get("randomly-seed", seed)
+                  timeout = cfg["pytest"].get("timeout", timeout)
+                  timeout_method = cfg["pytest"].get("timeout_method", timeout_method)
+          except Exception:
+              pass
+          print("Pytest/Plugins:")
+          print(f"  pytest={v('pytest')}")
+          print(f"  pytest-cov={v('pytest-cov')}")
+          print(f"  pytest-timeout={v('pytest-timeout')}")
+          print(f"  pytest-randomly={v('pytest-randomly')}")
+          print("Config (determinismo):")
+          print(f"  randomly-seed={seed}")
+          print(f"  timeout={timeout} (method={timeout_method})")
+          PY
+          echo "--- pytest --version --plugins ---"
+          pytest --version --plugins
 
       - name: Run integration tests with coverage (no gate)
         env:
