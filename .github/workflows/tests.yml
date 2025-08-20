@@ -72,8 +72,8 @@ jobs:
           print(f"  randomly-seed={seed}")
           print(f"  timeout={timeout} (method={timeout_method})")
           PY
-          echo "--- pytest --version --plugins ---"
-          pytest --version --plugins
+          echo "--- pytest --version ---"
+          pytest --version
 
       - name: Run tests
         env:
@@ -215,8 +215,8 @@ jobs:
           print(f"  randomly-seed={seed}")
           print(f"  timeout={timeout} (method={timeout_method})")
           PY
-          echo "--- pytest --version --plugins ---"
-          pytest --version --plugins
+          echo "--- pytest --version ---"
+          pytest --version
 
       - name: Run all E2E with coverage (no gate)
         env:
@@ -371,8 +371,8 @@ jobs:
           print(f"  randomly-seed={seed}")
           print(f"  timeout={timeout} (method={timeout_method})")
           PY
-          echo "--- pytest --version --plugins ---"
-          pytest --version --plugins
+          echo "--- pytest --version ---"
+          pytest --version
 
       - name: Run integration tests with coverage (no gate)
         env:
