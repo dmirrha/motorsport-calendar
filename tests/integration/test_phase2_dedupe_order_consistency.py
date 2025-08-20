@@ -20,7 +20,6 @@ def test_phase2_dedupe_order_consistency(freeze_datetime):
       contendo pares quase-duplicados (variação de nome/horário/local).
     - Valida deduplicação mantendo o melhor por prioridade de fonte.
     - Gera ICS e valida conteúdo + snapshot normalizado.
-    - Checagem de ordenação é tratada como xfail (seguindo plano).
     - Execução < 30s.
     """
     # Determinismo de tempo (facilita validações com janelas relativas)
