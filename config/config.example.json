@@ -45,6 +45,9 @@
     "excluded_sources": [],
     "timeout_seconds": 10,
     "retry_attempts": 3,
+    "retry_failed_sources": true,
+    "max_retries": 1,
+    "retry_backoff_seconds": 0.5,
     "rate_limit_delay": 1.0,
     "user_agents": [
       "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36",

@@ -33,6 +33,15 @@ Métricas — Cobertura por suíte (medição local em 2025-08-19)
 
 Detalhes e comandos de medição documentados em `docs/tests/overview.md`.
 
+Coletor — Retry por Fonte (Issue #111)
+
+- Novas chaves em `data_sources`:
+  - `retry_failed_sources` (boolean, padrão: `true`)
+  - `max_retries` (inteiro, padrão: `1`)
+  - `retry_backoff_seconds` (float, padrão: `0.5`)
+- Compatibilidade: `retry_attempts` (legado) continua suportado; se as novas chaves estiverem presentes, elas têm precedência.
+- Documentação: `docs/CONFIGURATION_GUIDE.md` atualizado; `config/config.example.json` contém as chaves.
+
 Testes — Unitários (CategoryDetector, Logger) e ajuste de stubs (DataCollector)
 
 - CategoryDetector:

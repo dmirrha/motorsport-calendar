@@ -40,6 +40,18 @@ e este projeto adere ao [Versionamento Semântico](https://semver.org/spec/v2.0.
 
 - Detalhes e comandos de medição documentados em `docs/tests/overview.md`.
 
+### Coletor — Retry por Fonte (Issue #111)
+
+- DataCollector: retry configurável por fonte ativado pela flag `retry_failed_sources`.
+- Novas chaves em `data_sources`:
+  - `retry_failed_sources` (boolean, padrão: `true`)
+  - `max_retries` (inteiro, padrão: `1`)
+  - `retry_backoff_seconds` (float, padrão: `0.5`)
+- Compatibilidade mantida com `retry_attempts` (legado) como fallback.
+- Implementação: lógica de retry centralizada em `DataCollector._collect_from_source`, aplicada para erros transitórios (`TimeoutError`, `OSError`, `IOError`) com backoff linear.
+- Configuração: `config/config.example.json` atualizado com as novas chaves.
+- Testes: adicionados testes determinísticos em `tests/unit/data_collector/test_data_collector_retry.py` cobrindo sucesso após retry e falha após esgotar tentativas.
+
 ### Testes — Unitários (CategoryDetector, Logger) e ajuste de stubs (DataCollector)
 - CategoryDetector:
   - Teste adicional cobrindo branches ausentes (normalização vazia, mapping custom, aprendizado/persistência).

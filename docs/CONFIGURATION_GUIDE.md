@@ -75,9 +75,16 @@ Configurações das fontes de dados.
 | `priority_order` | array | `["tomada_tempo"]` | Ordem de prioridade das fontes |
 | `excluded_sources` | array | `[]` | Fontes a serem ignoradas |
 | `timeout_seconds` | number | `10` | Timeout em segundos para requisições |
-| `retry_attempts` | number | `3` | Número de tentativas em caso de falha |
+| `retry_attempts` | number | `3` | Número de tentativas (legado; sobrescrito se novas chaves de retry estiverem definidas) |
+| `retry_failed_sources` | boolean | `true` | Habilita retry por fonte para erros transitórios |
+| `max_retries` | number | `1` | Máximo de novas tentativas por fonte (exclui a tentativa inicial) |
+| `retry_backoff_seconds` | number | `0.5` | Atraso entre tentativas (backoff linear, em segundos) |
 | `rate_limit_delay` | number | `1.0` | Atraso entre requisições (segundos) |
 | `user_agents` | array | Lista padrão | User-Agents para requisições HTTP |
+
+Nota:
+- Retry aplica-se apenas a exceções transitórias: `TimeoutError`, `OSError`, `IOError`.
+- Compatibilidade: `retry_attempts` é mantido para configurações antigas; quando `retry_failed_sources` está presente, as novas chaves (`max_retries`, `retry_backoff_seconds`) têm precedência.
 
 ## Seção: `event_filters`
 
