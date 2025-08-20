@@ -12,6 +12,7 @@ from typing import List, Dict, Any, Optional, Type
 import importlib
 import inspect
 from pathlib import Path
+import time
 
 from sources.base_source import BaseSource
 from sources.tomada_tempo import TomadaTempoSource
@@ -45,6 +46,8 @@ class DataCollector:
         self.max_concurrent_sources = 3
         self.collection_timeout = 300  # 5 minutes
         self.retry_failed_sources = True
+        self.max_retries = 1
+        self.retry_backoff_seconds = 0.5
         
         # Statistics
         self.collection_stats = {
@@ -73,6 +76,9 @@ class DataCollector:
         self.max_concurrent_sources = data_sources_config.get('max_concurrent_sources', 3)
         self.collection_timeout = data_sources_config.get('collection_timeout_seconds', 300)
         self.retry_failed_sources = data_sources_config.get('retry_failed_sources', True)
+        # Backward-compat: se max_retries não existir, usar retry_attempts
+        self.max_retries = data_sources_config.get('max_retries', data_sources_config.get('retry_attempts', 1))
+        self.retry_backoff_seconds = data_sources_config.get('retry_backoff_seconds', 0.5)
         
         # Source priorities from priority_order list
         priority_order = data_sources_config.get('priority_order', [])
@@ -228,7 +234,7 @@ class DataCollector:
                     self.logger.debug(f"🔄 Collecting from {source.get_display_name()}...")
                 
                 # Collect events from this source
-                source_events = source.collect_events(target_date)
+                source_events = self._collect_from_source(source, target_date)
                 
                 # Add source metadata to events
                 for event in source_events:
@@ -326,7 +332,39 @@ class DataCollector:
         Returns:
             List of events from this source
         """
-        return source.collect_events(target_date)
+        total_attempts = 1
+        if self.retry_failed_sources:
+            # total tentativas = 1 (primeira) + max_retries (retries adicionais)
+            total_attempts = 1 + max(0, int(self.max_retries))
+
+        last_error: Exception | None = None
+
+        for attempt in range(1, total_attempts + 1):
+            try:
+                return source.collect_events(target_date)
+            except Exception as e:
+                # Erros transitórios para retry
+                is_transient = isinstance(e, (TimeoutError, OSError, IOError))
+
+                # Se não habilitado, não-transitório, ou última tentativa: propagar
+                if (not self.retry_failed_sources) or (not is_transient) or (attempt == total_attempts):
+                    last_error = e
+                    break
+
+                # Log da tentativa e espera (backoff linear)
+                if self.logger:
+                    self.logger.debug(
+                        f"⏳ Retry {attempt}/{total_attempts - 1} for {source.get_display_name()} after transient error: {e}"
+                    )
+                wait_seconds = float(self.retry_backoff_seconds) * attempt
+                if wait_seconds > 0:
+                    time.sleep(wait_seconds)
+
+        # Se chegou aqui, falhou após tentativas
+        if last_error is not None:
+            raise last_error
+        # fallback defensivo (não deve ocorrer)
+        return []
     
     def _handle_source_error(self, source: BaseSource, error_msg: str) -> None:
         """Handle error from a source."""
