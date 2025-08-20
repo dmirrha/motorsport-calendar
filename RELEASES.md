@@ -22,6 +22,30 @@ Docs/Tests — Atualização do overview de testes
   - PayloadManager (integration): `tests/integration/test_phase2_payload_manager.py`.
 - Referências inexistentes anteriores foram marcadas para correção futura diretamente no documento, sem impacto no CI.
 
+## Versão 0.6.2 (2025-08-20)
+
+CI — Correção de comando pytest --version
+
+- Workflow `.github/workflows/tests.yml`: removida a flag não suportada `--plugins` do comando `pytest --version` nos jobs `tests`, `e2e_happy` e `integration`.
+- Efeito: evita erro de CLI e preserva a observabilidade introduzida em 0.6.1 (logs de versões e configurações).
+- Versionamento: `src/__init__.py` atualizado para `0.6.2`.
+
+## Versão 0.6.1 (2025-08-20)
+
+CI/Tests — Determinismo e observabilidade (pytest-timeout, pytest-randomly)
+
+- Dependências (dev): adicionados `pytest-timeout~=2.3` e `pytest-randomly~=3.15` em `requirements-dev.txt`.
+- Configuração em `pytest.ini`:
+  - `timeout = 30`
+  - `timeout_method = thread`
+  - `randomly-seed = 20240501`
+- Workflow `.github/workflows/tests.yml`: passos para logar em todos os jobs (unit/e2e/integration):
+  - Versões de `pytest`, `pytest-cov`, `pytest-timeout`, `pytest-randomly`.
+  - Valores efetivos lidos do `pytest.ini`: `randomly-seed`, `timeout`, `timeout_method`.
+  - Saída de `pytest --version`.
+- Motivação: reduzir flakiness e facilitar diagnóstico, garantindo reprodutibilidade no CI.
+- Versionamento: `src/__init__.py` atualizado para `0.6.1`.
+
 ## Versão 0.6.0 (2025-08-20)
 
 Coletor — Retry por Fonte (Issue #111, PR #135)
