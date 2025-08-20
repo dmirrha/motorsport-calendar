@@ -71,19 +71,6 @@ Objetivo: descrever a estratégia mínima de testes para o projeto, com foco em 
     - `WORKFLOW=.github/workflows/tests.yml` (default)
   - O alvo realiza: `git fetch` → `checkout` → `merge --no-edit origin/main` → `push` → `gh workflow run` → `gh run watch` → volta para sua branch original.
 
-### CI — Helper Make para PRs
-- Objetivo: manter a branch da PR atualizada com `main` e disparar o workflow `Tests`.
-- Pré-requisitos: working tree limpo; GitHub CLI autenticado (`gh auth login`).
-- Uso:
-  ```bash
-  make ci.pr-run BRANCH=<sua-branch>
-  # exemplo
-  make ci.pr-run BRANCH=chore/it2-tomadatempo-coverage-80
-  ```
-  - Variáveis opcionais:
-    - `WORKFLOW=.github/workflows/tests.yml` (default)
-  - O alvo realiza: `git fetch` → `checkout` → `merge --no-edit origin/main` → `push` → `gh workflow run` → `gh run watch` → volta para sua branch original.
-
 ## Estrutura de pastas
 - `tests/unit/`: testes unitários por módulo.
 - `tests/fixtures/`: insumos estáticos (ex.: `ical/` com snapshots canônicos).
@@ -95,12 +82,19 @@ Objetivo: descrever a estratégia mínima de testes para o projeto, com foco em 
 ## Atualizações recentes
 - CategoryDetector: teste adicional cobrindo branches previamente não exercitados em `src/category_detector.py` (normalização vazia, mapeamentos custom e aprendizado a partir de arquivo salvo). Arquivo: `tests/unit/category/test_category_detector_additional_coverage.py`. Resultado: 100% no run focado.
 - DataCollector: teste unitário para o caminho de timeout na coleta concorrente, garantindo marcação de erro e atualização de estatísticas. Arquivo: `tests/unit/data_collector/test_data_collector_timeout_not_done.py`. Resultado: 100% no run focado.
-- TomadaTempo IT1 (Issue #105): integração mínima determinística do parser `sources/tomada_tempo.py` cobrindo caminho feliz, campos opcionais ausentes e HTML malformado com fallbacks (sem crash). Testes: `tests/integration/test_phase3_tomada_tempo_integration.py`, `tests/integration/test_phase3_tomada_tempo_parsing_variants.py`. Métricas recentes: ~48% de cobertura no run de integração; execuções estáveis (ex.: 23 passed, 3 skipped, 1 xfailed).
+ - TomadaTempo IT1 (Issue #105): integração mínima determinística do parser `sources/tomada_tempo.py` cobrindo caminho feliz, campos opcionais ausentes e HTML malformado com fallbacks (sem crash). Testes: `tests/integration/test_phase3_tomada_tempo_integration.py`, `tests/integration/test_phase3_tomada_tempo_parsing_variants.py`. Métricas recentes: ~48% de cobertura no run de integração; execuções estáveis sem xfail (ex.: 23 passed, 3 skipped).
  - Logger: testes unitários cobrindo inicialização/configuração (handlers, formatters e níveis), rotação com limpeza desabilitada nos testes, emissão por nível e helpers de domínio. Arquivos: `tests/unit/logger/test_logger_basic.py`, `tests/unit/logger/test_logger_misc.py`. Resultado: módulo ~83%, 3× sem flakes (<30s).
  - DataCollector (stubs): ajustes para compatibilidade com `BaseSource` via `MinimalBase` (inicializa atributos essenciais antes de `super().__init__()` e neutraliza rede), evitando falhas silenciosas em `add_source()`. Arquivo ajustado: `tests/unit/test_data_collector.py`. Suíte unit estável e determinística.
 
+### Validação de referências (2025-08-20)
+- TomadaTempo (integração): OK — `tests/integration/test_phase3_tomada_tempo_integration.py`, `tests/integration/test_phase3_tomada_tempo_parsing_variants.py`.
+- TomadaTempo IT2: OK — `tests/integration/test_it2_tomada_tempo_*.py` (ex.: `dates_tz`, `entities_and_duplicates`, `fallbacks_and_parsing`, `multiday_and_location`, `streaming_constraints`).
+- PayloadManager (integração): OK — `tests/integration/test_phase2_payload_manager.py`.
+- CategoryDetector (unit): referência citada `tests/unit/category/test_category_detector_additional_coverage.py` NÃO encontrada. Atualize para um arquivo existente em `tests/unit/category/` (ex.: `test_category_detector_normalize_more.py`, `test_category_detector_threshold_and_learning.py`) ou ajuste a descrição.
+- DataCollector (unit): referência citada `tests/unit/data_collector/test_data_collector_timeout_not_done.py` NÃO encontrada. Unidades existentes: `test_data_collector_basic.py`, `test_data_collector_more.py`, `test_data_collector_retry.py`. Para timeout, existe `tests/integration/test_phase3_data_collector_timeout.py`.
+
 ## Determinismo de ICS e snapshots
-- Ordenação de eventos: VEVENTs ordenados determinísticamente por `datetime` (convertido para UTC; fallback para naive) e, em seguida, por `display_name`/`name` para desempate.
+ - Ordenação de eventos: VEVENTs ordenados deterministicamente por `datetime` (TZ-aware → UTC), `detected_category`, `display_name`/`name`, `source_priority` (desc) e `event_id` (desempate final).
 - Streaming links: `streaming_links` ordenados alfabeticamente e limitados a 3 na descrição do evento.
 - Normalização de snapshots: UID fixo; remoção de `DTSTAMP`, `CREATED`, `LAST-MODIFIED`, `SEQUENCE`, `PRODID`; quebras de linha `\n`.
 - Estabilidade: cada cenário deve passar 3× localmente sem flakes e em <30s.

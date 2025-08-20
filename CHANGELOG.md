@@ -13,7 +13,37 @@ O formato é baseado em [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)
 e este projeto adere ao [Versionamento Semântico](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
-- Nenhuma mudança registrada ainda.
+- ICS — Ordenação determinística reforçada
+  - `src/ical_generator.py`: adicionado critério final de desempate (`event_id`) na chave de ordenação em `ICalGenerator.generate_calendar` para garantir estabilidade absoluta quando `datetime`, `detected_category`, `display_name`/`name` e `source_priority` forem idênticos.
+  - Efeito: elimina variações residuais de ordem em empates, estabilizando VEVENTs no `.ics` em todos os cenários.
+- Testes/Docs — Limpeza de referência a xfail
+  - `tests/integration/test_phase2_dedupe_order_consistency.py`: removida menção desatualizada de que a checagem de ordenação é xfail; asserções permanecem ativas e determinísticas.
+  - Rastreabilidade: estabilização de ordenação ICS (removendo necessidade de xfail mencionado em comentários/docstring).
+  - Deduplicação — desempate determinístico no EventProcessor
+  - `src/event_processor.py`: em `_select_best_event`, adicionada chave final de desempate por `event_id` na ordenação de candidatos (após `source_priority`, contagem de `streaming_links`, tamanho de `name` e presença de `official_url`) para garantir estabilidade absoluta quando atributos principais empatam.
+  - Efeito: escolha do "melhor" evento torna-se estável entre execuções, evitando oscilação sutil em empates completos e refletindo de forma determinística na geração do `.ics` e nas estatísticas de processamento.
+- Docs/Tests — Atualização do overview de testes
+  - `docs/tests/overview.md`: removida seção duplicada "CI — Helper Make para PRs" e adicionada a subseção "Validação de referências (2025-08-20)".
+  - Ajuste de referências de testes citados no documento, confirmando arquivos existentes:
+    - CategoryDetector (unit): `tests/unit/category/test_category_detector_normalize_more.py`, `tests/unit/category/test_category_detector_threshold_and_learning.py`.
+    - DataCollector (unit): `tests/unit/data_collector/test_data_collector_basic.py`, `tests/unit/data_collector/test_data_collector_more.py`, `tests/unit/data_collector/test_data_collector_retry.py`.
+    - PayloadManager (integration): `tests/integration/test_phase2_payload_manager.py`.
+  - Referências inexistentes anteriores foram marcadas para correção futura no próprio documento, sem impacto na execução dos testes/CI.
+
+## [0.6.0] - 2025-08-20
+### Release — Publicação v0.6.0 (Release Drafter)
+
+- Consolida e publica as mudanças do ciclo anterior relacionadas ao retry por fonte no `DataCollector`.
+- Rastreabilidade: Issue #111 e PR #135 (fechados), artefatos arquivados em `docs/issues/closed/issue-111.{md,json}`.
+- Documentação sincronizada: `RELEASES.md` (seção "Versão 0.6.0"), `DATA_SOURCES.md`, `docs/CONFIGURATION_GUIDE.md`, `config/config.example.json`.
+- Versionamento: `src/__init__.py` atualizado para `0.6.0`.
+
+### Coletor — Retry por Fonte (Resumo)
+
+- Flags/chaves em `data_sources`: `retry_failed_sources`, `max_retries` (precedência sobre `retry_attempts` — legado) e `retry_backoff_seconds` (backoff linear).
+- Validação: `src/utils/config_validator.py::validate_data_sources_config` integrada via `src/config_manager.py` (normalização de tipos/valores ≥ 0).
+- Testes: `tests/unit/data_collector/test_data_collector_retry.py` cobrindo sucesso após retry e falha ao esgotar tentativas (determinístico).
+- Detalhes técnicos permanecem descritos na seção `[0.5.24]` abaixo.
 
 ## [0.5.24] - 2025-08-20
 ### CI/Tests — Cobertura por flags (ajuste unit/integration/e2e)

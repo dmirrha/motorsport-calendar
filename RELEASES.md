@@ -3,7 +3,40 @@
 Este arquivo contém um registro acumulativo de todas as versões lançadas do projeto, com notas detalhadas sobre as mudanças em cada versão.
 
 ## Não Lançado
-Sem notas no momento.
+ICS — Ordenação determinística reforçada
+
+- `src/ical_generator.py`: adicionado desempate final por `event_id` na chave de ordenação de eventos do iCal, garantindo estabilidade mesmo quando `datetime`/categoria/nome/prioridade de fonte forem idênticos.
+- Impacto: elimina variações residuais na ordem de VEVENTs no `.ics` em empates completos; snapshots mais estáveis.
+
+Testes/Docs — Limpeza de referência a xfail
+
+- `tests/integration/test_phase2_dedupe_order_consistency.py`: removida menção desatualizada de xfail na docstring; checagem de ordenação permanece ativa e determinística.
+- Documentos sincronizados: `CHANGELOG.md` (Unreleased) com a nota acima.
+
+Docs/Tests — Atualização do overview de testes
+
+- `docs/tests/overview.md`: removida seção duplicada "CI — Helper Make para PRs" e adicionada a subseção "Validação de referências (2025-08-20)".
+- Referências de arquivos de teste confirmadas e alinhadas ao estado atual do repositório:
+  - CategoryDetector (unit): `tests/unit/category/test_category_detector_normalize_more.py`, `tests/unit/category/test_category_detector_threshold_and_learning.py`.
+  - DataCollector (unit): `tests/unit/data_collector/test_data_collector_basic.py`, `tests/unit/data_collector/test_data_collector_more.py`, `tests/unit/data_collector/test_data_collector_retry.py`.
+  - PayloadManager (integration): `tests/integration/test_phase2_payload_manager.py`.
+- Referências inexistentes anteriores foram marcadas para correção futura diretamente no documento, sem impacto no CI.
+
+## Versão 0.6.0 (2025-08-20)
+
+Coletor — Retry por Fonte (Issue #111, PR #135)
+
+- Retry configurável por fonte ativado pela flag `retry_failed_sources`.
+- Novas chaves em `data_sources`:
+  - `retry_failed_sources` (boolean, padrão: `true`)
+  - `max_retries` (inteiro, padrão: `1`; precedência sobre `retry_attempts` — legado)
+  - `retry_backoff_seconds` (float, padrão: `0.5`)
+- Compatibilidade: `retry_attempts` (legado) permanece suportado como fallback quando `max_retries` não estiver presente.
+- Implementação: tratamento de exceções transitórias (`TimeoutError`, `OSError`, `IOError`) com backoff linear e contabilização por tentativa durante a coleta.
+- Validação: `src/utils/config_validator.py::validate_data_sources_config` normaliza as chaves acima e integra-se ao `ConfigManager`.
+- Documentação: `DATA_SOURCES.md`, `docs/CONFIGURATION_GUIDE.md` e `config/config.example.json` atualizados; `CHANGELOG.md` registra a mudança.
+- Testes: `tests/unit/data_collector/test_data_collector_retry.py` cobre sucesso após retry e falha ao esgotar tentativas, de forma determinística.
+- Rastreabilidade: issue #111 arquivada em `docs/issues/closed/issue-111.{md,json}`; release publicada via Release Drafter.
 
 ## Versão 0.5.24 (2025-08-20)
 CI/Tests — Cobertura por flags (ajuste unit/integration/e2e)
