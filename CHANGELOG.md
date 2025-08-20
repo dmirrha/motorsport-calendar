@@ -53,6 +53,7 @@ e este projeto adere ao [Versionamento Semântico](https://semver.org/spec/v2.0.
 - Compatibilidade mantida com `retry_attempts` (legado) como fallback.
 - Implementação: lógica de retry centralizada em `DataCollector._collect_from_source`, aplicada para erros transitórios (`TimeoutError`, `OSError`, `IOError`) com backoff linear.
 - Configuração: `config/config.example.json` atualizado com as novas chaves.
+- Validação: `src/utils/config_validator.py::validate_data_sources_config` valida/normaliza `retry_failed_sources` (bool), `max_retries` (int ≥ 0, com precedência sobre `retry_attempts` — legado) e `retry_backoff_seconds` (float ≥ 0); integração aplicada via `src/config_manager.py`.
 - Testes: adicionados testes determinísticos em `tests/unit/data_collector/test_data_collector_retry.py` cobrindo sucesso após retry e falha após esgotar tentativas.
 
 ### Testes — Unitários (CategoryDetector, Logger) e ajuste de stubs (DataCollector)
