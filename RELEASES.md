@@ -53,6 +53,7 @@ Coletor — Retry por Fonte (Issue #111)
   - `retry_backoff_seconds` (float, padrão: `0.5`)
 - Compatibilidade: `retry_attempts` (legado) continua suportado; se as novas chaves estiverem presentes, elas têm precedência.
 - Documentação: `docs/CONFIGURATION_GUIDE.md` atualizado; `config/config.example.json` contém as chaves.
+ - Validação: `src/utils/config_validator.py::validate_data_sources_config` valida/normaliza `retry_failed_sources` (bool), `max_retries` (int ≥ 0, com precedência sobre `retry_attempts`) e `retry_backoff_seconds` (float ≥ 0); integração aplicada via `src/config_manager.py`.
 
 Testes — Unitários (CategoryDetector, Logger) e ajuste de stubs (DataCollector)
 

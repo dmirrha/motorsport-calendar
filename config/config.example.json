@@ -94,7 +94,8 @@
     "event_status": "CONFIRMED",
     "include_streaming_links": true,
     "include_location": true,
-    "include_description": true
+    "include_description": true,
+    "enforce_sort": true
   },
   
   "streaming_providers": {

@@ -10,6 +10,10 @@ import os
 from pathlib import Path
 from typing import Dict, Any, Optional, List
 import logging
+from utils.config_validator import (
+    validate_data_sources_config,
+    ConfigValidationError,
+)
 
 
 class ConfigManager:
@@ -38,6 +42,9 @@ class ConfigManager:
                 "priority_order": ["tomada_tempo"],
                 "timeout_seconds": 10,
                 "retry_attempts": 3,
+                "retry_failed_sources": True,
+                "max_retries": 1,
+                "retry_backoff_seconds": 0.5,
                 "rate_limit_delay": 1.0
             },
             "event_filters": {
@@ -52,7 +59,8 @@ class ConfigManager:
             "ical_parameters": {
                 "calendar_name": "Motorsport Events",
                 "timezone": "America/Sao_Paulo",
-                "default_duration_minutes": 120
+                "default_duration_minutes": 120,
+                "enforce_sort": True
             }
         }
         
@@ -265,11 +273,23 @@ class ConfigManager:
             Path(output_dir).mkdir(parents=True, exist_ok=True)
         except Exception as e:
             issues.append(f"Cannot create output directory {output_dir}: {e}")
+
+        # Validate and normalize data_sources (including retry keys)
+        try:
+            normalized_ds = validate_data_sources_config(self.config.get('data_sources', {}))
+            self.config['data_sources'] = normalized_ds
+        except ConfigValidationError as e:
+            issues.append(f"data_sources invalid: {e}")
         
         # Validate priority sources
         priority_sources = self.get_priority_sources()
         if not priority_sources:
             issues.append("No data sources configured in priority_order")
+        
+        # Validate iCal parameters
+        enforce_sort = self.get('ical_parameters.enforce_sort', True)
+        if not isinstance(enforce_sort, bool):
+            issues.append("ical_parameters.enforce_sort must be boolean")
         
         return issues
     

@@ -288,3 +288,134 @@ def validate_silent_periods(periods: List[Dict[str, Any]]) -> List[Dict[str, Any
             )
     
     return valid_periods
+
+
+def validate_data_sources_config(config: Dict[str, Any]) -> Dict[str, Any]:
+    """Valida e padroniza a configuração da seção data_sources.
+    
+    Campos validados (com defaults):
+    - priority_order: list[str]
+    - excluded_sources: list[str]
+    - timeout_seconds: int > 0 (default 10)
+    - retry_attempts: int >= 0 (legado)
+    - retry_failed_sources: bool (default True)
+    - max_retries: int >= 0 (default 1; fallback em retry_attempts se ausente)
+    - retry_backoff_seconds: float >= 0 (default 0.5)
+    - rate_limit_delay: float >= 0 (default 1.0)
+    - user_agents: list[str]
+    
+    Returns:
+        Dicionário normalizado com os valores validados.
+    """
+    if config is None:
+        config = {}
+
+    if not isinstance(config, dict):
+        raise ConfigValidationError(
+            "Configuração de data_sources deve ser um objeto",
+            ErrorCode.CONFIG_VALIDATION_ERROR,
+            "data_sources"
+        )
+
+    merged: Dict[str, Any] = {**config}
+
+    # Listas de strings
+    def _normalize_str_list(value: Any, field: str) -> List[str]:
+        if value is None:
+            return []
+        if isinstance(value, list):
+            out: List[str] = []
+            for v in value:
+                if v is None:
+                    continue
+                s = str(v).strip()
+                if s:
+                    out.append(s)
+            # remove duplicatas mantendo ordem
+            seen = set()
+            uniq: List[str] = []
+            for s in out:
+                if s not in seen:
+                    seen.add(s)
+                    uniq.append(s)
+            return uniq
+        # se não for lista, tenta converter único valor
+        s = str(value).strip()
+        return [s] if s else []
+
+    merged['priority_order'] = _normalize_str_list(merged.get('priority_order', ["tomada_tempo"]), 'priority_order')
+    merged['excluded_sources'] = _normalize_str_list(merged.get('excluded_sources', []), 'excluded_sources')
+    merged['user_agents'] = _normalize_str_list(merged.get('user_agents', []), 'user_agents')
+
+    # timeout_seconds: int > 0
+    try:
+        timeout = int(merged.get('timeout_seconds', 10))
+        if timeout <= 0:
+            raise ValueError("timeout_seconds deve ser > 0")
+        merged['timeout_seconds'] = timeout
+    except (ValueError, TypeError) as e:
+        raise ConfigValidationError(
+            f"Valor inválido para timeout_seconds: {e}",
+            ErrorCode.CONFIG_VALIDATION_ERROR,
+            'data_sources.timeout_seconds'
+        ) from e
+
+    # rate_limit_delay: float >= 0
+    try:
+        rld = float(merged.get('rate_limit_delay', 1.0))
+        if rld < 0:
+            raise ValueError("rate_limit_delay deve ser >= 0")
+        merged['rate_limit_delay'] = rld
+    except (ValueError, TypeError) as e:
+        raise ConfigValidationError(
+            f"Valor inválido para rate_limit_delay: {e}",
+            ErrorCode.CONFIG_VALIDATION_ERROR,
+            'data_sources.rate_limit_delay'
+        ) from e
+
+    # retry_failed_sources: bool
+    rfs = merged.get('retry_failed_sources', True)
+    merged['retry_failed_sources'] = bool(rfs)
+
+    # retry_attempts (legado) e max_retries
+    # tenta normalizar ambos e aplicar precedence a max_retries quando presente
+    retry_attempts_val: Optional[int] = None
+    if 'retry_attempts' in merged:
+        try:
+            retry_attempts_val = max(0, int(merged.get('retry_attempts', 3)))
+            merged['retry_attempts'] = retry_attempts_val
+        except (ValueError, TypeError) as e:
+            raise ConfigValidationError(
+                f"Valor inválido para retry_attempts: {e}",
+                ErrorCode.CONFIG_VALIDATION_ERROR,
+                'data_sources.retry_attempts'
+            ) from e
+
+    try:
+        if 'max_retries' in merged:
+            mr = max(0, int(merged.get('max_retries', 1)))
+        else:
+            # fallback no legado
+            mr = max(0, int(merged.get('retry_attempts', 1)))
+        merged['max_retries'] = mr
+    except (ValueError, TypeError) as e:
+        raise ConfigValidationError(
+            f"Valor inválido para max_retries: {e}",
+            ErrorCode.CONFIG_VALIDATION_ERROR,
+            'data_sources.max_retries'
+        ) from e
+
+    # retry_backoff_seconds: float >= 0
+    try:
+        rbs = float(merged.get('retry_backoff_seconds', 0.5))
+        if rbs < 0:
+            raise ValueError("retry_backoff_seconds deve ser >= 0")
+        merged['retry_backoff_seconds'] = rbs
+    except (ValueError, TypeError) as e:
+        raise ConfigValidationError(
+            f"Valor inválido para retry_backoff_seconds: {e}",
+            ErrorCode.CONFIG_VALIDATION_ERROR,
+            'data_sources.retry_backoff_seconds'
+        ) from e
+
+    return merged

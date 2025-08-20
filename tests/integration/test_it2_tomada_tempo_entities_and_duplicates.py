@@ -5,6 +5,7 @@ from urllib.parse import urljoin
 
 import pytest
 from sources.tomada_tempo import TomadaTempoSource
+from src.event_processor import EventProcessor
 
 pytestmark = [pytest.mark.integration]
 
@@ -74,7 +75,6 @@ def test_entities_normalization(monkeypatch):
         assert isinstance(e.get("streaming_links"), list)
 
 
-@pytest.mark.xfail(reason="Deduplicação ainda não implementada para TomadaTempo", strict=False)
 def test_duplicates_deduplication(monkeypatch):
     programming_html = _read_fixture("programming_duplicates.html")
     src = TomadaTempoSource()
@@ -86,8 +86,13 @@ def test_duplicates_deduplication(monkeypatch):
     _patch_make_request(monkeypatch, src, main_html, programming_html, href)
     target_date = _make_target_friday()
 
-    events = src.collect_events(target_date)
+    # Coleta da fonte (pode conter duplicatas)
+    raw_events = src.collect_events(target_date)
 
-    # Esperado: apenas um evento após dedupe
-    names_times = [(e.get("name"), e.get("time"), e.get("date")) for e in events]
-    assert len(set(names_times)) == 1
+    # Deduplicação ocorre no pipeline de processamento
+    processor = EventProcessor()
+    processed = processor.process_events(raw_events, target_weekend=target_date)
+
+    # Esperado: apenas um evento após dedupe no pipeline
+    assert isinstance(processed, list)
+    assert len(processed) == 1, f"Esperado 1 evento após dedupe, obtido {len(processed)}: {[e.get('display_name') for e in processed]}"
