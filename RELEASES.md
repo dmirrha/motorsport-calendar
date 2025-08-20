@@ -1,17 +1,20 @@
 # Notas de Versão
- 
+
 Este arquivo contém um registro acumulativo de todas as versões lançadas do projeto, com notas detalhadas sobre as mudanças em cada versão.
- 
+
 ## Não Lançado
+Sem notas no momento.
+
+## Versão 0.5.24 (2025-08-20)
 CI/Tests — Cobertura por flags (ajuste unit/integration/e2e)
- 
+
 - Job `unit`: passa a excluir explicitamente testes `integration` e o conjunto `tests/integration/test_phase2_e2e_*.py` para evitar diluição do denominador das flags (`-m "not integration"` e `-k "not test_phase2_e2e_"`).
 - Job `integration`: mantém `pytest -m integration` com cobertura focada em módulos do fluxo principal (src/ e sources/ relevantes), refletindo melhor a suíte no Codecov (flag `integration`).
 - Job `e2e`: executa todos os `tests/integration/test_phase2_e2e_*.py` (não apenas `-k happy`) com cobertura focada no pipeline end‑to‑end (flag `e2e`).
 - Documentação: `docs/tests/overview.md` e `CHANGELOG.md` atualizados com a separação de escopos e política de marcadores.
- 
+
 CI/Codecov — Geração garantida de XML (e2e/integration)
- 
+
 - Removido `-c /dev/null` dos comandos `pytest` nos jobs `e2e_happy` e `integration` para respeitar o `pytest.ini` (plugins/opções globais e cobertura padrão).
 - Adicionado `--cov-fail-under=0` nesses jobs para neutralizar o gate global apenas para e2e/integration, mantendo o gate no job `unit`.
 - Passos de verificação e fallback adicionados antes do upload ao Codecov:
@@ -64,49 +67,6 @@ Testes — Unitários (CategoryDetector, Logger) e ajuste de stubs (DataCollecto
 - DataCollector (stubs):
   - Ajuste dos stubs para compatibilidade com `BaseSource` via `MinimalBase` (atributos essenciais antes de `super().__init__()` e sessão de rede neutralizada), evitando falhas silenciosas em `add_source()`.
   - Arquivo ajustado: `tests/unit/test_data_collector.py`. Suíte unit estável.
-
-CI/Docs — Helper Makefile ci.pr-run
-
-- Adicionado alvo `ci.pr-run` no Makefile para atualizar a branch do PR com `main` e disparar o workflow `Tests` via GitHub CLI (`gh`).
-- Documentação: `README.md` e `docs/tests/overview.md` com pré-requisitos e uso: `make ci.pr-run BRANCH=<branch> [WORKFLOW=Tests]`.
-- Comportamento: executa fetch/checkout/merge/push, aciona o workflow e retorna à branch original; imprime logs no terminal.
-
-Métricas — Cobertura por suíte (medição local em 2025-08-19)
-
-- Unit: 65.75%
-- Integration: 52.90%
-- E2E: 31.10%
-
-Detalhes e comandos de medição documentados em `docs/tests/overview.md`.
-
-Coletor — Retry por Fonte (Issue #111)
-
-- Novas chaves em `data_sources`:
-  - `retry_failed_sources` (boolean, padrão: `true`)
-  - `max_retries` (inteiro, padrão: `1`)
-  - `retry_backoff_seconds` (float, padrão: `0.5`)
-- Compatibilidade: `retry_attempts` (legado) continua suportado; se as novas chaves estiverem presentes, elas têm precedência.
-- Documentação: `docs/CONFIGURATION_GUIDE.md` atualizado; `config/config.example.json` contém as chaves.
-
-Testes — Unitários (CategoryDetector, Logger) e ajuste de stubs (DataCollector)
-
-- CategoryDetector:
-  - Teste adicional cobrindo branches ausentes (normalização vazia, mapping custom, aprendizado/persistência).
-  - Arquivo: `tests/unit/category/test_category_detector_additional_coverage.py`.
-  - Resultado: 100% no run focado; determinístico.
-- Logger:
-  - Testes para inicialização/configuração (handlers/formatters/níveis), rotação com limpeza desabilitada nos testes, emissão por nível e helpers de domínio.
-  - Arquivos: `tests/unit/logger/test_logger_basic.py`, `tests/unit/logger/test_logger_misc.py`.
-  - Resultado: ~83% do módulo; 3× sem flakes (<30s).
-- DataCollector (stubs):
-  - Ajuste dos stubs para compatibilidade com `BaseSource` via `MinimalBase` (atributos essenciais antes de `super().__init__()` e sessão de rede neutralizada), evitando falhas silenciosas em `add_source()`.
-  - Arquivo ajustado: `tests/unit/test_data_collector.py`. Suíte unit estável.
-
-CI/Docs — Helper Makefile ci.pr-run
-
-- Adicionado alvo `ci.pr-run` no Makefile para atualizar a branch do PR com `main` e disparar o workflow `Tests` via GitHub CLI (`gh`).
-- Documentação: `README.md` e `docs/tests/overview.md` com pré-requisitos e uso: `make ci.pr-run BRANCH=<branch> [WORKFLOW=Tests]`.
-- Comportamento: executa fetch/checkout/merge/push, aciona o workflow e retorna à branch original; imprime logs no terminal.
 
 ## Versão 0.5.23 (2025-08-19)
     
