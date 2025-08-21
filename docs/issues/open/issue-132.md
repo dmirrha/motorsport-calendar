@@ -61,7 +61,7 @@ A auditoria de testes (`docs/tests/audit/TEST_AUDIT_2025-08-19.md`) recomenda im
    - Imprimir resumo em `GITHUB_STEP_SUMMARY` (tabela compacta + links de artefatos).
 5) Documentação (no fim):
    - Atualizar `docs/tests/overview.md` (nova seção Flaky Nightly), `README.md` (referência rápida), `CHANGELOG.md` e `RELEASES.md`.
-   - Manter alinhado ao hub PR #110 e processo SemVer adotado.
+   - Manter alinhado ao processo SemVer adotado.
 
 ## Riscos e Mitigações
 - Tempo de execução elevado: manter `-q`, usar `pytest-timeout`, limitar `ITERATIONS` inicial (ex.: 5-6) e ajustar depois.
@@ -69,11 +69,19 @@ A auditoria de testes (`docs/tests/audit/TEST_AUDIT_2025-08-19.md`) recomenda im
 - Ruído por testes genuinamente quebrados: consolidar por período e observar tendência antes de ações corretivas.
 
 ## Tarefas
-- [ ] Criar workflow `.github/workflows/flaky-nightly.yml` com cron e manual.
-- [ ] Loop de iterações, coleta de `junit.xml` e logs.
-- [ ] Consolidação em CSV/JSON e `summary.md`.
-- [ ] Upload de artefatos e `GITHUB_STEP_SUMMARY`.
+- [x] Criar workflow `.github/workflows/flaky-nightly.yml` com cron e manual.
+- [x] Loop de iterações, coleta de `junit.xml` e logs.
+- [x] Consolidação em CSV/JSON e `summary.md`.
+- [x] Upload de artefatos e `GITHUB_STEP_SUMMARY`.
 - [ ] Atualizar documentação e release notes.
+
+## Progresso
+- Workflow implementado em `.github/workflows/flaky-nightly.yml` com `schedule` (03:00 UTC) e `workflow_dispatch`.
+- Iterações padrão (6), timeout (60s) e variação de seed por iteração configuradas; saída por iteração em `reports/gha/run_${{ github.run_id }}/iter_<N>/`.
+- Consolidação (CSV/JSON/MD), espelho em `reports/gha/latest_main/`, upload de artefatos e resumo no `GITHUB_STEP_SUMMARY` implementados.
+- Smoke executado via evento `pull_request` (2 iterações) em 2025-08-21T06:56:51-03:00; artefatos e resumo validados com sucesso.
+- Último run: https://github.com/dmirrha/motorsport-calendar/actions/runs/17123387807 (success)
+- Próximos passos: aguardar a primeira execução no cron e, em seguida, atualizar documentação e release notes (S5) antes do merge.
 
 ## Referências
 - `.github/workflows/tests.yml`
@@ -83,4 +91,4 @@ A auditoria de testes (`docs/tests/audit/TEST_AUDIT_2025-08-19.md`) recomenda im
 
 ---
 
-PEDE CONFIRMAÇÃO: Confirmar este plano para iniciar a implementação do workflow.
+CONFIRMAÇÃO: Plano aprovado e implementação aplicada em 2025-08-21T06:20:15-03:00. Smoke concluído em 2025-08-21T06:56:51-03:00. Aguardando a primeira execução agendada às 03:00 UTC.

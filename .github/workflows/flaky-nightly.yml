@@ -104,7 +104,7 @@ jobs:
           echo "ITERATIONS=${ITER}, TIMEOUT=${TIMEOUT}"
           FAILURES=0
           for i in $(seq 1 ${ITER}); do
-            echo "=== Iteration $i/${ITERATIONS} ==="
+            echo "=== Iteration $i/${ITER} ==="
             ITER_DIR="$ROOT/iter_${i}"
             mkdir -p "$ITER_DIR"
             JUNIT="$ITER_DIR/junit.xml"

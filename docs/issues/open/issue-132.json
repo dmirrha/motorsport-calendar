@@ -7,7 +7,7 @@
   "epic": null,
   "url": "https://github.com/dmirrha/motorsport-calendar/issues/132",
   "created_at": "2025-08-20T08:13:45Z",
-  "updated_at": "2025-08-20T08:13:45Z",
+  "updated_at": "2025-08-21T09:56:51Z",
   "labels": ["enhancement", "ci", "testing", "needs-triage", "priority: P0"],
   "plan": {
     "workflow_file": ".github/workflows/flaky-nightly.yml",
@@ -23,10 +23,10 @@
     }
   },
   "tasks": [
-    {"item": "Criar workflow agendado com suporte manual", "done": false},
-    {"item": "Executar suíte em N iterações e coletar JUnit/logs", "done": false},
-    {"item": "Consolidar métricas CSV/JSON e gerar summary.md", "done": false},
-    {"item": "Upload de artefatos e resumo no GITHUB_STEP_SUMMARY", "done": false},
+    {"item": "Criar workflow agendado com suporte manual", "done": true},
+    {"item": "Executar suíte em N iterações e coletar JUnit/logs", "done": true},
+    {"item": "Consolidar métricas CSV/JSON e gerar summary.md", "done": true},
+    {"item": "Upload de artefatos e resumo no GITHUB_STEP_SUMMARY", "done": true},
     {"item": "Atualizar documentação e release notes", "done": false},
     {"item": "Criar arquivos de rastreabilidade (md/json)", "done": true}
   ],
