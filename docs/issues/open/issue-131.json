@@ -1,0 +1,45 @@
+{
+  "id": 3337053812,
+  "number": 131,
+  "state": "open",
+  "title": "P0: Habilitar gate de cobertura de patch (≥85%) no Codecov (modo informativo)",
+  "milestone": null,
+  "epic": null,
+  "url": "https://github.com/dmirrha/motorsport-calendar/issues/131",
+  "created_at": "2025-08-20T08:13:43Z",
+  "updated_at": "2025-08-20T08:13:43Z",
+  "labels": ["enhancement", "ci", "coverage", "needs-triage", "priority: P0"],
+  "plan": {
+    "config_file": "codecov.yml",
+    "coverage": {
+      "status": {
+        "patch": {
+          "default": {
+            "informational": true,
+            "target": "85%"
+          }
+        },
+        "project": {
+          "default": {
+            "informational": true
+          }
+        }
+      }
+    }
+  },
+  "tasks": [
+    {"item": "Ajustar codecov.yml (patch.default.target: 85%, informational: true)", "done": true},
+    {"item": "Validar check do Codecov em PR de teste", "done": false},
+    {"item": "Atualizar README.md e docs/tests/overview.md com instruções", "done": false}
+  ],
+  "docs_updated": [
+    "docs/issues/open/issue-131.md",
+    "docs/issues/open/issue-131.json"
+  ],
+  "pr": 140,
+  "acceptance": [
+    "Check de patch aparece nos PRs com target de 85%",
+    "Não bloqueia merges (informational: true)",
+    "Documentação atualizada (README/overview)"
+  ]
+}
