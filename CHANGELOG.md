@@ -29,6 +29,7 @@ e este projeto adere ao [Versionamento Semântico](https://semver.org/spec/v2.0.
     - DataCollector (unit): `tests/unit/data_collector/test_data_collector_basic.py`, `tests/unit/data_collector/test_data_collector_more.py`, `tests/unit/data_collector/test_data_collector_retry.py`.
     - PayloadManager (integration): `tests/integration/test_phase2_payload_manager.py`.
   - Referências inexistentes anteriores foram marcadas para correção futura no próprio documento, sem impacto na execução dos testes/CI.
+ - Docs — Limpeza de referências desatualizadas de PR em arquivos de documentação e issues, evitando ambiguidade histórica e mantendo rastreabilidade coesa (sem impacto funcional).
 
 ## [0.6.2] - 2025-08-20
 ### CI — Correção de comando pytest --version
@@ -169,7 +170,7 @@ e este projeto adere ao [Versionamento Semântico](https://semver.org/spec/v2.0.
 - Em `src/ical_generator.py`, `ICalGenerator._create_event_description()` agora normaliza (`strip`), remove duplicados, ordena alfabeticamente e limita aos 3 primeiros os `streaming_links` antes de renderizar na `DESCRIPTION`.
 - Motivo: garantir determinismo/estabilidade e corrigir a falha do teste de integração `tests/integration/test_phase2_ical_options_and_edges.py::test_edges_streaming_sorted_and_limited_with_alarms` (ordenação/limite dos links de streaming na descrição do evento, incluindo o link `https://b.example/beta`).
 - Validação: `pytest -m integration` passou localmente (31 passed, 4 skipped, 1 xfailed), cobertura 53.15% (>45%).
-- Rastreabilidade: PRs #110/#112; Issue #105.
+- Rastreabilidade: PR #112; Issue #105.
 
 ### Documentação — Issue #105 (Plano — Fase 3)
 
@@ -235,7 +236,7 @@ e este projeto adere ao [Versionamento Semântico](https://semver.org/spec/v2.0.
   - `tests/fixtures/html/tomada_tempo_weekend_edge_cases.html`
   - `tests/fixtures/html/tomada_tempo_weekend_malformed.html` (novo)
 - Documentação atualizada: `docs/tests/scenarios/phase4_scenarios.md` com seção “Fixtures HTML”.
-- Rastreabilidade: PR #110; próximos passos (S2): implementar E2E → ICS com snapshot e testes de erros.
+- Rastreabilidade: próximos passos (S2): implementar E2E → ICS com snapshot e testes de erros.
 
 ### Testes — Cobertura Pontual (CategoryDetector e DataCollector)
 
