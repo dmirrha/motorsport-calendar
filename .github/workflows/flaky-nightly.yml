@@ -1,0 +1,263 @@
+name: Flaky Nightly
+
+on:
+  schedule:
+    - cron: '0 3 * * *'
+  workflow_dispatch:
+    inputs:
+      iterations:
+        description: 'Número de iterações da suíte'
+        type: number
+        default: 6
+      timeout_seconds:
+        description: 'Timeout por teste (segundos)'
+        type: number
+        default: 60
+
+concurrency:
+  group: flaky-nightly-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  flaky:
+    name: Detect flaky tests (nightly)
+    # Executa no agendamento apenas no branch default (ex.: main). Manual roda em qualquer branch.
+    if: ${{ github.event_name != 'schedule' || github.ref_name == 'main' }}
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    env:
+      ITERATIONS: ${{ inputs.iterations || 6 }}
+      TIMEOUT: ${{ inputs.timeout_seconds || 60 }}
+      TZ: America/Sao_Paulo
+    steps:
+      - name: Checkout
+      
+        uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Cache pip
+        uses: actions/cache@v4
+        with:
+          path: ~/.cache/pip
+          key: ${{ runner.os }}-pip-${{ hashFiles('**/requirements*.txt') }}
+          restore-keys: |
+            ${{ runner.os }}-pip-
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+          if [ -f requirements-dev.txt ]; then pip install -r requirements-dev.txt; fi
+          pip install pytest pytest-cov
+
+      - name: Log pytest/plugins versions and seed base
+        run: |
+          python - <<'PY'
+          import configparser
+          from importlib.metadata import version, PackageNotFoundError
+          def v(p):
+              try:
+                  return version(p)
+              except PackageNotFoundError:
+                  return "not installed"
+          cfg = configparser.ConfigParser()
+          seed = "N/D"
+          timeout = "N/D"
+          timeout_method = "N/D"
+          try:
+              cfg.read("pytest.ini")
+              if cfg.has_section("pytest"):
+                  seed = cfg["pytest"].get("randomly-seed", seed)
+                  timeout = cfg["pytest"].get("timeout", timeout)
+                  timeout_method = cfg["pytest"].get("timeout_method", timeout_method)
+          except Exception:
+              pass
+          print("Pytest/Plugins:")
+          print(f"  pytest={v('pytest')}")
+          print(f"  pytest-cov={v('pytest-cov')}")
+          print(f"  pytest-timeout={v('pytest-timeout')}")
+          print(f"  pytest-randomly={v('pytest-randomly')}")
+          print("Config (determinismo):")
+          print(f"  randomly-seed={seed}")
+          print(f"  timeout={timeout} (method={timeout_method})")
+          PY
+          echo "--- pytest --version ---"
+          pytest --version
+
+      - name: Run test suite multiple times (do not fail job)
+        shell: bash
+        run: |
+          set -e
+          ROOT="reports/gha/run_${{ github.run_id }}"
+          echo "Run root: $ROOT"
+          mkdir -p "$ROOT"
+          echo "ITERATIONS=${ITERATIONS}, TIMEOUT=${TIMEOUT}"
+          FAILURES=0
+          for i in $(seq 1 ${ITERATIONS}); do
+            echo "=== Iteration $i/${ITERATIONS} ==="
+            ITER_DIR="$ROOT/iter_${i}"
+            mkdir -p "$ITER_DIR"
+            JUNIT="$ITER_DIR/junit.xml"
+            LOG="$ITER_DIR/pytest.log"
+            SEED=$(( ( ( ${{ github.run_id }} + i ) % 100000 ) + 1 ))
+            echo "Seed=${SEED}" | tee "$ITER_DIR/seed.txt"
+            set +e
+            pytest -q -rA \
+              --durations=25 \
+              --timeout=${TIMEOUT} \
+              --junitxml="${JUNIT}" \
+              -o junit_family=legacy \
+              --randomly-seed=${SEED} \
+              2>&1 | tee "${LOG}"
+            EC=${PIPESTATUS[0]}
+            echo "exit_code=${EC}" | tee "$ITER_DIR/status.txt"
+            if [ $EC -ne 0 ]; then
+              echo "Iteration $i: failures occurred (exit=${EC})."
+              FAILURES=$((FAILURES+1))
+            fi
+            set -e
+          done
+          echo "Total iterations with failures: ${FAILURES}" | tee "$ROOT/summary/iterations_failures.txt"
+
+      - name: Consolidate JUnit results into CSV/JSON/MD
+        if: always()
+        run: |
+          python - <<'PY'
+          import os, glob, csv, json, xml.etree.ElementTree as ET
+          from datetime import datetime, timezone
+
+          run_id = os.getenv('GITHUB_RUN_ID', 'local')
+          root = f"reports/gha/run_{run_id}"
+          summary_dir = os.path.join(root, "summary")
+          os.makedirs(summary_dir, exist_ok=True)
+
+          junit_files = sorted(glob.glob(os.path.join(root, 'iter_*', 'junit.xml')))
+          agg = {}
+          total_cases = 0
+
+          def testcase_outcome(tc):
+            if tc.find('skipped') is not None:
+              return 'skipped'
+            if tc.find('failure') is not None or tc.find('error') is not None:
+              return 'failed'
+            return 'passed'
+
+          for jf in junit_files:
+            try:
+              tree = ET.parse(jf)
+              root_xml = tree.getroot()
+            except Exception:
+              continue
+            suites = [root_xml] if root_xml.tag == 'testsuite' else root_xml.findall('.//testsuite')
+            for s in suites:
+              for tc in s.findall('testcase'):
+                name = tc.attrib.get('name', '')
+                cls = tc.attrib.get('classname', '')
+                file = tc.attrib.get('file', '')
+                nodeid = f"{cls}::{name}" if cls else name
+                if file:
+                  nodeid = f"{file}::{nodeid}"
+                out = testcase_outcome(tc)
+                rec = agg.setdefault(nodeid, {"runs":0, "passes":0, "fails":0, "errors":0, "skips":0})
+                rec["runs"] += 1
+                if out == 'passed':
+                  rec["passes"] += 1
+                elif out == 'skipped':
+                  rec["skips"] += 1
+                else:
+                  # não distinguimos failure vs error com precisão do JUnit simplificado acima
+                  rec["fails"] += 1
+                total_cases += 1
+
+          items = []
+          for nodeid, m in agg.items():
+            runs = m["runs"] or 1
+            fails = m["fails"] + m["errors"]
+            passes = m["passes"]
+            skips = m["skips"]
+            flaky = passes > 0 and fails > 0
+            fail_rate = round(fails / runs, 4)
+            items.append({
+              "nodeid": nodeid,
+              "runs": runs,
+              "passes": passes,
+              "fails": m["fails"],
+              "errors": m["errors"],
+              "skips": skips,
+              "flaky": flaky,
+              "fail_rate": fail_rate,
+            })
+
+          items.sort(key=lambda x: (not x["flaky"], -x["fail_rate"], -x["runs"], x["nodeid"]))
+          flaky_count = sum(1 for x in items if x["flaky"]) if items else 0
+
+          csv_path = os.path.join(summary_dir, 'flaky_summary.csv')
+          with open(csv_path, 'w', newline='', encoding='utf-8') as f:
+            w = csv.DictWriter(f, fieldnames=["nodeid","runs","passes","fails","errors","skips","flaky","fail_rate"])
+            w.writeheader(); w.writerows(items)
+
+          json_path = os.path.join(summary_dir, 'flaky_summary.json')
+          with open(json_path, 'w', encoding='utf-8') as f:
+            json.dump({
+              "generated_at": datetime.now(timezone.utc).isoformat(),
+              "run_id": run_id,
+              "junit_files": junit_files,
+              "total_cases": total_cases,
+              "tests": items,
+              "flaky_count": flaky_count,
+            }, f, ensure_ascii=False, indent=2)
+
+          top = [x for x in items if x["flaky"]][:20]
+          md_path = os.path.join(summary_dir, 'summary.md')
+          with open(md_path, 'w', encoding='utf-8') as f:
+            f.write("# Flaky Nightly — Resumo\n\n")
+            f.write(f"- Total de testcases agregados: {len(items)}\n")
+            f.write(f"- Total de entradas JUnit: {len(junit_files)}\n")
+            f.write(f"- Testes marcados como flaky: {flaky_count}\n\n")
+            f.write("## Top 20 flaky (por taxa de falha)\n\n")
+            if not top:
+              f.write("Nenhum teste considerado flaky nesta execução.\n")
+            else:
+              f.write("| nodeid | runs | passes | fails | skips | fail_rate |\n")
+              f.write("|---|---:|---:|---:|---:|---:|\n")
+              for x in top:
+                f.write(f"| {x['nodeid']} | {x['runs']} | {x['passes']} | {x['fails']} | {x['skips']} | {x['fail_rate']:.2%} |\n")
+          print(f"Resumo gerado em: {summary_dir}")
+          PY
+
+      - name: Mirror summary to latest_main (default branch only)
+        if: ${{ always() && github.ref_name == 'main' }}
+        run: |
+          ROOT="reports/gha/run_${{ github.run_id }}"
+          mkdir -p reports/gha/latest_main/
+          cp -r "$ROOT/summary" reports/gha/latest_main/
+
+      - name: Upload artifacts (reports/gha)
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: flaky-nightly-${{ github.run_id }}
+          path: |
+            reports/gha/
+          retention-days: 14
+
+      - name: Job summary
+        if: always()
+        run: |
+          RUN_URL="${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}"
+          echo "Flaky Nightly — Relatório" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "- Execução: ${RUN_URL}" >> $GITHUB_STEP_SUMMARY
+          echo "- Artefato: flaky-nightly-${{ github.run_id }}" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          if [ -f "reports/gha/run_${{ github.run_id }}/summary/summary.md" ]; then
+            echo "## Resumo" >> $GITHUB_STEP_SUMMARY
+            cat "reports/gha/run_${{ github.run_id }}/summary/summary.md" >> $GITHUB_STEP_SUMMARY
+          else
+            echo "Resumo não encontrado." >> $GITHUB_STEP_SUMMARY
+          fi
