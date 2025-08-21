@@ -1,0 +1,22 @@
+{
+  "id": 3337053740,
+  "number": 130,
+  "state": "open",
+  "title": "P0: Adicionar pytest-timeout e pytest-randomly para estabilidade e ordem não determinística",
+  "url": "https://github.com/dmirrha/motorsport-calendar/issues/130",
+  "created_at": "2025-08-20T08:13:41Z",
+  "updated_at": "2025-08-20T08:13:41Z",
+  "labels": ["enhancement", "ci", "testing", "needs-triage", "priority: P0"],
+  "tasks": [
+    {"item": "Adicionar dependências aos requirements-dev (pytest-timeout, pytest-randomly)", "done": false},
+    {"item": "Configurar pytest.ini: --timeout=60 e --timeout-method=thread; habilitar randomização via plugin", "done": false},
+    {"item": "Atualizar CI (.github/workflows/tests.yml) para logar seed e invocar --randomly-seed=$SEED", "done": false},
+    {"item": "Atualizar docs/tests/overview.md com instruções de reprodução por seed e uso de markers de timeout", "done": false},
+    {"item": "Atualizar CHANGELOG.md e RELEASES.md (seções Unreleased/Não Lançado)", "done": false}
+  ],
+  "acceptance": [
+    "Timeouts aplicados globalmente (60s) com possibilidade de override por marker",
+    "Ordem dos testes embaralhada por padrão; seed registrada no log do CI",
+    "Documentação atualizada com instruções de reprodução via seed"
+  ]
+}

@@ -86,6 +86,16 @@ Objetivo: descrever a estratégia mínima de testes para o projeto, com foco em 
  - Logger: testes unitários cobrindo inicialização/configuração (handlers, formatters e níveis), rotação com limpeza desabilitada nos testes, emissão por nível e helpers de domínio. Arquivos: `tests/unit/logger/test_logger_basic.py`, `tests/unit/logger/test_logger_misc.py`. Resultado: módulo ~83%, 3× sem flakes (<30s).
  - DataCollector (stubs): ajustes para compatibilidade com `BaseSource` via `MinimalBase` (inicializa atributos essenciais antes de `super().__init__()` e neutraliza rede), evitando falhas silenciosas em `add_source()`. Arquivo ajustado: `tests/unit/test_data_collector.py`. Suíte unit estável e determinística.
 
+### Plugins de teste e determinismo (pytest-timeout/pytest-randomly)
+
+- Dependências (dev): `pytest-timeout~=2.3` e `pytest-randomly~=3.15` em `requirements-dev.txt`.
+- Configuração em `pytest.ini`:
+  - `timeout = 30`
+  - `timeout_method = thread`
+  - `randomly-seed = 20240501`
+- CI (`.github/workflows/tests.yml`): passos extras imprimem versões de `pytest`, `pytest-cov`, `pytest-timeout`, `pytest-randomly` e leem do `pytest.ini` os valores de `randomly-seed`, `timeout`, `timeout_method` para diagnósticos. Comando de versão corrigido para `pytest --version` (sem `--plugins`).
+- Objetivo: reduzir flakiness e garantir reprodutibilidade local e em CI.
+
 ### Validação de referências (2025-08-20)
 - TomadaTempo (integração): OK — `tests/integration/test_phase3_tomada_tempo_integration.py`, `tests/integration/test_phase3_tomada_tempo_parsing_variants.py`.
 - TomadaTempo IT2: OK — `tests/integration/test_it2_tomada_tempo_*.py` (ex.: `dates_tz`, `entities_and_duplicates`, `fallbacks_and_parsing`, `multiday_and_location`, `streaming_constraints`).

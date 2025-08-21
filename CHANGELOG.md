@@ -30,6 +30,28 @@ e este projeto adere ao [Versionamento Semântico](https://semver.org/spec/v2.0.
     - PayloadManager (integration): `tests/integration/test_phase2_payload_manager.py`.
   - Referências inexistentes anteriores foram marcadas para correção futura no próprio documento, sem impacto na execução dos testes/CI.
 
+## [0.6.2] - 2025-08-20
+### CI — Correção de comando pytest --version
+
+- Workflow `.github/workflows/tests.yml`: corrigido o uso indevido de `pytest --version --plugins` (flag `--plugins` não suportada). Mantido o log da versão com `pytest --version` simples e os demais logs de plugins e configuração.
+- Efeito: evita falhas no CI mantendo a observabilidade adicionada no 0.6.1.
+- Versionamento: `src/__init__.py` atualizado para `0.6.2`.
+
+## [0.6.1] - 2025-08-20
+### CI/Tests — Determinismo e observabilidade (pytest-timeout, pytest-randomly)
+
+- Dependências (dev): adicionados `pytest-timeout~=2.3` e `pytest-randomly~=3.15` em `requirements-dev.txt`.
+- Configuração (`pytest.ini`):
+  - `timeout = 30`
+  - `timeout_method = thread`
+  - `randomly-seed = 20240501`
+- Workflow `.github/workflows/tests.yml`: passos de log (jobs `tests`, `e2e_happy`, `integration`) imprimem:
+  - Versões de `pytest`, `pytest-cov`, `pytest-timeout`, `pytest-randomly`.
+  - Configurações lidas do `pytest.ini`: `randomly-seed`, `timeout`, `timeout_method`.
+  - Saída de `pytest --version`.
+- Motivação: reduzir flakiness e garantir reprodutibilidade/diagnóstico em CI.
+- Versionamento: `src/__init__.py` atualizado para `0.6.1`.
+
 ## [0.6.0] - 2025-08-20
 ### Release — Publicação v0.6.0 (Release Drafter)
 
