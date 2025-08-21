@@ -1,0 +1,45 @@
+{
+  "id": 3337053877,
+  "number": 132,
+  "state": "open",
+  "title": "P0: Job noturno para detecção de flaky tests com múltiplas execuções",
+  "milestone": null,
+  "epic": null,
+  "url": "https://github.com/dmirrha/motorsport-calendar/issues/132",
+  "created_at": "2025-08-20T08:13:45Z",
+  "updated_at": "2025-08-21T09:56:51Z",
+  "labels": ["enhancement", "ci", "testing", "needs-triage", "priority: P0"],
+  "plan": {
+    "workflow_file": ".github/workflows/flaky-nightly.yml",
+    "schedule_cron": "0 3 * * *",
+    "iterations": 6,
+    "pytest_opts": "-q -rA --timeout=60 --durations=25",
+    "plugins": ["pytest-timeout", "pytest-randomly"],
+    "outputs": {
+      "per_iteration": ["junit.xml", "pytest.log"],
+      "consolidated": ["flaky_summary.csv", "flaky_summary.json", "summary.md"],
+      "artifact_root": "reports/gha/run_${{ github.run_id }}/",
+      "latest_main_mirror": "reports/gha/latest_main/"
+    }
+  },
+  "tasks": [
+    {"item": "Criar workflow agendado com suporte manual", "done": true},
+    {"item": "Executar suíte em N iterações e coletar JUnit/logs", "done": true},
+    {"item": "Consolidar métricas CSV/JSON e gerar summary.md", "done": true},
+    {"item": "Upload de artefatos e resumo no GITHUB_STEP_SUMMARY", "done": true},
+    {"item": "Atualizar documentação e release notes", "done": false},
+    {"item": "Criar arquivos de rastreabilidade (md/json)", "done": true}
+  ],
+  "docs_updated": [
+    "docs/issues/open/issue-132.md",
+    "docs/issues/open/issue-132.json"
+  ],
+  "pr": null,
+  "acceptance": [
+    "Workflow roda via cron diário (03:00 UTC) e manual",
+    "Artefatos por iteração e consolidados disponíveis para download",
+    "Relatório consolidado em reports/gha/latest_main/ dentro do artefato",
+    "Resumo no GITHUB_STEP_SUMMARY",
+    "Documentação de triagem atualizada antes do merge"
+  ]
+}
