@@ -14,6 +14,9 @@ on:
         type: number
         default: 60
 
+  pull_request:
+    paths:
+      - '.github/workflows/flaky-nightly.yml'
 concurrency:
   group: flaky-nightly-${{ github.ref }}
   cancel-in-progress: false
@@ -96,9 +99,11 @@ jobs:
           ROOT="reports/gha/run_${{ github.run_id }}"
           echo "Run root: $ROOT"
           mkdir -p "$ROOT"
-          echo "ITERATIONS=${ITERATIONS}, TIMEOUT=${TIMEOUT}"
+          # Em PRs, força 2 iterações para smoke; caso contrário, usa env.ITERATIONS
+          ITER="${{ github.event_name == 'pull_request' && '2' || env.ITERATIONS }}"
+          echo "ITERATIONS=${ITER}, TIMEOUT=${TIMEOUT}"
           FAILURES=0
-          for i in $(seq 1 ${ITERATIONS}); do
+          for i in $(seq 1 ${ITER}); do
             echo "=== Iteration $i/${ITERATIONS} ==="
             ITER_DIR="$ROOT/iter_${i}"
             mkdir -p "$ITER_DIR"
