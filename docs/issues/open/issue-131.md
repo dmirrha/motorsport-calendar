@@ -25,7 +25,7 @@ Configurar `codecov.yml` para ativar o status de `patch` com limiar ≥85% em mo
 - Documentação atualizada.
 
 ## Tarefas (da issue)
-- [ ] Ajustar `codecov.yml`.
+- [x] Ajustar `codecov.yml`.
 - [ ] Validar em PR de teste.
 - [ ] Atualizar docs.
 
@@ -57,13 +57,16 @@ Configurar `codecov.yml` para ativar o status de `patch` com limiar ≥85% em mo
 - Ruído inicial em PRs: manter “informational” até estabilizar o processo, depois avaliar tornar required.
 
 ## Checklist de Execução
-- [ ] Atualizar `codecov.yml` (target 85% em `coverage.status.patch.default`).
+- [x] Atualizar `codecov.yml` (target 85% em `coverage.status.patch.default`).
 - [ ] Abrir PR e validar check do Codecov (patch ≥85%).
 - [ ] Atualizar `README.md` e `docs/tests/overview.md` com instruções de interpretação.
 - [ ] Atualizar `CHANGELOG.md` e `RELEASES.md`.
 - [ ] PR com “Closes #131” e CI verde.
 
 ---
+
+## Status
+- PR aberta: #140 — https://github.com/dmirrha/motorsport-calendar/pull/140
 
 ## Confirmação
 Autoriza aplicar o plano acima na branch `issue/131-codecov-patch-gate-85` (editar `codecov.yml` e abrir PR de validação)?
