@@ -4,7 +4,6 @@ Referências:
 - Fonte: `sources/tomada_tempo.py`
 - Pipeline: `src/event_processor.py`, `src/ical_generator.py`
 - Issue: #105 — Aumentar a cobertura de testes integrados para >80%
-- PR: #110 — Plano/execução da Fase 4
 - Regras: `.windsurf/rules/tester.md`
 
 ## Objetivo

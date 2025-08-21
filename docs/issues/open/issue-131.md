@@ -50,7 +50,7 @@ Configurar `codecov.yml` para ativar o status de `patch` com limiar ≥85% em mo
   - O que é “patch coverage” e o limiar de 85%.
   - Que o check é informativo nesta fase (não bloqueia).
   - Como interpretar o relatório do Codecov no PR.
-- Notas de versão: `CHANGELOG.md` e `RELEASES.md` (marcar como patch release; coordenação com PR #110 para consolidar doc no último passo antes do merge).
+- Notas de versão: `CHANGELOG.md` e `RELEASES.md` (marcar como patch release; consolidar doc no último passo antes do merge).
 
 ## 4) Riscos e Mitigações
 - Flutuação de cobertura em patches pequenos: documentar limites e ajustar futuramente (ex.: `threshold`).
