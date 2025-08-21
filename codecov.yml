@@ -6,6 +6,7 @@ coverage:
     patch:
       default:
         informational: true
+        target: 85%
 comment: false
 flags:
   unit: {}
