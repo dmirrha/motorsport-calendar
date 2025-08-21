@@ -1,0 +1,28 @@
+{
+  "title": "P1: Mutation testing baseline (mutmut) em módulos críticos (event_processor, ical_generator, base_source)",
+  "body": "144-mutation-testing-baseline.md",
+  "labels": [
+    "enhancement",
+    "testing",
+    "ci",
+    "needs-triage",
+    "priority: P1"
+  ],
+  "assignees": [],
+  "milestone": null,
+  "state": "open",
+  "metadata": {
+    "created_at": "2025-08-21T09:10:22-03:00",
+    "priority": "P1",
+    "type": "testing",
+    "components": [
+      "mutmut",
+      "event_processor",
+      "ical_generator",
+      "base_source"
+    ],
+    "related_issues": []
+  },
+  "github_issue_number": 144,
+  "github_issue_url": "https://github.com/dmirrha/motorsport-calendar/issues/144"
+}

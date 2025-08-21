@@ -1,0 +1,41 @@
+{
+  "id": 3341577998,
+  "number": 142,
+  "state": "open",
+  "title": "P1: Elevar gradualmente o gate global de cobertura (+5pp por release até 75–80%)",
+  "milestone": null,
+  "epic": null,
+  "url": "https://github.com/dmirrha/motorsport-calendar/issues/142",
+  "created_at": "2025-08-21T12:35:31Z",
+  "updated_at": "2025-08-21T12:35:31Z",
+  "labels": ["enhancement", "ci", "coverage", "needs-triage", "priority: P1"],
+  "plan": {
+    "strategy": "+5pp por release até ~75–80%",
+    "gate": {
+      "hard": "pytest --cov-fail-under=<limite>",
+      "informational": "codecov.yml project status"
+    },
+    "steps": [
+      "Medir baseline de cobertura global",
+      "Definir próximo limite (baseline + 5pp)",
+      "Aplicar --cov-fail-under nos jobs de teste",
+      "Validar em PR e ajustar documentação"
+    ]
+  },
+  "tasks": [
+    {"item": "Medir baseline atual e definir próximo limite (+5pp)", "done": false},
+    {"item": "Atualizar workflows com novo --cov-fail-under", "done": false},
+    {"item": "Validar em PR", "done": false},
+    {"item": "Atualizar README.md, docs/tests/overview.md, CHANGELOG.md e RELEASES.md", "done": false}
+  ],
+  "docs_updated": [
+    "docs/issues/open/issue-142.md",
+    "docs/issues/open/issue-142.json"
+  ],
+  "pr": null,
+  "acceptance": [
+    "Primeiro incremento aplicado e validado no CI",
+    "Documentação atualizada (README/overview)",
+    "Notas em CHANGELOG.md e RELEASES.md"
+  ]
+}

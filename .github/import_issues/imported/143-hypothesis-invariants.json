@@ -1,0 +1,27 @@
+{
+  "title": "P1: Property-based testing (hypothesis) para invariantes de parsing/dedupe/ordenação ICS",
+  "body": "143-hypothesis-invariants.md",
+  "labels": [
+    "enhancement",
+    "testing",
+    "needs-triage",
+    "priority: P1"
+  ],
+  "assignees": [],
+  "milestone": null,
+  "state": "open",
+  "metadata": {
+    "created_at": "2025-08-21T09:10:22-03:00",
+    "priority": "P1",
+    "type": "testing",
+    "components": [
+      "hypothesis",
+      "parsers",
+      "dedupe",
+      "ical"
+    ],
+    "related_issues": []
+  },
+  "github_issue_number": 143,
+  "github_issue_url": "https://github.com/dmirrha/motorsport-calendar/issues/143"
+}

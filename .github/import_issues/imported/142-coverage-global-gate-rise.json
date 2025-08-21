@@ -1,0 +1,29 @@
+{
+  "title": "P1: Elevar gradualmente o gate global de cobertura (+5pp por release até 75–80%)",
+  "body": "142-coverage-global-gate-rise.md",
+  "labels": [
+    "enhancement",
+    "ci",
+    "coverage",
+    "needs-triage",
+    "priority: P1"
+  ],
+  "assignees": [],
+  "milestone": null,
+  "state": "open",
+  "metadata": {
+    "created_at": "2025-08-21T09:10:22-03:00",
+    "priority": "P1",
+    "type": "ci",
+    "components": [
+      "codecov",
+      "coverage",
+      "workflows"
+    ],
+    "related_issues": [
+      131
+    ]
+  },
+  "github_issue_number": 142,
+  "github_issue_url": "https://github.com/dmirrha/motorsport-calendar/issues/142"
+}
