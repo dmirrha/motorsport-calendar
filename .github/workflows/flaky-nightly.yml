@@ -122,6 +122,7 @@ jobs:
             fi
             set -e
           done
+          mkdir -p "$ROOT/summary"
           echo "Total iterations with failures: ${FAILURES}" | tee "$ROOT/summary/iterations_failures.txt"
 
       - name: Consolidate JUnit results into CSV/JSON/MD
