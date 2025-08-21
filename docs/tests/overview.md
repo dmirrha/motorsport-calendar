@@ -92,9 +92,29 @@ Objetivo: descrever a estratégia mínima de testes para o projeto, com foco em 
 - Configuração em `pytest.ini`:
   - `timeout = 30`
   - `timeout_method = thread`
-  - `randomly-seed = 20240501`
-- CI (`.github/workflows/tests.yml`): passos extras imprimem versões de `pytest`, `pytest-cov`, `pytest-timeout`, `pytest-randomly` e leem do `pytest.ini` os valores de `randomly-seed`, `timeout`, `timeout_method` para diagnósticos. Comando de versão corrigido para `pytest --version` (sem `--plugins`).
+  - Seed do `pytest-randomly` configurada via `addopts`: `--randomly-seed=20240501`.
+- CI (`.github/workflows/tests.yml`): passos extras imprimem versões de `pytest`, `pytest-cov`, `pytest-timeout`, `pytest-randomly`. Para diagnósticos, leem de `pytest.ini` os valores de `timeout`/`timeout_method` e exibem a seed definida em `addopts`. Comando de versão corrigido para `pytest --version` (sem `--plugins`).
 - Objetivo: reduzir flakiness e garantir reprodutibilidade local e em CI.
+
+
+### Property-based tests (Hypothesis)
+
+- Diretório e marcador: testes residem em `tests/property/` e usam `@pytest.mark.property` (marcador registrado em `pytest.ini`).
+- Perfil dedicado: `tests/property/conftest.py` registra e carrega o perfil `property` do Hypothesis (`deadline=None`, `max_examples=30`, e supressão de health checks comuns) para evitar flakes em CI.
+- Execução:
+  ```bash
+  # por marcador
+  pytest -m property -q
+  # por caminho
+  pytest tests/property -q
+  ```
+- Referências principais:
+  - `tests/property/test_prop_datetime_parsing_roundtrip.py` — roundtrip de parsing de `datetime` com TZ.
+  - `tests/property/test_prop_dedupe_invariants.py` — invariantes de deduplicação: idempotência e merge estável de links.
+  - `tests/property/test_prop_ical_ordering_stability.py` — estabilidade/determinismo da ordenação do iCal.
+- Determinismo: com `pytest-randomly` (seed fixa em `pytest.ini`) e o perfil acima, as execuções têm sido estáveis no CI. Em caso de falha, o Hypothesis imprime seed e estratégia para reprodução.
+- Determinismo: com `pytest-randomly` (seed fixa via `addopts` em `pytest.ini`) e o perfil acima, as execuções têm sido estáveis no CI. Em caso de falha, o Hypothesis imprime seed e estratégia para reprodução.
+- Boas práticas: evitar I/O real; focar invariantes (roundtrip/sort/dedupe); utilizar o marcador `property` e o perfil existente; considerar `max_examples` adequado ao custo do teste.
 
 ### Validação de referências (2025-08-20)
 - TomadaTempo (integração): OK — `tests/integration/test_phase3_tomada_tempo_integration.py`, `tests/integration/test_phase3_tomada_tempo_parsing_variants.py`.

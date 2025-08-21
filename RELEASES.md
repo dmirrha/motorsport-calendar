@@ -26,6 +26,15 @@ Docs — Limpeza de referências desatualizadas de PR
 
 - Removidas referências de PR obsoletas em `CHANGELOG.md`, `RELEASES.md` e docs de issues para evitar ambiguidade histórica e manter a rastreabilidade coesa. Sem impacto funcional.
 
+Testes — Property-based (Hypothesis)
+
+- Documentada seção “Property-based tests (Hypothesis)” em `docs/tests/overview.md` cobrindo:
+  - Diretório `tests/property/` e marcador `@pytest.mark.property` (registrado em `pytest.ini`).
+  - Perfil `property` do Hypothesis em `tests/property/conftest.py` (`deadline=None`, `max_examples=30`, supressão de health checks) para reduzir flakes.
+  - Exemplos de execução por marcador e por caminho.
+- Referências principais: `tests/property/test_prop_datetime_parsing_roundtrip.py`, `tests/property/test_prop_dedupe_invariants.py`, `tests/property/test_prop_ical_ordering_stability.py`.
+- Determinismo reforçado no CI com seed fixa de `pytest-randomly` e perfil Hypothesis dedicado.
+
 ## Versão 0.6.2 (2025-08-20)
 
 CI — Correção de comando pytest --version
