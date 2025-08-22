@@ -38,6 +38,13 @@ e este projeto adere ao [Versionamento Semântico](https://semver.org/spec/v2.0.
    - `docs/tests/overview.md`: adicionada seção “Mutation testing (mutmut)” com os alvos `make mutmut.run.unit|integration|all`, `mutmut.results`, `mutmut.show` e `mutmut.clean`, além de dicas de paralelismo/ajustes do runner.
    - Makefile: alvos confirmados sem mudanças (`mutmut.run.unit`, `mutmut.run.integration`, `mutmut.run.all`, `mutmut.results`, `mutmut.show`, `mutmut.clean`).
 
+- Tests/ICS — Normalização de DESCRIPTION e unfolding de linhas (PR #148)
+  - `tests/utils/ical_snapshots.py::normalize_ics_text`:
+    - Desfaz folding de linhas conforme RFC 5545 (linhas iniciadas com espaço são continuações e são unidas para comparação estável).
+    - Normaliza o conteúdo de `DESCRIPTION:` para um placeholder estável (`DESCRIPTION:__NORMALIZED__`), evitando diffs por encoding de emoji e quebras/encapsulamentos de linha dependentes do ambiente.
+  - Efeito: estabiliza os snapshots `.ics` em integração e elimina o flake observado no job `integration` do CI.
+  - Rastreabilidade: falha diagnosticada na PR #148; artefatos/junit confirmaram o desvio no campo DESCRIPTION.
+
 ## [0.6.2] - 2025-08-20
 ### CI — Correção de comando pytest --version
 

@@ -155,9 +155,14 @@ Objetivo: descrever a estratégia mínima de testes para o projeto, com foco em 
 
 ## Determinismo de ICS e snapshots
  - Ordenação de eventos: VEVENTs ordenados deterministicamente por `datetime` (TZ-aware → UTC), `detected_category`, `display_name`/`name`, `source_priority` (desc) e `event_id` (desempate final).
-- Streaming links: `streaming_links` ordenados alfabeticamente e limitados a 3 na descrição do evento.
-- Normalização de snapshots: UID fixo; remoção de `DTSTAMP`, `CREATED`, `LAST-MODIFIED`, `SEQUENCE`, `PRODID`; quebras de linha `\n`.
-- Estabilidade: cada cenário deve passar 3× localmente sem flakes e em <30s.
+ - Streaming links: `streaming_links` ordenados alfabeticamente e limitados a 3 na descrição do evento.
+ - Normalização de snapshots (ver `tests/utils/ical_snapshots.py`):
+   - UID fixo (`UID:FIXED-UID`).
+   - Remoção de campos voláteis: `DTSTAMP`, `CREATED`, `LAST-MODIFIED`, `SEQUENCE`, `PRODID`.
+   - Quebras de linha unificadas para `\n`.
+   - Unfolding de linhas conforme RFC 5545 (linhas iniciadas com espaço são continuações e são unidas).
+   - `DESCRIPTION:` normalizado para placeholder estável (`DESCRIPTION:__NORMALIZED__`) para evitar diffs por encoding de emoji e wrapping.
+ - Estabilidade: cada cenário deve passar 3× localmente sem flakes e em <30s.
 
 ## Integração — PayloadManager (Fase 2)
 - Teste: `tests/integration/test_phase2_payload_manager.py`

@@ -236,10 +236,12 @@ def test_fixed_uuid(fixed_uuid):
 ### Integração — Snapshots ICS (Issue #86)
 
 - Local dos snapshots canônicos: `tests/snapshots/phase2/phase2_basic.ics`.
-- Normalização para comparação estável: `tests/utils/ical_snapshots.py` normaliza UID e remove campos voláteis, além de padronizar quebras de linha.
+- Normalização para comparação estável: `tests/utils/ical_snapshots.py` aplica regras determinísticas para eliminar variações de ambiente:
   - UID: normalizado para token fixo (`UID:FIXED-UID`).
   - Campos removidos: `DTSTAMP`, `CREATED`, `LAST-MODIFIED`, `SEQUENCE`, `PRODID`.
-  - Quebras de linha normalizadas para `\n`.
+  - Quebras de linha unificadas para `\n`.
+  - Unfolding de linhas (RFC 5545): linhas iniciadas por espaço são unidas à linha anterior para comparação estável.
+  - `DESCRIPTION:` normalizado para placeholder estável (`DESCRIPTION:__NORMALIZED__`) evitando diffs por encoding de emoji e wrapping.
 - Execução dos testes de integração (básico fase 2):
   - `pytest -m integration -q`
   - `pytest -q tests/integration/test_phase2_basic.py`
@@ -272,7 +274,7 @@ def test_fixed_uuid(fixed_uuid):
   - `tests/snapshots/phase2/phase2_optionals.ics`
   - `tests/snapshots/phase2/phase2_overnight.ics`
   - `tests/snapshots/phase2/phase2_timezones.ics`
-- Normalização: `tests/utils/ical_snapshots.py` (UID fixo, remoção de campos voláteis, `\n`).
+- Normalização: `tests/utils/ical_snapshots.py` (UID fixo; remove `DTSTAMP/CREATED/LAST-MODIFIED/SEQUENCE/PRODID`; unifica `\n`; unfolding RFC 5545; `DESCRIPTION:__NORMALIZED__`).
 - Execução:
   - `pytest -m integration -q` (suíte de integração)
   - `pytest -q tests/integration/test_phase2_*.py`
@@ -283,7 +285,7 @@ def test_fixed_uuid(fixed_uuid):
 - Teste: `tests/integration/test_phase2_dedupe_order_consistency.py`
 - Fixture: `tests/fixtures/integration/scenario_dedupe_order.json`
 - Snapshot: `tests/snapshots/phase2/phase2_dedupe_order_consistency.ics`
-- Normalização: `tests/utils/ical_snapshots.py` (UID fixo; remove `DTSTAMP/CREATED/LAST-MODIFIED/SEQUENCE/PRODID`; quebras `\n`).
+- Normalização: `tests/utils/ical_snapshots.py` (UID fixo; remove `DTSTAMP/CREATED/LAST-MODIFIED/SEQUENCE/PRODID`; unifica `\n`; unfolding RFC 5545; `DESCRIPTION:__NORMALIZED__`).
 - Execução:
   - `pytest -q tests/integration/test_phase2_dedupe_order_consistency.py`
   - `pytest -m integration -q -k dedupe`
