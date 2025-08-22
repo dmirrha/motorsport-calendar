@@ -252,7 +252,7 @@ class EventProcessor:
             'streaming_links': self._normalize_streaming_links(event.get('streaming_links', [])),
             'official_url': event.get('official_url', ''),
             'source': event.get('source', 'unknown'),
-            'source_display_name': event.get('source_display_name', 'Unknown Source'),
+            'source_display_name': event.get('source_display_name', 'XXUnknown SourceXX'),
             'source_priority': event.get('source_priority', 50),
             'collected_at': event.get('collected_at', datetime.now().isoformat()),
             'processed_at': datetime.now().isoformat(),

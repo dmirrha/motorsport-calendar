@@ -1,7 +1,11 @@
-.PHONY: help test test.unit test.integration coverage report clean ci.pr-run
+.PHONY: help test test.unit test.integration coverage report clean ci.pr-run mutmut.run.unit mutmut.run.integration mutmut.run.all mutmut.results mutmut.show mutmut.clean
 
 PYTEST ?= pytest
 PYTEST_ARGS ?=
+MUTMUT ?= python3 -m mutmut
+MUTMUT_ARGS ?=
+# Runner base usado pelo mutmut (respeita addopts extras via PYTEST_ARGS)
+MUTMUT_RUNNER_BASE = $(PYTEST) -q -x $(PYTEST_ARGS)
 BRANCH ?= $(shell git rev-parse --abbrev-ref HEAD)
 WORKFLOW ?= .github/workflows/tests.yml
 
@@ -13,6 +17,13 @@ help:
 	echo "  make coverage        # executa pytest gerando relatórios de cobertura (html/xml)" && \
 	echo "  make report          # mostra onde encontrar os relatórios" && \
 	echo "  make clean           # remove artefatos de testes" && \
+	echo "  make mutmut.run.unit        # mutation testing (mutmut) executando apenas testes marcados como unit" && \
+	echo "  make mutmut.run.integration # mutation testing (mutmut) executando apenas testes marcados como integration" && \
+	echo "  make mutmut.run.all         # mutation testing (mutmut) executando toda a suíte (cuidado: lento)" && \
+	echo "  make mutmut-baseline        # mutation testing (mutmut) focado em módulos críticos (baseline)" && \
+	echo "  make mutmut.results         # mostra os mutantes sobreviventes" && \
+	echo "  make mutmut.show ID=<id>    # mostra diff de um mutante específico" && \
+	echo "  make mutmut.clean           # limpa cache do mutmut (.mutmut-cache)" && \
 	echo "  make ci.pr-run BRANCH=<branch> [WORKFLOW=path]  # atualiza a branch com main e dispara o workflow Tests via gh"
 
 # Usa addopts do pytest.ini (inclui cobertura, relatórios e --cov-fail-under=45)
@@ -39,6 +50,48 @@ report:
 
 clean:
 	rm -rf .pytest_cache htmlcov .coverage .coverage.* coverage.xml junit.xml test_results
+
+# ---------------------------
+# Mutation testing (mutmut)
+# ---------------------------
+.PHONY: mutmut-baseline
+
+# Executa mutmut contra caminhos de código fonte, usando somente testes unitários
+mutmut.run.unit:
+	$(MUTMUT) run $(MUTMUT_ARGS) --tests-dir=tests --runner="$(MUTMUT_RUNNER_BASE) -m unit" --paths-to-mutate src
+	$(MUTMUT) run $(MUTMUT_ARGS) --tests-dir=tests --runner="$(MUTMUT_RUNNER_BASE) -m unit" --paths-to-mutate sources
+
+# Executa mutmut usando a suíte de integração (marcador integration)
+mutmut.run.integration:
+	$(MUTMUT) run $(MUTMUT_ARGS) --tests-dir=tests --runner="$(MUTMUT_RUNNER_BASE) -m integration" --paths-to-mutate src
+	$(MUTMUT) run $(MUTMUT_ARGS) --tests-dir=tests --runner="$(MUTMUT_RUNNER_BASE) -m integration" --paths-to-mutate sources
+
+# Executa mutmut com toda a suíte (pode ser bem lento!)
+mutmut.run.all:
+	$(MUTMUT) run $(MUTMUT_ARGS) --tests-dir=tests --runner="$(MUTMUT_RUNNER_BASE)" --paths-to-mutate src
+	$(MUTMUT) run $(MUTMUT_ARGS) --tests-dir=tests --runner="$(MUTMUT_RUNNER_BASE)" --paths-to-mutate sources
+
+# Baseline: foca em módulos críticos, executando a suíte completa de testes como runner
+mutmut-baseline:
+	$(MUTMUT) run $(MUTMUT_ARGS) --tests-dir=tests --runner="$(MUTMUT_RUNNER_BASE)" --paths-to-mutate src/event_processor.py
+	$(MUTMUT) run $(MUTMUT_ARGS) --tests-dir=tests --runner="$(MUTMUT_RUNNER_BASE)" --paths-to-mutate src/ical_generator.py
+	$(MUTMUT) run $(MUTMUT_ARGS) --tests-dir=tests --runner="$(MUTMUT_RUNNER_BASE)" --paths-to-mutate sources/base_source.py
+
+# Lista mutantes sobreviventes
+mutmut.results:
+	$(MUTMUT) results
+
+# Mostra diff detalhado de um mutante específico: make mutmut.show ID=<id>
+mutmut.show:
+	@if [ -z "$(ID)" ]; then \
+		echo "Uso: make mutmut.show ID=<id>"; \
+		exit 2; \
+	fi
+	$(MUTMUT) show $(ID)
+
+# Limpa cache do mutmut
+mutmut.clean:
+	rm -rf .mutmut-cache
 
 # Atualiza a branch da PR com origin/main e dispara o workflow Tests
 # Requisitos: working tree limpo e gh CLI autenticado

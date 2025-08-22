@@ -23,6 +23,36 @@ Objetivo: descrever a estratégia mínima de testes para o projeto, com foco em 
   - Sem falha por cobertura (override local): `PYTEST_ADDOPTS="--cov-fail-under=0" pytest`
   - CI: GitHub Actions (`.github/workflows/tests.yml`) usando as mesmas opções do `pytest.ini`.
 
+## Mutation testing (mutmut)
+
+- Requisitos: `mutmut` em `requirements-dev.txt`.
+- Alvos (Makefile):
+  - `make mutmut.run.unit` — roda mutações contra `src/` e `sources/` usando apenas testes com marcador `unit`.
+  - `make mutmut.run.integration` — idem usando marcador `integration`.
+  - `make mutmut.run.all` — roda toda a suíte (mais lento).
+  - `make mutmut-baseline` — baseline focado em módulos críticos (`src/event_processor.py`, `src/ical_generator.py`, `sources/base_source.py`).
+  - `make mutmut.results` — lista mutantes sobreviventes.
+  - `make mutmut.show ID=<id>` — mostra o diff de um mutante específico.
+  - `make mutmut.clean` — limpa cache `.mutmut-cache`.
+
+- Dicas:
+  - Paralelismo (pytest-xdist): `PYTEST_ARGS="-n auto" make mutmut.run.unit`.
+  - Ajustes do runner (pytest): `PYTEST_ARGS="-k 'not slow'" make mutmut.run.integration`.
+  - Fluxo recomendado: ciclo local focado (unit → integration) antes de `mutmut.run.all`.
+
+  Baseline (inicial recomendado):
+
+  ```bash
+  # Executa baseline em módulos críticos usando a suíte completa como runner
+  PYTEST_ARGS="-n auto" make mutmut-baseline
+
+  # Após a execução, liste mutantes sobreviventes
+  make mutmut.results
+
+  # Inspecione um mutante específico
+  make mutmut.show ID=<id>
+  ```
+
 ## Métricas — Cobertura por suíte (medição local em 2025-08-19)
 - Unit: **65.75%** — artefatos: `.coverage.unit`, `reports/coverage.unit.xml`, HTML em `htmlcov-unit/`
 - Integration: **52.90%** — artefatos: `.coverage.integration`, `reports/coverage.integration.xml`, HTML em `htmlcov-integration/`

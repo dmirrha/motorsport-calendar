@@ -122,8 +122,8 @@ O projeto executa a suíte de testes no GitHub Actions via workflow em `.github/
 - Execução: `pytest` com cobertura em `src/` e `sources/`
 - Relatórios: `junit.xml`, `coverage.xml`, `htmlcov/` (enviados como artefatos)
 - Cache de pip habilitado por hash dos arquivos `requirements*.txt`
-- Job adicional: `e2e_happy` — executa apenas `tests/integration/test_phase2_e2e_happy.py` com cobertura, ignorando `pytest.ini` via `-c /dev/null`. Artefatos: `test_results_e2e/junit.xml`, `coverage_e2e.xml`, `htmlcov-e2e/`.
-- Job adicional: `integration` — executa a suíte marcada com `-m integration`, ignorando `pytest.ini` via `-c /dev/null` para evitar gates globais. Artefatos: `test_results_integration/junit.xml`, `coverage_integration.xml`, `htmlcov-integration/`.
+- Job `e2e_happy` — executa todos os `tests/integration/test_phase2_e2e_*.py` com cobertura, respeitando o `pytest.ini` e neutralizando o gate via `--cov-fail-under=0`. Artefatos: `test_results_e2e/junit.xml`, `coverage_e2e.xml`, `htmlcov-e2e/`.
+- Job `integration` — executa a suíte marcada com `-m integration` com cobertura focada nos módulos do fluxo (src/ e sources/ principais), respeitando o `pytest.ini` e neutralizando o gate via `--cov-fail-under=0`. Artefatos: `test_results_integration/junit.xml`, `coverage_integration.xml`, `htmlcov-integration/`.
 
 Badge do workflow (branch main):
 
@@ -137,6 +137,36 @@ Badge do workflow (branch main):
   - Components: cobertura agregada por componentes lógicos definidos em `codecov.yml` (ex.: `core-processing`, `calendar-generation`, `data-collection`, `configuration`, `ui`, `utils`, `logging`, `sources`).
   - Tests Analytics: resultados JUnit enviados por job via `codecov/test-results-action@v1` para análise de testes (flakiness, timings, etc.).
 - Observação: nesta fase não há gates/status obrigatórios; falhas de upload não quebram o CI.
+
+### Mutation testing (mutmut)
+
+- Requisitos: `mutmut` em `requirements-dev.txt`.
+- Alvos (Makefile):
+  - `make mutmut.run.unit` — executa mutação contra `src/` e `sources/` usando apenas testes marcados com `unit`.
+  - `make mutmut.run.integration` — idem usando apenas testes marcados com `integration`.
+  - `make mutmut.run.all` — executa toda a suíte (lento).
+  - `make mutmut-baseline` — baseline focado em módulos críticos (`src/event_processor.py`, `src/ical_generator.py`, `sources/base_source.py`).
+  - `make mutmut.results` — lista mutantes sobreviventes.
+  - `make mutmut.show ID=<id>` — mostra o diff de um mutante específico.
+  - `make mutmut.clean` — limpa cache `.mutmut-cache`.
+
+- Dicas:
+  - Paralelismo (pytest-xdist): `PYTEST_ARGS="-n auto" make mutmut.run.unit`.
+  - Ajustes do runner (pytest): `PYTEST_ARGS="-k 'not slow'" make mutmut.run.integration`.
+  - Use em ciclos locais focados (unit → integration) antes de `mutmut.run.all`.
+
+  Baseline (inicial recomendado):
+
+  ```bash
+  # Executa baseline em módulos críticos usando a suíte completa como runner
+  PYTEST_ARGS="-n auto" make mutmut-baseline
+
+  # Após a execução, liste mutantes sobreviventes
+  make mutmut.results
+
+  # Inspecione um mutante específico
+  make mutmut.show ID=<id>
+  ```
 
 ## Mocks e Isolamento
 

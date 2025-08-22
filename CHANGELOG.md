@@ -30,9 +30,13 @@ e este projeto adere ao [Versionamento Semântico](https://semver.org/spec/v2.0.
     - PayloadManager (integration): `tests/integration/test_phase2_payload_manager.py`.
   - Referências inexistentes anteriores foram marcadas para correção futura no próprio documento, sem impacto na execução dos testes/CI.
  - Docs — Limpeza de referências desatualizadas de PR em arquivos de documentação e issues, evitando ambiguidade histórica e mantendo rastreabilidade coesa (sem impacto funcional).
- - Tests — Property-based (Hypothesis)
-   - Documentada seção “Property-based tests (Hypothesis)” em `docs/tests/overview.md` cobrindo diretório `tests/property/`, marcador `@pytest.mark.property` (registrado em `pytest.ini`), perfil `property` do Hypothesis definido em `tests/property/conftest.py` e exemplos de execução por marcador/caminho.
-   - Referências dos testes: `tests/property/test_prop_datetime_parsing_roundtrip.py`, `tests/property/test_prop_dedupe_invariants.py`, `tests/property/test_prop_ical_ordering_stability.py`. Determinismo reforçado via seed fixa do `pytest-randomly` e perfil Hypothesis (sem `deadline`, `max_examples=30`).
+- Tests — Property-based (Hypothesis)
+  - Documentada seção “Property-based tests (Hypothesis)” em `docs/tests/overview.md` cobrindo diretório `tests/property/`, marcador `@pytest.mark.property` (registrado em `pytest.ini`), perfil `property` do Hypothesis definido em `tests/property/conftest.py` e exemplos de execução por marcador/caminho.
+  - Referências dos testes: `tests/property/test_prop_datetime_parsing_roundtrip.py`, `tests/property/test_prop_dedupe_invariants.py`, `tests/property/test_prop_ical_ordering_stability.py`. Determinismo reforçado via seed fixa do `pytest-randomly` e perfil Hypothesis (sem `deadline`, `max_examples=30`).
+ - Docs/CI — Mutation testing (mutmut) e alinhamento de CI
+   - `tests/README.md`: seção de CI atualizada para refletir remoção de `-c /dev/null` e neutralização do gate de cobertura via `--cov-fail-under=0` nos jobs `integration` e `e2e_happy`; adicionada seção prática “Mutation testing (mutmut)” com alvos do Makefile e dicas de uso.
+   - `docs/tests/overview.md`: adicionada seção “Mutation testing (mutmut)” com os alvos `make mutmut.run.unit|integration|all`, `mutmut.results`, `mutmut.show` e `mutmut.clean`, além de dicas de paralelismo/ajustes do runner.
+   - Makefile: alvos confirmados sem mudanças (`mutmut.run.unit`, `mutmut.run.integration`, `mutmut.run.all`, `mutmut.results`, `mutmut.show`, `mutmut.clean`).
 
 ## [0.6.2] - 2025-08-20
 ### CI — Correção de comando pytest --version

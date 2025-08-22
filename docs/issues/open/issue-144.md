@@ -66,5 +66,32 @@ Configurar `mutmut` para avaliar mutantes em módulos críticos:
 
 ---
 
+## Resultados — Baseline (local)
+
+Comandos sugeridos (execução local):
+
+```bash
+# Limpeza de cache (opcional)
+make mutmut.clean
+
+# Executar baseline com paralelismo automático
+MUTMUT_ARGS="-j auto" make mutmut-baseline
+
+# Listar mutantes sobreviventes
+make mutmut.results | tee docs/issues/open/issue-144_mutmut-baseline.txt
+
+# Inspecionar mutante específico
+make mutmut.show ID=<id>
+```
+
+Resumo inicial (colar aqui após a execução local):
+
+- Data/hora:
+- Ambiente (OS/Python):
+- Comando: `MUTMUT_ARGS="-j auto" make mutmut-baseline`
+- Módulos avaliados: `src/event_processor.py`, `src/ical_generator.py`, `sources/base_source.py`
+- Totais: <mutantes gerados> / <mutantes sobreviventes>
+- Observações: <gaps relevantes / falsos positivos / ações priorizadas>
+
 ## Status
 - Aberta; aguardando priorização/triagem.

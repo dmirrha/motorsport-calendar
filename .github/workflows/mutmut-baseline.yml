@@ -1,0 +1,88 @@
+name: Mutmut Baseline
+
+on:
+  schedule:
+    # Diariamente às 04:00 UTC
+    - cron: '0 4 * * *'
+  workflow_dispatch:
+
+concurrency:
+  group: mutmut-baseline
+  cancel-in-progress: false
+
+jobs:
+  baseline:
+    name: Run mutmut baseline (informativo)
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      id-token: write
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Cache pip
+        uses: actions/cache@v4
+        with:
+          path: ~/.cache/pip
+          key: ${{ runner.os }}-pip-${{ hashFiles('**/requirements*.txt') }}
+          restore-keys: |
+            ${{ runner.os }}-pip-
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+          if [ -f requirements-dev.txt ]; then pip install -r requirements-dev.txt; fi
+          # Garantia explícita (caso requirements-dev.txt mude)
+          pip install mutmut==2.5.0 pytest pytest-cov pytest-xdist
+
+      - name: Log tool versions
+        run: |
+          echo "Python: $(python --version)"
+          echo "mutmut: $(python -m mutmut --version || true)"
+          echo "pytest: $(pytest --version)"
+
+      - name: Run mutmut baseline (paralelo via pytest-xdist)
+        env:
+          TZ: America/Sao_Paulo
+          PYTEST_ARGS: -n auto
+        run: |
+          make mutmut-baseline
+
+      - name: Collect results
+        if: always()
+        run: |
+          echo "=== mutmut results ===" | tee mutmut_results.txt
+          python -m mutmut results | tee -a mutmut_results.txt || true
+
+      - name: Job summary
+        if: always()
+        run: |
+          {
+            echo "## 🧬 Mutmut Baseline — Resultados";
+            echo;
+            echo "Workflow: $GITHUB_SERVER_URL/$GITHUB_REPOSITORY/actions/runs/$GITHUB_RUN_ID";
+            echo;
+            echo "<details><summary>Saída do 'mutmut results'</summary>";
+            echo;
+            echo '```';
+            cat mutmut_results.txt || true;
+            echo '```';
+            echo;
+            echo "</details>";
+          } >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Upload artifacts
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: mutmut-baseline-artifacts
+          path: |
+            mutmut_results.txt
+            .mutmut-cache/
