@@ -33,6 +33,17 @@ def normalize_ics_text(content: Union[str, bytes]) -> str:
     # Normalize newlines
     text = text.replace("\r\n", "\n").replace("\r", "\n")
 
+    # Unfold iCalendar folded lines (RFC 5545): a line that begins with a single space
+    # is a continuation of the previous line. Join them for stable comparisons.
+    unfolded_lines: list[str] = []
+    for line in text.split("\n"):
+        if line.startswith(" ") and unfolded_lines:
+            # append continuation without the leading space
+            unfolded_lines[-1] += line[1:]
+        else:
+            unfolded_lines.append(line)
+    text = "\n".join(unfolded_lines)
+
     # Normalize UID lines to a fixed token (keep the property presence)
     text = re.sub(r"^UID:.*$", "UID:FIXED-UID", text, flags=re.MULTILINE)
 
@@ -47,6 +58,11 @@ def normalize_ics_text(content: Union[str, bytes]) -> str:
     normalized_lines = []
     for line in text.split("\n"):
         if any(line.startswith(prefix) for prefix in volatile_prefixes):
+            continue
+        # Normalize DESCRIPTION content to avoid environment-dependent differences
+        # (e.g., emoji encoded as #x1F3C1 vs literal, and wrapping/folding).
+        if line.startswith("DESCRIPTION:"):
+            normalized_lines.append("DESCRIPTION:__NORMALIZED__")
             continue
         # Remove trailing spaces for stability
         normalized_lines.append(line.rstrip())

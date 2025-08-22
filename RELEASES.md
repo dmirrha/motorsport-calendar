@@ -22,6 +22,21 @@ Docs/Tests — Atualização do overview de testes
   - PayloadManager (integration): `tests/integration/test_phase2_payload_manager.py`.
 - Referências inexistentes anteriores foram marcadas para correção futura diretamente no documento, sem impacto no CI.
 
+Tests/Mutation — Baseline mutmut (Issue #144)
+
+- Makefile: novo alvo `mutmut-baseline` focado em módulos críticos (`src/event_processor.py`, `src/ical_generator.py`, `sources/base_source.py`). Runner usa a suíte completa (`pytest`) respeitando `PYTEST_ARGS`; paralelismo configurável via `MUTMUT_ARGS` (ex.: `-j auto`).
+- Documentação: `tests/README.md` e `docs/tests/overview.md` atualizados com instruções de execução, leitura de resultados (`mutmut.results`) e inspeção de mutantes (`mutmut.show`).
+- CI: sem impacto nos jobs de PR; job noturno informativo opcional poderá ser avaliado em etapa futura.
+
+CI — Mutmut Baseline nightly (informativo) e Badge no README (Issue #144)
+
+- Workflow adicionado: `.github/workflows/mutmut-baseline.yml` (nome: "Mutmut Baseline").
+  - Agenda: diariamente às 04:00 UTC (`schedule`) e disparo manual (`workflow_dispatch`).
+  - Execução: `make mutmut-baseline` com `PYTEST_ARGS=-n auto` (pytest-xdist); coleta `mutmut results` e publica no Job Summary; artefatos enviados (`mutmut_results.txt`, `.mutmut-cache/`).
+  - Permissões mínimas; informativo (não gateia PRs).
+- README: adicionado badge "Mutmut Baseline" apontando para o workflow para visibilidade rápida dos resultados.
+- Rastreabilidade: Issue #144.
+
 Docs — Limpeza de referências desatualizadas de PR
 
 - Removidas referências de PR obsoletas em `CHANGELOG.md`, `RELEASES.md` e docs de issues para evitar ambiguidade histórica e manter a rastreabilidade coesa. Sem impacto funcional.

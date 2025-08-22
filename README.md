@@ -1,6 +1,8 @@
 # 🏁 Motorsport Calendar Generator
 
-![Tests](https://github.com/dmirrha/motorsport-calendar/actions/workflows/tests.yml/badge.svg?branch=main) [![codecov](https://codecov.io/gh/dmirrha/motorsport-calendar/branch/main/graph/badge.svg)](https://app.codecov.io/github/dmirrha/motorsport-calendar)
+[![Tests](https://github.com/dmirrha/motorsport-calendar/actions/workflows/tests.yml/badge.svg?branch=main)](https://github.com/dmirrha/motorsport-calendar/actions/workflows/tests.yml) [![codecov](https://codecov.io/gh/dmirrha/motorsport-calendar/branch/main/graph/badge.svg)](https://app.codecov.io/github/dmirrha/motorsport-calendar)
+
+[![Flaky Nightly](https://github.com/dmirrha/motorsport-calendar/actions/workflows/flaky-nightly.yml/badge.svg?branch=main)](https://github.com/dmirrha/motorsport-calendar/actions/workflows/flaky-nightly.yml) [![Mutmut Baseline](https://github.com/dmirrha/motorsport-calendar/actions/workflows/mutmut-baseline.yml/badge.svg?branch=main)](https://github.com/dmirrha/motorsport-calendar/actions/workflows/mutmut-baseline.yml) [![Release Drafter](https://github.com/dmirrha/motorsport-calendar/actions/workflows/release-drafter.yml/badge.svg?branch=main)](https://github.com/dmirrha/motorsport-calendar/actions/workflows/release-drafter.yml)
 
 Um script Python avançado para coleta automática de eventos de automobilismo de múltiplas fontes e geração de arquivos iCal para importação no Google Calendar. Desenvolvido para entusiastas de automobilismo que desejam acompanhar todas as corridas do fim de semana em um só lugar.
 
