@@ -50,6 +50,12 @@ Testes — Property-based (Hypothesis)
 - Referências principais: `tests/property/test_prop_datetime_parsing_roundtrip.py`, `tests/property/test_prop_dedupe_invariants.py`, `tests/property/test_prop_ical_ordering_stability.py`.
 - Determinismo reforçado no CI com seed fixa de `pytest-randomly` e perfil Hypothesis dedicado.
 
+Docs — Fix: Leitura de Markdown (Issue #142)
+
+- `docs/issues/open/issue-142.md`: substituídos separadores '---' por '***' para evitar que parsers interpretem YAML front matter no meio do arquivo.
+- Impacto: previne crash no leitor automático de Markdown; sem mudanças de runtime.
+- Rastreabilidade: Issue #142; PR associada referenciando a issue.
+
 ## Versão 0.6.2 (2025-08-20)
 
 CI — Correção de comando pytest --version
@@ -215,7 +221,13 @@ Testes — Cobertura Pontual (CategoryDetector e DataCollector):
 
 - Integração — Codecov Hardening (Issue #103): OIDC habilitado nos uploads do Codecov (`use_oidc: true`), varredura automática desabilitada (`disable_search: true`), `codecov.yml` mínimo (statuses informativos `project`/`patch`, `comment: false`) e upload adicional do E2E (flag `e2e`). Documentação atualizada (`tests/README.md`, `docs/TEST_AUTOMATION_PLAN.md`).
 
-- Integração — Codecov Components e Tests Analytics (Issue #104): componentes no `codecov.yml` (inclui `sources/` para evitar cobertura "unassigned"); habilitado Tests Analytics via `codecov/test-results-action@v1` com uploads por job (`tests`/`unit`, `integration`, `e2e_happy`/`e2e`) e `if: always()`; ajustado `pytest` com `-o junit_family=legacy`; links do Codecov corrigidos para slug `/github`; `.gitignore` ampliado para `tmp/`, `coverage_*.xml`, `htmlcov-*/`, `test_results_*/`; documentação atualizada (`README.md`, `tests/README.md`, `docs/TEST_AUTOMATION_PLAN.md`, `docs/issues/open/issue-104.{md,json}`).
+- Integração — Codecov Components e Tests Analytics (Issue #104):
+  - Componentes no `codecov.yml` (inclui `sources/` para evitar cobertura "unassigned").
+  - Tests Analytics habilitado via `codecov/test-results-action@v1` com uploads por job (`tests`/`unit`, `integration`, `e2e_happy`/`e2e`) e `if: always()`.
+  - `pytest` ajustado com `-o junit_family=legacy`.
+  - Links do Codecov corrigidos para slug `/github`.
+  - `.gitignore` ampliado para `tmp/`, `coverage_*.xml`, `htmlcov-*/`, `test_results_*/`.
+  - Documentação atualizada: `README.md`, `tests/README.md`, `docs/TEST_AUTOMATION_PLAN.md`, `docs/issues/open/issue-104.{md,json}`.
 
  - Atualizados: `docs/issues/open/issue-83.{md,json}`, `docs/TEST_AUTOMATION_PLAN.md`, `tests/README.md`, `docs/tests/scenarios/phase2_scenarios.md`, `docs/tests/scenarios/SCENARIOS_INDEX.md`, `CHANGELOG.md`.
  - Branch: `tests/issue-83-docs-traceability`.
@@ -508,7 +520,14 @@ Issue #64 (concluída)
       - Docs sincronizadas: `CHANGELOG.md`, `RELEASES.md`, `docs/TEST_AUTOMATION_PLAN.md`, `docs/issues/open/issue-64.{md,json}`; PR #73 (draft) atualizado.
       - Versão: bump para `0.5.6`.
     - P6 — `src/logger.py`:
-      - Testes adicionados: `tests/unit/logger/test_logger_basic.py` e `tests/unit/logger/test_logger_misc.py` cobrindo inicialização/configuração (handlers/formatters/níveis), rotação, emissão de níveis, `save_payload` (json/html/text) incluindo exceções, `set_console_level`, `get_logger`, resumo/finalização de execução e helpers de domínio (category detection, remoção de duplicados, weekend, iCal, eventos por fonte) com fallbacks de config.
+      - Testes adicionados:
+        - `tests/unit/logger/test_logger_basic.py`
+        - `tests/unit/logger/test_logger_misc.py`
+      - Escopo:
+        - inicialização/configuração (handlers/formatters/níveis), rotação, emissão de níveis
+        - `save_payload` (json/html/text), exceções
+        - `set_console_level`, `get_logger`, resumo/finalização de execução
+        - helpers de domínio (category detection, remoção de duplicados, weekend, iCal, eventos por fonte) com fallbacks de config
       - Estratégia: isolamento total de I/O real (uso de `tmp_path`), monkeypatch para desabilitar limpezas `_cleanup_old_logs` e `_cleanup_rotated_logs`, e handlers custom para capturar registros.
       - Métricas: módulo **83%**; suíte **295 passed**; estabilidade **3×** (<30s).
       - Docs sincronizadas: `CHANGELOG.md`, `RELEASES.md`, `docs/TEST_AUTOMATION_PLAN.md`, `docs/issues/open/issue-64.{md,json}`; PR #73 (draft) atualizado.
@@ -528,7 +547,13 @@ Issue #60 (PR #67 — draft)
 - Testes unitários para `BaseSource.make_request`
  - Cobertura do arquivo `sources/base_source.py`: **97%** (meta ≥60% atingida)
  - Suíte: **132 passed**; cobertura global: **38.57%**
- - Abrange: erros HTTP 4xx/5xx com retries e logs; backoff exponencial/rate-limit com monkeypatch em `time.sleep` (sem sleeps reais); comportamento seguro quando `logger=None` via `getattr` para métodos customizados; verificação de logs e salvamento de payload; teste opcional de rotação de `User-Agent` na 10ª requisição (determinístico via `random.choice`). Helpers/parsers cobertos: `parse_date_time`, `normalize_event_data`, `filter_weekend_events`, `_setup_session` (headers), `get_streaming_links`.
+ - Abrange:
+    - erros HTTP 4xx/5xx com retries e logs
+    - backoff exponencial/rate-limit com monkeypatch em `time.sleep` (sem sleeps reais)
+    - comportamento seguro quando `logger=None` via `getattr` para métodos customizados
+    - verificação de logs e salvamento de payload
+    - teste opcional de rotação de `User-Agent` na 10ª requisição (determinístico via `random.choice`)
+    - Helpers/parsers: `parse_date_time`, `normalize_event_data`, `filter_weekend_events`, `_setup_session` (headers), `get_streaming_links`
  - Incrementais entregues: campos ausentes/HTML malformado, `recent_errors` slice em `get_statistics`, `filter_weekend_events(None)`, formatos adicionais de data/segundos e timezone custom, estabilidade/variação de `_generate_event_id`.
  - Atualização (branch coverage): cobertos ramos adicionais — exceção em `filter_weekend_events`, limpeza de campos com espaços em `normalize_event_data`, e uso do context manager (`__enter__/__exit__`), `__str__`/`__repr__`.
 - Bug corrigido (mantido para importação em lote): `.github/import_issues/open/026-basesource-logger-none-attributeerror.{md,json}` — remoção de fallback para `logging.getLogger(__name__)` quando `logger=None` e proteção de chamadas a métodos customizados com `getattr`.
