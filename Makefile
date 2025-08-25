@@ -76,6 +76,10 @@ mutmut.run.all:
 
 # Baseline: foca em módulos críticos, executando a suíte completa de testes como runner
 mutmut-baseline:
+ 	coverage erase || true
+ 	coverage run -m pytest -q -o addopts= -p no:cov $(PYTEST_ARGS)
+ 	coverage combine || true
+ 	ls -la .coverage* || true
 	$(MUTMUT) run $(MUTMUT_ARGS) --use-coverage --tests-dir=tests --runner="$(MUTMUT_RUNNER_BASE)" --paths-to-mutate src/event_processor.py
 	$(MUTMUT) run $(MUTMUT_ARGS) --use-coverage --tests-dir=tests --runner="$(MUTMUT_RUNNER_BASE)" --paths-to-mutate src/ical_generator.py
 	$(MUTMUT) run $(MUTMUT_ARGS) --use-coverage --tests-dir=tests --runner="$(MUTMUT_RUNNER_BASE)" --paths-to-mutate sources/base_source.py
