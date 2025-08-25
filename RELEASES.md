@@ -33,7 +33,7 @@ CI — Mutmut Baseline nightly (informativo) e Badge no README (Issue #144)
 - Workflow adicionado: `.github/workflows/mutmut-baseline.yml` (nome: "Mutmut Baseline").
   - Agenda: diariamente às 04:00 UTC (`schedule`) e disparo manual (`workflow_dispatch`).
   - Execução: `make mutmut-baseline` em modo serial (sem xdist) para compatibilidade com `--use-coverage` do Mutmut; coleta `mutmut results` e publica no Job Summary; artefatos enviados (`mutmut_results.txt`, `.mutmut-cache/`).
-  - Passo temporariamente não-bloqueante (`continue-on-error: true`) enquanto a suíte de mutação é estabilizada.
+  - Passo agora bloqueante (removido `continue-on-error: true`) após estabilização do baseline de mutação.
   - Permissões mínimas; informativo (não gateia PRs).
 - README: adicionado badge "Mutmut Baseline" apontando para o workflow para visibilidade rápida dos resultados.
 - Rastreabilidade: Issue #144.
@@ -42,7 +42,7 @@ Fix — Geração de .coverage antes do baseline do Mutmut (Issue #144)
 
 - Makefile: o alvo `mutmut-baseline` passou a executar `coverage run -m pytest -q -o addopts= -p no:cov` antes do `mutmut run --use-coverage`, garantindo a presença do arquivo `.coverage`.
 - Efeito: elimina o erro `FileNotFoundError: No .coverage file found` e assegura que o `--use-coverage` seja aplicado corretamente no baseline.
-- Workflow: `.github/workflows/mutmut-baseline.yml` continua invocando `make mutmut-baseline`; execução permanece informativa enquanto estabilizamos o baseline.
+- Workflow: `.github/workflows/mutmut-baseline.yml` continua invocando `make mutmut-baseline`; execução agora é bloqueante (sem `continue-on-error`).
 
  Robustez — Baseline do Mutmut: garantir e inspecionar `.coverage`
 

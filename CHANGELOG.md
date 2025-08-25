@@ -40,7 +40,7 @@ e este projeto adere ao [Versionamento Semântico](https://semver.org/spec/v2.0.
   - Fix — Mutmut Baseline: geração de `.coverage`
     - Makefile: o alvo `mutmut-baseline` agora executa `coverage run -m pytest -q -o addopts= -p no:cov` antes de invocar `mutmut run --use-coverage`, garantindo a criação do arquivo `.coverage`.
     - Efeito: elimina o erro `FileNotFoundError: No .coverage file found` observado no workflow e assegura a aplicação correta do `--use-coverage` durante o baseline.
-    - Workflow: `.github/workflows/mutmut-baseline.yml` segue chamando `make mutmut-baseline`; execução permanece informativa (`continue-on-error: true`) enquanto estabilizamos a suíte de mutação.
+    - Workflow: `.github/workflows/mutmut-baseline.yml` segue chamando `make mutmut-baseline`; execução agora é bloqueante (removido `continue-on-error: true`) após estabilização do baseline.
   - Robustez — Mutmut Baseline: garantir e inspecionar `.coverage`
     - Makefile: adicionados `coverage erase || true`, `coverage combine || true` e `ls -la .coverage* || true` no alvo `mutmut-baseline` para garantir a presença do arquivo e facilitar depuração em CI.
  - Tests/ICS — Normalização de DESCRIPTION e unfolding de linhas (PR #148)
