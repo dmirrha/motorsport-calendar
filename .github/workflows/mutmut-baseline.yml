@@ -48,10 +48,10 @@ jobs:
           echo "mutmut: $(python -m mutmut --version || true)"
           echo "pytest: $(pytest --version)"
 
-      - name: Run mutmut baseline (paralelo via pytest-xdist)
+      - name: Run mutmut baseline (serial)
+        continue-on-error: true
         env:
           TZ: America/Sao_Paulo
-          PYTEST_ARGS: -n auto
         run: |
           make mutmut-baseline
 

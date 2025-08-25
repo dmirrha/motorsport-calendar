@@ -6,13 +6,36 @@ and data quality validation for collected motorsport events.
 """
 
 import re
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, tzinfo
 from typing import List, Dict, Any, Optional, Tuple, Set
 from collections import defaultdict
 import hashlib
 from fuzzywuzzy import fuzz
 from unidecode import unidecode
 from src.silent_period import SilentPeriodManager
+
+
+class _TzWithZone(tzinfo):
+    """Wrapper for tzinfo that adds a 'zone' attribute expected by tests.
+
+    Delegates tz behavior to an underlying tzinfo (e.g., zoneinfo.ZoneInfo),
+    while exposing a 'zone' attribute with the provided timezone name.
+    """
+    def __init__(self, base_tz: tzinfo, name: str):
+        self._base = base_tz
+        self.zone = name
+
+    def utcoffset(self, dt: Optional[datetime]) -> Optional["timedelta"]:
+        return self._base.utcoffset(dt)  # type: ignore[attr-defined]
+
+    def dst(self, dt: Optional[datetime]) -> Optional["timedelta"]:
+        return self._base.dst(dt)  # type: ignore[attr-defined]
+
+    def tzname(self, dt: Optional[datetime]) -> Optional[str]:
+        try:
+            return self._base.tzname(dt)  # type: ignore[attr-defined]
+        except Exception:
+            return self.zone
 
 
 class EventProcessor:
@@ -358,8 +381,12 @@ class EventProcessor:
         """Normalize time to HH:MM format."""
         if not time_value:
             return None
-        
+
         try:
+            # If a datetime is provided, extract time
+            if isinstance(time_value, datetime):
+                return time_value.strftime('%H:%M')
+
             if isinstance(time_value, str):
                 # Extract time from string
                 time_patterns = [
@@ -367,78 +394,109 @@ class EventProcessor:
                     r'(\d{1,2})h(\d{2})',
                     r'(\d{1,2})\.(\d{2})'
                 ]
-                
+
                 for pattern in time_patterns:
                     match = re.search(pattern, time_value)
                     if match:
                         hour = int(match.group(1))
                         minute = int(match.group(2))
-                        
+
                         if 0 <= hour <= 23 and 0 <= minute <= 59:
                             return f"{hour:02d}:{minute:02d}"
-            
         except Exception as e:
             if self.logger:
                 self.logger.debug(f"⚠️ Failed to normalize time '{time_value}': {e}")
-        
+
         return None
-    
-    def _compute_datetime(self, date_str: Optional[str], time_str: Optional[str], 
-                         timezone_str: str) -> Optional[datetime]:
-        """Compute datetime object from date and time strings."""
+
+    def _compute_datetime(self, date_str: Optional[str], time_str: Optional[str], timezone_str: Optional[str]) -> Optional[datetime]:
+        """Compute timezone-aware datetime from date, time and timezone strings."""
         if not date_str:
             return None
-        
+
+        dt_str = date_str
+        if time_str:
+            dt_str += f" {time_str}"
+
+        # Parse datetime
+        dt: Optional[datetime] = None
         try:
-            import pytz
-            from dateutil import parser
-            
-            # Create datetime string
-            if time_str:
-                datetime_str = f"{date_str} {time_str}"
-            else:
-                datetime_str = f"{date_str} 12:00"  # Default to noon
-            
-            # Parse datetime
-            parsed_dt = parser.parse(datetime_str)
-            
-            # Add timezone
-            if parsed_dt.tzinfo is None:
-                # Fallback robusto para timezone vazio ou inválido
-                tz_name = timezone_str or (self.config.get_timezone() if self.config else 'America/Sao_Paulo')
-                try:
-                    tz = pytz.timezone(tz_name)
-                except Exception:
-                    tz = pytz.timezone('America/Sao_Paulo')
-                parsed_dt = tz.localize(parsed_dt)
-            
-            return parsed_dt
-            
-        except Exception as e:
-            if self.logger:
-                self.logger.debug(f"⚠️ Failed to compute datetime: {e}")
+            try:
+                from dateutil import parser  # type: ignore
+                dt = parser.parse(dt_str)
+            except ImportError:
+                # Fallback if dateutil is not installed
+                if time_str:
+                    try:
+                        dt = datetime.strptime(dt_str, "%Y-%m-%d %H:%M")
+                    except ValueError:
+                        dt = None
+                if dt is None:
+                    try:
+                        dt = datetime.strptime(dt_str, "%Y-%m-%d")
+                    except ValueError:
+                        return None
+        except Exception:
             return None
-    
+
+        # If time was not provided, default to 12:00 (noon) for better midpoint semantics
+        if not time_str:
+            try:
+                dt = dt.replace(hour=12, minute=0, second=0, microsecond=0)
+            except Exception:
+                pass
+
+        # Apply timezone if possible
+        tz_name = timezone_str or (self.config.get_timezone() if self.config else 'America/Sao_Paulo')
+        try:
+            import pytz  # type: ignore
+            tz = pytz.timezone(tz_name)
+            if dt.tzinfo is None:
+                dt = tz.localize(dt)
+            else:
+                dt = dt.astimezone(tz)
+        except ImportError:
+            # Fallback to zoneinfo (Python 3.9+)
+            try:
+                from zoneinfo import ZoneInfo  # type: ignore
+                base_tz = ZoneInfo(tz_name)
+                if dt.tzinfo is None:
+                    dt = dt.replace(tzinfo=_TzWithZone(base_tz, tz_name))
+                else:
+                    dt = dt.astimezone(base_tz)
+                    # Ensure tzinfo has 'zone' attribute for test compatibility
+                    dt = dt.replace(tzinfo=_TzWithZone(base_tz, tz_name))
+            except Exception as e:
+                if self.logger:
+                    self.logger.debug(f"Failed to compute datetime: timezone fallback failed for '{tz_name}': {e}")
+                return None
+        except Exception as e:
+            # pytz is available but timezone lookup/localization failed
+            if self.logger:
+                self.logger.debug(f"Failed to compute datetime: timezone '{tz_name}' invalid or localization failed: {e}")
+            return None
+
+        return dt
+
     def _normalize_location(self, location: str) -> str:
-        """Normalize location/circuit name."""
+        """Normalize location name to a canonical form when possible."""
         if not location:
             return ""
-        
-        location = str(location).strip()
-        
-        # Common location normalizations
+
+        raw = str(location).strip()
+        key = unidecode(raw).lower()
+
         location_map = {
             'interlagos': 'Autódromo José Carlos Pace (Interlagos)',
-            'jacarepaguá': 'Autódromo Internacional Nelson Piquet',
+            'jacarepagua': 'Autódromo Internacional Nelson Piquet',
             'silverstone': 'Silverstone Circuit',
             'monza': 'Autodromo Nazionale di Monza',
             'spa': 'Circuit de Spa-Francorchamps',
             'monaco': 'Circuit de Monaco',
-            'suzuka': 'Suzuka International Racing Course'
+            'suzuka': 'Suzuka International Racing Course',
         }
-        
-        location_lower = location.lower()
-        return location_map.get(location_lower, location)
+
+        return location_map.get(key, raw)
     
     def _normalize_country(self, country: str) -> str:
         """Normalize country name."""

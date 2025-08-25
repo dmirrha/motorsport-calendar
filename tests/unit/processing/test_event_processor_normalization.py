@@ -19,8 +19,13 @@ def _ensure_stubs():
     # unidecode
     if 'unidecode' not in sys.modules:
         mod = types.ModuleType('unidecode')
+        # Implementa remoção simples de acentos via unicodedata para simular unidecode real
+        import unicodedata as _ud
         def _unidecode(s):
-            return s
+            try:
+                return _ud.normalize('NFKD', str(s)).encode('ascii', 'ignore').decode('ascii')
+            except Exception:
+                return str(s)
         mod.unidecode = _unidecode
         sys.modules['unidecode'] = mod
 

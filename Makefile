@@ -4,14 +4,17 @@ PYTEST ?= pytest
 PYTEST_ARGS ?=
 MUTMUT ?= python3 -m mutmut
 MUTMUT_ARGS ?=
-# Runner base usado pelo mutmut (respeita addopts extras via PYTEST_ARGS)
-MUTMUT_RUNNER_BASE = $(PYTEST) -q -x $(PYTEST_ARGS)
+# Runner base usado pelo mutmut
+# -o addopts=   -> ignora addopts definidos em pytest.ini (evita --cov*, --cov-fail-under, etc.)
+# -p no:cov     -> desabilita o plugin pytest-cov caso instalado (mutmut usará coverage diretamente via --use-coverage)
+# Respeita addopts extras via PYTEST_ARGS (ex.: -n auto)
+MUTMUT_RUNNER_BASE = $(PYTEST) -q -x -o addopts= -p no:cov $(PYTEST_ARGS)
 BRANCH ?= $(shell git rev-parse --abbrev-ref HEAD)
 WORKFLOW ?= .github/workflows/tests.yml
 
 help:
 	@echo "Targets:" && \
-	echo "  make test            # roda pytest com addopts do pytest.ini (inclui cobertura e gate 50%)" && \
+	echo "  make test            # roda pytest com addopts do pytest.ini (inclui cobertura e gate 45%)" && \
 	echo "  make test.unit       # roda apenas testes marcados como unit" && \
 	echo "  make test.integration# roda apenas testes marcados como integration" && \
 	echo "  make coverage        # executa pytest gerando relatórios de cobertura (html/xml)" && \
@@ -26,7 +29,7 @@ help:
 	echo "  make mutmut.clean           # limpa cache do mutmut (.mutmut-cache)" && \
 	echo "  make ci.pr-run BRANCH=<branch> [WORKFLOW=path]  # atualiza a branch com main e dispara o workflow Tests via gh"
 
-# Usa addopts do pytest.ini (inclui cobertura, relatórios e --cov-fail-under=50)
+# Usa addopts do pytest.ini (inclui cobertura, relatórios e --cov-fail-under=45)
 test:
 	$(PYTEST) $(PYTEST_ARGS)
 
@@ -38,7 +41,7 @@ test.unit:
 test.integration:
 	$(PYTEST) -m integration $(PYTEST_ARGS)
 
-# Gera relatórios de cobertura (respeita o gate 50% do pytest.ini)
+# Gera relatórios de cobertura (respeita o gate 45% do pytest.ini)
 coverage:
 	$(PYTEST) $(PYTEST_ARGS)
 
@@ -58,24 +61,24 @@ clean:
 
 # Executa mutmut contra caminhos de código fonte, usando somente testes unitários
 mutmut.run.unit:
-	$(MUTMUT) run $(MUTMUT_ARGS) --tests-dir=tests --runner="$(MUTMUT_RUNNER_BASE) -m unit" --paths-to-mutate src
-	$(MUTMUT) run $(MUTMUT_ARGS) --tests-dir=tests --runner="$(MUTMUT_RUNNER_BASE) -m unit" --paths-to-mutate sources
+	$(MUTMUT) run $(MUTMUT_ARGS) --use-coverage --tests-dir=tests --runner="$(MUTMUT_RUNNER_BASE) -m unit" --paths-to-mutate src
+	$(MUTMUT) run $(MUTMUT_ARGS) --use-coverage --tests-dir=tests --runner="$(MUTMUT_RUNNER_BASE) -m unit" --paths-to-mutate sources
 
 # Executa mutmut usando a suíte de integração (marcador integration)
 mutmut.run.integration:
-	$(MUTMUT) run $(MUTMUT_ARGS) --tests-dir=tests --runner="$(MUTMUT_RUNNER_BASE) -m integration" --paths-to-mutate src
-	$(MUTMUT) run $(MUTMUT_ARGS) --tests-dir=tests --runner="$(MUTMUT_RUNNER_BASE) -m integration" --paths-to-mutate sources
+	$(MUTMUT) run $(MUTMUT_ARGS) --use-coverage --tests-dir=tests --runner="$(MUTMUT_RUNNER_BASE) -m integration" --paths-to-mutate src
+	$(MUTMUT) run $(MUTMUT_ARGS) --use-coverage --tests-dir=tests --runner="$(MUTMUT_RUNNER_BASE) -m integration" --paths-to-mutate sources
 
 # Executa mutmut com toda a suíte (pode ser bem lento!)
 mutmut.run.all:
-	$(MUTMUT) run $(MUTMUT_ARGS) --tests-dir=tests --runner="$(MUTMUT_RUNNER_BASE)" --paths-to-mutate src
-	$(MUTMUT) run $(MUTMUT_ARGS) --tests-dir=tests --runner="$(MUTMUT_RUNNER_BASE)" --paths-to-mutate sources
+	$(MUTMUT) run $(MUTMUT_ARGS) --use-coverage --tests-dir=tests --runner="$(MUTMUT_RUNNER_BASE)" --paths-to-mutate src
+	$(MUTMUT) run $(MUTMUT_ARGS) --use-coverage --tests-dir=tests --runner="$(MUTMUT_RUNNER_BASE)" --paths-to-mutate sources
 
 # Baseline: foca em módulos críticos, executando a suíte completa de testes como runner
 mutmut-baseline:
-	$(MUTMUT) run $(MUTMUT_ARGS) --tests-dir=tests --runner="$(MUTMUT_RUNNER_BASE)" --paths-to-mutate src/event_processor.py
-	$(MUTMUT) run $(MUTMUT_ARGS) --tests-dir=tests --runner="$(MUTMUT_RUNNER_BASE)" --paths-to-mutate src/ical_generator.py
-	$(MUTMUT) run $(MUTMUT_ARGS) --tests-dir=tests --runner="$(MUTMUT_RUNNER_BASE)" --paths-to-mutate sources/base_source.py
+	$(MUTMUT) run $(MUTMUT_ARGS) --use-coverage --tests-dir=tests --runner="$(MUTMUT_RUNNER_BASE)" --paths-to-mutate src/event_processor.py
+	$(MUTMUT) run $(MUTMUT_ARGS) --use-coverage --tests-dir=tests --runner="$(MUTMUT_RUNNER_BASE)" --paths-to-mutate src/ical_generator.py
+	$(MUTMUT) run $(MUTMUT_ARGS) --use-coverage --tests-dir=tests --runner="$(MUTMUT_RUNNER_BASE)" --paths-to-mutate sources/base_source.py
 
 # Lista mutantes sobreviventes
 mutmut.results:

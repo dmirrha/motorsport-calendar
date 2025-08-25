@@ -337,6 +337,11 @@ Documentar as fontes de dados atualmente integradas ao sistema, incluindo detalh
 ### **Configurações de Coleta:**
 - **Timeout**: 10 segundos por requisição
 - **Retry**: controlado por `data_sources.retry_failed_sources` (padrão: `true`), `data_sources.max_retries` (padrão: `1`, exclui a tentativa inicial) e `data_sources.retry_backoff_seconds` (padrão: `0.5`, backoff linear). Compatível com `retry_attempts` (legado) quando as novas chaves não estiverem presentes.
+  - Notas de validação e precedência:
+    - `max_retries` tem precedência sobre `retry_attempts` (legado). Se `max_retries` estiver definido, `retry_attempts` é ignorado.
+    - `max_retries ≥ 0`; `retry_backoff_seconds ≥ 0`.
+    - Retry aplica-se a erros transitórios (ex.: `TimeoutError`, `OSError`, `IOError`).
+    - O valor de `max_retries` não inclui a tentativa inicial (i.e., total de tentativas = `1 + max_retries`).
 - **Rate Limiting**: 1 requisição por segundo
 - **User-Agent**: Rotativo para evitar bloqueios
 - **Category Learning**: Habilita/desabilita aprendizado de novas categorias

@@ -86,16 +86,16 @@
     "timezone": "America/Sao_Paulo",
     "default_duration_minutes": 120,
     "reminders": [
-      {"minutes": 60, "method": "popup"},
-      {"minutes": 15, "method": "popup"}
+      {"minutes": 60},
+      {"minutes": 15}
     ],
-    "event_category": "SPORTS",
-    "event_priority": "NORMAL",
-    "event_status": "CONFIRMED",
     "include_streaming_links": true,
-    "include_location": true,
-    "include_description": true,
-    "enforce_sort": true
+    "include_source_info": true,
+    "enforce_sort": true,
+    "output": {
+      "directory": "output",
+      "filename_template": "motorsport_events_{date}.ics"
+    }
   },
   
   "streaming_providers": {
@@ -196,7 +196,10 @@
       "save_raw": true,
       "pretty_print": true,
       "include_headers": true,
-      "separate_by_source": true
+      "separate_by_source": true,
+      "compress": true,
+      "max_files_per_source": 50,
+      "max_age_days": 30
     }
   }
 }

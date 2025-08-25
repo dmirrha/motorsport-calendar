@@ -20,8 +20,12 @@ def _ensure_third_party_stubs():
         sys.modules['fuzzywuzzy'] = mod
     if 'unidecode' not in sys.modules:
         mod = types.ModuleType('unidecode')
+        import unicodedata as _ud
         def _unidecode(s):
-            return s
+            try:
+                return _ud.normalize('NFKD', str(s)).encode('ascii', 'ignore').decode('ascii')
+            except Exception:
+                return str(s)
         mod.unidecode = _unidecode
         sys.modules['unidecode'] = mod
 

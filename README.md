@@ -369,6 +369,28 @@ O arquivo `config/config.json` permite personalizar. Consulte o [Guia de Configu
 - **Links de transmissão** por região
 - **Sistema de logging**
 
+### Exemplo rápido — ical_parameters
+
+```json
+"ical_parameters": {
+  "calendar_name": "Motorsport Events",
+  "calendar_description": "Weekend motorsport events calendar",
+  "timezone": "America/Sao_Paulo",
+  "include_streaming_links": true,
+  "include_source_info": true,
+  "enforce_sort": true,
+  "reminders": { "minutes": 30 },
+  "output": {
+    "directory": "output",
+    "filename_template": "motorsport_events_{date}.ics"
+  }
+}
+```
+
+Notas rápidas:
+- `ical_parameters.output.directory` afeta apenas a saída do arquivo `.ics` e tem precedência sobre `general.output_directory` para esse artefato específico.
+- Apenas `reminders.minutes` é utilizado no snapshot atual.
+
 ## 🎨 Interface Visual
 
 O script exibe uma interface colorida com:
@@ -441,6 +463,7 @@ No arquivo `config.json`, você pode personalizar o comportamento do logging:
     "pretty_print": true,
     "include_headers": true,
     "separate_by_source": true,
+    "compress": true,
     "max_files_per_source": 50,
     "max_age_days": 30
   }
@@ -484,6 +507,10 @@ O sistema agora gerencia automaticamente os arquivos de payload:
   - Separação por fonte de dados
   - Nomenclatura consistente de arquivos
   - Metadados incluídos nos nomes dos arquivos
+
+- **Compressão**
+  - Compressão de payloads para economia de espaço
+  - Configurável via `logging.payload_settings.compress` (padrão: `true`)
 
 ### 🛠️ Validação de Configuração
 
