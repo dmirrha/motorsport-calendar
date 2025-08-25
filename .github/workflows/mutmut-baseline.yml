@@ -12,7 +12,7 @@ concurrency:
 
 jobs:
   baseline:
-    name: Run mutmut baseline (informativo)
+    name: Run mutmut baseline
     runs-on: ubuntu-latest
     permissions:
       contents: read

@@ -101,6 +101,7 @@ coverage.xml
 coverage_*.xml
 *.cover
 .hypothesis/
+.mutmut-cache/
 pytest.log
 report.html
 junit.xml
