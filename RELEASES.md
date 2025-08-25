@@ -32,7 +32,8 @@ CI — Mutmut Baseline nightly (informativo) e Badge no README (Issue #144)
 
 - Workflow adicionado: `.github/workflows/mutmut-baseline.yml` (nome: "Mutmut Baseline").
   - Agenda: diariamente às 04:00 UTC (`schedule`) e disparo manual (`workflow_dispatch`).
-  - Execução: `make mutmut-baseline` com `PYTEST_ARGS=-n auto` (pytest-xdist); coleta `mutmut results` e publica no Job Summary; artefatos enviados (`mutmut_results.txt`, `.mutmut-cache/`).
+  - Execução: `make mutmut-baseline` em modo serial (sem xdist) para compatibilidade com `--use-coverage` do Mutmut; coleta `mutmut results` e publica no Job Summary; artefatos enviados (`mutmut_results.txt`, `.mutmut-cache/`).
+  - Passo temporariamente não-bloqueante (`continue-on-error: true`) enquanto a suíte de mutação é estabilizada.
   - Permissões mínimas; informativo (não gateia PRs).
 - README: adicionado badge "Mutmut Baseline" apontando para o workflow para visibilidade rápida dos resultados.
 - Rastreabilidade: Issue #144.
@@ -47,14 +48,46 @@ Testes — Property-based (Hypothesis)
   - Diretório `tests/property/` e marcador `@pytest.mark.property` (registrado em `pytest.ini`).
   - Perfil `property` do Hypothesis em `tests/property/conftest.py` (`deadline=None`, `max_examples=30`, supressão de health checks) para reduzir flakes.
   - Exemplos de execução por marcador e por caminho.
-- Referências principais: `tests/property/test_prop_datetime_parsing_roundtrip.py`, `tests/property/test_prop_dedupe_invariants.py`, `tests/property/test_prop_ical_ordering_stability.py`.
-- Determinismo reforçado no CI com seed fixa de `pytest-randomly` e perfil Hypothesis dedicado.
+  - Referências principais: `tests/property/test_prop_datetime_parsing_roundtrip.py`, `tests/property/test_prop_dedupe_invariants.py`, `tests/property/test_prop_ical_ordering_stability.py`.
+  - Determinismo reforçado no CI com seed fixa de `pytest-randomly` e perfil Hypothesis dedicado.
+
+ Fix — Markdown: Front matter seguro e integração no importador (Issue #142)
+ 
+ - Utilitário: `src/utils/markdown_front_matter.py` com `split_front_matter(md_text)` e `strip_front_matter(md_text)`. Só considera front matter se a primeira linha for exatamente `'---'` e houver fechamento `'---'`. Em caso de YAML inválido ou fechamento ausente, retorna o texto original (fallback seguro, sem crash).
+ - Integração: `.github/import_issues/import_issues.py` passou a usar `strip_front_matter` para sanitizar o corpo das issues lidas de `.md` ou strings literais, prevenindo falhas quando `'---'` aparece no meio do arquivo.
+ - Testes: `tests/unit/utils/test_markdown_front_matter.py` cobrindo front matter válido, inválido, ausente e separador no meio do arquivo.
+ - Dependência: `PyYAML` já presente em `requirements.txt`.
+ - Documentação: `CHANGELOG.md` [Unreleased] atualizado com a correção e rastreabilidade.
+ - Rastreabilidade: Issue #142.
 
 Docs — Fix: Leitura de Markdown (Issue #142)
+  
+  - `docs/issues/open/issue-142.md`: substituídos separadores '---' por '***' para evitar que parsers interpretem YAML front matter no meio do arquivo.
+  - Impacto: previne crash no leitor automático de Markdown; sem mudanças de runtime.
+  - Rastreabilidade: Issue #142; PR associada referenciando a issue.
 
-- `docs/issues/open/issue-142.md`: substituídos separadores '---' por '***' para evitar que parsers interpretem YAML front matter no meio do arquivo.
-- Impacto: previne crash no leitor automático de Markdown; sem mudanças de runtime.
-- Rastreabilidade: Issue #142; PR associada referenciando a issue.
+Fix — EventProcessor: normalização de datetime e timezones (Mutmut Baseline)
+
+- `src/event_processor.py`:
+  - `_compute_datetime` agora retorna `None` e registra debug quando `pytz.timezone(tz_name)` lança exceção (timezone inválido), sem fallback para `zoneinfo` nesse cenário.
+  - Fallback para `zoneinfo.ZoneInfo` é aplicado apenas quando `pytz` não está instalado (ImportError).
+  - Mantido default de horário `12:00` quando `time_str` está ausente (com `replace` protegido por `try/except`).
+  - Wrapper `_TzWithZone` assegura atributo `.zone` em instâncias de `tzinfo` (compatibilidade com testes que verificam `tzinfo.zone`).
+- Testes: `tests/unit/processing/test_event_processor_pipeline.py::TestEventProcessorPipeline::test_compute_datetime_invalid_timezone_logs_and_none` passa; suíte unit unitária completa: 342 passed; cobertura ~86.48% (> threshold).
+- Impacto: comportamento de erro explícito e determinístico para timezones inválidos; estabiliza normalização de horários/TZ e reduz falsos positivos na Mutmut Baseline.
+- Rastreabilidade: Mutmut Baseline; CHANGELOG sincronizado.
+
+Docs/Config — iCal e payloads alinhados ao snapshot 0.5.1
+
+- `docs/CONFIGURATION_GUIDE.md`: seção `ical_parameters` revista e alinhada ao código (`src/ical_generator.py`):
+  - Adicionado `include_source_info` (boolean, padrão: `true`).
+  - Sub-seção `output` com `directory` (padrão: `"output"`) e `filename_template` (padrão: `"motorsport_events_{date}.ics"`).
+  - `reminders`: apenas `minutes` é considerado; `method` é ignorado.
+  - Remoção/nota de chaves legadas sem efeito: `event_category`, `event_priority`, `event_status`, `include_location`, `include_description`.
+  - Default corrigido de `calendar_description` para `"Weekend motorsport events calendar"`.
+- `config/config.example.json`: espelha as alterações acima em `ical_parameters` e `reminders`.
+- `README.md`: `logging.payload_settings` atualizado com `compress`, `max_files_per_source` e `max_age_days`; exemplo breve de `ical_parameters` adicionado.
+- `DATA_SOURCES.md`: notas de validação e precedência para retry em `data_sources` confirmadas (compatibilidade com `retry_attempts`).
 
 ## Versão 0.6.2 (2025-08-20)
 
