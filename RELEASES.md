@@ -44,6 +44,10 @@ Fix — Geração de .coverage antes do baseline do Mutmut (Issue #144)
 - Efeito: elimina o erro `FileNotFoundError: No .coverage file found` e assegura que o `--use-coverage` seja aplicado corretamente no baseline.
 - Workflow: `.github/workflows/mutmut-baseline.yml` continua invocando `make mutmut-baseline`; execução permanece informativa enquanto estabilizamos o baseline.
 
+ Robustez — Baseline do Mutmut: garantir e inspecionar `.coverage`
+
+- Makefile: adicionados `coverage erase || true`, `coverage combine || true` e `ls -la .coverage* || true` ao alvo `mutmut-baseline` para garantir a existência do arquivo `.coverage` e facilitar depuração no CI.
+
 Docs — Limpeza de referências desatualizadas de PR
 
 - Removidas referências de PR obsoletas em `CHANGELOG.md`, `RELEASES.md` e docs de issues para evitar ambiguidade histórica e manter a rastreabilidade coesa. Sem impacto funcional.
