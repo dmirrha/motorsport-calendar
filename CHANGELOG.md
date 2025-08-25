@@ -37,7 +37,10 @@ e este projeto adere ao [Versionamento Semântico](https://semver.org/spec/v2.0.
    - `tests/README.md`: seção de CI atualizada para refletir remoção de `-c /dev/null` e neutralização do gate de cobertura via `--cov-fail-under=0` nos jobs `integration` e `e2e_happy`; adicionada seção prática “Mutation testing (mutmut)” com alvos do Makefile e dicas de uso.
    - `docs/tests/overview.md`: adicionada seção “Mutation testing (mutmut)” com os alvos `make mutmut.run.unit|integration|all`, `mutmut.results`, `mutmut.show` e `mutmut.clean`, além de dicas de paralelismo/ajustes do runner.
    - Makefile: alvos confirmados sem mudanças (`mutmut.run.unit`, `mutmut.run.integration`, `mutmut.run.all`, `mutmut.results`, `mutmut.show`, `mutmut.clean`).
-
+  - Fix — Mutmut Baseline: geração de `.coverage`
+    - Makefile: o alvo `mutmut-baseline` agora executa `coverage run -m pytest -q -o addopts= -p no:cov` antes de invocar `mutmut run --use-coverage`, garantindo a criação do arquivo `.coverage`.
+    - Efeito: elimina o erro `FileNotFoundError: No .coverage file found` observado no workflow e assegura a aplicação correta do `--use-coverage` durante o baseline.
+    - Workflow: `.github/workflows/mutmut-baseline.yml` segue chamando `make mutmut-baseline`; execução permanece informativa (`continue-on-error: true`) enquanto estabilizamos a suíte de mutação.
 - Tests/ICS — Normalização de DESCRIPTION e unfolding de linhas (PR #148)
   - `tests/utils/ical_snapshots.py::normalize_ics_text`:
 
