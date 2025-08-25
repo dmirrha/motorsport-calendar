@@ -46,6 +46,16 @@ e este projeto adere ao [Versionamento Semântico](https://semver.org/spec/v2.0.
  - Tests/ICS — Normalização de DESCRIPTION e unfolding de linhas (PR #148)
   - `tests/utils/ical_snapshots.py::normalize_ics_text`:
 
+## [0.6.4] - 2025-08-25
+### Category — Detecção de categorias aprimorada (Issue #2)
+
+- `src/category_detector.py`: dicionário expandido (ex.: F1Academy, CopaTruck, FormulaTruck, TurismoNacional) e novos sinônimos/aliases.
+- Alias mapping canônico com atalho de alta confiança em `detect_category()` (verificação de `alias_map` antes de fuzzy/exact matching).
+- Classificações de tipo atualizadas para novas categorias.
+- Testes: unitários e de integração executados localmente sem regressões.
+- Versionamento: `src/__init__.py` atualizado para `0.6.4`.
+- Rastreabilidade: progresso documentado em `docs/issues/open/issue-2.{md,json}`.
+
 ## [0.6.2] - 2025-08-20
 ### CI — Correção de comando pytest --version
 
