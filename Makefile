@@ -11,7 +11,7 @@ WORKFLOW ?= .github/workflows/tests.yml
 
 help:
 	@echo "Targets:" && \
-	echo "  make test            # roda pytest com addopts do pytest.ini (inclui cobertura e gate 45%)" && \
+	echo "  make test            # roda pytest com addopts do pytest.ini (inclui cobertura e gate 50%)" && \
 	echo "  make test.unit       # roda apenas testes marcados como unit" && \
 	echo "  make test.integration# roda apenas testes marcados como integration" && \
 	echo "  make coverage        # executa pytest gerando relatórios de cobertura (html/xml)" && \
@@ -26,7 +26,7 @@ help:
 	echo "  make mutmut.clean           # limpa cache do mutmut (.mutmut-cache)" && \
 	echo "  make ci.pr-run BRANCH=<branch> [WORKFLOW=path]  # atualiza a branch com main e dispara o workflow Tests via gh"
 
-# Usa addopts do pytest.ini (inclui cobertura, relatórios e --cov-fail-under=45)
+# Usa addopts do pytest.ini (inclui cobertura, relatórios e --cov-fail-under=50)
 test:
 	$(PYTEST) $(PYTEST_ARGS)
 
@@ -38,7 +38,7 @@ test.unit:
 test.integration:
 	$(PYTEST) -m integration $(PYTEST_ARGS)
 
-# Gera relatórios de cobertura (respeita o gate 45% do pytest.ini)
+# Gera relatórios de cobertura (respeita o gate 50% do pytest.ini)
 coverage:
 	$(PYTEST) $(PYTEST_ARGS)
 

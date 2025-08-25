@@ -32,13 +32,17 @@ Aplicar incremento de +5pp por release até atingir ~75–80% de cobertura globa
 - [ ] Validar em PR.
 - [ ] Atualizar documentação e notas de release.
 
----
+***
 
 # Plano de Resolução (proposto)
 
 ## 1) Medição e definição de alvo
-- Executar local/CI: `pytest --cov=src --cov-report=term-missing` para obter baseline atual.
-- Definir `next_limit = baseline + 5pp`.
+- Execução local (equivalente ao job "unit" do CI):
+  - Comando: `pytest -q -m "not integration" -k "not test_phase2_e2e_" --cov=src --cov=sources --cov-report=xml:coverage.unit.local.xml --cov-fail-under=0`
+  - Resultado: baseline (line-rate) = **87.36%**.
+- Definição de alvo (incremental +5pp por release):
+  - Gate atual: **45%** (`pytest.ini` via `--cov-fail-under=45`).
+  - Próximo limite proposto: **50%** (45% → 50%).
 
 ## 2) Aplicação do gate
 - Preferência: aplicar `--cov-fail-under=<next_limit>` no(s) job(s) de teste.
@@ -57,12 +61,12 @@ Aplicar incremento de +5pp por release até atingir ~75–80% de cobertura globa
 - Oscilação de cobertura: considerar margem (ex.: thresholds em Codecov) e guias de escrita de testes.
 
 ## Checklist de Execução
-- [ ] Baseline medido e próximo limite definido.
+- [x] Baseline medido e próximo limite definido (unit: 87.36% line-rate; gate proposto: 50%).
 - [ ] CI configurado com novo `--cov-fail-under`.
 - [ ] PR de validação aprovado.
 - [ ] Documentação e notas atualizadas.
 
----
+***
 
 ## Status
-- Aberta; aguardando priorização/triagem.
+- Em andamento: baseline medido (unit 87.36%); aguardando confirmação para alterar `pytest.ini` para `--cov-fail-under=50` e abrir PR de validação (mencionar #142).
