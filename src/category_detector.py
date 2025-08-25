@@ -40,6 +40,7 @@ class CategoryDetector:
         # Initialize knowledge base
         self.category_mappings = self._load_default_mappings()
         self.type_classifications = self._load_type_classifications()
+        self.alias_map = self._load_alias_map()
         self.learned_variations = {}
         self.detection_stats = {}
         
@@ -48,6 +49,34 @@ class CategoryDetector:
         
         self.logger.info("🎯 Category Detector initialized with dynamic learning")
     
+    def _load_alias_map(self) -> Dict[str, str]:
+        """Load canonical alias mapping (normalized alias -> canonical category)."""
+        alias_pairs = {
+            # Open wheel
+            "f indy": "IndyCar",
+            "findy": "IndyCar",
+            "f-indy": "IndyCar",
+            # Trucks
+            "f truck": "CopaTruck",
+            "f-truck": "CopaTruck",
+            "formula truck": "FormulaTruck",
+            # Endurance
+            "imsa weathertech": "IMSA",
+            "weathertech sportscar": "IMSA",
+            "fia wec": "WEC",
+            "prototipos": "WEC",
+            "prototypes": "WEC",
+            # Rallycross
+            "wrx": "Rallycross",
+            # Touring / Stock
+            "stock series": "StockCar",
+        }
+        # Normalize keys once to ensure stable lookups
+        normalized_aliases: Dict[str, str] = {}
+        for k, v in alias_pairs.items():
+            normalized_aliases[self.normalize_text(k)] = v
+        return normalized_aliases
+
     def _load_default_mappings(self) -> Dict[str, List[str]]:
         """Load default category mappings."""
         return {
@@ -64,6 +93,9 @@ class CategoryDetector:
             ],
             "F4": [
                 "formula 4", "fórmula 4", "f-4", "formula4"
+            ],
+            "F1Academy": [
+                "f1 academy", "formula 1 academy", "f-1 academy", "academia f1"
             ],
             "FormulaE": [
                 "formula e", "fórmula e", "fe", "electric formula", "e-prix",
@@ -97,9 +129,15 @@ class CategoryDetector:
                 "stock car brasil", "stock car", "scb", "stock car championship",
                 "campeonato de stock car"
             ],
+            "CopaTruck": [
+                "copa truck", "copa truck brasil", "truck series brasil"
+            ],
+            "FormulaTruck": [
+                "formula truck", "fórmula truck", "f-truck", "f truck"
+            ],
             "NASCAR": [
                 "nascar cup", "nascar xfinity", "nascar truck", "nascar series",
-                "cup series", "xfinity series", "truck series"
+                "cup series", "xfinity series", "truck series", "nascar cup series"
             ],
             
             # IndyCar and Open Wheel
@@ -115,11 +153,12 @@ class CategoryDetector:
             # Endurance Racing
             "WEC": [
                 "world endurance championship", "wec", "le mans", "endurance",
-                "campeonato mundial de endurance", "resistência"
+                "campeonato mundial de endurance", "resistência", "fia wec",
+                "prototipos", "prototypes"
             ],
             "IMSA": [
                 "imsa", "imsa sportscar", "weathertech sportscar",
-                "american endurance"
+                "american endurance", "imsa weathertech"
             ],
             "LeMans": [
                 "le mans", "24 hours of le mans", "24h le mans",
@@ -154,12 +193,16 @@ class CategoryDetector:
                 "campeonato mundial de rally", "mundial de rally"
             ],
             "Rallycross": [
-                "rallycross", "world rallycross", "rx", "mundial de rallycross"
+                "rallycross", "world rallycross", "rx", "mundial de rallycross",
+                "wrx"
             ],
             
             # Other Categories
             "Karting": [
                 "karting", "kart", "go-kart", "kartismo"
+            ],
+            "TurismoNacional": [
+                "turismo nacional", "tn", "campeonato turismo nacional"
             ],
             "Drift": [
                 "drift", "drifting", "formula drift", "drift championship"
@@ -179,9 +222,10 @@ class CategoryDetector:
         """Load category type classifications."""
         return {
             "cars": [
-                "F1", "F2", "F3", "F4", "FormulaE", "StockCar", "NASCAR",
-                "IndyCar", "SuperFormula", "WEC", "IMSA", "LeMans", "DTM",
-                "WTCR", "BTCC", "GTWorldChallenge", "SuperGT"
+                "F1", "F2", "F3", "F4", "F1Academy", "FormulaE", "StockCar",
+                "CopaTruck", "FormulaTruck", "NASCAR", "IndyCar", "SuperFormula",
+                "WEC", "IMSA", "LeMans", "DTM", "WTCR", "BTCC",
+                "GTWorldChallenge", "SuperGT", "TurismoNacional"
             ],
             "motorcycles": [
                 "MotoGP", "Moto2", "Moto3", "MotoE", "WSBK", "Supersport"
@@ -247,21 +291,97 @@ class CategoryDetector:
         
         return normalized.strip()
     
-    def detect_category(self, raw_text: str, source: str = "unknown") -> Tuple[str, float, Dict[str, Any]]:
+    def detect_category(self, raw_text: str, source: str = "unknown", context: Optional[Dict[str, Any]] = None) -> Tuple[str, float, Dict[str, Any]]:
         """
         Detect motorsport category from raw text.
         
         Args:
             raw_text: Raw category text from source
             source: Source name for tracking
-            
+            context: Optional additional context (e.g., name, display_name, location, country,
+                     session_type, official_url, page_title, page_url, date, timezone)
+        
         Returns:
             Tuple of (detected_category, confidence_score, metadata)
         """
+        # Prepare context-aware input
+        orig_raw_text = raw_text or ""
+        context_used = False
+        used_context_fields: List[str] = []
+        context_combined_snippets: List[str] = []
+
+        if context and isinstance(context, dict):
+            # Common, useful context keys
+            candidate_keys = [
+                "name", "display_name", "page_title", "page_url", "official_url",
+                "location", "country", "session_type", "date", "timezone"
+            ]
+            for k in candidate_keys:
+                v = context.get(k)
+                if isinstance(v, (str, int, float)) and str(v).strip():
+                    context_combined_snippets.append(str(v).strip())
+                    used_context_fields.append(k)
+            if context_combined_snippets:
+                # Combine raw_text with context to strengthen matching
+                combined = (orig_raw_text + " " + " ".join(context_combined_snippets)).strip()
+                raw_text = combined
+                context_used = True
+
+        # If nothing to match (and no context provided meaningful text)
         if not raw_text:
-            return "Unknown", 0.0, {"raw_text": raw_text, "source": source}
-        
+            return "Unknown", 0.0, {
+                "raw_text": orig_raw_text,
+                "raw_text_combined": raw_text,
+                "source": source,
+                "context_used": context_used,
+                "context_fields": used_context_fields,
+            }
+
+        # Alias mapping shortcut based on the original raw text when available
+        normalized_text_original = self.normalize_text(orig_raw_text)
+        if normalized_text_original and normalized_text_original in self.alias_map:
+            best_category = self.alias_map[normalized_text_original]
+            best_score = 0.95  # high-confidence alias mapping
+            metadata = {
+                "raw_text": orig_raw_text,
+                "raw_text_combined": raw_text,
+                "normalized_text": normalized_text_original,
+                "source": source,
+                "best_match": "alias",
+                "category_type": self._get_category_type(best_category),
+                "confidence": best_score,
+                "context_used": context_used,
+                "context_fields": used_context_fields,
+            }
+            self._update_stats(source, best_category, best_score)
+            if self.logger:
+                self.logger.debug(
+                    f"🏷️ Alias mapped: '{orig_raw_text}' → '{best_category}' (confidence: {best_score:.2f})"
+                )
+            return best_category, best_score, metadata
+
         normalized_text = self.normalize_text(raw_text)
+        # 0) Alias mapping shortcut (exact normalized form) on the combined text
+        if normalized_text in self.alias_map:
+            best_category = self.alias_map[normalized_text]
+            best_score = 0.95  # high-confidence alias mapping
+            metadata = {
+                "raw_text": orig_raw_text,
+                "raw_text_combined": raw_text,
+                "normalized_text": normalized_text,
+                "source": source,
+                "best_match": "alias",
+                "category_type": self._get_category_type(best_category),
+                "confidence": best_score,
+                "context_used": context_used,
+                "context_fields": used_context_fields,
+            }
+            self._update_stats(source, best_category, best_score)
+            if self.logger:
+                self.logger.debug(
+                    f"🏷️ Alias mapped (combined): '{raw_text}' → '{best_category}' (confidence: {best_score:.2f})"
+                )
+            return best_category, best_score, metadata
         best_match = None
         best_score = 0.0
         best_category = "Unknown"
@@ -326,12 +446,15 @@ class CategoryDetector:
         category_type = self._get_category_type(best_category)
         
         metadata = {
-            "raw_text": raw_text,
+            "raw_text": orig_raw_text,
+            "raw_text_combined": raw_text,
             "normalized_text": normalized_text,
             "source": source,
             "best_match": best_match,
             "category_type": category_type,
-            "confidence": best_score
+            "confidence": best_score,
+            "context_used": context_used,
+            "context_fields": used_context_fields,
         }
         
         if self.logger:
@@ -399,37 +522,86 @@ class CategoryDetector:
         stats["total_confidence"] += confidence
         stats["avg_confidence"] = stats["total_confidence"] / stats["count"]
     
-    def batch_detect_categories(self, events: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
+    def batch_detect_categories(self, events: List[Dict[str, Any]], context: Optional[Dict[str, Any]] = None) -> List[Dict[str, Any]]:
         """
-        Detect categories for a batch of events.
-        
-        Args:
-            events: List of event dictionaries
-            
-        Returns:
-            List of events with detected categories
+        DEPRECATED wrapper mantido por compatibilidade, mas com comportamento
+        de enriquecimento esperado pelos testes legados.
+
+        Diferente de `detect_categories_batch`, este método retorna a lista de
+        eventos enriquecidos, adicionando:
+          - 'category'
+          - 'category_type'
+          - 'category_confidence'
+          - 'raw_category_text'
+          - 'category_metadata' (inclui metadados retornados pelo detector)
+
+        Observação importante: quando 'raw_category' estiver presente, evitamos
+        combinar contexto no texto de detecção para preservar matches exatos
+        (ex.: 'MotoGP' → 1.0), conforme esperado pelos testes.
         """
-        processed_events = []
-        
+        if self.logger:
+            try:
+                self.logger.debug("batch_detect_categories() is deprecated; kept for legacy enriched output")
+            except Exception:
+                pass
+
+        enriched: List[Dict[str, Any]] = []
+
         for event in events:
-            raw_category = event.get('raw_category', event.get('category', ''))
-            source = event.get('source', 'unknown')
-            
-            detected_category, confidence, metadata = self.detect_category(raw_category, source)
-            
-            # Update event with detected information
-            updated_event = event.copy()
-            updated_event.update({
-                'category': detected_category,
-                'category_type': metadata['category_type'],
-                'category_confidence': confidence,
-                'raw_category_text': raw_category,
-                'category_metadata': metadata
-            })
-            
-            processed_events.append(updated_event)
-        
-        return processed_events
+            raw_category = event.get('raw_category', '') or event.get('category', '')
+            event_name = event.get('name', '') or event.get('display_name', '')
+            source_name = event.get('source', 'unknown')
+
+            # Monta contexto por-evento, mas só será passado quando NÃO houver raw_category
+            per_event_context: Dict[str, Any] = {
+                'name': event_name,
+                'display_name': event.get('display_name', ''),
+                'official_url': event.get('official_url', ''),
+                'timezone': event.get('timezone', ''),
+                'country': event.get('country', ''),
+                'location': event.get('location', ''),
+                'session_type': event.get('session_type', ''),
+                'date': event.get('date', ''),
+            }
+
+            # Mescla contexto aninhado em raw_data.category_context, se houver
+            try:
+                raw_data = event.get('raw_data', {}) or {}
+                category_context = raw_data.get('category_context', {}) if isinstance(raw_data, dict) else {}
+                if isinstance(category_context, dict):
+                    for k in [
+                        'page_title', 'page_url', 'official_url', 'location', 'country',
+                        'session_type'
+                    ]:
+                        if k in category_context and category_context[k]:
+                            per_event_context[k] = category_context[k]
+            except Exception:
+                pass
+
+            # Contexto global (raro)
+            if context and isinstance(context, dict):
+                per_event_context.update({k: v for k, v in context.items() if v})
+
+            # Texto principal: se houver raw_category, prioriza e NÃO combina contexto
+            primary_text = raw_category if raw_category else event_name
+            context_to_pass = None if raw_category else per_event_context
+
+            cat, conf, meta = self.detect_category(primary_text, source=source_name, context=context_to_pass)
+
+            # Monta saída enriquecida no próprio evento (sem mutar o original in-place)
+            out_ev = dict(event)
+            out_ev['category'] = cat
+            out_ev['category_type'] = meta.get('category_type', self._get_category_type(cat))
+            out_ev['category_confidence'] = float(meta.get('confidence', conf)) if isinstance(meta.get('confidence', conf), (int, float)) else conf
+            out_ev['raw_category_text'] = raw_category
+            category_metadata = dict(meta)
+            # Garante presença do nome da fonte
+            category_metadata['source'] = source_name
+            out_ev['category_metadata'] = category_metadata
+
+            enriched.append(out_ev)
+
+        return enriched
     
     def get_detected_categories_summary(self) -> Dict[str, Any]:
         """
@@ -578,46 +750,65 @@ class CategoryDetector:
             "learning_enabled": self.learning_enabled
         }
     
-    def detect_categories_batch(self, events: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
+    def detect_categories_batch(self, events: List[Dict[str, Any]], context: Optional[Dict[str, Any]] = None) -> List[Dict[str, Any]]:
         """
         Detect categories for a batch of events.
         
         Args:
             events: List of event dictionaries
-            
+            context: Optional global context to be applied to all items (rarely used)
+        
         Returns:
             List of category detection results
         """
         category_results = []
         
         for event in events:
-            # Use existing detect_category with a two-step approach:
-            # 1) Tentar somente raw_category (prioriza match exato)
-            # 2) Se vazio/baixo, tentar combinar com nome para melhorar sinal
+            # Build per-event context and detect using context-aware API
             raw_category = event.get('raw_category', '') or event.get('category', '')
-            event_name = event.get('name', '')
+            event_name = event.get('name', '') or event.get('display_name', '')
+            source_name = event.get('source', 'unknown')
 
-            detected_category = 'Unknown'
-            confidence = 0.0
+            per_event_context: Dict[str, Any] = {
+                'name': event_name,
+                'display_name': event.get('display_name', ''),
+                'official_url': event.get('official_url', ''),
+                'timezone': event.get('timezone', ''),
+                'country': event.get('country', ''),
+                'location': event.get('location', ''),
+                'session_type': event.get('session_type', ''),
+                'date': event.get('date', ''),
+            }
+            # Merge optional nested context from raw_data.category_context if provided
+            try:
+                raw_data = event.get('raw_data', {}) or {}
+                category_context = raw_data.get('category_context', {}) if isinstance(raw_data, dict) else {}
+                if isinstance(category_context, dict):
+                    for k in [
+                        'page_title', 'page_url', 'official_url', 'location', 'country',
+                        'session_type'
+                    ]:
+                        if k in category_context and category_context[k]:
+                            per_event_context[k] = category_context[k]
+            except Exception:
+                pass
 
-            if raw_category:
-                cat1, conf1, _meta1 = self.detect_category(raw_category)
-                detected_category, confidence = cat1, conf1
+            # Merge any global context provided (rare)
+            if context and isinstance(context, dict):
+                per_event_context.update({k: v for k, v in context.items() if v})
 
-            # Se não atingiu threshold (ou vazio), tenta combinar com nome
-            if (not raw_category or confidence < self.confidence_threshold) and (raw_category or event_name):
-                combined = f"{raw_category} {event_name}".strip()
-                if combined:
-                    cat2, conf2, _meta2 = self.detect_category(combined)
-                    # Escolhe o melhor por confiança
-                    if conf2 > confidence:
-                        detected_category, confidence = cat2, conf2
-            
-            # Return category information dictionary
+            # Choose the primary text to detect from
+            primary_text = raw_category if raw_category else event_name
+            # Important: if we have a raw_category, avoid combining context to preserve exact matches
+            context_to_pass = None if raw_category else per_event_context
+            cat, conf, _meta = self.detect_category(primary_text, source=source_name, context=context_to_pass)
+
+            # Fonte deve refletir se contexto foi utilizado ou não
+            use_source = 'pattern_matching' if raw_category else 'pattern_matching+context'
             category_results.append({
-                'category': detected_category,
-                'confidence': confidence,
-                'source': 'pattern_matching'
+                'category': cat,
+                'confidence': conf,
+                'source': use_source
             })
         
         return category_results

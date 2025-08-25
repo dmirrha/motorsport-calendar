@@ -595,18 +595,8 @@ class EventProcessor:
         if self.logger:
             self.logger.debug("🏷️ Detecting event categories...")
         
-        # Extract category information for batch processing
-        category_inputs = []
-        for event in events:
-            category_inputs.append({
-                'name': event.get('name', ''),
-                'raw_category': event.get('raw_category', ''),
-                'location': event.get('location', ''),
-                'source': event.get('source', '')
-            })
-        
-        # Batch detect categories
-        detected_categories = self.category_detector.detect_categories_batch(category_inputs)
+        # Batch detect categories using full event dictionaries (enables context-aware detection)
+        detected_categories = self.category_detector.detect_categories_batch(events)
         
         # Update events with detected categories
         for event, detected in zip(events, detected_categories):

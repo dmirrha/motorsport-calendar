@@ -99,6 +99,27 @@ Docs/Config — iCal e payloads alinhados ao snapshot 0.5.1
 - `README.md`: `logging.payload_settings` atualizado com `compress`, `max_files_per_source` e `max_age_days`; exemplo breve de `ical_parameters` adicionado.
 - `DATA_SOURCES.md`: notas de validação e precedência para retry em `data_sources` confirmadas (compatibilidade com `retry_attempts`).
 
+## Versão 0.6.5 (2025-08-25)
+
+Category — Correções (Issue #2)
+
+- Fix — `detect_categories_batch`: semântica do campo `source` ajustada.
+  - Quando `raw_category` estiver presente (match exato, sem uso de contexto) → `source = "pattern_matching"`.
+  - Quando for necessário combinar com contexto (`name`/outros) → `source = "pattern_matching+context"`.
+  - Teste coberto: `tests/unit/category/test_category_detector_filter_and_batch.py::test_detect_categories_batch_combines_name_and_handles_empty`.
+  - Rastreabilidade: Issue #2.
+- Versionamento: `src/__init__.py` atualizado para `0.6.5`.
+
+## Versão 0.6.4 (2025-08-25)
+
+Category — Detecção de categorias aprimorada (Issue #2)
+
+- `src/category_detector.py`: dicionário expandido (inclui F1Academy, CopaTruck, FormulaTruck, TurismoNacional) e novos sinônimos/aliases para IMSA, WEC, NASCAR, Rallycross, IndyCar, etc.
+- Alias mapping canônico: `detect_category()` verifica `alias_map` antes de fuzzy/exact matching para atalho de alta confiança e melhor desempenho.
+- Tipos de categoria atualizados para contemplar novas categorias.
+- Testes: unit e integração executados localmente sem regressões.
+- Rastreabilidade: progresso documentado em `docs/issues/open/issue-2.{md,json}`.
+
 ## Versão 0.6.2 (2025-08-20)
 
 CI — Correção de comando pytest --version

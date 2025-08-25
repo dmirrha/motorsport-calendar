@@ -7,15 +7,50 @@ handles source management, and coordinates the collection process.
 
 import asyncio
 import concurrent.futures
-from datetime import datetime, timedelta
-from typing import List, Dict, Any, Optional, Type
+import faulthandler
 import importlib
 import inspect
+import os
+import signal
+from datetime import datetime, timedelta
+from typing import List, Dict, Any, Optional, Type
 from pathlib import Path
 import time
 
 from sources.base_source import BaseSource
 from sources.tomada_tempo import TomadaTempoSource
+
+
+def _run_source_in_subprocess(module_name: str, class_name: str, data_sources_config: Dict[str, Any], target_date_iso: str) -> List[Dict[str, Any]]:
+    """Função topo-de-módulo para execução em subprocesso.
+
+    - Reinstancia a fonte sem logger/UI (para evitar objetos não-serializáveis)
+    - Usa um proxy mínimo de configuração baseado em dict
+    """
+    # Proxy simples somente com a interface necessária
+    class _ConfigProxy:
+        def __init__(self, cfg: Dict[str, Any]):
+            self._cfg = dict(cfg or {})
+
+        def get_data_sources_config(self) -> Dict[str, Any]:
+            return dict(self._cfg)
+
+    # Importa classe
+    module = importlib.import_module(module_name)
+    cls = getattr(module, class_name)
+
+    # Instancia com config mínima
+    cfg = _ConfigProxy(data_sources_config)
+    source: BaseSource = cls(config_manager=cfg, logger=None, ui_manager=None)
+
+    # Converte target_date
+    td = datetime.fromisoformat(target_date_iso)
+
+    # Executa coleta
+    events = source.collect_events(td)
+    # Normaliza para garantir serialização simples (já são dicts/strings/datetimes)
+    # Datetimes dentro dos eventos devem ser serializáveis; assumimos que sim (ou strings)
+    return events
 
 
 class DataCollector:
@@ -48,6 +83,8 @@ class DataCollector:
         self.retry_failed_sources = True
         self.max_retries = 1
         self.retry_backoff_seconds = 0.5
+        self.use_process_pool = False
+        self.per_source_timeout_seconds: Optional[float] = None
         
         # Statistics
         self.collection_stats = {
@@ -79,6 +116,8 @@ class DataCollector:
         # Backward-compat: se max_retries não existir, usar retry_attempts
         self.max_retries = data_sources_config.get('max_retries', data_sources_config.get('retry_attempts', 1))
         self.retry_backoff_seconds = data_sources_config.get('retry_backoff_seconds', 0.5)
+        self.use_process_pool = bool(data_sources_config.get('use_process_pool', False))
+        self.per_source_timeout_seconds = data_sources_config.get('per_source_timeout_seconds')
         
         # Source priorities from priority_order list
         priority_order = data_sources_config.get('priority_order', [])
@@ -201,11 +240,29 @@ class DataCollector:
         if self.logger:
             self.logger.debug(f"🎯 Target date for collection: {target_date.strftime('%Y-%m-%d')}")
         
-        # Collect from sources (with concurrency control)
-        if self.max_concurrent_sources > 1:
-            all_events = self._collect_concurrent(target_date)
-        else:
-            all_events = self._collect_sequential(target_date)
+        # Habilita watchdog de stacktrace se demorar demais (ajuda diagnóstico de hang)
+        # Será cancelado ao final do método.
+        try:
+            faulthandler.dump_traceback_later(timeout=self.collection_timeout + 30, repeat=False)
+        except Exception:
+            # Se não suportado no ambiente, segue sem watchdog
+            pass
+
+        try:
+            # Collect from sources (with concurrency control)
+            if self.max_concurrent_sources > 1:
+                if self.use_process_pool:
+                    all_events = self._collect_concurrent_processes(target_date)
+                else:
+                    all_events = self._collect_concurrent(target_date)
+            else:
+                all_events = self._collect_sequential(target_date)
+        finally:
+            # Cancela watchdog se habilitado
+            try:
+                faulthandler.cancel_dump_traceback_later()
+            except Exception:
+                pass
         
         # Update final statistics
         self.collection_stats['collection_end_time'] = datetime.now().isoformat()
@@ -280,26 +337,61 @@ class DataCollector:
         """
         all_events = []
         
-        with concurrent.futures.ThreadPoolExecutor(max_workers=self.max_concurrent_sources) as executor:
-            # Submit collection tasks
-            future_to_source = {}
+        # Não usar context manager para poder controlar shutdown(wait=False)
+        executor = concurrent.futures.ThreadPoolExecutor(max_workers=self.max_concurrent_sources)
+        start_by_source: Dict[str, float] = {}
+        try:
+            # Submit tasks
+            future_to_source: Dict[concurrent.futures.Future, BaseSource] = {}
             for source in self.active_sources:
+                start_by_source[source.source_name] = time.time()
+                if self.logger:
+                    self.logger.debug(f"🔄 Collecting from {source.get_display_name()}...")
                 future = executor.submit(self._collect_from_source, source, target_date)
                 future_to_source[future] = source
-            
-            # Collect results as they complete
-            for future in concurrent.futures.as_completed(future_to_source, timeout=self.collection_timeout):
-                source = future_to_source[future]
-                
+
+            # Espera global até timeout por todas as futures
+            done, not_done = concurrent.futures.wait(
+                set(future_to_source.keys()),
+                timeout=self.collection_timeout,
+                return_when=concurrent.futures.ALL_COMPLETED,
+            )
+
+            # Cancela as pendentes e marca timeout
+            if not_done:
+                for f in not_done:
+                    f.cancel()
+                if self.logger:
+                    pending = ", ".join(
+                        future_to_source[f].get_display_name() for f in not_done
+                    )
+                    self.logger.debug(
+                        f"⏱️ Global collection timeout after {self.collection_timeout}s; cancelling: {pending}"
+                    )
+                # Registra erro de timeout por fonte não concluída
+                for f in not_done:
+                    src = future_to_source[f]
+                    self._handle_source_error(
+                        src,
+                        f"Collection timed out after {self.collection_timeout} seconds",
+                    )
+
+            # Processa resultados concluídos
+            for f in done:
+                source = future_to_source[f]
                 try:
-                    source_events = future.result()
-                    
+                    # Se per_source_timeout_seconds configurado, aplica ao obter o resultado
+                    if self.per_source_timeout_seconds and self.per_source_timeout_seconds > 0:
+                        source_events = f.result(timeout=float(self.per_source_timeout_seconds))
+                    else:
+                        source_events = f.result()
+
                     # Add source metadata to events
                     for event in source_events:
                         event['source_priority'] = self.source_priorities.get(source.source_name, 50)
-                    
+
                     all_events.extend(source_events)
-                    
+
                     # Update statistics
                     self.collection_stats['successful_sources'] += 1
                     self.collection_stats['source_results'][source.source_name] = {
@@ -307,20 +399,141 @@ class DataCollector:
                         'events_count': len(source_events),
                         'source_display_name': source.get_display_name()
                     }
-                    
+
                     if self.logger:
+                        duration = time.time() - start_by_source.get(source.source_name, time.time())
                         self.logger.log_source_success(source.get_display_name(), len(source_events))
-                
-                except concurrent.futures.TimeoutError:
-                    error_msg = f"Collection timed out after {self.collection_timeout} seconds"
-                    self._handle_source_error(source, error_msg)
-                
+                        self.logger.debug(f"⏱️ {source.get_display_name()} finished in {duration:.1f}s")
+
                 except Exception as e:
                     error_msg = f"Collection failed: {str(e)}"
                     self._handle_source_error(source, error_msg)
-        
-        return all_events
-    
+
+            return all_events
+        finally:
+            # Encerra sem bloquear; tenta cancelar futures remanescentes
+            try:
+                executor.shutdown(wait=False, cancel_futures=True)
+            except TypeError:
+                # Compatibilidade com versões antigas do Python
+                executor.shutdown(wait=False)
+
+    def _collect_concurrent_processes(self, target_date: datetime) -> List[Dict[str, Any]]:
+        """
+        Collect events concurrently using subprocesses. Útil para isolar hangs de I/O
+        (processos podem ser encerrados no timeout sem bloquear o processo principal).
+
+        Args:
+            target_date: Target date for collection
+
+        Returns:
+            List of all collected events
+        """
+        all_events: List[Dict[str, Any]] = []
+
+        # Prepara pacote mínimo de config serializável
+        data_sources_config: Dict[str, Any] = {}
+        try:
+            if self.config:
+                data_sources_config = dict(self.config.get_data_sources_config() or {})
+        except Exception:
+            data_sources_config = {}
+
+        executor = concurrent.futures.ProcessPoolExecutor(max_workers=self.max_concurrent_sources)
+        start_by_source: Dict[str, float] = {}
+        try:
+            future_to_source_name: Dict[concurrent.futures.Future, str] = {}
+            future_to_display: Dict[concurrent.futures.Future, str] = {}
+            for source in self.active_sources:
+                start_by_source[source.source_name] = time.time()
+                if self.logger:
+                    self.logger.debug(f"🔄 [proc] Collecting from {source.get_display_name()}...")
+
+                cls = source.__class__
+                module_name = cls.__module__
+                class_name = cls.__name__
+                target_iso = target_date.isoformat()
+
+                fut = executor.submit(
+                    _run_source_in_subprocess,
+                    module_name,
+                    class_name,
+                    data_sources_config,
+                    target_iso,
+                )
+                future_to_source_name[fut] = source.source_name
+                future_to_display[fut] = source.get_display_name()
+
+            # Espera global
+            done, not_done = concurrent.futures.wait(
+                set(future_to_source_name.keys()),
+                timeout=self.collection_timeout,
+                return_when=concurrent.futures.ALL_COMPLETED,
+            )
+
+            # Timeout global: tenta cancelar e registra erro
+            if not_done:
+                for f in not_done:
+                    f.cancel()
+                if self.logger:
+                    pending = ", ".join(future_to_display[f] for f in not_done)
+                    self.logger.debug(
+                        f"⏱️ [proc] Global collection timeout after {self.collection_timeout}s; cancelling: {pending}"
+                    )
+                for f in not_done:
+                    src_name = future_to_source_name[f]
+                    self._handle_source_error(
+                        next(s for s in self.active_sources if s.source_name == src_name),
+                        f"Collection timed out after {self.collection_timeout} seconds",
+                    )
+
+            # Resultados
+            for f in done:
+                src_name = future_to_source_name[f]
+                display = future_to_display[f]
+                try:
+                    # Timeout por-fonte ao obter resultado
+                    if self.per_source_timeout_seconds and self.per_source_timeout_seconds > 0:
+                        source_events = f.result(timeout=float(self.per_source_timeout_seconds))
+                    else:
+                        source_events = f.result()
+
+                    # Adiciona metadados de prioridade
+                    for event in source_events:
+                        event['source_priority'] = self.source_priorities.get(src_name, 50)
+
+                    all_events.extend(source_events)
+
+                    # Estatísticas
+                    self.collection_stats['successful_sources'] += 1
+                    self.collection_stats['source_results'][src_name] = {
+                        'success': True,
+                        'events_count': len(source_events),
+                        'source_display_name': display,
+                    }
+
+                    if self.logger:
+                        duration = time.time() - start_by_source.get(src_name, time.time())
+                        self.logger.log_source_success(display, len(source_events))
+                        self.logger.debug(f"⏱️ [proc] {display} finished in {duration:.1f}s")
+
+                except Exception as e:
+                    # Mapeia para objeto source correspondente só para logging estatístico
+                    src = next((s for s in self.active_sources if s.source_name == src_name), None)
+                    err_msg = f"Collection failed: {str(e)}"
+                    if src is not None:
+                        self._handle_source_error(src, err_msg)
+                    else:
+                        if self.logger:
+                            self.logger.log_source_error(display, err_msg)
+
+            return all_events
+        finally:
+            try:
+                executor.shutdown(wait=False, cancel_futures=True)
+            except TypeError:
+                executor.shutdown(wait=False)
+
     def _collect_from_source(self, source: BaseSource, target_date: datetime) -> List[Dict[str, Any]]:
         """
         Collect events from a single source (for concurrent execution).

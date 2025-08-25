@@ -264,6 +264,9 @@ class TomadaTempoSource(BaseSource):
             
             # Extract programming context (weekend dates) from page title or URL
             programming_context = self._extract_programming_context(soup, page_url)
+            # Attach page_url into programming context for downstream consumers
+            if page_url:
+                programming_context['page_url'] = page_url
             
             # FIRST: Try to parse the specific weekend programming structure
             weekend_events = self._parse_weekend_programming_structure(soup, target_date, programming_context)
@@ -496,6 +499,26 @@ class TomadaTempoSource(BaseSource):
                 'from_weekend_programming': True
             }
             
+            # Enrich with category_context for detection pipeline
+            try:
+                event['category_context'] = {
+                    'page_title': programming_context.get('programming_title') if programming_context else None,
+                    'page_url': programming_context.get('page_url') if programming_context else None,
+                    'event_name': event_name,
+                    'raw_category_text': category or None,
+                    'location': location,
+                    'country': 'Brasil',
+                    'session_type': event.get('session_type'),
+                    'official_url': event.get('official_url'),
+                    'date': event.get('date'),
+                    'time': event_time,
+                    'timezone': 'America/Sao_Paulo',
+                    'from_weekend_programming': True
+                }
+            except Exception:
+                # Best-effort enrichment; do not break event creation
+                pass
+            
             if self.logger:
                 self.logger.debug(f"🎯 Parsed event: {event_name} at {event_time} on {event_date}")
             
@@ -647,7 +670,7 @@ class TomadaTempoSource(BaseSource):
             
             # Accept event if it has name and either explicit date or was associated to context
             if event_name and (event_date or (programming_context and category)):
-                return {
+                evt = {
                     'name': event_name,
                     'category': category or 'Unknown',
                     'date': event_date,
@@ -660,6 +683,25 @@ class TomadaTempoSource(BaseSource):
                     'raw_text': text_content,
                     'from_context': not bool(self._extract_date(text_content))  # Flag to indicate if date came from context
                 }
+                # Enrich with category_context similar to weekend parsing
+                try:
+                    evt['category_context'] = {
+                        'page_title': programming_context.get('programming_title') if programming_context else None,
+                        'page_url': programming_context.get('page_url') if programming_context else None,
+                        'event_name': event_name,
+                        'raw_category_text': category or None,
+                        'location': location,
+                        'country': 'Brasil',
+                        'session_type': evt.get('session_type'),
+                        'official_url': evt.get('official_url'),
+                        'date': evt.get('date'),
+                        'time': event_time,
+                        'timezone': 'America/Sao_Paulo',
+                        'from_context': evt.get('from_context')
+                    }
+                except Exception:
+                    pass
+                return evt
             
         except Exception as e:
             if self.logger:

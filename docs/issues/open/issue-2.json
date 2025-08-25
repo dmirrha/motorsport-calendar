@@ -1,0 +1,62 @@
+{
+  "id": 3286117339,
+  "number": 2,
+  "state": "open",
+  "title": "✨ Aprimorar detecção de categorias de automobilismo",
+  "milestone": null,
+  "epic": null,
+  "url": "https://github.com/dmirrha/motorsport-calendar/issues/2",
+  "created_at": "2025-08-02T16:48:52Z",
+  "updated_at": "2025-08-25T00:00:00Z",
+  "labels": ["enhancement", "medium priority", "category-detection"],
+  "plan": {
+    "goals": [
+      "Cobrir ≥95% das categorias mencionadas no Tomada de Tempo",
+      "Atingir ≥90% de acurácia de classificação",
+      "Atualizar documentação com categorias suportadas"
+    ],
+    "steps": [
+      "Expandir dicionário de categorias e sinônimos em src/category_detector.py",
+      "Implementar mapeamento de aliases → categoria canônica",
+      "Adicionar boosts por contexto (título, subtítulo, URL) na detecção",
+      "Passar contexto adicional da fonte sources/tomada_tempo.py para o detector",
+      "Garantir título/descrição corretos no src/ical_generator.py",
+      "Adicionar/atualizar testes unitários e de integração",
+      "Atualizar documentação (README.md, DATA_SOURCES.md, CHANGELOG.md, RELEASES.md)"
+    ]
+  },
+  "tasks": [
+    {"item": "Expandir dicionário de categorias e sinônimos em src/category_detector.py", "done": true},
+    {"item": "Implementar alias mapping para categorias similares", "done": true},
+    {"item": "Context-based detection: incorporar boosts por título/subtítulo/URL", "done": false},
+    {"item": "Integrar contexto em sources/tomada_tempo.py → CategoryDetector", "done": false},
+    {"item": "Garantir que src/ical_generator.py reflita categorias corretas", "done": false},
+    {"item": "Testes unitários de parsing/detecção", "done": false},
+    {"item": "Testes de integração da fonte Tomada de Tempo", "done": false},
+    {"item": "Atualizar documentação (README, DATA_SOURCES, CHANGELOG, RELEASES)", "done": false}
+  ],
+  "recent_updates": [
+    {
+      "date": "2025-08-25T00:00:00Z",
+      "change": "Ajuste da semântica do campo 'source' em detect_categories_batch: 'pattern_matching' quando raw_category presente; caso contrário, 'pattern_matching+context'.",
+      "tests": [
+        "tests/unit/category/test_category_detector_filter_and_batch.py::test_detect_categories_batch_combines_name_and_handles_empty"
+      ],
+      "files": [
+        "src/category_detector.py",
+        "RELEASES.md",
+        "docs/issues/open/issue-2.md"
+      ]
+    }
+  ],
+  "docs_updated": [
+    "docs/issues/open/issue-2.md",
+    "docs/issues/open/issue-2.json"
+  ],
+  "pr": null,
+  "acceptance": [
+    "≥95% de cobertura das categorias mencionadas no Tomada de Tempo",
+    "≥90% de acurácia na classificação automática",
+    "Documentação atualizada"
+  ]
+}

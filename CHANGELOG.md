@@ -46,6 +46,26 @@ e este projeto adere ao [Versionamento Semântico](https://semver.org/spec/v2.0.
  - Tests/ICS — Normalização de DESCRIPTION e unfolding de linhas (PR #148)
   - `tests/utils/ical_snapshots.py::normalize_ics_text`:
 
+## [0.6.5] - 2025-08-25
+### Category — Correções (Issue #2)
+
+- Fix — `detect_categories_batch`: semântica do campo `source` ajustada.
+  - Quando `raw_category` estiver presente (match exato, sem uso de contexto) → `source = "pattern_matching"`.
+  - Quando for necessário combinar com contexto (`name`/outros) → `source = "pattern_matching+context"`.
+  - Teste coberto: `tests/unit/category/test_category_detector_filter_and_batch.py::test_detect_categories_batch_combines_name_and_handles_empty`.
+  - Rastreabilidade: Issue #2.
+- Versionamento: `src/__init__.py` atualizado para `0.6.5`.
+
+## [0.6.4] - 2025-08-25
+### Category — Detecção de categorias aprimorada (Issue #2)
+
+- `src/category_detector.py`: dicionário expandido (ex.: F1Academy, CopaTruck, FormulaTruck, TurismoNacional) e novos sinônimos/aliases.
+- Alias mapping canônico com atalho de alta confiança em `detect_category()` (verificação de `alias_map` antes de fuzzy/exact matching).
+- Classificações de tipo atualizadas para novas categorias.
+- Testes: unitários e de integração executados localmente sem regressões.
+- Versionamento: `src/__init__.py` atualizado para `0.6.4`.
+- Rastreabilidade: progresso documentado em `docs/issues/open/issue-2.{md,json}`.
+
 ## [0.6.2] - 2025-08-20
 ### CI — Correção de comando pytest --version
 
