@@ -40,16 +40,7 @@ e este projeto adere ao [Versionamento Semântico](https://semver.org/spec/v2.0.
 
 - Tests/ICS — Normalização de DESCRIPTION e unfolding de linhas (PR #148)
   - `tests/utils/ical_snapshots.py::normalize_ics_text`:
-    - Desfaz folding de linhas conforme RFC 5545 (linhas iniciadas com espaço são continuações e são unidas para comparação estável).
-    - Normaliza o conteúdo de `DESCRIPTION:` para um placeholder estável (`DESCRIPTION:__NORMALIZED__`), evitando diffs por encoding de emoji e quebras/encapsulamentos de linha dependentes do ambiente.
-  - Efeito: estabiliza os snapshots `.ics` em integração e elimina o flake observado no job `integration` do CI.
- - Rastreabilidade: falha diagnosticada na PR #148; artefatos/junit confirmaram o desvio no campo DESCRIPTION.
--
- - Docs — Fix: Leitura de Markdown (Issue #142)
-   - `docs/issues/open/issue-142.md`: substituídos separadores '---' por '***' para evitar que parsers interpretem YAML front matter no meio do arquivo.
-   - Impacto: previne crash no leitor automático de Markdown; sem mudanças de runtime.
-   - Rastreabilidade: Issue #142; PR associada referenciando a issue.
- 
+
 ## [0.6.2] - 2025-08-20
 ### CI — Correção de comando pytest --version
 

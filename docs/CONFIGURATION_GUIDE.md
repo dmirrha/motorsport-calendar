@@ -1,5 +1,4 @@
----
-
+ 
 ## Diretórios de saída e artefatos
 
 - `output/`: diretório onde os arquivos `.ics` são gerados (mantém `output/.gitkeep`).
@@ -66,6 +65,12 @@ Cada período contém:
 | `end_time` | string | Sim | Hora de término (formato HH:MM) |
 | `days_of_week` | array | Sim | Dias da semana (ex: ["monday", "tuesday"]) |
 
+Notas de validação:
+- Horários devem estar no formato HH:MM com horas 00–23 e minutos 00–59. Valores são normalizados com zero à esquerda quando necessário (ex.: `7:5` → `07:05`).
+- `days_of_week` é case-insensitive; valores inválidos são ignorados. Se nenhum dia válido for informado, utiliza-se todos os dias da semana por padrão.
+- `enabled` assume `true` quando omitido.
+- `name` é obrigatório; quando ausente, é atribuído automaticamente como "Período N".
+
 ## Seção: `data_sources`
 
 Configurações das fontes de dados.
@@ -85,6 +90,8 @@ Configurações das fontes de dados.
 Nota:
 - Retry aplica-se apenas a exceções transitórias: `TimeoutError`, `OSError`, `IOError`.
 - Compatibilidade: `retry_attempts` é mantido para configurações antigas; quando `retry_failed_sources` está presente, as novas chaves (`max_retries`, `retry_backoff_seconds`) têm precedência.
+- `user_agents` é normalizado como lista de strings; valores vazios são descartados e duplicatas removidas mantendo a ordem.
+- `timeout_seconds` deve ser > 0. `rate_limit_delay` e `retry_backoff_seconds` devem ser ≥ 0.
 
 ## Seção: `event_filters`
 
@@ -137,15 +144,12 @@ Configurações para geração de arquivos iCal.
 | Parâmetro | Tipo | Padrão | Descrição |
 |-----------|------|--------|-----------|
 | `calendar_name` | string | `"Motorsport Events"` | Nome do calendário |
-| `calendar_description` | string | `"Weekend motorsport events automatically collected"` | Descrição do calendário |
+| `calendar_description` | string | `"Weekend motorsport events calendar"` | Descrição do calendário |
 | `timezone` | string | `"America/Sao_Paulo"` | Fuso horário do calendário |
 | `default_duration_minutes` | number | `120` | Duração padrão dos eventos (minutos) |
-| `event_category` | string | `"SPORTS"` | Categoria dos eventos |
-| `event_priority` | string | `"NORMAL"` | Prioridade dos eventos |
-| `event_status` | string | `"CONFIRMED"` | Status dos eventos |
 | `include_streaming_links` | boolean | `true` | Inclui links de transmissão |
-| `include_location` | boolean | `true` | Inclui localização |
-| `include_description` | boolean | `true` | Inclui descrição detalhada |
+| `include_source_info` | boolean | `true` | Inclui informações da fonte no campo de descrição |
+| `enforce_sort` | boolean | `true` | Garante ordenação determinística dos eventos no arquivo iCal |
 
 ### Subseção: `reminders`
 
@@ -156,7 +160,24 @@ Cada lembrete contém:
 | Parâmetro | Tipo | Obrigatório | Descrição |
 |-----------|------|-------------|-----------|
 | `minutes` | number | Sim | Minutos antes do evento |
-| `method` | string | Sim | Método ("popup" ou "email") |
+
+Notas:
+- No snapshot atual, apenas `minutes` é utilizado pelo gerador iCal. O campo `method` (ex.: "popup"/"email") é ignorado.
+
+### Subseção: `output`
+
+Define opções de saída específicas do iCal.
+
+| Parâmetro | Tipo | Padrão | Descrição |
+|-----------|------|--------|-----------|
+| `directory` | string | `"output"` | Diretório onde o arquivo `.ics` será gerado |
+| `filename_template` | string | `"motorsport_events_{date}.ics"` | Template do nome do arquivo (usa `{date}` do primeiro evento) |
+
+Notas:
+- Essas opções em `ical_parameters.output` controlam apenas a geração do `.ics`. A opção global `general.output_directory` continua válida para outros artefatos.
+
+Notas de compatibilidade (snapshot 0.5.1):
+- Chaves legadas como `event_category`, `event_priority`, `event_status`, `include_location` e `include_description` podem existir em configurações antigas, mas não têm efeito no snapshot atual e podem ser reintroduzidas em PRs futuros.
 
 ## Seção: `streaming_providers`
 
@@ -227,6 +248,15 @@ Configurações detalhadas de log.
 | `console` | string | Formato padrão | Formato para saída no console |
 | `file` | string | Formato detalhado | Formato para arquivos de log |
 
+Notas (formatos padrão quando não definidos em `config.json`):
+
+```json
+{
+  "console": "%(asctime)s - %(name)s - %(levelname)s - %(message)s",
+  "file": "%(asctime)s - %(name)s - %(levelname)s - %(funcName)s:%(lineno)d - %(message)s"
+}
+```
+
 ### Subseção: `rotation`
 
 | Parâmetro | Tipo | Padrão | Descrição |
@@ -243,6 +273,9 @@ Configurações detalhadas de log.
 | `pretty_print` | boolean | `true` | Formatação legível dos payloads |
 | `include_headers` | boolean | `true` | Inclui cabeçalhos HTTP |
 | `separate_by_source` | boolean | `true` | Separa por fonte de dados |
+| `compress` | boolean | `true` | Comprime payloads salvos para economizar espaço |
+| `max_files_per_source` | number | `50` | Máximo de arquivos de payload por fonte (rotação por quantidade) |
+| `max_age_days` | number | `30` | Remove payloads mais antigos que X dias (limpeza por idade) |
 
 ## Exemplo Completo
 

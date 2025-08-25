@@ -32,6 +32,13 @@ from cryptography.hazmat.primitives import hashes
 from cryptography.hazmat.primitives.kdf.pbkdf2 import PBKDF2HMAC
 from github import Github, GithubException
 
+# Garante que o root do projeto esteja no sys.path para permitir imports de 'src.*'
+REPO_ROOT = Path(__file__).resolve().parents[2]
+if str(REPO_ROOT) not in sys.path:
+    sys.path.insert(0, str(REPO_ROOT))
+
+from src.utils.markdown_front_matter import strip_front_matter
+
 def get_config_path():
     """Retorna o caminho para o arquivo de configuração."""
     config_dir = Path.home() / '.config' / 'github_importer'
@@ -186,9 +193,14 @@ def import_issue(repo, issue_file):
             md_file = issue_file.parent / body_content
             if md_file.exists():
                 with open(md_file, 'r', encoding='utf-8') as f:
-                    body_content = f.read()
+                    # Remove front matter somente se estiver no topo; caso contrário, mantém o conteúdo
+                    body_content = strip_front_matter(f.read())
             else:
                 print(f" Arquivo markdown não encontrado: {md_file}")
+
+        # Sanitiza qualquer conteúdo string para evitar crashes por '---' no meio do texto
+        if isinstance(body_content, str):
+            body_content = strip_front_matter(body_content)
         
         # Cria a issue no GitHub
         issue = repo.create_issue(

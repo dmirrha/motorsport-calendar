@@ -9,7 +9,7 @@ import re
 import json
 from typing import Dict, List, Tuple, Optional, Any, Set
 from pathlib import Path
-from fuzzywuzzy import fuzz, process
+from fuzzywuzzy import fuzz
 from unidecode import unidecode
 import jellyfish
 import logging
