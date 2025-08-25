@@ -38,6 +38,12 @@ CI — Mutmut Baseline nightly (informativo) e Badge no README (Issue #144)
 - README: adicionado badge "Mutmut Baseline" apontando para o workflow para visibilidade rápida dos resultados.
 - Rastreabilidade: Issue #144.
 
+Fix — Geração de .coverage antes do baseline do Mutmut (Issue #144)
+
+- Makefile: o alvo `mutmut-baseline` passou a executar `coverage run -m pytest -q -o addopts= -p no:cov` antes do `mutmut run --use-coverage`, garantindo a presença do arquivo `.coverage`.
+- Efeito: elimina o erro `FileNotFoundError: No .coverage file found` e assegura que o `--use-coverage` seja aplicado corretamente no baseline.
+- Workflow: `.github/workflows/mutmut-baseline.yml` continua invocando `make mutmut-baseline`; execução permanece informativa enquanto estabilizamos o baseline.
+
 Docs — Limpeza de referências desatualizadas de PR
 
 - Removidas referências de PR obsoletas em `CHANGELOG.md`, `RELEASES.md` e docs de issues para evitar ambiguidade histórica e manter a rastreabilidade coesa. Sem impacto funcional.
