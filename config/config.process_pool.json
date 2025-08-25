@@ -1,0 +1,64 @@
+{
+  "general": {
+    "timezone": "America/Sao_Paulo",
+    "language": "pt-BR",
+    "log_level": "DEBUG",
+    "output_directory": "./output",
+    "visual_interface": {
+      "enabled": true,
+      "colors": true,
+      "progress_bars": true,
+      "icons": true
+    }
+  },
+  "data_sources": {
+    "priority_order": [
+      "tomada_tempo"
+    ],
+    "excluded_sources": [],
+    "timeout_seconds": 10,
+    "retry_attempts": 3,
+    "retry_failed_sources": true,
+    "max_retries": 1,
+    "retry_backoff_seconds": 0.5,
+    "rate_limit_delay": 1.0,
+    "user_agents": [
+      "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36",
+      "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36"
+    ],
+    "max_concurrent_sources": 2,
+    "collection_timeout_seconds": 120,
+    "per_source_timeout_seconds": 30,
+    "use_process_pool": true
+  },
+  "event_filters": {
+    "category_detection": {
+      "enabled": true,
+      "learning_mode": true,
+      "confidence_threshold": 0.7
+    },
+    "included_categories": ["*"],
+    "excluded_categories": [],
+    "weekend_detection": {
+      "algorithm": "first_event_based",
+      "days_range": ["friday", "saturday", "sunday"],
+      "extend_to_thursday": false,
+      "extend_to_monday": false
+    }
+  },
+  "ical_parameters": {
+    "calendar_name": "Motorsport Events",
+    "calendar_description": "Weekend motorsport events automatically collected",
+    "timezone": "America/Sao_Paulo",
+    "default_duration_minutes": 120,
+    "reminders": [
+      {"minutes": 60, "method": "popup"},
+      {"minutes": 15, "method": "popup"}
+    ],
+    "enforce_sort": true,
+    "output": {
+      "directory": "output",
+      "filename_template": "motorsport_events_{date}.ics"
+    }
+  }
+}

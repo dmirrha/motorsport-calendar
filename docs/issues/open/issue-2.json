@@ -35,6 +35,20 @@
     {"item": "Testes de integração da fonte Tomada de Tempo", "done": false},
     {"item": "Atualizar documentação (README, DATA_SOURCES, CHANGELOG, RELEASES)", "done": false}
   ],
+  "recent_updates": [
+    {
+      "date": "2025-08-25T00:00:00Z",
+      "change": "Ajuste da semântica do campo 'source' em detect_categories_batch: 'pattern_matching' quando raw_category presente; caso contrário, 'pattern_matching+context'.",
+      "tests": [
+        "tests/unit/category/test_category_detector_filter_and_batch.py::test_detect_categories_batch_combines_name_and_handles_empty"
+      ],
+      "files": [
+        "src/category_detector.py",
+        "RELEASES.md",
+        "docs/issues/open/issue-2.md"
+      ]
+    }
+  ],
   "docs_updated": [
     "docs/issues/open/issue-2.md",
     "docs/issues/open/issue-2.json"
