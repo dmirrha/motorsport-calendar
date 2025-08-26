@@ -6,6 +6,7 @@ for all data sources (APIs, web scrapers, etc.).
 """
 
 import time
+import threading
 import requests
 from abc import ABC, abstractmethod
 from typing import List, Dict, Any, Optional, Tuple
@@ -33,6 +34,8 @@ class BaseSource(ABC):
         # sejam condicionais e não causem AttributeError.
         self.logger = logger
         self.ui = ui_manager
+        # Cooperative cancellation flag for long operations (sleeps/backoff)
+        self.cancel_event: threading.Event = threading.Event()
         
         # Source identification
         self.source_name = self.__class__.__name__.replace('Source', '').lower()
@@ -64,6 +67,26 @@ class BaseSource(ABC):
             'last_collection_time': None,
             'errors': []
         }
+
+    def _sleep_with_cancel(self, seconds: float) -> None:
+        """
+        Sleep cooperatively, waking up early if cancellation is requested.
+
+        Args:
+            seconds: number of seconds to wait
+
+        Raises:
+            TimeoutError: if cancellation was requested during the wait
+        """
+        if seconds is None or seconds <= 0:
+            return
+        # Fast-path: already cancelled
+        if self.cancel_event.is_set():
+            raise TimeoutError("Cancelled")
+        # Wait with timeout; returns True if event is set
+        self.cancel_event.wait(timeout=float(seconds))
+        if self.cancel_event.is_set():
+            raise TimeoutError("Cancelled")
     
     def _load_config(self) -> None:
         """Load source-specific configuration."""
@@ -147,11 +170,18 @@ class BaseSource(ABC):
         Returns:
             Response object or None if failed
         """
+        # Abort early if cancelled
+        if self.cancel_event.is_set():
+            if self.logger:
+                self.logger.debug(f"⛔ {self.source_display_name}: Cancel requested before request to {url}")
+            raise TimeoutError("Cancelled")
+
         self.stats['requests_made'] += 1
         
         # Rate limiting
         if self.stats['requests_made'] > 1:
-            time.sleep(self.rate_limit_delay)
+            # Cooperative rate limit delay
+            self._sleep_with_cancel(self.rate_limit_delay)
         
         # Rotate user agent occasionally
         if self.stats['requests_made'] % 10 == 0:
@@ -197,9 +227,9 @@ class BaseSource(ABC):
                 })
                 
                 if attempt < self.retry_attempts - 1:
-                    # Exponential backoff
+                    # Exponential backoff (cooperative)
                     wait_time = (2 ** attempt) * self.rate_limit_delay
-                    time.sleep(wait_time)
+                    self._sleep_with_cancel(wait_time)
                 else:
                     # Final attempt failed
                     self.stats['failed_requests'] += 1

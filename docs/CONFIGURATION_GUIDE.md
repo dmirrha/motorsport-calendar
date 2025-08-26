@@ -80,6 +80,10 @@ Configurações das fontes de dados.
 | `priority_order` | array | `["tomada_tempo"]` | Ordem de prioridade das fontes |
 | `excluded_sources` | array | `[]` | Fontes a serem ignoradas |
 | `timeout_seconds` | number | `10` | Timeout em segundos para requisições |
+| `max_concurrent_sources` | number | `3` | Máximo de fontes executadas em paralelo |
+| `collection_timeout_seconds` | number | `300` | Timeout total da coleta (cancela remanescentes de forma cooperativa) |
+| `use_process_pool` | boolean | `false` | Executa fontes em pool de processos (isolamento opcional) |
+| `per_source_timeout_seconds` | number | não definido | Timeout individual por fonte; quando ausente, não é aplicado explicitamente |
 | `retry_attempts` | number | `3` | Número de tentativas (legado; sobrescrito se novas chaves de retry estiverem definidas) |
 | `retry_failed_sources` | boolean | `true` | Habilita retry por fonte para erros transitórios |
 | `max_retries` | number | `1` | Máximo de novas tentativas por fonte (exclui a tentativa inicial) |
@@ -87,11 +91,15 @@ Configurações das fontes de dados.
 | `rate_limit_delay` | number | `1.0` | Atraso entre requisições (segundos) |
 | `user_agents` | array | Lista padrão | User-Agents para requisições HTTP |
 
-Nota:
+Notas:
 - Retry aplica-se apenas a exceções transitórias: `TimeoutError`, `OSError`, `IOError`.
 - Compatibilidade: `retry_attempts` é mantido para configurações antigas; quando `retry_failed_sources` está presente, as novas chaves (`max_retries`, `retry_backoff_seconds`) têm precedência.
 - `user_agents` é normalizado como lista de strings; valores vazios são descartados e duplicatas removidas mantendo a ordem.
 - `timeout_seconds` deve ser > 0. `rate_limit_delay` e `retry_backoff_seconds` devem ser ≥ 0.
+- Concorrência: `max_concurrent_sources` limita a quantidade de fontes que executam em paralelo; excedentes aguardam em fila.
+- Tempo limite total: `collection_timeout_seconds` encerra a coleta restante de forma cooperativa. Implementações podem registrar avisos de cancelamento nas tarefas remanescentes.
+- Timeout por fonte: quando `per_source_timeout_seconds` estiver definido e for > 0, aplica-se ao trabalho de cada fonte. Quando ausente/ inválido, não é aplicado explicitamente (o sistema depende de timeouts internos e do `collection_timeout_seconds`).
+- Pool de processos: `use_process_pool` habilita execução em processos separados (isolamento de memória/CPU). Pode introduzir overhead e diferenças na ordenação dos logs; avalie manter `false` a menos que haja necessidade de isolamento.
 
 ## Seção: `event_filters`
 

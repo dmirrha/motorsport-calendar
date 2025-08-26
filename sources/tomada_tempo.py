@@ -43,6 +43,9 @@ class TomadaTempoSource(BaseSource):
         events = []
         
         try:
+            # Cancelamento cooperativo imediato, se solicitado
+            if getattr(self, 'cancel_event', None) is not None and self.cancel_event.is_set():
+                raise TimeoutError("Cancelled")
             # Get current weekend if no target date provided
             if not target_date:
                 target_date = self._get_next_weekend()
@@ -97,6 +100,13 @@ class TomadaTempoSource(BaseSource):
             
             return valid_events
             
+        except TimeoutError:
+            # Cancelamento solicitado (por timeout global/per-fonte ou sinal)
+            if self.logger:
+                self.logger.debug("⛔ Coleta cancelada por timeout/cancel_event em Tomada de Tempo")
+            if self.ui:
+                self.ui.show_source_result(self.source_display_name, False, 0, "Cancelled by timeout")
+            return []
         except Exception as e:
             error_msg = f"Failed to collect events: {str(e)}"
             self.stats['failed_requests'] += 1
@@ -135,6 +145,9 @@ class TomadaTempoSource(BaseSource):
         events = []
         
         try:
+            # Cancelamento cooperativo
+            if getattr(self, 'cancel_event', None) is not None and self.cancel_event.is_set():
+                raise TimeoutError("Cancelled")
             # Get the main page first
             response = self.make_request(self.get_base_url())
             if not response:
@@ -160,6 +173,8 @@ class TomadaTempoSource(BaseSource):
             all_links = soup.find_all('a', href=True)
             
             for link in all_links:
+                if getattr(self, 'cancel_event', None) is not None and self.cancel_event.is_set():
+                    raise TimeoutError("Cancelled")
                 link_text = link.get_text(strip=True)
                 link_href = link.get('href', '')
                 
@@ -180,6 +195,8 @@ class TomadaTempoSource(BaseSource):
             # If no exact date match, look for any "PROGRAMAÇÃO DA TV E INTERNET" link
             if not programming_link:
                 for link in all_links:
+                    if getattr(self, 'cancel_event', None) is not None and self.cancel_event.is_set():
+                        raise TimeoutError("Cancelled")
                     link_text = link.get_text(strip=True)
                     link_href = link.get('href', '')
                     
@@ -195,6 +212,8 @@ class TomadaTempoSource(BaseSource):
                 if self.logger:
                     self.logger.debug(f"🌐 Accessing weekend programming page: {programming_link}")
                 
+                if getattr(self, 'cancel_event', None) is not None and self.cancel_event.is_set():
+                    raise TimeoutError("Cancelled")
                 programming_response = self.make_request(programming_link)
                 if programming_response:
                     # Parse the programming page
@@ -214,6 +233,8 @@ class TomadaTempoSource(BaseSource):
                 if self.logger:
                     self.logger.debug("🔍 No weekend programming link found on main page")
                     
+        except TimeoutError:
+            raise
         except Exception as e:
             if self.logger:
                 self.logger.debug(f"⚠️ Error collecting from weekend programming: {e}")
@@ -233,11 +254,15 @@ class TomadaTempoSource(BaseSource):
         events = []
         
         try:
+            if getattr(self, 'cancel_event', None) is not None and self.cancel_event.is_set():
+                raise TimeoutError("Cancelled")
             # Make request to calendar page
             response = self.make_request(self.get_base_url())
             if response:
                 events = self._parse_calendar_page(response.text, target_date, response.url)
                 
+        except TimeoutError:
+            raise
         except Exception as e:
             error_msg = f"Failed to collect from calendar: {e}"
             if self.logger:
@@ -260,6 +285,8 @@ class TomadaTempoSource(BaseSource):
         events = []
         
         try:
+            if getattr(self, 'cancel_event', None) is not None and self.cancel_event.is_set():
+                raise TimeoutError("Cancelled")
             soup = BeautifulSoup(html_content, 'html.parser')
             
             # Extract programming context (weekend dates) from page title or URL
@@ -289,9 +316,13 @@ class TomadaTempoSource(BaseSource):
                 ]
                 
                 for selector in event_selectors:
+                    if getattr(self, 'cancel_event', None) is not None and self.cancel_event.is_set():
+                        raise TimeoutError("Cancelled")
                     event_elements = soup.select(selector)
                     if event_elements:
                         for element in event_elements:
+                            if getattr(self, 'cancel_event', None) is not None and self.cancel_event.is_set():
+                                raise TimeoutError("Cancelled")
                             event = self._extract_event_from_element(element, target_date, programming_context)
                             if event:
                                 events.append(event)
@@ -301,6 +332,8 @@ class TomadaTempoSource(BaseSource):
             if not events:
                 events = self._parse_text_content(html_content, target_date, programming_context)
                 
+        except TimeoutError:
+            raise
         except Exception as e:
             if self.logger:
                 self.logger.debug(f"⚠️ Error parsing calendar page: {e}")
@@ -338,6 +371,8 @@ class TomadaTempoSource(BaseSource):
                 current_date = None
                 
                 while current_element:
+                    if getattr(self, 'cancel_event', None) is not None and self.cancel_event.is_set():
+                        raise TimeoutError("Cancelled")
                     if hasattr(current_element, 'name'):
                         # Check for date headers (like "SEXTA-FEIRA – 01/08/2025")
                         if current_element.name in ['p', 'h6', 'strong'] and current_element.get_text():
@@ -385,6 +420,8 @@ class TomadaTempoSource(BaseSource):
                 if self.logger:
                     self.logger.debug("📅 No weekend programming header found")
             
+        except TimeoutError:
+            raise
         except Exception as e:
             if self.logger:
                 self.logger.debug(f"⚠️ Error parsing weekend programming structure: {e}")
@@ -407,6 +444,8 @@ class TomadaTempoSource(BaseSource):
         
         try:
             for li in ul_element.find_all('li'):
+                if getattr(self, 'cancel_event', None) is not None and self.cancel_event.is_set():
+                    raise TimeoutError("Cancelled")
                 li_text = li.get_text(strip=True)
                 
                 if li_text and len(li_text) > 10:
@@ -414,6 +453,8 @@ class TomadaTempoSource(BaseSource):
                     if event:
                         events.append(event)
         
+        except TimeoutError:
+            raise
         except Exception as e:
             if self.logger:
                 self.logger.debug(f"⚠️ Error parsing event list: {e}")
@@ -524,6 +565,8 @@ class TomadaTempoSource(BaseSource):
             
             return event
             
+        except TimeoutError:
+            raise
         except Exception as e:
             if self.logger:
                 self.logger.debug(f"⚠️ Error parsing event from li: {e}")
@@ -605,6 +648,8 @@ class TomadaTempoSource(BaseSource):
                     except ValueError:
                         pass
         
+        except TimeoutError:
+            raise
         except Exception as e:
             if self.logger:
                 self.logger.debug(f"⚠️ Error extracting programming context: {e}")
@@ -703,6 +748,8 @@ class TomadaTempoSource(BaseSource):
                     pass
                 return evt
             
+        except TimeoutError:
+            raise
         except Exception as e:
             if self.logger:
                 self.logger.debug(f"⚠️ Error extracting event from element: {e}")
@@ -963,11 +1010,15 @@ class TomadaTempoSource(BaseSource):
         
         for page in category_pages:
             try:
+                if getattr(self, 'cancel_event', None) is not None and self.cancel_event.is_set():
+                    raise TimeoutError("Cancelled")
                 url = urljoin(self.get_base_url(), page)
                 response = self.make_request(url)
                 if response:
                     page_events = self._parse_calendar_page(response.text, target_date, response.url)
                     events.extend(page_events)
+            except TimeoutError:
+                raise
             except Exception as e:
                 if self.logger:
                     self.logger.debug(f"⚠️ Error collecting from category page {page}: {e}")
@@ -995,6 +1046,8 @@ class TomadaTempoSource(BaseSource):
         current_event = {}
         
         for line in lines:
+            if getattr(self, 'cancel_event', None) is not None and self.cancel_event.is_set():
+                raise TimeoutError("Cancelled")
             if line is not None:
                 line = line.strip()
             if not line or len(line) < 10:
@@ -1048,6 +1101,8 @@ class TomadaTempoSource(BaseSource):
                     'raw_text': line,
                     'from_context': not bool(self._extract_date(line))  # Flag to indicate if date came from context
                 }
+        except TimeoutError:
+            raise
         except Exception as e:
             if self.logger:
                 self.logger.debug(f"⚠️ Error extracting from text line: {e}")
