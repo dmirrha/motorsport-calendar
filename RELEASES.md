@@ -14,6 +14,13 @@ Config — Concorrência e timeouts em data_sources
 - Documentação: `docs/CONFIGURATION_GUIDE.md` atualizado com tabela e notas sobre concorrência, timeout total cooperativo e uso opcional de pool de processos.
 - Exemplo: `config/config.example.json` atualizado com os novos campos e valores sugeridos.
 
+Fix — BaseSource: sleep/backoff compatível com testes (CI unit)
+
+- `sources/base_source.py::_sleep_with_cancel()` agora utiliza `time.sleep(seconds)` com checagem de cancelamento antes/depois, em vez de `Event.wait(timeout)`.
+- Motivo: permitir que o `monkeypatch` capture os delays no teste `tests/unit/sources/base_source/test_make_request.py::test_make_request_backoff_and_rate_limit_no_sleep` (esperado: `[0.5, 0.5, 1.0]`).
+- Impacto: sem alteração de comportamento funcional; melhora compatibilidade e observabilidade em testes.
+- Validação local: teste específico passa isolado; a suíte completa será validada no CI do GitHub.
+
 ICS — Ordenação determinística reforçada
 
 - `src/ical_generator.py`: adicionado desempate final por `event_id` na chave de ordenação de eventos do iCal, garantindo estabilidade mesmo quando `datetime`/categoria/nome/prioridade de fonte forem idênticos.
