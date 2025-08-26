@@ -391,6 +391,56 @@ O arquivo `config/config.json` permite personalizar. Consulte o [Guia de Configu
 - **Links de transmissão** por região
 - **Sistema de logging**
 
+### IA — Serviço de Embeddings Offline
+
+Este projeto inclui um serviço local de embeddings 100% offline, com batching e cache (memória + disco). Útil para recursos semânticos como categorização e deduplicação futuras, sem dependência de internet.
+
+- Suporte de device: `auto` detecta `mps` (Metal), depois `cuda`, e por fim `cpu`.
+- Backend atual: `hashing` (determinístico), dimensão configurável.
+- Cache combinado: LRU em memória + persistência em disco via SQLite (TTL opcional).
+- Métricas expostas por execução: `batch_latencies_ms`, `cache_hits`, `cache_misses`.
+
+#### Como habilitar (config/config.json)
+
+Copie o exemplo e ajuste conforme necessário:
+
+```json
+{
+  "ai": {
+    "enabled": true,
+    "device": "auto",   
+    "batch_size": 16,
+    "cache": {
+      "enabled": true,
+      "dir": "cache/embeddings",
+      "ttl_days": 30
+    },
+    "embeddings": {
+      "backend": "hashing",
+      "dim": 256,
+      "lru_capacity": 10000
+    }
+  }
+}
+```
+
+Notas:
+- O diretório de cache é criado automaticamente e precisa de permissão de escrita.
+- `ttl_days = 0` desativa expiração por idade no cache de disco.
+- `dim` e `backend` compõem a chave de cache (invalidação automática quando mudam).
+
+#### Execução e verificação
+
+- Rode sua rotina normalmente; o serviço de embeddings é utilizado internamente quando `ai.enabled=true`.
+- Observe logs (nível INFO/DEBUG) para métricas de lotes e hits/misses de cache.
+- Para testes locais focados no serviço: `pytest -q tests/unit/ai/test_embeddings_service.py`
+
+#### Troubleshooting
+
+- Permissões: garanta escrita em `cache/embeddings`.
+- Device: em `device=auto`, se `mps`/`cuda` não estiverem disponíveis, o fallback é CPU.
+- Determinismo: entradas iguais devem gerar embeddings iguais entre execuções.
+
 ### Exemplo rápido — ical_parameters
 
 ```json
