@@ -3,6 +3,22 @@
 Este arquivo contém um registro acumulativo de todas as versões lançadas do projeto, com notas detalhadas sobre as mudanças em cada versão.
 
 ## Não Lançado
+Benchmarks — Baseline vs IA (Issue #158)
+
+- Scripts de avaliação e benchmarking adicionados para comparar métodos baseline heurísticos versus IA na categorização e deduplicação de eventos.
+- Dataset sintético: `docs/tests/scenarios/data/eval_dataset.csv` (contém ground-truth de categorias e grupos de duplicata).
+- CLI: `scripts/eval/benchmarks.py` com flags para tarefa (`--task category|dedup|both`), modo (`--mode baseline|ia|both`), entrada e saída, seed e batch size.
+- Saídas: relatórios em `docs/tests/audit/benchmarks/` — `metrics.csv` (tabelar) e `report.md` (resumo legível), incluindo métricas de precisão/cobertura/confiança (categorização), precisão/recall/F1/TP/FP/FN (deduplicação) e latência (total e por item).
+- Execução local (exemplo):
+  ```bash
+  python scripts/eval/benchmarks.py \
+    --task both --mode both \
+    --input docs/tests/scenarios/data/eval_dataset.csv \
+    --outdir docs/tests/audit/benchmarks \
+    --seed 42
+  ```
+- Documentação: `docs/tests/overview.md` atualizado com instruções, descrição das métricas e caminhos de entrada/saída.
+
 Config — Concorrência e timeouts em data_sources
 
 - Novas chaves documentadas e validadas em `data_sources`:

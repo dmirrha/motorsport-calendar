@@ -337,6 +337,28 @@ python motorsport_calendar.py --output meu_calendario.ics
 python motorsport_calendar.py --verbose
 ```
 
+## 📈 Benchmarks — Baseline vs IA (Issue #158)
+
+- Script CLI: `scripts/eval/benchmarks.py`
+- Dataset sintético: `docs/tests/scenarios/data/eval_dataset.csv`
+- Saídas: `docs/tests/audit/benchmarks/metrics.csv` e `report.md`
+
+Execução exemplo:
+
+```bash
+python scripts/eval/benchmarks.py \
+  --task both --mode both \
+  --input docs/tests/scenarios/data/eval_dataset.csv \
+  --outdir docs/tests/audit/benchmarks \
+  --seed 42
+```
+
+Métricas geradas:
+- Categorização: accuracy, coverage, avg_confidence, latência total e por item.
+- Deduplicação: precision, recall, F1, TP/FP/FN, pares preditos/verdadeiros, latência.
+
+Detalhes e troubleshooting: consulte `docs/tests/overview.md` (seção Benchmarks).
+
 ## 📁 Estrutura do Projeto
 
 ```
