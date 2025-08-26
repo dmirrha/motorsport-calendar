@@ -24,6 +24,9 @@ Converter o modelo para ONNX e habilitar execução opcional via `onnxruntime` (
 ## 📊 Impacto
 Médio — otimização de performance opcional.
 
+## 🔗 Relacionamento
+- EPIC: #157
+
 ## 🔗 Referências
 - `docs/architecture/ai_implementation_plan.md`
 - `requirements.txt`

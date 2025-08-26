@@ -24,6 +24,9 @@ Adicionar chaves `ai.*` ao `config/config.example.json` e validar em `src/utils/
 ## 📊 Impacto
 Médio — base para ativação segura da IA.
 
+## 🔗 Relacionamento
+- EPIC: #157
+
 ## 🔗 Referências
 - `src/utils/config_validator.py`
 - `config/config.example.json`
