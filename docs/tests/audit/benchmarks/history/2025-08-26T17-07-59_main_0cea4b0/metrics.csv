@@ -1,0 +1,5 @@
+run_at,dataset,task,mode,accuracy,coverage,avg_confidence,precision,recall,f1,latency_ms_total,latency_ms_per_item,total_items,tp,fp,fn,pred_pairs,truth_pairs
+2025-08-26T17:09:01,docs/tests/scenarios/data/eval_dataset.csv,category,baseline,0.5333,1.0,1.0,,,,0,0.002,15,,,,,
+2025-08-26T17:09:01,docs/tests/scenarios/data/eval_dataset.csv,category,ia,0.9333,1.0,0.9967,,,,21,1.431,15,,,,,
+2025-08-26T17:09:01,docs/tests/scenarios/data/eval_dataset.csv,dedup,baseline,,,,0.0,0.0,0.0,0,0.017,15,0,0,4,0,4
+2025-08-26T17:09:01,docs/tests/scenarios/data/eval_dataset.csv,dedup,ia,,,,0.0,0.0,0.0,17,1.177,15,0,0,4,0,4

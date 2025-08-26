@@ -1,0 +1,9 @@
+timestamp,seed,task,mode,dataset,count,accuracy,coverage,avg_confidence,precision,recall,f1,latency_ms,notes
+2025-08-26T16:29:34,42,category,baseline,/Users/daniel.m.santos/My Drive/Projetos/Race Calendar/docs/tests/scenarios/data/eval_dataset.csv,0,0.0000,0.0000,,,,,1183.97,Sem detector (usa raw_category)
+2025-08-26T16:29:34,42,dedup,baseline,/Users/daniel.m.santos/My Drive/Projetos/Race Calendar/docs/tests/scenarios/data/eval_dataset.csv,10,,,,0.0000,0.0000,0.0000,0.69,Sem detector (usa raw_category)
+2025-08-26T16:29:34,42,category,ia,/Users/daniel.m.santos/My Drive/Projetos/Race Calendar/docs/tests/scenarios/data/eval_dataset.csv,0,0.0000,0.0000,1.0000,,,,10.71,CategoryDetector habilitado
+2025-08-26T16:29:34,42,dedup,ia,/Users/daniel.m.santos/My Drive/Projetos/Race Calendar/docs/tests/scenarios/data/eval_dataset.csv,10,,,,0.0000,0.0000,0.0000,10.27,CategoryDetector habilitado
+2025-08-26T16:35:41,docs/tests/scenarios/data/eval_dataset.csv,category,baseline,0.5333,1.0,1.0,,,,0,0.003,15,,,,,
+2025-08-26T16:35:41,docs/tests/scenarios/data/eval_dataset.csv,category,ia,0.9333,1.0,0.9967,,,,19,1.333,15,,,,,
+2025-08-26T16:35:41,docs/tests/scenarios/data/eval_dataset.csv,dedup,baseline,,,,0.0,0.0,0.0,0,0.017,15,0,0,4,0,4
+2025-08-26T16:35:41,docs/tests/scenarios/data/eval_dataset.csv,dedup,ia,,,,0.0,0.0,0.0,16,1.124,15,0,0,4,0,4
