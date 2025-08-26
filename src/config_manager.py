@@ -10,10 +10,25 @@ import os
 from pathlib import Path
 from typing import Dict, Any, Optional, List
 import logging
-from utils.config_validator import (
-    validate_data_sources_config,
-    ConfigValidationError,
-)
+try:
+    from .utils.config_validator import (
+        validate_data_sources_config,
+        ConfigValidationError,
+        validate_ai_config,
+    )
+except Exception:
+    try:
+        from src.utils.config_validator import (
+            validate_data_sources_config,
+            ConfigValidationError,
+            validate_ai_config,
+        )
+    except Exception:
+        from utils.config_validator import (
+            validate_data_sources_config,
+            ConfigValidationError,
+            validate_ai_config,
+        )
 
 
 class ConfigManager:
@@ -280,6 +295,13 @@ class ConfigManager:
             self.config['data_sources'] = normalized_ds
         except ConfigValidationError as e:
             issues.append(f"data_sources invalid: {e}")
+
+        # Validate and normalize AI section
+        try:
+            normalized_ai = validate_ai_config(self.config.get('ai', {}))
+            self.config['ai'] = normalized_ai
+        except ConfigValidationError as e:
+            issues.append(f"ai invalid: {e}")
         
         # Validate priority sources
         priority_sources = self.get_priority_sources()

@@ -16,10 +16,19 @@ Config — Concorrência e timeouts em data_sources
 
 Fix — BaseSource: sleep/backoff compatível com testes (CI unit)
 
-- `sources/base_source.py::_sleep_with_cancel()` agora utiliza `time.sleep(seconds)` com checagem de cancelamento antes/depois, em vez de `Event.wait(timeout)`.
-- Motivo: permitir que o `monkeypatch` capture os delays no teste `tests/unit/sources/base_source/test_make_request.py::test_make_request_backoff_and_rate_limit_no_sleep` (esperado: `[0.5, 0.5, 1.0]`).
-- Impacto: sem alteração de comportamento funcional; melhora compatibilidade e observabilidade em testes.
-- Validação local: teste específico passa isolado; a suíte completa será validada no CI do GitHub.
+    - `sources/base_source.py::_sleep_with_cancel()` agora utiliza `time.sleep(seconds)` com checagem de cancelamento antes/depois, em vez de `Event.wait(timeout)`.
+    - Motivo: permitir que o `monkeypatch` capture os delays no teste `tests/unit/sources/base_source/test_make_request.py::test_make_request_backoff_and_rate_limit_no_sleep` (esperado: `[0.5, 0.5, 1.0]`).
+    - Impacto: sem alteração de comportamento funcional; melhora compatibilidade e observabilidade em testes.
+    - Validação local: teste específico passa isolado; a suíte completa será validada no CI do GitHub.
+
+Fix — ConfigManager: import resiliente do `utils.config_validator`
+
+- `src/config_manager.py`: passa a tentar importar o validador de três formas para suportar diferentes contextos de execução (pacote e módulo isolado):
+  - `from .utils import config_validator`
+  - `from src.utils import config_validator`
+  - `import utils.config_validator as config_validator`
+- Impacto: melhora robustez do import em execuções locais/CI sem alterar comportamento funcional.
+- Validação: suíte completa passou localmente (`415 passed, 8 skipped`), cobertura global ~`81.41%`.
 
 ICS — Ordenação determinística reforçada
 

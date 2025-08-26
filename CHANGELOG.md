@@ -19,6 +19,10 @@ e este projeto adere ao [Versionamento Semântico](https://semver.org/spec/v2.0.
   - Impacto: sem alteração de comportamento funcional; melhora compatibilidade e observabilidade em testes.
   - Validação local: teste específico passa isolado; a suíte completa será validada no CI.
   - Versionamento: `src/__init__.py` atualizado para `0.6.6`.
+- Fix — ConfigManager: import resiliente do `utils.config_validator`
+  - `src/config_manager.py`: tenta importar de três formas (relativo `.utils.config_validator`; absoluto `src.utils.config_validator`; `utils.config_validator`) para suportar execução como pacote `src` ou módulo isolado.
+  - Impacto: melhora compatibilidade de import em execuções locais/CI e uso como módulo; sem mudança funcional.
+  - Validação: suíte completa passou localmente (`415 passed, 8 skipped`), cobertura global `81.41%`.
 - ICS — Ordenação determinística reforçada
   - `src/ical_generator.py`: adicionado critério final de desempate (`event_id`) na chave de ordenação em `ICalGenerator.generate_calendar` para garantir estabilidade absoluta quando `datetime`, `detected_category`, `display_name`/`name` e `source_priority` forem idênticos.
   - Efeito: elimina variações residuais de ordem em empates, estabilizando VEVENTs no `.ics` em todos os cenários.
