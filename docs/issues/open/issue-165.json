@@ -36,11 +36,11 @@
   },
   "tasks": [
     {"item": "Branch feat/165-embeddings-service criada a partir de main", "done": true},
-    {"item": "Arquivos de issue (MD/JSON) criados em docs/issues/open/", "done": false},
-    {"item": "Especificar API e estratégia de cache/batching", "done": false},
-    {"item": "Atualizar config e validador", "done": false},
-    {"item": "Implementar serviço e testes unitários", "done": false},
-    {"item": "Documentar execução offline e requisitos", "done": false},
+    {"item": "Arquivos de issue (MD/JSON) criados em docs/issues/open/", "done": true},
+    {"item": "Especificar API e estratégia de cache/batching", "done": true},
+    {"item": "Atualizar config e validador", "done": true},
+    {"item": "Implementar serviço e testes unitários", "done": true},
+    {"item": "Documentar execução offline e requisitos", "done": true},
     {"item": "Abrir PR referenciando #165", "done": false}
   ],
   "docs_updated": [

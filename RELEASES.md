@@ -3,6 +3,16 @@
 Este arquivo contém um registro acumulativo de todas as versões lançadas do projeto, com notas detalhadas sobre as mudanças em cada versão.
 
 ## Não Lançado
+AI — Serviço de Embeddings offline (Issue #165)
+
+- Serviço local 100% offline baseado em hashing determinístico (multilíngue).
+- Batching configurável (`ai.batch_size`) com métricas: `batch_latencies_ms`, `cache_hits`, `cache_misses`.
+- Cache em dois níveis: LRU em memória e persistência em disco com TTL (`ai.cache.enabled|dir|ttl_days`).
+- Seleção automática de device (`ai.device`): `auto` → `mps` → `cuda` → `cpu` (fallback garantido).
+- Configuração adicionada: `ai.enabled`, `ai.device`, `ai.batch_size`, `ai.cache.*`, `ai.embeddings.backend|dim|lru_capacity`.
+- Testes: `tests/unit/ai/test_embeddings_service.py` cobre determinismo, batching, cache e fallback de device.
+- Documentação: `README.md` e `docs/CONFIGURATION_GUIDE.md` atualizados com setup/uso/troubleshooting.
+
 Benchmarks — Baseline vs IA (Issue #158)
 
 - Scripts de avaliação e benchmarking adicionados para comparar métodos baseline heurísticos versus IA na categorização e deduplicação de eventos.

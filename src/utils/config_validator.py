@@ -605,4 +605,30 @@ def validate_ai_config(config: Dict[str, Any]) -> Dict[str, Any]:
         'ttl_days': ttl_days,
     }
 
+    # embeddings (fase 1)
+    embeddings = merged.get('embeddings', {}) or {}
+    try:
+        backend = str(embeddings.get('backend', 'hashing')).strip().lower()
+        # Fase 1 suporta apenas 'hashing'
+        if backend not in {'hashing'}:
+            backend = 'hashing'
+        dim = int(embeddings.get('dim', 256))
+        if dim < 1:
+            raise ValueError('embeddings.dim deve ser >= 1')
+        lru_capacity = int(embeddings.get('lru_capacity', 10000))
+        if lru_capacity < 1:
+            raise ValueError('embeddings.lru_capacity deve ser >= 1')
+    except (ValueError, TypeError) as e:
+        raise ConfigValidationError(
+            f"Valor inválido em ai.embeddings: {e}",
+            ErrorCode.CONFIG_VALIDATION_ERROR,
+            'ai.embeddings'
+        ) from e
+
+    merged['embeddings'] = {
+        'backend': backend,
+        'dim': dim,
+        'lru_capacity': lru_capacity,
+    }
+
     return merged

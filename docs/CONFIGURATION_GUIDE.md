@@ -258,6 +258,19 @@ Notas:
 - `dir` é convertido para caminho absoluto e criado automaticamente; é exigida permissão de escrita. Falhas na preparação do diretório são reportadas como `OUTPUT-5000-ERROR`.
 - Quando `enabled=false`, a seção pode permanecer configurada para uso futuro, mas não será utilizada.
 
+### Subseção: `embeddings`
+
+| Parâmetro | Tipo | Padrão | Descrição |
+|-----------|------|--------|-----------|
+| `backend` | string | `"hashing"` | Backend de geração de embeddings (offline determinístico) |
+| `dim` | number | `256` | Dimensão do vetor de embeddings (≥ 1) |
+| `lru_capacity` | number | `10000` | Capacidade do cache LRU em memória (≥ 1) |
+
+Notas:
+- Backend suportado no snapshot atual: `hashing`.
+- A chave de cache inclui `backend` e `dim`; ao alterá-los, entradas antigas são invalidadas automaticamente.
+- Métricas disponíveis em runtime (via logs/serviço): `batch_latencies_ms`, `cache_hits`, `cache_misses`.
+
 ## Seção: `logging`
 
 Configurações detalhadas de log.

@@ -70,12 +70,21 @@ Implementar um serviço local de embeddings para suporte semântico multilíngue
 
 ## Checklist de Execução
 - [x] Branch `feat/165-embeddings-service` criada a partir de `main`.
-- [ ] Artefatos da issue (MD/JSON) criados em `docs/issues/open/`.
-- [ ] Especificação de API/cache/batching revisada e aprovada.
-- [ ] Config e validador atualizados.
-- [ ] Serviço implementado com testes unitários passando.
-- [ ] Documentação atualizada.
+- [x] Artefatos da issue (MD/JSON) criados em `docs/issues/open/`.
+- [x] Especificação de API/cache/batching revisada e aprovada.
+- [x] Config e validador atualizados.
+- [x] Serviço implementado com testes unitários passando.
+- [x] Documentação atualizada.
 - [ ] PR aberta referenciando e fechando #165.
+
+## Evidências dos Testes
+- Comando: `pytest -q -c /dev/null -p no:cov tests/unit/ai/test_embeddings_service.py`
+- Resultado: `2 passed` (1.72s)
+- Cobertura global ignorada para foco no módulo (gate global de 45% não aplicável nesta execução isolada).
+- Validações:
+  - Determinismo e dimensão dos vetores (`dim`).
+  - Batching com métricas de latência por lote (`batch_latencies_ms`).
+  - Cache: hits na segunda execução, sem novos lotes (LRU + disco via SQLite).
 
 ## Logs e Referências
 - Issue: https://github.com/dmirrha/motorsport-calendar/issues/165
@@ -85,4 +94,4 @@ Implementar um serviço local de embeddings para suporte semântico multilíngue
 - Requisitos: `requirements.txt`
 
 ## Status
-Aberta; aguardando confirmação do plano para iniciar a implementação.
+Em finalização: serviço implementado, configuração validada e documentação atualizada. Preparando PR para fechar #165.

@@ -13,6 +13,15 @@ O formato é baseado em [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)
 e este projeto adere ao [Versionamento Semântico](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
+- Feature — AI: Serviço de Embeddings offline (Issue #165)
+  - Novo `EmbeddingsService` 100% offline com backend determinístico por hashing (multilíngue).
+  - Batching configurável (`ai.batch_size`) com métricas: `batch_latencies_ms`, `cache_hits`, `cache_misses`.
+  - Cache em dois níveis: LRU em memória (`lru_capacity`) e persistência em disco (`ai.cache.dir`, TTL `ai.cache.ttl_days`).
+  - Seleção de device (`ai.device`): `auto` → `mps` → `cuda` → `cpu` (fallback garantido).
+  - Configuração: `ai.enabled`, `ai.device`, `ai.batch_size`, `ai.cache.enabled|dir|ttl_days`, `ai.embeddings.backend|dim|lru_capacity`.
+  - Testes unitários: `tests/unit/ai/test_embeddings_service.py` cobrindo determinismo, batching, cache e fallback de device.
+  - Documentação atualizada: `README.md` e `docs/CONFIGURATION_GUIDE.md`.
+  - Versionamento: `src/__init__.py` atualizado para `0.6.7`.
 - Fix — BaseSource: sleep/backoff compatível com testes (CI unit)
   - `sources/base_source.py::_sleep_with_cancel()` passa a usar `time.sleep(seconds)` com checagem de cancelamento antes/depois, em vez de `Event.wait(timeout)`.
   - Motivo: permitir que `monkeypatch` capture os delays no teste `tests/unit/sources/base_source/test_make_request.py::test_make_request_backoff_and_rate_limit_no_sleep` (esperado: `[0.5, 0.5, 1.0]`).
