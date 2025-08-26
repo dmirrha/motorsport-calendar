@@ -1,0 +1,16 @@
+event_id,name,raw_category,date,time,timezone,location,country,session_type,source,ground_truth_category,duplicate_group
+E001,Formula 1 Italian Grand Prix,formula 1,2025-09-07,15:00,Europe/Rome,Monza,Italy,race,FIA,F1,1
+E002,F1 GP Italia,f-1,2025-09-07,15:05,Europe/Rome,Monza,Italy,race,FIA,F1,1
+E003,MotoGP San Marino,moto gp,2025-09-14,14:00,Europe/Rome,Misano,Italy,race,Dorna,MotoGP,2
+E004,Gran Premio di San Marino,motogp,2025-09-14,14:02,Europe/Rome,Misano,Italy,race,Dorna,MotoGP,2
+E005,San Marino GP - MotoGP,world championship,2025-09-14,14:01,Europe/Rome,Misano,Italy,race,Dorna,MotoGP,2
+E006,6 Hours of Monza,wec,2025-07-07,12:00,Europe/Rome,Monza,Italy,race,FIA,WEC,
+E007,IMSA at Road Atlanta,imsa weathertech,2025-10-12,16:00,America/New_York,Atlanta,United States,race,IMSA,IMSA,
+E008,Stock Car Pro Series Interlagos,stock car,2025-08-10,13:00,America/Sao_Paulo,Interlagos,Brazil,race,StockCar,StockCar,
+E009,NASCAR Cup Series Daytona,nascar cup,2025-08-25,18:30,America/New_York,Daytona,United States,race,NASCAR,NASCAR,
+E010,IndyCar Grand Prix of Long Beach,indycar,2025-04-13,13:00,America/Los_Angeles,Long Beach,United States,race,IndyCar,IndyCar,
+E011,WRC Rally Finland,wrc,2025-08-03,10:00,Europe/Helsinki,Jyvaskyla,Finland,race,WRC,WRC,
+E012,DTM Norisring,dtm,2025-07-06,13:30,Europe/Berlin,Norisring,Germany,race,DTM,DTM,
+E013,Formula E Berlin E-Prix,formula e,2025-05-25,15:00,Europe/Berlin,Berlin,Germany,race,FIA,FormulaE,
+E014,Super GT Fuji,super gt,2025-08-04,13:00,Asia/Tokyo,Fujinomiya,Japan,race,SuperGT,SuperGT,
+E015,WTCR Vila Real,wtcr,2025-06-30,12:00,Europe/Lisbon,Vila Real,Portugal,race,WTCR,WTCR,

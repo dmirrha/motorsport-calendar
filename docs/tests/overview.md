@@ -187,10 +187,22 @@ Objetivo: descrever a estratégia mínima de testes para o projeto, com foco em 
   - Arquivos de integração não-E2E em `tests/integration/` CONTÊM `pytest.mark.integration`.
 - Objetivo: evitar regressões que baguncem o escopo dos jobs `integration` e `e2e` no CI.
 
-## Atualização CI — Codecov XML (fallback e gates)
-- Removido `-c /dev/null` dos comandos `pytest` nos jobs `e2e_happy` e `integration` em `.github/workflows/tests.yml` para que o `pytest.ini` e plugins (ex.: `pytest-cov`) sejam respeitados.
-- Aplicado `--cov-fail-under=0` apenas nesses jobs, neutralizando o gate global de cobertura sem afetar o job `unit`.
-- Adicionados passos de verificação e fallback antes do upload ao Codecov:
-  - Verificar `coverage_e2e.xml` e `coverage_integration.xml` com `ls -l`, `wc -c`, `head`.
-  - Se ausente, gerar o XML via `python -m coverage xml -i -o <arquivo>` (reaproveitando dados `.coverage`).
-  - Uploads usam `disable_search: true` e apontam explicitamente para os arquivos esperados para evitar uploads indevidos.
+## Benchmarks — Baseline vs IA (Issue #158)
+
+- Dataset: `docs/tests/scenarios/data/eval_dataset.csv`
+- CLI: `scripts/eval/benchmarks.py`
+- Saídas: `docs/tests/audit/benchmarks/metrics.csv` e `docs/tests/audit/benchmarks/report.md`
+
+Execução local:
+
+```bash
+python scripts/eval/benchmarks.py \
+  --task both --mode both \
+  --input docs/tests/scenarios/data/eval_dataset.csv \
+  --outdir docs/tests/audit/benchmarks \
+  --seed 42
+```
+
+Métricas:
+- Categorização: accuracy, coverage, avg_confidence, latência total e por item.
+- Deduplicação: precision, recall, F1, TP/FP/FN, latência total e por item.
