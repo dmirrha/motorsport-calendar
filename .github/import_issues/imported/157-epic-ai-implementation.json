@@ -1,0 +1,26 @@
+{
+  "title": "EPIC: Implementação do Plano de IA (F0–F3)",
+  "body": "157-epic-ai-implementation.md",
+  "labels": [
+    "epic",
+    "ai",
+    "governance",
+    "docs",
+    "needs-triage",
+    "priority: P1"
+  ],
+  "assignees": [],
+  "milestone": null,
+  "state": "open",
+  "metadata": {
+    "created_at": "2025-08-26T10:25:50-03:00",
+    "priority": "P1",
+    "type": "epic",
+    "components": [
+      "ai"
+    ],
+    "related_issues": []
+  },
+  "github_issue_number": 157,
+  "github_issue_url": "https://github.com/dmirrha/motorsport-calendar/issues/157"
+}

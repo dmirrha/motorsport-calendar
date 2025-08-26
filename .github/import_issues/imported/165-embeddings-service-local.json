@@ -1,0 +1,28 @@
+{
+  "title": "F1: Serviço local de embeddings (cache+batch)",
+  "body": "165-embeddings-service-local.md",
+  "labels": [
+    "enhancement",
+    "ai",
+    "performance",
+    "needs-triage",
+    "priority: P1"
+  ],
+  "assignees": [],
+  "milestone": null,
+  "state": "open",
+  "metadata": {
+    "created_at": "2025-08-26T10:25:50-03:00",
+    "priority": "P1",
+    "type": "feature",
+    "components": [
+      "ai",
+      "embeddings"
+    ],
+    "related_issues": [
+      145
+    ]
+  },
+  "github_issue_number": 165,
+  "github_issue_url": "https://github.com/dmirrha/motorsport-calendar/issues/165"
+}
