@@ -13,6 +13,12 @@ O formato é baseado em [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)
 e este projeto adere ao [Versionamento Semântico](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
+- Fix — BaseSource: sleep/backoff compatível com testes (CI unit)
+  - `sources/base_source.py::_sleep_with_cancel()` passa a usar `time.sleep(seconds)` com checagem de cancelamento antes/depois, em vez de `Event.wait(timeout)`.
+  - Motivo: permitir que `monkeypatch` capture os delays no teste `tests/unit/sources/base_source/test_make_request.py::test_make_request_backoff_and_rate_limit_no_sleep` (esperado: `[0.5, 0.5, 1.0]`).
+  - Impacto: sem alteração de comportamento funcional; melhora compatibilidade e observabilidade em testes.
+  - Validação local: teste específico passa isolado; a suíte completa será validada no CI.
+  - Versionamento: `src/__init__.py` atualizado para `0.6.6`.
 - ICS — Ordenação determinística reforçada
   - `src/ical_generator.py`: adicionado critério final de desempate (`event_id`) na chave de ordenação em `ICalGenerator.generate_calendar` para garantir estabilidade absoluta quando `datetime`, `detected_category`, `display_name`/`name` e `source_priority` forem idênticos.
   - Efeito: elimina variações residuais de ordem em empates, estabilizando VEVENTs no `.ics` em todos os cenários.

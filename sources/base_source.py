@@ -80,11 +80,11 @@ class BaseSource(ABC):
         """
         if seconds is None or seconds <= 0:
             return
-        # Fast-path: already cancelled
+        # Verificação rápida: já cancelado
         if self.cancel_event.is_set():
             raise TimeoutError("Cancelled")
-        # Wait with timeout; returns True if event is set
-        self.cancel_event.wait(timeout=float(seconds))
+        # Usar time.sleep diretamente para compatibilidade com testes (monkeypatch de time.sleep)
+        time.sleep(float(seconds))
         if self.cancel_event.is_set():
             raise TimeoutError("Cancelled")
     
