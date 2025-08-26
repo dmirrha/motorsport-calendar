@@ -4,7 +4,7 @@
 Implementar um serviço local de embeddings para suporte semântico (multilíngue) usando modelo `paraphrase-multilingual-MiniLM-L12-v2`, com batching e cache (memória/disco), executando offline (CPU por padrão; GPU/MPS se disponível).
 
 ## 🔍 Contexto
-- Integrações futuras: categorização (issue #147) e deduplicação (issue #148).
+- Integrações futuras: categorização (issue #163) e deduplicação (issue #160).
 - Padrão opt-in: `ai.enabled=false`.
 - Arquivos alvo: `src/ai/embeddings_service.py`, `src/ai/cache.py` (novos), integração via `src/category_detector.py` e `src/event_processor.py`.
 
@@ -28,6 +28,9 @@ Implementar um serviço local de embeddings para suporte semântico (multilíngu
 
 ## 📊 Impacto
 Médio/Alto — base para recursos semânticos com controle de performance local.
+
+## 🔗 Relacionamento
+- EPIC: #157
 
 ## 🔗 Referências
 - Plano: `docs/architecture/ai_implementation_plan.md`

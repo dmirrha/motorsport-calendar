@@ -24,6 +24,9 @@ Atualizar documentação e governança para refletir as novas capacidades de IA,
 ## 📊 Impacto
 Médio — melhora a adoção segura e a rastreabilidade.
 
+## 🔗 Relacionamento
+- EPIC: #157
+
 ## 🔗 Referências
 - `docs/architecture/ai_implementation_plan.md`
 - `requirements.txt`

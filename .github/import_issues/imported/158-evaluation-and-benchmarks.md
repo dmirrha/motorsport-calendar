@@ -25,6 +25,9 @@ Criar scripts e cenários de avaliação para comparar baseline (heurístico/fuz
 ## 📊 Impacto
 Médio — garante visibilidade de qualidade/performance e reduz risco.
 
+## 🔗 Relacionamento
+- EPIC: #157
+
 ## 🔗 Referências
 - `docs/architecture/ai_implementation_plan.md`
 - `requirements.txt`

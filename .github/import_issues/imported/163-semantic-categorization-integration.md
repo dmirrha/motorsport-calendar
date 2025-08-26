@@ -4,7 +4,7 @@
 Integrar categorização semântica por embeddings em `src/category_detector.py`, mantendo heurísticas atuais como fallback. Expor `category_confidence` e `category_source`.
 
 ## 🔍 Contexto
-- Serviço de embeddings (#146) provê `embed_texts()`.
+- Serviço de embeddings (#165) provê `embed_texts()`.
 - Threshold de categorização: 0.75 (ajustável por config `ai.thresholds.category`).
 
 ## 🎯 Comportamento Esperado
@@ -26,6 +26,9 @@ Integrar categorização semântica por embeddings em `src/category_detector.py`
 
 ## 📊 Impacto
 Médio — melhora de classificação com controle de risco via opt-in.
+
+## 🔗 Relacionamento
+ - EPIC: #157
 
 ## 🔗 Referências
 - `src/category_detector.py`, `src/utils/config_validator.py`

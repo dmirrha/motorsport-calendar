@@ -16,14 +16,14 @@ EPIC para conduzir a implementação incremental do plano de IA descrito em `doc
 - Scripts de avaliação local para aferir precisão, latência e estabilidade (cache/batching).
 
 ## 📋 Tarefas
-- [ ] #146 F1: Serviço local de embeddings (cache+batch)
-- [ ] #147 F1: Integração de categorização semântica (0.75)
-- [ ] #148 F1b: Deduplicação semântica (0.85)
-- [ ] #149 F0: Avaliação e benchmarks (baseline vs IA)
-- [ ] #150 F3 (opcional): ONNX/quantização
-- [ ] #151 Config/validador: chaves `ai.*`
-- [ ] #152 Docs/governança e release notes
-- [ ] #153 F2 (opcional): Regras simples de anomalias
+- [ ] #158 F0: Avaliação e benchmarks (baseline vs IA)
+- [ ] #159 F2 (opcional): Regras simples de anomalias
+- [ ] #160 F1b: Deduplicação semântica (0.85)
+- [ ] #161 Docs/governança e release notes
+- [ ] #162 Config/validador: chaves `ai.*`
+- [ ] #163 F1: Integração de categorização semântica (0.75)
+- [ ] #164 F3 (opcional): ONNX/quantização
+- [ ] #165 F1: Serviço local de embeddings (cache+batch)
 
 ## 📊 Impacto
 - Médio/Alto: Melhora de qualidade (categorias/dedup), mantendo compatibilidade ao deixar IA desativada por padrão.

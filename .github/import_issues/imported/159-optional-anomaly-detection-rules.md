@@ -25,6 +25,9 @@ Implementar checagens leves de qualidade para sinalizar anomalias (datas fora do
 ## 📊 Impacto
 Baixo/Médio — melhora a confiabilidade percebida.
 
+## 🔗 Relacionamento
+- EPIC: #157
+
 ## 🔗 Referências
 - `src/event_processor.py`
 - `docs/architecture/ai_implementation_plan.md`

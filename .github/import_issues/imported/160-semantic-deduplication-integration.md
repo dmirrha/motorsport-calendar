@@ -4,7 +4,7 @@
 Adicionar camada de similaridade semântica à deduplicação em `src/event_processor.py::_are_events_similar()`, mantendo fuzzy/heurísticas existentes e determinismo do `_select_best_event()`.
 
 ## 🔍 Contexto
-- Usa serviço de embeddings (#146) para nomes normalizados e, se disponível, local.
+- Usa serviço de embeddings (#165) para nomes normalizados e, se disponível, local.
 - Threshold de dedup: 0.85 (`ai.thresholds.dedup`).
 
 ## 🎯 Comportamento Esperado
@@ -26,6 +26,9 @@ Adicionar camada de similaridade semântica à deduplicação em `src/event_proc
 
 ## 📊 Impacto
 Médio — consolida eventos redundantes com maior robustez.
+
+## 🔗 Relacionamento
+ - EPIC: #157
 
 ## 🔗 Referências
 - `src/event_processor.py`
