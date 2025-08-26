@@ -1,0 +1,57 @@
+{
+  "id": 3356428371,
+  "number": 165,
+  "state": "open",
+  "title": "F1: Serviço local de embeddings (cache+batch)",
+  "milestone": null,
+  "epic": 157,
+  "url": "https://github.com/dmirrha/motorsport-calendar/issues/165",
+  "created_at": "2025-08-26T16:56:59Z",
+  "updated_at": "2025-08-26T17:09:19Z",
+  "labels": ["enhancement", "needs-triage", "priority: P1", "ai", "performance"],
+  "plan": {
+    "summary": "Implementar serviço local de embeddings (multilíngue) com batching e cache (memória+disco), 100% offline, com seleção automática de device e métricas de desempenho.",
+    "files": [
+      "src/ai/embeddings_service.py",
+      "src/ai/cache.py",
+      "src/category_detector.py",
+      "src/event_processor.py",
+      "src/utils/config_validator.py",
+      "config/config.example.json",
+      "requirements.txt",
+      "tests/unit/test_embeddings_service.py",
+      "README.md",
+      "docs/tests/overview.md"
+    ],
+    "steps": [
+      "Criar EmbeddingsService com API: embed_texts(list[str]) -> list[list[float]] (ou np.ndarray)",
+      "Implementar cache LRU em memória e cache persistente em disco (sqlite/jsonl) usando chave hash do texto",
+      "Adicionar batching configurável e logging de métricas (latência por lote, cache hits/misses)",
+      "Suportar ai.device=auto (MPS/Metal -> CUDA -> CPU), ai.batch_size, ai.cache_dir, ai.enabled",
+      "Garantir execução offline com local_files_only=true e instruções para provisionar o modelo local",
+      "Atualizar config e validador para novas chaves em ai.*",
+      "Criar testes unitários determinísticos cobrindo cache, batching e fallback de device",
+      "Documentar setup local do modelo e troubleshooting"
+    ]
+  },
+  "tasks": [
+    {"item": "Branch feat/165-embeddings-service criada a partir de main", "done": true},
+    {"item": "Arquivos de issue (MD/JSON) criados em docs/issues/open/", "done": false},
+    {"item": "Especificar API e estratégia de cache/batching", "done": false},
+    {"item": "Atualizar config e validador", "done": false},
+    {"item": "Implementar serviço e testes unitários", "done": false},
+    {"item": "Documentar execução offline e requisitos", "done": false},
+    {"item": "Abrir PR referenciando #165", "done": false}
+  ],
+  "docs_updated": [
+    "docs/issues/open/issue-165.md",
+    "docs/issues/open/issue-165.json"
+  ],
+  "pr": null,
+  "acceptance": [
+    "100% offline em runtime (sem chamadas de rede)",
+    "Batching e cache configuráveis (memória+disco)",
+    "Testes unitários cobrindo cache/batch/device fallback",
+    "Documentação de setup e troubleshooting local"
+  ]
+}
