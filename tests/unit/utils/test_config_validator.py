@@ -12,7 +12,8 @@ from src.utils.config_validator import (
     validate_logging_config,
     validate_payload_settings,
     validate_silent_periods,
-    ConfigValidationError
+    ConfigValidationError,
+    validate_ai_config,
 )
 from src.utils.error_codes import ErrorCode
 
@@ -227,6 +228,78 @@ class TestConfigValidator(unittest.TestCase):
             self.assertEqual(len(result), 1)
             self.assertEqual(len(result[0]['days_of_week']), 7)  # Deve usar todos os dias
             mock_warning.assert_called()
+
+
+    # ----------------------------
+    # Testes para seção ai.*
+    # ----------------------------
+    def test_validate_ai_config_defaults_and_normalization(self):
+        """Valida normalização da seção ai com valores custom e paths absolutos."""
+        cache_dir = str(self.test_dir / 'ai_cache')
+        ai_cfg = {
+            'enabled': True,
+            'device': 'CPU',
+            'batch_size': '32',
+            'thresholds': {'category': '0.8', 'dedup': 0.9},
+            'onnx': {'enabled': True, 'provider': 'CUDA', 'opset': '17'},
+            'cache': {'enabled': False, 'dir': cache_dir, 'ttl_days': '7'}
+        }
+        result = validate_ai_config(ai_cfg)
+        self.assertTrue(result['enabled'])
+        self.assertEqual(result['device'], 'cpu')
+        self.assertEqual(result['batch_size'], 32)
+        self.assertAlmostEqual(result['thresholds']['category'], 0.8)
+        self.assertAlmostEqual(result['thresholds']['dedup'], 0.9)
+        self.assertTrue(result['onnx']['enabled'])
+        self.assertEqual(result['onnx']['provider'], 'cuda')
+        self.assertEqual(result['onnx']['opset'], 17)
+        # Cache
+        self.assertFalse(result['cache']['enabled'])
+        self.assertEqual(result['cache']['ttl_days'], 7)
+        self.assertTrue(Path(result['cache']['dir']).is_absolute())
+        self.assertTrue(Path(result['cache']['dir']).exists())
+
+    def test_validate_ai_config_invalid_device(self):
+        with self.assertRaises(ConfigValidationError) as cm:
+            validate_ai_config({'device': 'tpu'})
+        self.assertEqual(cm.exception.error_code, ErrorCode.CONFIG_VALIDATION_ERROR)
+
+    def test_validate_ai_config_invalid_batch_size(self):
+        with self.assertRaises(ConfigValidationError) as cm:
+            validate_ai_config({'batch_size': 0})
+        self.assertEqual(cm.exception.error_code, ErrorCode.CONFIG_VALIDATION_ERROR)
+
+    def test_validate_ai_config_invalid_thresholds(self):
+        with self.assertRaises(ConfigValidationError) as cm:
+            validate_ai_config({'thresholds': {'category': 1.1}})
+        self.assertEqual(cm.exception.error_code, ErrorCode.CONFIG_VALIDATION_ERROR)
+
+    def test_validate_ai_config_invalid_onnx_provider(self):
+        with self.assertRaises(ConfigValidationError) as cm:
+            validate_ai_config({'onnx': {'provider': 'directml'}})
+        self.assertEqual(cm.exception.error_code, ErrorCode.CONFIG_VALIDATION_ERROR)
+
+    def test_validate_ai_config_invalid_onnx_opset(self):
+        with self.assertRaises(ConfigValidationError) as cm:
+            validate_ai_config({'onnx': {'opset': 9}})
+        self.assertEqual(cm.exception.error_code, ErrorCode.CONFIG_VALIDATION_ERROR)
+
+    @patch('os.access', return_value=False)
+    def test_validate_ai_config_cache_permission_error(self, mock_access):
+        cache_dir = str(self.test_dir / 'ai_cache_perm')
+        with self.assertRaises(ConfigValidationError) as cm:
+            validate_ai_config({'cache': {'dir': cache_dir}})
+        self.assertEqual(cm.exception.error_code, ErrorCode.OUTPUT_WRITE_ERROR)
+
+    def test_validate_ai_config_invalid_ttl_days(self):
+        with self.assertRaises(ConfigValidationError) as cm:
+            validate_ai_config({'cache': {'ttl_days': -1}})
+        self.assertEqual(cm.exception.error_code, ErrorCode.CONFIG_VALIDATION_ERROR)
+
+    def test_validate_ai_config_non_object(self):
+        with self.assertRaises(ConfigValidationError) as cm:
+            validate_ai_config(['not', 'a', 'dict'])
+        self.assertEqual(cm.exception.error_code, ErrorCode.CONFIG_VALIDATION_ERROR)
 
 
 if __name__ == '__main__':

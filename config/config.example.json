@@ -170,6 +170,26 @@
     }
   },
   
+  "ai": {
+    "enabled": false,
+    "device": "auto",
+    "batch_size": 16,
+    "thresholds": {
+      "category": 0.75,
+      "dedup": 0.85
+    },
+    "onnx": {
+      "enabled": false,
+      "provider": "cpu",
+      "opset": 17
+    },
+    "cache": {
+      "enabled": true,
+      "dir": "cache/embeddings",
+      "ttl_days": 30
+    }
+  },
+  
   "logging": {
     "file_structure": {
       "main_log": "logs/motorsport_calendar.log",

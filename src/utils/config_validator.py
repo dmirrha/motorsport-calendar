@@ -469,3 +469,140 @@ def validate_data_sources_config(config: Dict[str, Any]) -> Dict[str, Any]:
         ) from e
 
     return merged
+
+def validate_ai_config(config: Dict[str, Any]) -> Dict[str, Any]:
+    """Valida e padroniza a configuração da seção ai.
+    
+    Estrutura validada (com defaults):
+    - enabled: bool (default False)
+    - device: str in {auto,cpu,cuda,mps} (default 'auto')
+    - batch_size: int >= 1 (default 16)
+    - thresholds:
+        - category: float entre 0 e 1 (default 0.75)
+        - dedup: float entre 0 e 1 (default 0.85)
+    - onnx:
+        - enabled: bool (default False)
+        - provider: str in {cpu,cuda,coreml} (default 'cpu')
+        - opset: int >= 11 (default 17)
+    - cache:
+        - enabled: bool (default True)
+        - dir: caminho gravável (default 'cache/embeddings')
+        - ttl_days: int >= 0 (default 30)
+    """
+    if config is None:
+        config = {}
+    if not isinstance(config, dict):
+        raise ConfigValidationError(
+            "Configuração de ai deve ser um objeto",
+            ErrorCode.CONFIG_VALIDATION_ERROR,
+            "ai"
+        )
+
+    merged: Dict[str, Any] = {**config}
+
+    # enabled
+    merged['enabled'] = bool(merged.get('enabled', False))
+
+    # device
+    device = str(merged.get('device', 'auto')).strip().lower()
+    allowed_devices = {'auto', 'cpu', 'cuda', 'mps'}
+    if device not in allowed_devices:
+        raise ConfigValidationError(
+            f"Valor inválido para ai.device: {device}",
+            ErrorCode.CONFIG_VALIDATION_ERROR,
+            'ai.device'
+        )
+    merged['device'] = device
+
+    # batch_size
+    try:
+        bs = int(merged.get('batch_size', 16))
+        if bs < 1:
+            raise ValueError("batch_size deve ser >= 1")
+        merged['batch_size'] = bs
+    except (ValueError, TypeError) as e:
+        raise ConfigValidationError(
+            f"Valor inválido para ai.batch_size: {e}",
+            ErrorCode.CONFIG_VALIDATION_ERROR,
+            'ai.batch_size'
+        ) from e
+
+    # thresholds
+    thresholds = merged.get('thresholds', {}) or {}
+    try:
+        cat = float(thresholds.get('category', 0.75))
+        ded = float(thresholds.get('dedup', 0.85))
+        if not (0.0 <= cat <= 1.0):
+            raise ValueError('category deve estar entre 0 e 1')
+        if not (0.0 <= ded <= 1.0):
+            raise ValueError('dedup deve estar entre 0 e 1')
+        merged['thresholds'] = {'category': cat, 'dedup': ded}
+    except (ValueError, TypeError) as e:
+        raise ConfigValidationError(
+            f"Valor inválido em ai.thresholds: {e}",
+            ErrorCode.CONFIG_VALIDATION_ERROR,
+            'ai.thresholds'
+        ) from e
+
+    # onnx
+    onnx = merged.get('onnx', {}) or {}
+    onnx_enabled = bool(onnx.get('enabled', False))
+    provider = str(onnx.get('provider', 'cpu')).strip().lower()
+    allowed_providers = {'cpu', 'cuda', 'coreml'}
+    if provider not in allowed_providers:
+        raise ConfigValidationError(
+            f"Valor inválido para ai.onnx.provider: {provider}",
+            ErrorCode.CONFIG_VALIDATION_ERROR,
+            'ai.onnx.provider'
+        )
+    try:
+        opset = int(onnx.get('opset', 17))
+        if opset < 11:
+            raise ValueError('opset deve ser >= 11')
+    except (ValueError, TypeError) as e:
+        raise ConfigValidationError(
+            f"Valor inválido para ai.onnx.opset: {e}",
+            ErrorCode.CONFIG_VALIDATION_ERROR,
+            'ai.onnx.opset'
+        ) from e
+    merged['onnx'] = {
+        'enabled': onnx_enabled,
+        'provider': provider,
+        'opset': opset,
+    }
+
+    # cache
+    cache = merged.get('cache', {}) or {}
+    cache_enabled = bool(cache.get('enabled', True))
+    cache_dir = str(cache.get('dir', 'cache/embeddings')).strip()
+    try:
+        cache_path = Path(cache_dir)
+        if not cache_path.is_absolute():
+            cache_path = Path.cwd() / cache_path
+        cache_path.mkdir(parents=True, exist_ok=True)
+        if not os.access(cache_path, os.W_OK):
+            raise PermissionError(f"Sem permissão de escrita em {cache_path}")
+    except Exception as e:
+        raise ConfigValidationError(
+            f"Falha ao preparar diretório de cache: {e}",
+            ErrorCode.OUTPUT_WRITE_ERROR,
+            'ai.cache.dir'
+        ) from e
+    try:
+        ttl_days = int(cache.get('ttl_days', 30))
+        if ttl_days < 0:
+            raise ValueError('ttl_days deve ser >= 0')
+    except (ValueError, TypeError) as e:
+        raise ConfigValidationError(
+            f"Valor inválido para ai.cache.ttl_days: {e}",
+            ErrorCode.CONFIG_VALIDATION_ERROR,
+            'ai.cache.ttl_days'
+        ) from e
+
+    merged['cache'] = {
+        'enabled': cache_enabled,
+        'dir': str(cache_path.absolute()),
+        'ttl_days': ttl_days,
+    }
+
+    return merged

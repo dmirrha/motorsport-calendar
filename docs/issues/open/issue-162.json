@@ -1,0 +1,50 @@
+{
+  "id": 3356427015,
+  "number": 162,
+  "state": "open",
+  "title": "Config/Validator: chaves ai.* e defaults alinhados ao plano",
+  "milestone": null,
+  "epic": 157,
+  "url": "https://github.com/dmirrha/motorsport-calendar/issues/162",
+  "created_at": "2025-08-26T16:56:41Z",
+  "updated_at": "2025-08-26T17:11:22Z",
+  "labels": ["needs-triage", "priority: P1", "ai", "docs", "config"],
+  "plan": {
+    "summary": "Adicionar e validar seção ai no config, documentar e cobrir com testes.",
+    "files": [
+      "config/config.example.json",
+      "src/utils/config_validator.py",
+      "src/config_manager.py",
+      "docs/CONFIGURATION_GUIDE.md",
+      "tests/unit/utils/test_config_validator.py",
+      "CHANGELOG.md",
+      "RELEASES.md"
+    ],
+    "steps": [
+      "Atualizar config/config.example.json com seção ai",
+      "Implementar validate_ai_config em src/utils/config_validator.py",
+      "Integrar chamada ao validate_ai_config no src/config_manager.py",
+      "Documentar seção ai em docs/CONFIGURATION_GUIDE.md",
+      "Adicionar/validar testes em tests/unit/utils/test_config_validator.py",
+      "Atualizar notas em CHANGELOG.md e RELEASES.md"
+    ]
+  },
+  "tasks": [
+    {"item": "Seção ai adicionada ao config.example", "done": true},
+    {"item": "Função validate_ai_config implementada", "done": true},
+    {"item": "Integração no ConfigManager realizada", "done": true},
+    {"item": "Documentação atualizada (CONFIGURATION_GUIDE)", "done": true},
+    {"item": "Testes de validação criados/ajustados", "done": true},
+    {"item": "Notas de release/changelog atualizadas", "done": true}
+  ],
+  "docs_updated": [
+    "docs/issues/open/issue-162.md",
+    "docs/issues/open/issue-162.json"
+  ],
+  "pr": null,
+  "acceptance": [
+    "Defaults corretos e tipos/intervalos validados",
+    "Guia de configuração atualizado",
+    "Testes cobrindo casos válidos e inválidos"
+  ]
+}

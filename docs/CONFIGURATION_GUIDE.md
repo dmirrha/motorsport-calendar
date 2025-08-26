@@ -220,6 +220,44 @@ Mapeamento de categorias e classificação.
 | `custom_mappings` | object | - | Mapeamentos personalizados de nomes para categorias |
 | `type_classification` | object | - | Classificação de tipos de veículos |
 
+## Seção: `ai`
+
+Configurações de recursos de IA locais (desabilitados por padrão).
+
+| Parâmetro | Tipo | Padrão | Descrição |
+|-----------|------|--------|-----------|
+| `enabled` | boolean | `false` | Habilita a seção de IA |
+| `device` | string | `"auto"` | Dispositivo de execução: `auto`, `cpu`, `cuda`, `mps` |
+| `batch_size` | number | `16` | Tamanho do lote para inferências |
+
+### Subseção: `thresholds`
+
+| Parâmetro | Tipo | Padrão | Descrição |
+|-----------|------|--------|-----------|
+| `category` | number | `0.75` | Limite de confiança (0–1) para decisões de categoria |
+| `dedup` | number | `0.85` | Limite (0–1) para deduplicação baseada em similaridade |
+
+### Subseção: `onnx`
+
+| Parâmetro | Tipo | Padrão | Descrição |
+|-----------|------|--------|-----------|
+| `enabled` | boolean | `false` | Habilita execução via ONNX Runtime |
+| `provider` | string | `"cpu"` | Provider: `cpu`, `cuda`, `coreml` |
+| `opset` | number | `17` | Versão mínima suportada: `>= 11` |
+
+### Subseção: `cache`
+
+| Parâmetro | Tipo | Padrão | Descrição |
+|-----------|------|--------|-----------|
+| `enabled` | boolean | `true` | Habilita cache local (ex.: embeddings) |
+| `dir` | string | `"cache/embeddings"` | Diretório do cache; criado se não existir |
+| `ttl_days` | number | `30` | Tempo de vida (dias) para limpeza de itens de cache (>= 0) |
+
+Notas:
+- `device` e `provider` são case-insensitive e validados. Valores inválidos geram erro de validação.
+- `dir` é convertido para caminho absoluto e criado automaticamente; é exigida permissão de escrita. Falhas na preparação do diretório são reportadas como `OUTPUT-5000-ERROR`.
+- Quando `enabled=false`, a seção pode permanecer configurada para uso futuro, mas não será utilizada.
+
 ## Seção: `logging`
 
 Configurações detalhadas de log.
