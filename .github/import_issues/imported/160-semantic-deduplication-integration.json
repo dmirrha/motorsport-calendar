@@ -1,0 +1,29 @@
+{
+  "title": "F1b: Deduplicação semântica (threshold 0.85)",
+  "body": "160-semantic-deduplication-integration.md",
+  "labels": [
+    "enhancement",
+    "ai",
+    "dedup",
+    "needs-triage",
+    "priority: P1"
+  ],
+  "assignees": [],
+  "milestone": null,
+  "state": "open",
+  "metadata": {
+    "created_at": "2025-08-26T10:25:50-03:00",
+    "priority": "P1",
+    "type": "feature",
+    "components": [
+      "ai",
+      "dedup"
+    ],
+    "related_issues": [
+      145,
+      146
+    ]
+  },
+  "github_issue_number": 160,
+  "github_issue_url": "https://github.com/dmirrha/motorsport-calendar/issues/160"
+}

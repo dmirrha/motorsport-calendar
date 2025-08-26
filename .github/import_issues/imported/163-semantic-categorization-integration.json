@@ -1,0 +1,29 @@
+{
+  "title": "F1: Integração de categorização semântica (threshold 0.75)",
+  "body": "163-semantic-categorization-integration.md",
+  "labels": [
+    "enhancement",
+    "ai",
+    "category",
+    "needs-triage",
+    "priority: P1"
+  ],
+  "assignees": [],
+  "milestone": null,
+  "state": "open",
+  "metadata": {
+    "created_at": "2025-08-26T10:25:50-03:00",
+    "priority": "P1",
+    "type": "feature",
+    "components": [
+      "ai",
+      "category"
+    ],
+    "related_issues": [
+      145,
+      146
+    ]
+  },
+  "github_issue_number": 163,
+  "github_issue_url": "https://github.com/dmirrha/motorsport-calendar/issues/163"
+}

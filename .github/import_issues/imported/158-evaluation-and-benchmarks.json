@@ -1,0 +1,31 @@
+{
+  "title": "F0: Avaliação e benchmarks (baseline vs IA)",
+  "body": "158-evaluation-and-benchmarks.md",
+  "labels": [
+    "testing",
+    "ai",
+    "docs",
+    "needs-triage",
+    "priority: P2"
+  ],
+  "assignees": [],
+  "milestone": null,
+  "state": "open",
+  "metadata": {
+    "created_at": "2025-08-26T10:25:50-03:00",
+    "priority": "P2",
+    "type": "testing",
+    "components": [
+      "ai",
+      "eval"
+    ],
+    "related_issues": [
+      145,
+      146,
+      147,
+      148
+    ]
+  },
+  "github_issue_number": 158,
+  "github_issue_url": "https://github.com/dmirrha/motorsport-calendar/issues/158"
+}

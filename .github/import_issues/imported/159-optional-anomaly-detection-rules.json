@@ -1,0 +1,30 @@
+{
+  "title": "F2 (opcional): Regras simples de detecção de anomalias",
+  "body": "159-optional-anomaly-detection-rules.md",
+  "labels": [
+    "enhancement",
+    "ai",
+    "optional",
+    "needs-triage",
+    "priority: P3"
+  ],
+  "assignees": [],
+  "milestone": null,
+  "state": "open",
+  "metadata": {
+    "created_at": "2025-08-26T10:25:50-03:00",
+    "priority": "P3",
+    "type": "feature",
+    "components": [
+      "ai",
+      "quality"
+    ],
+    "related_issues": [
+      145,
+      147,
+      148
+    ]
+  },
+  "github_issue_number": 159,
+  "github_issue_url": "https://github.com/dmirrha/motorsport-calendar/issues/159"
+}
