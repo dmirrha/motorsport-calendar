@@ -3,6 +3,17 @@
 Este arquivo contém um registro acumulativo de todas as versões lançadas do projeto, com notas detalhadas sobre as mudanças em cada versão.
 
 ## Não Lançado
+Config — Concorrência e timeouts em data_sources
+
+- Novas chaves documentadas e validadas em `data_sources`:
+  - `max_concurrent_sources` (int, padrão: `3`)
+  - `collection_timeout_seconds` (int, padrão: `300`)
+  - `use_process_pool` (bool, padrão: `false`)
+  - `per_source_timeout_seconds` (float opcional > 0; quando ausente/ inválido, não é aplicado)
+- Validação: `src/utils/config_validator.py::validate_data_sources_config` normaliza tipos/limites e defaults acima, mantendo compatibilidade com chaves já existentes (`retry_*`, `timeout_seconds`, `rate_limit_delay`, `user_agents`).
+- Documentação: `docs/CONFIGURATION_GUIDE.md` atualizado com tabela e notas sobre concorrência, timeout total cooperativo e uso opcional de pool de processos.
+- Exemplo: `config/config.example.json` atualizado com os novos campos e valores sugeridos.
+
 ICS — Ordenação determinística reforçada
 
 - `src/ical_generator.py`: adicionado desempate final por `event_id` na chave de ordenação de eventos do iCal, garantindo estabilidade mesmo quando `datetime`/categoria/nome/prioridade de fonte forem idênticos.

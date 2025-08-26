@@ -11,7 +11,10 @@ import faulthandler
 import importlib
 import inspect
 import os
+import sys
 import signal
+import multiprocessing as mp
+import queue
 from datetime import datetime, timedelta
 from typing import List, Dict, Any, Optional, Type
 from pathlib import Path
@@ -35,6 +38,39 @@ def _run_source_in_subprocess(module_name: str, class_name: str, data_sources_co
         def get_data_sources_config(self) -> Dict[str, Any]:
             return dict(self._cfg)
 
+    # Suporte a cancelamento cooperativo via sinais (SIGTERM/SIGINT) no subprocesso
+    # Usamos um holder para referenciar a instância após criação
+    _source_holder: Dict[str, Any] = {"src": None}
+
+    def _sig_cancel_handler(signum, frame):
+        try:
+            # Log imediato no processo-filho para visibilidade de cancelamento
+            try:
+                sig_label = signal.Signals(signum).name
+            except Exception:
+                sig_label = str(signum)
+            try:
+                pid = os.getpid()
+                sys.stderr.write(f"⚠️ [proc-child pid={pid}] Received {sig_label}; setting cancel_event if available\n")
+                sys.stderr.flush()
+            except Exception:
+                pass
+            src = _source_holder.get("src")
+            if src is not None and hasattr(src, "cancel_event") and src.cancel_event is not None:
+                src.cancel_event.set()
+        except Exception:
+            # Evita falhas no handler interromperem o processo
+            pass
+
+    try:
+        signal.signal(signal.SIGTERM, _sig_cancel_handler)
+    except Exception:
+        pass
+    try:
+        signal.signal(signal.SIGINT, _sig_cancel_handler)
+    except Exception:
+        pass
+
     # Importa classe
     module = importlib.import_module(module_name)
     cls = getattr(module, class_name)
@@ -42,6 +78,7 @@ def _run_source_in_subprocess(module_name: str, class_name: str, data_sources_co
     # Instancia com config mínima
     cfg = _ConfigProxy(data_sources_config)
     source: BaseSource = cls(config_manager=cfg, logger=None, ui_manager=None)
+    _source_holder["src"] = source
 
     # Converte target_date
     td = datetime.fromisoformat(target_date_iso)
@@ -51,6 +88,27 @@ def _run_source_in_subprocess(module_name: str, class_name: str, data_sources_co
     # Normaliza para garantir serialização simples (já são dicts/strings/datetimes)
     # Datetimes dentro dos eventos devem ser serializáveis; assumimos que sim (ou strings)
     return events
+
+def _proc_worker(result_q: mp.Queue, src_name: str, display: str, module_name: str, class_name: str, cfg: Dict[str, Any], target_iso: str) -> None:
+    """Worker top-level para compatibilidade com start method 'spawn' (macOS/Windows).
+
+    Executa a coleta via `_run_source_in_subprocess` e envia um pacote com status na fila.
+    """
+    try:
+        events = _run_source_in_subprocess(module_name, class_name, cfg, target_iso)
+        result_q.put({
+            "status": "ok",
+            "source_name": src_name,
+            "display": display,
+            "events": events,
+        })
+    except Exception as e:
+        result_q.put({
+            "status": "error",
+            "source_name": src_name,
+            "display": display,
+            "error": f"Collection failed: {e}",
+        })
 
 
 class DataCollector:
@@ -360,6 +418,13 @@ class DataCollector:
             # Cancela as pendentes e marca timeout
             if not_done:
                 for f in not_done:
+                    # Sinaliza cancelamento cooperativo na fonte
+                    src = future_to_source.get(f)
+                    if src is not None and hasattr(src, 'cancel_event'):
+                        try:
+                            src.cancel_event.set()
+                        except Exception:
+                            pass
                     f.cancel()
                 if self.logger:
                     pending = ", ".join(
@@ -405,6 +470,16 @@ class DataCollector:
                         self.logger.log_source_success(source.get_display_name(), len(source_events))
                         self.logger.debug(f"⏱️ {source.get_display_name()} finished in {duration:.1f}s")
 
+                except concurrent.futures.TimeoutError as e:
+                    # Timeout por-fonte ao obter resultado: aciona cancel_event e registra erro
+                    try:
+                        if hasattr(source, 'cancel_event'):
+                            source.cancel_event.set()
+                    finally:
+                        self._handle_source_error(source, f"Per-source timeout after {self.per_source_timeout_seconds}s: {e}")
+                        if self.logger:
+                            self.logger.debug(f"⛔ Cancel signalled to {source.get_display_name()} due to per-source timeout")
+                        continue
                 except Exception as e:
                     error_msg = f"Collection failed: {str(e)}"
                     self._handle_source_error(source, error_msg)
@@ -420,14 +495,15 @@ class DataCollector:
 
     def _collect_concurrent_processes(self, target_date: datetime) -> List[Dict[str, Any]]:
         """
-        Collect events concurrently using subprocesses. Útil para isolar hangs de I/O
-        (processos podem ser encerrados no timeout sem bloquear o processo principal).
+        Coleta concorrente usando processos dedicados (multiprocessing.Process),
+        com cancelamento cooperativo via sinais no subprocesso e término forçado
+        por timeout (global e por-fonte) usando terminate/kill.
 
         Args:
-            target_date: Target date for collection
+            target_date: Data alvo
 
         Returns:
-            List of all collected events
+            Lista de eventos coletados
         """
         all_events: List[Dict[str, Any]] = []
 
@@ -439,105 +515,192 @@ class DataCollector:
         except Exception:
             data_sources_config = {}
 
-        executor = concurrent.futures.ProcessPoolExecutor(max_workers=self.max_concurrent_sources)
+        # Fila compartilhada para resultados
+        result_queue: mp.Queue = mp.Queue()
+
+        # Estruturas de controle
+        procs: Dict[str, mp.Process] = {}
         start_by_source: Dict[str, float] = {}
-        try:
-            future_to_source_name: Dict[concurrent.futures.Future, str] = {}
-            future_to_display: Dict[concurrent.futures.Future, str] = {}
-            for source in self.active_sources:
-                start_by_source[source.source_name] = time.time()
-                if self.logger:
-                    self.logger.debug(f"🔄 [proc] Collecting from {source.get_display_name()}...")
+        display_by_source: Dict[str, str] = {}
 
-                cls = source.__class__
-                module_name = cls.__module__
-                class_name = cls.__name__
-                target_iso = target_date.isoformat()
+        # worker movido para nível de módulo como `_proc_worker` para compatibilidade com 'spawn'
 
-                fut = executor.submit(
-                    _run_source_in_subprocess,
-                    module_name,
-                    class_name,
-                    data_sources_config,
-                    target_iso,
-                )
-                future_to_source_name[fut] = source.source_name
-                future_to_display[fut] = source.get_display_name()
+        # Inicia processos
+        for source in self.active_sources:
+            start_by_source[source.source_name] = time.time()
+            display_by_source[source.source_name] = source.get_display_name()
+            if self.logger:
+                self.logger.debug(f"🔄 [proc] Collecting from {source.get_display_name()}...")
 
-            # Espera global
-            done, not_done = concurrent.futures.wait(
-                set(future_to_source_name.keys()),
-                timeout=self.collection_timeout,
-                return_when=concurrent.futures.ALL_COMPLETED,
+            cls = source.__class__
+            module_name = cls.__module__
+            class_name = cls.__name__
+            target_iso = target_date.isoformat()
+
+            p = mp.Process(
+                target=_proc_worker,
+                args=(result_queue, source.source_name, source.get_display_name(), module_name, class_name, data_sources_config, target_iso),
+                name=f"collector-{source.source_name}",
             )
+            p.daemon = False  # queremos controle explícito de término
+            p.start()
+            procs[source.source_name] = p
 
-            # Timeout global: tenta cancelar e registra erro
-            if not_done:
-                for f in not_done:
-                    f.cancel()
-                if self.logger:
-                    pending = ", ".join(future_to_display[f] for f in not_done)
-                    self.logger.debug(
-                        f"⏱️ [proc] Global collection timeout after {self.collection_timeout}s; cancelling: {pending}"
-                    )
-                for f in not_done:
-                    src_name = future_to_source_name[f]
-                    self._handle_source_error(
-                        next(s for s in self.active_sources if s.source_name == src_name),
-                        f"Collection timed out after {self.collection_timeout} seconds",
-                    )
+        total = len(procs)
+        completed: Dict[str, bool] = {name: False for name in procs}
 
-            # Resultados
-            for f in done:
-                src_name = future_to_source_name[f]
-                display = future_to_display[f]
+        deadline = time.time() + float(self.collection_timeout)
+        per_src_timeout = float(self.per_source_timeout_seconds) if (self.per_source_timeout_seconds and self.per_source_timeout_seconds > 0) else None
+
+        # Loop de supervisão
+        while True:
+            now = time.time()
+
+            # Consome resultados disponíveis sem bloquear
+            while True:
                 try:
-                    # Timeout por-fonte ao obter resultado
-                    if self.per_source_timeout_seconds and self.per_source_timeout_seconds > 0:
-                        source_events = f.result(timeout=float(self.per_source_timeout_seconds))
-                    else:
-                        source_events = f.result()
+                    msg = result_queue.get_nowait()
+                except queue.Empty:
+                    break
+                if not isinstance(msg, dict):
+                    continue
+                src_name = msg.get("source_name")
+                if not src_name or src_name not in procs or completed.get(src_name):
+                    continue
 
-                    # Adiciona metadados de prioridade
+                # Marca como concluído e trata
+                completed[src_name] = True
+                proc = procs[src_name]
+                try:
+                    if proc.is_alive():
+                        # processo terminou logicamente; garante reaproveitamento
+                        proc.join(timeout=0.1)
+                except Exception:
+                    pass
+
+                if msg.get("status") == "ok":
+                    source_events = msg.get("events") or []
+                    # metadados
                     for event in source_events:
                         event['source_priority'] = self.source_priorities.get(src_name, 50)
-
                     all_events.extend(source_events)
 
-                    # Estatísticas
+                    # estatísticas
                     self.collection_stats['successful_sources'] += 1
                     self.collection_stats['source_results'][src_name] = {
                         'success': True,
                         'events_count': len(source_events),
-                        'source_display_name': display,
+                        'source_display_name': display_by_source.get(src_name, src_name),
                     }
 
                     if self.logger:
-                        duration = time.time() - start_by_source.get(src_name, time.time())
-                        self.logger.log_source_success(display, len(source_events))
-                        self.logger.debug(f"⏱️ [proc] {display} finished in {duration:.1f}s")
-
-                except Exception as e:
-                    # Mapeia para objeto source correspondente só para logging estatístico
-                    src = next((s for s in self.active_sources if s.source_name == src_name), None)
-                    err_msg = f"Collection failed: {str(e)}"
-                    if src is not None:
-                        self._handle_source_error(src, err_msg)
+                        duration = now - start_by_source.get(src_name, now)
+                        self.logger.log_source_success(display_by_source.get(src_name, src_name), len(source_events))
+                        self.logger.debug(f"⏱️ [proc] {display_by_source.get(src_name, src_name)} finished in {duration:.1f}s")
+                else:
+                    err_msg = msg.get("error") or "Unknown error"
+                    # Encontra objeto source correspondente para logging estatístico
+                    src_obj = next((s for s in self.active_sources if s.source_name == src_name), None)
+                    if src_obj is not None:
+                        self._handle_source_error(src_obj, err_msg)
                     else:
                         if self.logger:
-                            self.logger.log_source_error(display, err_msg)
+                            self.logger.log_source_error(display_by_source.get(src_name, src_name), err_msg)
 
-            return all_events
-        finally:
+            # Verifica timeouts por-fonte
+            if per_src_timeout is not None and per_src_timeout > 0:
+                for src_name, proc in procs.items():
+                    if completed.get(src_name):
+                        continue
+                    elapsed = now - start_by_source.get(src_name, now)
+                    if elapsed > per_src_timeout:
+                        # Timeout por-fonte: envia término (SIGTERM) e registra erro
+                        try:
+                            if proc.is_alive():
+                                proc.terminate()  # SIGTERM em POSIX -> handler seta cancel_event
+                                if self.logger:
+                                    self.logger.debug(
+                                        f"⏱️ [proc] Per-source timeout after {per_src_timeout}s; sending SIGTERM to {display_by_source.get(src_name, src_name)} (pid={proc.pid})"
+                                    )
+                        except Exception:
+                            pass
+                        # Loga erro estatístico e marca como concluído
+                        src_obj = next((s for s in self.active_sources if s.source_name == src_name), None)
+                        if src_obj is not None:
+                            self._handle_source_error(src_obj, f"Per-source timeout after {per_src_timeout}s")
+                        completed[src_name] = True
+
+            # Condições de parada
+            if all(completed.values()):
+                break
+            if now >= deadline:
+                # Timeout global: encerra remanescentes
+                pending = [n for n, v in completed.items() if not v]
+                if self.logger and pending:
+                    names = ", ".join(
+                        f"{display_by_source.get(n, n)}(pid={procs[n].pid})" for n in pending
+                    )
+                    self.logger.debug(
+                        f"⏱️ [proc] Global collection timeout after {self.collection_timeout}s; sending SIGTERM to: {names}"
+                    )
+                for src_name in pending:
+                    proc = procs[src_name]
+                    try:
+                        if proc.is_alive():
+                            proc.terminate()  # SIGTERM
+                    except Exception:
+                        pass
+                    # Marca erro estatístico
+                    src_obj = next((s for s in self.active_sources if s.source_name == src_name), None)
+                    if src_obj is not None:
+                        self._handle_source_error(src_obj, f"Collection timed out after {self.collection_timeout} seconds")
+                    completed[src_name] = True
+                break
+
+            # Pequeno intervalo para evitar busy-wait; curto o bastante para responsividade
+            time.sleep(0.05)
+
+        # Pós-processamento: força kill de quaisquer processos que ainda estejam vivos
+        for src_name, proc in procs.items():
             try:
-                executor.shutdown(wait=False, cancel_futures=True)
-            except TypeError:
-                executor.shutdown(wait=False)
+                if proc.is_alive():
+                    # Tentativa final de término educado
+                    try:
+                        proc.terminate()
+                    except Exception:
+                        pass
+                    # Aguarda breve
+                    proc.join(timeout=0.2)
+                    if proc.is_alive():
+                        # Kill duro (POSIX)
+                        try:
+                            os.kill(proc.pid, signal.SIGKILL)
+                            if self.logger:
+                                self.logger.debug(
+                                    f"🛑 [proc] Escalating to SIGKILL for {display_by_source.get(src_name, src_name)} (pid={proc.pid})"
+                                )
+                        except Exception:
+                            pass
+                # Loga código de saída/terminação por sinal, se disponível
+                if self.logger and proc.exitcode is not None:
+                    if proc.exitcode < 0:
+                        self.logger.debug(
+                            f"⚠️ [proc] {display_by_source.get(src_name, src_name)} terminated by signal {-proc.exitcode}"
+                        )
+                    elif proc.exitcode > 0:
+                        self.logger.debug(
+                            f"⚠️ [proc] {display_by_source.get(src_name, src_name)} exited with code {proc.exitcode}"
+                        )
+            except Exception:
+                pass
+
+        return all_events
 
     def _collect_from_source(self, source: BaseSource, target_date: datetime) -> List[Dict[str, Any]]:
         """
         Collect events from a single source (for concurrent execution).
         
+{{ ... }}
         Args:
             source: Source instance
             target_date: Target date for collection
@@ -571,7 +734,17 @@ class DataCollector:
                     )
                 wait_seconds = float(self.retry_backoff_seconds) * attempt
                 if wait_seconds > 0:
-                    time.sleep(wait_seconds)
+                    # Espera cooperativa usando cancel_event da fonte, se existir
+                    try:
+                        if hasattr(source, 'cancel_event') and source.cancel_event is not None:
+                            # wait retorna True se cancelado; interrompe com TimeoutError
+                            if source.cancel_event.wait(timeout=wait_seconds):
+                                raise TimeoutError("Cancelled during retry backoff")
+                        else:
+                            time.sleep(wait_seconds)
+                    except Exception:
+                        # Se cancelado, propaga para encerrar rapidamente
+                        raise
 
         # Se chegou aqui, falhou após tentativas
         if last_error is not None:

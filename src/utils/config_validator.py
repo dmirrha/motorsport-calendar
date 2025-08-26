@@ -297,6 +297,10 @@ def validate_data_sources_config(config: Dict[str, Any]) -> Dict[str, Any]:
     - priority_order: list[str]
     - excluded_sources: list[str]
     - timeout_seconds: int > 0 (default 10)
+    - max_concurrent_sources: int >= 1 (default 3)
+    - collection_timeout_seconds: int > 0 (default 300)
+    - use_process_pool: bool (default False)
+    - per_source_timeout_seconds: float > 0 (opcional; se ausente ou inválido, não aplicado)
     - retry_attempts: int >= 0 (legado)
     - retry_failed_sources: bool (default True)
     - max_retries: int >= 0 (default 1; fallback em retry_attempts se ausente)
@@ -359,6 +363,52 @@ def validate_data_sources_config(config: Dict[str, Any]) -> Dict[str, Any]:
             ErrorCode.CONFIG_VALIDATION_ERROR,
             'data_sources.timeout_seconds'
         ) from e
+
+    # max_concurrent_sources: int >= 1
+    try:
+        mcs = int(merged.get('max_concurrent_sources', 3))
+        if mcs < 1:
+            raise ValueError("max_concurrent_sources deve ser >= 1")
+        merged['max_concurrent_sources'] = mcs
+    except (ValueError, TypeError) as e:
+        raise ConfigValidationError(
+            f"Valor inválido para max_concurrent_sources: {e}",
+            ErrorCode.CONFIG_VALIDATION_ERROR,
+            'data_sources.max_concurrent_sources'
+        ) from e
+
+    # collection_timeout_seconds: int > 0
+    try:
+        cts = int(merged.get('collection_timeout_seconds', 300))
+        if cts <= 0:
+            raise ValueError("collection_timeout_seconds deve ser > 0")
+        merged['collection_timeout_seconds'] = cts
+    except (ValueError, TypeError) as e:
+        raise ConfigValidationError(
+            f"Valor inválido para collection_timeout_seconds: {e}",
+            ErrorCode.CONFIG_VALIDATION_ERROR,
+            'data_sources.collection_timeout_seconds'
+        ) from e
+
+    # use_process_pool: bool
+    upp = merged.get('use_process_pool', False)
+    merged['use_process_pool'] = bool(upp)
+
+    # per_source_timeout_seconds: float > 0 (opcional)
+    try:
+        if 'per_source_timeout_seconds' in merged and merged.get('per_source_timeout_seconds') is not None:
+            pst = float(merged.get('per_source_timeout_seconds'))
+            if pst <= 0:
+                # se não for válido, remove para sinalizar que não deve ser aplicado
+                merged['per_source_timeout_seconds'] = None
+            else:
+                merged['per_source_timeout_seconds'] = pst
+        else:
+            # não define quando ausente
+            merged.pop('per_source_timeout_seconds', None)
+    except (ValueError, TypeError) as e:
+        # em caso de erro, remove para não aplicar
+        merged.pop('per_source_timeout_seconds', None)
 
     # rate_limit_delay: float >= 0
     try:
