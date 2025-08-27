@@ -1,0 +1,2 @@
+ONNX Model Test File - This is not a real ONNX model, just a placeholder for tests.
+Real tests will mock the ONNX runtime, so this file just needs to exist.

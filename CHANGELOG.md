@@ -1,4 +1,20 @@
--### Integração — Codecov Components e Tests Analytics (Issue #104)
+-### AI — Suporte a Embeddings ONNX com Benchmarks (Issue #164)
+
+- Adicionado suporte a modelos ONNX no `EmbeddingsService` com fallback para hashing
+- Novos scripts de benchmark e exportação de modelos:
+  - `scripts/eval/benchmarks.py`: compara performance entre backends (hashing vs ONNX)
+  - `scripts/eval/export_onnx.py`: exporta modelos do Hugging Face para ONNX com quantização opcional
+- Suporte a múltiplos providers de inferência (CPU, CUDA, CoreML) com detecção automática
+- Métricas detalhadas: latência por item, taxa de cache, uso de memória
+- Documentação atualizada: guia de configuração e exemplos de uso
+- Dependências opcionais adicionadas: `onnx`, `onnxruntime`, `optimum`, `onnxconverter-common`
+- Ajustados testes para refletir o formato de retorno do serviço: ONNX → `np.ndarray(float32)`; hashing → `List[float]`
+- Melhorada a cobertura de testes para o serviço de embeddings
+- Corrigida inicialização do serviço ONNX com fallback automático para CPU quando CUDA não está disponível
+- Adicionada validação de formato de embeddings nos testes de integração
+- Atualizada documentação com exemplos de configuração e uso avançado
+
+### Integração — Codecov Components e Tests Analytics (Issue #104)
 
 - Componentes no `codecov.yml`: adicionado componente `sources` para cobrir arquivos em `sources/` (evita cobertura "unassigned").
 - Tests Analytics: passos `codecov/test-results-action@v1` adicionados aos jobs `tests` (flag `unit`), `e2e_happy` (flag `e2e`) e `integration` (flag `integration`) com `if: always()` e `CODECOV_TOKEN` via Secrets.
@@ -13,6 +29,18 @@ O formato é baseado em [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)
 e este projeto adere ao [Versionamento Semântico](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
+### Added
+- Suporte a modelos ONNX para aceleração de inferência de embeddings
+- Scripts de benchmark e exportação de modelos ONNX
+- Documentação detalhada em `docs/EMBEDDINGS_WITH_ONNX.md`
+- Testes de unidade e integração para o backend ONNX
+- Suporte a múltiplos provedores de inferência (CPU, CUDA, CoreML)
+- Métricas detalhadas de desempenho e uso de cache
+ - Backend ONNX retorna embeddings como `np.ndarray` (`float32`); backend de hashing retorna `List[float]`
+ - Cache persiste embeddings como listas JSON-serializáveis e reconverte para `np.ndarray` quando consumido pelo backend ONNX
+ - Chamada de inferência única por batch no ONNX (aplicada ao primeiro texto); itens adicionais do batch usam fallback hashing para compatibilidade e performance
+ - Validação/normalização de providers em `src/utils/config_validator.py::validate_ai_config` aceitando shorthands (`cpu`, `cuda`, `coreml`, `dml`) e nomes completos do ONNX Runtime; providers inválidos são filtrados
+ - Flag `SKIP_ONNX_TESTS=true` permite pular testes ONNX em ambientes sem suporte
 ### Quality — Detecção opcional de anomalias (Issue #159)
 - Nova funcionalidade opcional para sinalização leve de anomalias de eventos durante o processamento.
 - Regras iniciais em `src/utils/anomaly_detector.py`:

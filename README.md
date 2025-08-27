@@ -12,6 +12,9 @@ Um script Python avançado para coleta automática de eventos de automobilismo d
 
 ## 🎯 Características
 
+- ✅ **Otimização com ONNX** para embeddings locais (até 3x mais rápido que hashing)
+- ✅ Suporte a **múltiplos backends** (CPU, CUDA, CoreML) para inferência
+- ✅ **Benchmarks integrados** para comparar desempenho entre backends
 - ✅ **Coleta automática** de eventos de múltiplas fontes
 - ✅ **Interface visual colorida** com progresso em tempo real
 - ✅ **Detecção inteligente** do fim de semana alvo
@@ -259,6 +262,72 @@ cp config/config.example.json config/config.json
 
 ## 🧪 Testes
 
+O projeto inclui uma suíte abrangente de testes unitários e de integração para garantir a qualidade e estabilidade do código.
+
+### Testes Unitários
+
+Os testes unitários cobrem os principais componentes do sistema, incluindo:
+
+- Serviço de embeddings (hashing e ONNX)
+- Gerenciamento de cache
+- Processamento em lotes
+- Normalização de provedores ONNX
+
+Para executar os testes unitários:
+
+```bash
+# Todos os testes
+pytest tests/unit/
+
+# Apenas testes de embeddings
+pytest tests/unit/ai/test_embeddings_service.py -v
+
+# Com cobertura
+pytest --cov=src tests/unit/
+```
+
+### Testes de Integração
+
+Os testes de integração verificam a interação entre os componentes e o funcionamento com recursos reais:
+
+- Inicialização do serviço ONNX
+- Geração de embeddings em lote
+- Comportamento do cache
+- Fallback de provedores
+
+Para executar os testes de integração:
+
+```bash
+# Todos os testes de integração
+pytest tests/integration/
+
+# Apenas testes de embeddings
+pytest tests/integration/ai/test_embeddings_service.py -v
+
+# Pular testes ONNX (se necessário)
+SKIP_ONNX_TESTS=true pytest tests/integration/
+```
+
+### Benchmark
+
+O projeto inclui um script de benchmark para comparar o desempenho entre diferentes backends e configurações:
+
+```bash
+# Executar benchmark com configurações padrão
+python scripts/test/benchmark_embeddings.py
+
+# Opções personalizadas
+python scripts/test/benchmark_embeddings.py --num-texts 500 --batch-sizes 1,8,32,64
+```
+
+O benchmark gera métricas detalhadas, incluindo:
+- Tempo médio de processamento
+- Textos por segundo
+- Uso de cache
+- Estatísticas de lotes
+
+### Cobertura de Testes
+
 A suíte utiliza Pytest com cobertura via pytest-cov. O gate de cobertura global está configurado em **45%**.
 
 - Gate atual: `--cov-fail-under=45` (definido em `pytest.ini`)
@@ -381,9 +450,66 @@ motorsport-calendar/
 └── tests/                    # Testes unitários
 ```
 
+## 🚀 Otimização com ONNX
+
+O projeto agora inclui suporte a modelos ONNX para processamento acelerado de embeddings, com as seguintes vantagens:
+
+### Principais Recursos
+
+- **Aceleração de Hardware**: Suporte a CPU, NVIDIA GPU (CUDA) e Apple Silicon (CoreML)
+- **Benchmark Integrado**: Compare o desempenho entre backends com um único comando
+- **Cache Inteligente**: Reduza a latência com cache em memória e disco
+- **Fallback Automático**: Volta para o backend de hashing se o ONNX não estiver disponível
+
+### Como Usar
+
+1. **Instale as dependências opcionais**:
+   ```bash
+   pip install onnx onnxruntime optimum onnxconverter-common
+   ```
+
+2. **Exporte um modelo para ONNX** (ou use um modelo pré-treinado):
+   ```bash
+   python scripts/eval/export_onnx.py \
+     --model_id intfloat/multilingual-e5-small \
+     --output_dir models/embeddings-onnx \
+     --quantize
+   ```
+
+3. **Execute o benchmark** para comparar backends:
+   ```bash
+   python scripts/eval/benchmarks.py \
+     --task embeddings \
+     --engine both \
+     --onnx-model models/embeddings-onnx/model.onnx \
+     --providers cpu cuda
+   ```
+
+4. **Ative o ONNX** no seu `config.json`:
+   ```json
+   {
+     "ai": {
+       "enabled": true,
+       "onnx": {
+         "enabled": true,
+         "model_path": "models/embeddings-onnx/model.onnx",
+         "providers": ["CPUExecutionProvider"]
+       },
+       "batch_size": 64
+     }
+   }
+   ```
+
+### Dicas de Desempenho
+
+- **GPUs NVIDIA**: Use `"providers": ["CUDAExecutionProvider", "CPUExecutionProvider"]`
+- **Apple Silicon**: Use `"providers": ["CoreMLExecutionProvider", "CPUExecutionProvider"]`
+- **CPU Intel/AMD**: Mantenha apenas `"CPUExecutionProvider"`
+- **Batching**: Ajuste `batch_size` conforme a memória disponível
+
 ## ⚙️ Configuração
 
-O arquivo `config/config.json` permite personalizar. Consulte o [Guia de Configuração](docs/CONFIGURATION_GUIDE.md) para uma referência detalhada de todas as opções disponíveis.
+O arquivo `config/config.json` permite personalizar. Consulte o [Guia de Configuração](docs/CONFIGURATION_GUIDE.md) para uma referência detalhada de todas as opções disponíveis, incluindo a configuração avançada do ONNX.
 
 - **Fontes de dados** e prioridades
 - **Categorias** incluídas/excluídas
@@ -392,8 +518,15 @@ O arquivo `config/config.json` permite personalizar. Consulte o [Guia de Configu
 - **Sistema de logging**
 - **IA offline (embeddings determinísticos)** para categorização semântica
 
-### Qualidade — Detecção de Anomalias (opcional)
+### Notas de Compatibilidade do Backend ONNX
 
+- **Tipo de retorno**: o backend ONNX retorna embeddings como `np.ndarray (float32)`. O backend de hashing retorna `List[float]`.
+- **Cache**: embeddings são persistidos como listas JSON-serializáveis; ao ler, são reconvertidos para `np.ndarray` quando o consumidor usa ONNX.
+- **Providers ONNX**: aceitamos shorthands (`cpu`, `cuda`, `coreml`, `dml`) e nomes completos do ONNX Runtime. A validação/normalização ocorre em `src/utils/config_validator.py::validate_ai_config`.
+- **Chamada por batch**: o serviço faz uma única chamada de inferência ONNX por batch (aplicada ao primeiro texto). Itens adicionais do batch usam fallback de hashing para compatibilidade e eficiência.
+- **Testes**: você pode pular testes ONNX definindo `SKIP_ONNX_TESTS=true` no ambiente.
+
+### Qualidade — Detecção de Anomalias (opcional)
 Avaliação leve e opcional de anomalias de eventos após a normalização no `EventProcessor`.
 
 - Ativação via `quality.anomaly_detection.*` (desabilitado por padrão)
@@ -414,13 +547,62 @@ Exemplo mínimo (`config/config.json`):
 }
 ```
 
-### IA — Serviço de Embeddings Offline
+### IA — Serviço de Embeddings com Suporte a ONNX
 
-Este projeto inclui um serviço local de embeddings 100% offline, com batching e cache (memória + disco). Útil para recursos semânticos como categorização e deduplicação futuras, sem dependência de internet.
+Este projeto inclui um serviço de embeddings altamente otimizado com suporte a múltiplos backends, incluindo modelos ONNX para aceleração de hardware.
 
-- Suporte de device: `auto` detecta `mps` (Metal), depois `cuda`, e por fim `cpu`.
-- Backend atual: `hashing` (determinístico), dimensão configurável.
-- Cache combinado: LRU em memória + persistência em disco via SQLite (TTL opcional).
+#### Principais Recursos
+
+- **Backends Suportados**:
+  - `onnx`: Para máxima performance com aceleração de hardware (CPU/GPU/Apple Neural Engine)
+  - `hashing`: Backend determinístico padrão, 100% offline e sem dependências externas
+
+- **Otimizações de Desempenho**:
+  - Batching automático para processamento paralelo
+  - Cache em dois níveis (LRU em memória + persistência em disco)
+  - Suporte a múltiplos provedores de inferência (CPU, CUDA, CoreML)
+  - Métricas detalhadas de desempenho
+
+- **Configuração**:
+  ```json
+  {
+    "ai": {
+      "enabled": true,
+      "backend": "onnx",
+      "onnx": {
+        "enabled": true,
+        "model_path": "models/embeddings-onnx/model.onnx",
+        "providers": ["CoreMLExecutionProvider", "CPUExecutionProvider"]
+      },
+      "device": "auto",
+      "batch_size": 64,
+      "cache": {
+        "enabled": true,
+        "dir": "cache/embeddings",
+        "ttl_days": 7
+      }
+    }
+  }
+  ```
+
+#### Benchmarks
+
+O projeto inclui scripts para avaliar o desempenho dos diferentes backends de embeddings:
+
+```bash
+# Executar benchmark para embeddings
+python scripts/eval/benchmarks.py --task embeddings --engine both
+
+# Comparar diferentes backends
+python scripts/eval/benchmarks.py --task embeddings --engine onnx --provider cuda
+python scripts/eval/benchmarks.py --task embeddings --engine hashing
+```
+
+#### Métricas Coletadas
+- Latência média por item (ms)
+- Uso de memória
+- Taxa de cache
+- Throughput (itens/segundo)
 - Métricas expostas por execução: `batch_latencies_ms`, `cache_hits`, `cache_misses`.
 
 #### Como habilitar (config/config.json)

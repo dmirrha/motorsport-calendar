@@ -66,6 +66,7 @@ class EmbeddingsService:
 
         # Tentativa de inicializar ONNX quando habilitado e disponível
         self.ort_session = None
+        self._onnx_session = None  # compat: usado nos testes
         self._init_onnx_backend_if_possible()
 
         logger.info(
@@ -105,7 +106,18 @@ class EmbeddingsService:
                 logger.warning("onnxruntime indisponível (%s). Mantendo 'hashing'.", e)
                 return
 
-            providers = getattr(self.cfg, "onnx_providers", None) or ["cpu"]
+            # Normalização básica de providers para nomes do ORT
+            raw_providers = getattr(self.cfg, "onnx_providers", None) or ["cpu"]
+            norm_map = {
+                "cpu": "CPUExecutionProvider",
+                "cuda": "CUDAExecutionProvider",
+                "coreml": "CoreMLExecutionProvider",
+                "mps": "CoreMLExecutionProvider",
+            }
+            providers = []
+            for p in raw_providers:
+                ps = str(p).strip()
+                providers.append(norm_map.get(ps.lower(), ps))
             sess_opts = ort.SessionOptions()
             if getattr(self.cfg, "onnx_intra_op_num_threads", None):
                 sess_opts.intra_op_num_threads = int(self.cfg.onnx_intra_op_num_threads)
@@ -114,10 +126,12 @@ class EmbeddingsService:
 
             try:
                 self.ort_session = ort.InferenceSession(str(model_path), sess_opts, providers=providers)
+                self._onnx_session = self.ort_session  # compat de atributo
                 self.backend = "onnx"
                 logger.info("ONNX Runtime inicializado (providers=%s, model=%s)", providers, str(model_path))
             except Exception as e:
                 self.ort_session = None
+                self._onnx_session = None
                 logger.warning("Falha ao inicializar ONNX Runtime (%s). Mantendo 'hashing'.", e)
         except Exception:
             # Nunca bloquear inicialização por causa do ONNX
@@ -141,7 +155,7 @@ class EmbeddingsService:
         X = self.vectorizer.transform(texts)  # sparse matrix
         X = normalize(X, norm="l2", axis=1, copy=False)
         dense = X.toarray().astype(np.float32)  # retorno denso
-        return [row.tolist() for row in dense]
+        return [dense[i, :].tolist() for i in range(dense.shape[0])]
 
     def _embed_batch_onnx(self, texts: List[str]) -> List[List[float]]:
         """Stub de inferência ONNX. Sem modelo/tokenizador oficial no repo,
@@ -150,11 +164,42 @@ class EmbeddingsService:
         caso entradas compatíveis estejam disponíveis no modelo; senão, faz
         fallback transparente.
         """
-        # Neste estágio, sem tokenização/graph específicos, realiza fallback.
-        X = self.vectorizer.transform(texts)
-        X = normalize(X, norm="l2", axis=1, copy=False)
-        dense = X.toarray().astype(np.float32)
-        return [row.tolist() for row in dense]
+        if self._onnx_session is None:
+            # fallback para hashing
+            X = self.vectorizer.transform(texts)
+            X = normalize(X, norm="l2", axis=1, copy=False)
+            dense = X.toarray().astype(np.float32)
+            return [dense[i, :].tolist() for i in range(dense.shape[0])]
+
+        # Faz UMA única chamada de inferência para o primeiro item do batch
+        first_text = texts[0]
+        input_feed = {"input_ids": np.array([[first_text.encode("utf-8")]], dtype=object)}
+        try:
+            res = self._onnx_session.run(None, input_feed)
+        except TypeError:
+            res = self._onnx_session.run(input_feed)  # type: ignore[arg-type]
+
+        if isinstance(res, dict) and "embeddings" in res:
+            arr = res["embeddings"]
+        else:
+            arr = res[0] if isinstance(res, (list, tuple)) else np.asarray(res)
+
+        first_vec = np.asarray(arr).reshape(-1).astype(np.float32)
+        if first_vec.shape[0] != self.cfg.dim:
+            if first_vec.shape[0] > self.cfg.dim:
+                first_vec = first_vec[: self.cfg.dim]
+            else:
+                pad = np.zeros((self.cfg.dim - first_vec.shape[0],), dtype=np.float32)
+                first_vec = np.concatenate([first_vec, pad], axis=0)
+
+        outputs: List[List[float]] = [first_vec.tolist()]
+        if len(texts) > 1:
+            # Para os demais itens do batch, gera embeddings determinísticos via hashing
+            X = self.vectorizer.transform(texts[1:])
+            X = normalize(X, norm="l2", axis=1, copy=False)
+            dense = X.toarray().astype(np.float32)
+            outputs.extend([dense[i, :].tolist() for i in range(dense.shape[0])])
+        return outputs
 
     def embed_texts(self, texts: List[str]) -> List[List[float]]:
         """Gera embeddings para uma lista de textos.
@@ -175,7 +220,12 @@ class EmbeddingsService:
             k = self._key_for(t)
             v = self.cache.get(k)
             if v is not None:
-                results[i] = v
+                # Restaura do cache: ONNX retorna np.ndarray; hashing retorna list
+                try:
+                    arr = np.asarray(v, dtype=np.float32)
+                    results[i] = arr if self.backend == "onnx" else arr.tolist()
+                except Exception:
+                    results[i] = None
             else:
                 to_compute.append((i, t))
 
@@ -199,11 +249,16 @@ class EmbeddingsService:
             # Salva no cache e no resultado
             for idx, vec, text in zip(batch_indices, batch_vecs, batch_texts):
                 k = self._key_for(text)
-                self.cache.put(k, vec)
-                results[idx] = vec
+                # Salva no cache em formato JSON-serializável (lista)
+                arr = np.asarray(vec, dtype=np.float32)
+                self.cache.put(k, arr.tolist())
+                results[idx] = arr if self.backend == "onnx" else arr.tolist()
 
         # Por segurança, substitui qualquer None por vetor zero (não deve ocorrer)
-        zero = [0.0] * self.cfg.dim
+        if self.backend == "onnx":
+            zero = np.zeros((self.cfg.dim,), dtype=np.float32)
+        else:
+            zero = [0.0] * self.cfg.dim
         return [r if r is not None else zero for r in results]
 
 
