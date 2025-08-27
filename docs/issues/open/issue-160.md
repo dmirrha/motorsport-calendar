@@ -25,11 +25,11 @@ Adicionar camada de similaridade semântica à deduplicação em `src/event_proc
 - Métricas de impacto (duplicatas removidas vs baseline).
 
 ## Critérios de Aceite
-- [ ] Não regredir determinismo de `_select_best_event()`.
-- [ ] Melhorar recall/precisão de dedup comparado ao baseline.
-- [ ] Opt-in via `ai.enabled` respeitado; desativado mantém pipeline atual.
-- [ ] Threshold configurável via `ai.thresholds.dedup` (default 0.85).
-- [ ] Testes de integração cobrindo falsos positivos/negativos mais comuns.
+- [x] Não regredir determinismo de `_select_best_event()`.
+- [x] Melhorar recall/precisão de dedup comparado ao baseline.
+- [x] Opt-in via `ai.enabled` respeitado; desativado mantém pipeline atual.
+- [x] Threshold configurável via `ai.thresholds.dedup` (default 0.85).
+- [x] Testes de integração cobrindo falsos positivos/negativos mais comuns.
 
 ## Plano de Resolução (proposto)
 1) Integração no `EventProcessor`
@@ -53,20 +53,22 @@ Adicionar camada de similaridade semântica à deduplicação em `src/event_proc
 - Documentar comportamento, configuração e troubleshooting em `docs/CONFIGURATION_GUIDE.md` e README.
 - Atualizar `CHANGELOG.md` e `RELEASES.md`.
 
+Status do plano: [x] Confirmado e executado conforme descrito.
+
 ## Resultados — Verificações (a preencher durante a execução)
-- `_are_events_similar()` combina fuzzy+semântico sob `ai.enabled`.
-- Threshold aplicado corretamente (`ai.thresholds.dedup`).
-- Determinismo preservado em `_select_best_event()`.
-- Testes de integração passando.
-- Métricas de impacto registradas.
+- `_are_events_similar()` combina fuzzy+semântico sob `ai.enabled`. [ok]
+- Threshold aplicado corretamente (`ai.thresholds.dedup`). [ok]
+- Determinismo preservado em `_select_best_event()`. [ok]
+- Testes de integração passando. [ok]
+- Métricas de impacto registradas. [ok]
 
 ## Checklist de Execução
 - [x] Branch criada: `feat/160-semantic-dedup`.
 - [x] Artefatos locais criados: `docs/issues/open/issue-160.md` e `.json`.
-- [ ] Plano confirmado para iniciar implementação.
-- [ ] Implementação da deduplicação semântica com score composto.
-- [ ] Testes unitários/integrados ajustados.
-- [ ] Documentação e release notes atualizadas.
+- [x] Plano confirmado para iniciar implementação.
+- [x] Implementação da deduplicação semântica com score composto.
+- [x] Testes unitários/integrados ajustados.
+- [x] Documentação e release notes atualizadas.
 
 ## Logs e Referências
 - Arquivos: `src/event_processor.py`, `src/utils/config_validator.py`, `motorsport_calendar.py`, `docs/architecture/ai_implementation_plan.md`, `docs/CONFIGURATION_GUIDE.md`, `CHANGELOG.md`, `RELEASES.md`.
@@ -74,4 +76,4 @@ Adicionar camada de similaridade semântica à deduplicação em `src/event_proc
 - Epic relacionada: #157
 
 ## Status
-- Aberta; pronta para implementação após confirmação do plano.
+- Em PR (aguardando review).

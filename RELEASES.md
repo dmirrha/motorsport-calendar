@@ -21,9 +21,22 @@ AI — Serviço de Embeddings offline (Issue #165)
 - Batching configurável (`ai.batch_size`) com métricas: `batch_latencies_ms`, `cache_hits`, `cache_misses`.
 - Cache em dois níveis: LRU em memória e persistência em disco com TTL (`ai.cache.enabled|dir|ttl_days`).
 - Seleção automática de device (`ai.device`): `auto` → `mps` → `cuda` → `cpu` (fallback garantido).
-- Configuração adicionada: `ai.enabled`, `ai.device`, `ai.batch_size`, `ai.cache.*`, `ai.embeddings.backend|dim|lru_capacity`.
+- Configuração adicionada: `ai.enabled`, `ai.device`, `ai.batch_size`, `ai.cache.*`, `ai.embeddings.*`.
 - Testes: `tests/unit/ai/test_embeddings_service.py` cobre determinismo, batching, cache e fallback de device.
 - Documentação: `README.md` e `docs/CONFIGURATION_GUIDE.md` atualizados com setup/uso/troubleshooting.
+
+IA — Deduplicação Semântica Offline (Issue #160)
+
+- Nova capacidade opcional que complementa o algoritmo heurístico de deduplicação (ex.: `name_similarity_threshold`, `time_tolerance_minutes`, `location_matching`, `category_matching`, `source_priority_resolution`).
+- Funcionamento: calcula similaridade semântica sobre pares candidatos usando os mesmos embeddings determinísticos do serviço offline (sem chamadas externas).
+- Ativação/controle:
+  - `ai.enabled = true`
+  - `ai.thresholds.dedup` (padrão: `0.85`) — limiar mínimo para considerar dois eventos semanticamente duplicados
+  - `ai.batch_size` (padrão: `16`) e `ai.device` (`auto|mps|cuda|cpu`) — desempenho e fallback
+  - `ai.cache.*` (opcional) — melhora latência/throughput com cache em memória+disco
+- Integração com `deduplication.*`: a decisão final de consolidar eventos respeita também regras de tempo/local/categoria e resolução por prioridade de fonte quando configuradas.
+- Determinismo/offline: resultados estáveis entre execuções com a mesma configuração/entrada; cálculo 100% local.
+- Observabilidade: logs detalhando pares avaliados, similaridade e motivos de dedupe/não‑dedupe; pode ser avaliado com o script de benchmarks (ver seção abaixo) para métricas de precisão/recall/F1 e latência.
 
 Benchmarks — Baseline vs IA (Issue #158)
 

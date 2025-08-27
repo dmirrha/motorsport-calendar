@@ -10,9 +10,13 @@ from datetime import datetime, timedelta, tzinfo
 from typing import List, Dict, Any, Optional, Tuple, Set
 from collections import defaultdict
 import hashlib
+from pathlib import Path
+
+import numpy as np
 from fuzzywuzzy import fuzz
 from unidecode import unidecode
 from src.silent_period import SilentPeriodManager
+from src.ai.embeddings_service import EmbeddingsService, EmbeddingsConfig
 
 
 class _TzWithZone(tzinfo):
@@ -84,7 +88,15 @@ class EventProcessor:
         }
         
         # Load configuration
+        # Defaults para AI (compat com instâncias sem ConfigManager)
+        self.ai_enabled: bool = False
+        self.ai_dedup_threshold: float = 0.85
+        self._ai_cfg: Dict[str, Any] = {}
+
         self._load_config()
+        
+        # AI/Embeddings
+        self._embeddings_service: Optional[EmbeddingsService] = None
     
     def _load_config(self) -> None:
         """Load event processing configuration."""
@@ -105,6 +117,43 @@ class EventProcessor:
         self.weekend_start_day = weekend_config.get('start_day', 4)  # Friday
         self.weekend_end_day = weekend_config.get('end_day', 6)      # Sunday
         self.extend_weekend_hours = weekend_config.get('extend_hours', 6)
+
+        # AI settings (validated em ConfigManager.validate_config via validate_ai_config)
+        try:
+            ai_cfg = self.config.get('ai', {})
+        except Exception:
+            ai_cfg = {}
+        self.ai_enabled: bool = bool(ai_cfg.get('enabled', False))
+        thresholds = ai_cfg.get('thresholds', {}) or {}
+        try:
+            self.ai_dedup_threshold: float = float(thresholds.get('dedup', 0.85))
+        except Exception:
+            self.ai_dedup_threshold = 0.85
+        self._ai_cfg: Dict[str, Any] = ai_cfg
+
+    def _get_embeddings_service(self) -> EmbeddingsService:
+        """Lazy-inicializa e retorna o EmbeddingsService conforme config ai.*"""
+        if self._embeddings_service is not None:
+            return self._embeddings_service
+        ai = self._ai_cfg or {}
+        cache = ai.get('cache', {}) or {}
+        emb = ai.get('embeddings', {}) or {}
+        try:
+            cfg = EmbeddingsConfig(
+                enabled=self.ai_enabled,
+                device=str(ai.get('device', 'cpu')),
+                batch_size=int(ai.get('batch_size', 16)),
+                backend=str(emb.get('backend', 'hashing')),
+                dim=int(emb.get('dim', 256)),
+                lru_capacity=int(emb.get('lru_capacity', 10000)),
+                cache_dir=Path(str(cache.get('dir', 'cache/embeddings'))),
+                ttl_days=int(cache.get('ttl_days', 30)),
+            )
+        except Exception:
+            # Fallback seguro
+            cfg = EmbeddingsConfig()
+        self._embeddings_service = EmbeddingsService(cfg)
+        return self._embeddings_service
     
     def process_events(self, raw_events: List[Dict[str, Any]], 
                       target_weekend: Optional[Tuple[datetime, datetime]] = None) -> List[Dict[str, Any]]:
@@ -762,15 +811,7 @@ class EventProcessor:
     
     def _are_events_similar(self, event1: Dict[str, Any], event2: Dict[str, Any]) -> bool:
         """Check if two events are similar (duplicates)."""
-        # Check name similarity
-        name1 = unidecode(event1.get('name', '')).lower()
-        name2 = unidecode(event2.get('name', '')).lower()
-        name_similarity = fuzz.ratio(name1, name2)
-        
-        if name_similarity < self.similarity_threshold:
-            return False
-        
-        # Check datetime similarity
+        # Check datetime similarity (guard-rail)
         dt1 = event1.get('datetime')
         dt2 = event2.get('datetime')
         
@@ -778,8 +819,8 @@ class EventProcessor:
             time_diff = abs((dt1 - dt2).total_seconds()) / 60  # minutes
             if time_diff > self.time_tolerance_minutes:
                 return False
-        
-        # Check category similarity
+
+        # Check category similarity (guard-rail)
         cat1 = event1.get('detected_category', '').lower()
         cat2 = event2.get('detected_category', '').lower()
         
@@ -787,8 +828,8 @@ class EventProcessor:
             cat_similarity = fuzz.ratio(cat1, cat2)
             if cat_similarity < self.category_similarity_threshold:
                 return False
-        
-        # Check location similarity (if available)
+
+        # Check location similarity (guard-rail)
         loc1 = event1.get('location', '').lower()
         loc2 = event2.get('location', '').lower()
         
@@ -796,8 +837,49 @@ class EventProcessor:
             loc_similarity = fuzz.ratio(loc1, loc2)
             if loc_similarity < self.location_similarity_threshold:
                 return False
+
+        # If AI disabled, fallback to original fuzzy name thresholding
+        name1 = unidecode(event1.get('name', '')).lower()
+        name2 = unidecode(event2.get('name', '')).lower()
+        if not self.ai_enabled:
+            name_similarity = fuzz.ratio(name1, name2)
+            return name_similarity >= self.similarity_threshold
+
+        # AI enabled: compute composite score (fuzzy + semantic)
+        fuzzy_name_norm = (fuzz.ratio(name1, name2) / 100.0) if (name1 or name2) else 0.0
+
+        # Prepare semantic pairs (only if non-empty)
+        texts: List[str] = []
+        idx = {}
+        if name1 and name2:
+            idx['name'] = (len(texts), len(texts) + 1)
+            texts.extend([name1, name2])
+        if loc1 and loc2:
+            idx['loc'] = (len(texts), len(texts) + 1)
+            texts.extend([loc1, loc2])
+
+        semantic_vals: List[float] = []
+        if texts:
+            try:
+                vecs = self._get_embeddings_service().embed_texts(texts)
+                np_vecs = [np.asarray(v, dtype=np.float32) for v in vecs]
+                if 'name' in idx:
+                    i, j = idx['name']
+                    a, b = np_vecs[i], np_vecs[j]
+                    semantic_vals.append(float(np.dot(a, b)))
+                if 'loc' in idx:
+                    i, j = idx['loc']
+                    a, b = np_vecs[i], np_vecs[j]
+                    semantic_vals.append(float(np.dot(a, b)))
+            except Exception:
+                # Em caso de falha na IA, ignorar componente semântico
+                pass
+
+        semantic_mean = float(np.mean(semantic_vals)) if semantic_vals else 0.0
+        # Pesos iniciais 50/50 entre fuzzy e semântico
+        score = 0.5 * fuzzy_name_norm + 0.5 * semantic_mean
         
-        return True
+        return score >= self.ai_dedup_threshold
     
     def _select_best_event(self, event_group: List[Dict[str, Any]]) -> Dict[str, Any]:
         """Select the best event from a group of similar events."""
