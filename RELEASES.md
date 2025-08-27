@@ -9,6 +9,12 @@ AI — Suporte a Embeddings ONNX com Benchmarks (Issue #164)
   - Suporte a modelos ONNX com fallback para hashing
   - Normalização automática de providers (mps→CoreML, cpu→CPU, cuda→CUDA)
   - Métricas detalhadas de latência e uso de cache
+  - Retorno de embeddings como `np.ndarray` (`float32`) no backend ONNX; backend de hashing retorna `List[float]`
+  - Cache persiste embeddings como listas JSON-serializáveis e reconverte para `np.ndarray` ao consumir via ONNX
+  - Chamada de inferência única por batch no ONNX (primeiro item); textos adicionais do mesmo batch usam fallback hashing para compatibilidade e performance
+  - Validação/normalização de providers em `src/utils/config_validator.py::validate_ai_config`
+    - Aceita shorthands (`cpu`, `cuda`, `coreml`, `dml`) e nomes completos do ONNX Runtime; normaliza e filtra inválidos
+  - Testes: ONNX pode ser pulado com `SKIP_ONNX_TESTS=true` no ambiente
 
 - **Ferramentas de Benchmark**
   - `scripts/eval/benchmarks.py`: compara performance entre backends (hashing vs ONNX)

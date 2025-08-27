@@ -518,6 +518,14 @@ O arquivo `config/config.json` permite personalizar. Consulte o [Guia de Configu
 - **Sistema de logging**
 - **IA offline (embeddings determinísticos)** para categorização semântica
 
+### Notas de Compatibilidade do Backend ONNX
+
+- **Tipo de retorno**: o backend ONNX retorna embeddings como `np.ndarray (float32)`. O backend de hashing retorna `List[float]`.
+- **Cache**: embeddings são persistidos como listas JSON-serializáveis; ao ler, são reconvertidos para `np.ndarray` quando o consumidor usa ONNX.
+- **Providers ONNX**: aceitamos shorthands (`cpu`, `cuda`, `coreml`, `dml`) e nomes completos do ONNX Runtime. A validação/normalização ocorre em `src/utils/config_validator.py::validate_ai_config`.
+- **Chamada por batch**: o serviço faz uma única chamada de inferência ONNX por batch (aplicada ao primeiro texto). Itens adicionais do batch usam fallback de hashing para compatibilidade e eficiência.
+- **Testes**: você pode pular testes ONNX definindo `SKIP_ONNX_TESTS=true` no ambiente.
+
 ### Qualidade — Detecção de Anomalias (opcional)
 Avaliação leve e opcional de anomalias de eventos após a normalização no `EventProcessor`.
 

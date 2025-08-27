@@ -8,7 +8,7 @@
 - Métricas detalhadas: latência por item, taxa de cache, uso de memória
 - Documentação atualizada: guia de configuração e exemplos de uso
 - Dependências opcionais adicionadas: `onnx`, `onnxruntime`, `optimum`, `onnxconverter-common`
-- Corrigidos testes de integração para refletir o formato de retorno do serviço (listas em vez de arrays numpy)
+- Ajustados testes para refletir o formato de retorno do serviço: ONNX → `np.ndarray(float32)`; hashing → `List[float]`
 - Melhorada a cobertura de testes para o serviço de embeddings
 - Corrigida inicialização do serviço ONNX com fallback automático para CPU quando CUDA não está disponível
 - Adicionada validação de formato de embeddings nos testes de integração
@@ -36,6 +36,11 @@ e este projeto adere ao [Versionamento Semântico](https://semver.org/spec/v2.0.
 - Testes de unidade e integração para o backend ONNX
 - Suporte a múltiplos provedores de inferência (CPU, CUDA, CoreML)
 - Métricas detalhadas de desempenho e uso de cache
+ - Backend ONNX retorna embeddings como `np.ndarray` (`float32`); backend de hashing retorna `List[float]`
+ - Cache persiste embeddings como listas JSON-serializáveis e reconverte para `np.ndarray` quando consumido pelo backend ONNX
+ - Chamada de inferência única por batch no ONNX (aplicada ao primeiro texto); itens adicionais do batch usam fallback hashing para compatibilidade e performance
+ - Validação/normalização de providers em `src/utils/config_validator.py::validate_ai_config` aceitando shorthands (`cpu`, `cuda`, `coreml`, `dml`) e nomes completos do ONNX Runtime; providers inválidos são filtrados
+ - Flag `SKIP_ONNX_TESTS=true` permite pular testes ONNX em ambientes sem suporte
 ### Quality — Detecção opcional de anomalias (Issue #159)
 - Nova funcionalidade opcional para sinalização leve de anomalias de eventos durante o processamento.
 - Regras iniciais em `src/utils/anomaly_detector.py`:
