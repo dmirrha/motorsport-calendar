@@ -187,6 +187,11 @@
       "enabled": true,
       "dir": "cache/embeddings",
       "ttl_days": 30
+    },
+    "embeddings": {
+      "backend": "hashing",
+      "dim": 256,
+      "lru_capacity": 10000
     }
   },
   

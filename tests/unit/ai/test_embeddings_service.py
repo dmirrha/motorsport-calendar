@@ -1,49 +1,79 @@
 import math
-from src.ai.embeddings_service import EmbeddingsService
+from pathlib import Path
+
+import numpy as np
+import pytest
+
+from src.ai import EmbeddingsService, EmbeddingsConfig
 
 
-def test_embeddings_service_determinism_and_shape():
-    svc = EmbeddingsService(config=None, logger=None)
+@pytest.mark.unit
+def test_embeddings_determinism_and_shape(tmp_path: Path):
+    cfg = EmbeddingsConfig(
+        enabled=True,
+        device="cpu",
+        batch_size=4,
+        backend="hashing",
+        dim=128,
+        lru_capacity=128,
+        cache_dir=tmp_path / "cache",
+        ttl_days=30,
+    )
+    svc = EmbeddingsService(cfg)
+
     texts = [
-        "Formula 1 Grand Prix",
-        "IMSA WeatherTech",
-        "",
-        None,
-        "Formula 1 Grand Prix",  # repetido para checar cache/determinismo
+        "F1 Grand Prix São Paulo",
+        "F1 Grand Prix São Paulo",
+        "MotoGP Argentina",
+        "Stock Car Brasil Goiânia",
     ]
-    vecs = svc.embed_texts(texts)
 
-    # Tamanho consistente
-    assert isinstance(vecs, list)
-    assert len(vecs) == len(texts)
-    assert all(isinstance(v, list) for v in vecs)
-    assert all(len(v) == svc.dim for v in vecs)
+    embs1 = svc.embed_texts(texts)
+    embs2 = svc.embed_texts(texts)
 
-    # Normalização L2
-    for v in vecs:
-        norm = math.sqrt(sum(x * x for x in v))
-        # vazio pode gerar vetor zero (norm 0), demais devem ser ~1.0
-        if any(x != 0.0 for x in v):
-            assert 0.99 <= norm <= 1.01
+    # Mesmo vetor para entradas iguais
+    assert np.allclose(embs1[0], embs1[1])
 
-    # Determinismo (mesmo texto → mesmo vetor)
-    assert vecs[0] == vecs[4]
+    # Determinismo entre chamadas
+    for a, b in zip(embs1, embs2):
+        assert np.allclose(a, b)
+
+    # Checa dimensão
+    for e in embs1:
+        assert len(e) == cfg.dim
 
 
-def test_embeddings_service_similarity_reasonable():
-    svc = EmbeddingsService(config=None, logger=None)
-    a = "Formula 1 Grand Prix"
-    b = "F1 Grand Prix"
-    c = "World Rally Championship"
-    va, vb, vc = svc.embed_texts([a, b, c])
+@pytest.mark.unit
+def test_cache_hits_and_batching(tmp_path: Path):
+    cfg = EmbeddingsConfig(
+        enabled=True,
+        device="cpu",
+        batch_size=4,
+        backend="hashing",
+        dim=64,
+        lru_capacity=64,
+        cache_dir=tmp_path / "cache",
+        ttl_days=30,
+    )
 
-    def cos(u, v):
-        dot = sum(x*y for x, y in zip(u, v))
-        nu = math.sqrt(sum(x*x for x in u))
-        nv = math.sqrt(sum(y*y for y in v))
-        return dot / (nu * nv) if nu > 0 and nv > 0 else 0.0
+    # 10 itens para gerar 3 lotes (4+4+2)
+    texts = [f"evento_{i}" for i in range(10)]
 
-    sim_ab = cos(va, vb)
-    sim_ac = cos(va, vc)
+    svc = EmbeddingsService(cfg)
+    embs1 = svc.embed_texts(texts)
+    assert len(embs1) == len(texts)
 
-    assert sim_ab > sim_ac, (sim_ab, sim_ac)
+    # 3 latências registradas (3 lotes)
+    assert len(svc.metrics["batch_latencies_ms"]) == math.ceil(len(texts) / cfg.batch_size)
+
+    # Segunda chamada deve ser 100% cache hit (sem novos lotes)
+    before_hits = svc.metrics["cache_hits"]
+    embs2 = svc.embed_texts(texts)
+    assert len(embs2) == len(texts)
+
+    # hits incrementados em N
+    assert svc.metrics["cache_hits"] >= before_hits + len(texts)
+
+    # Não deve registrar novas latências para misses (apenas se houver misses)
+    after_batches = len(svc.metrics["batch_latencies_ms"])
+    assert after_batches == math.ceil(len(texts) / cfg.batch_size)

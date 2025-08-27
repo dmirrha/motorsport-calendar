@@ -1,154 +1,153 @@
-"""
-Serviço de embeddings OFFLINE leve baseado em hashing de n-gramas.
-
-Objetivo: fornecer uma implementação local, sem dependências externas, para
-habilitar a integração semântica do `CategoryDetector` quando `ai.enabled=true`.
-
-Interface esperada pelo `CategoryDetector`:
-- Classe: EmbeddingsService(config, logger)
-- Método: embed_texts(texts: List[str]) -> List[List[float]]
-
-Notas:
-- Implementa vetorização por hashing de n-gramas de caracteres (bag-of-char-ngrams).
-- Normaliza cada vetor para norma L2 = 1.0, possibilitando uso com similaridade do cosseno.
-- Respeita `ai.batch_size` (utilizado apenas para logging e processamento em chunks).
-- Inclui cache em memória por processo para acelerar textos repetidos durante a execução.
-"""
-from __future__ import annotations
-
-import math
-import time
+import hashlib
 import logging
-from typing import Any, Dict, List, Optional, Tuple
+import time
+from dataclasses import dataclass
+from pathlib import Path
+from typing import List, Optional, Tuple
+
+import numpy as np
+from sklearn.feature_extraction.text import HashingVectorizer
+from sklearn.preprocessing import normalize
+
+from .cache import LRUCache, DiskCache, CombinedCache, CacheConfig
+
+
+logger = logging.getLogger(__name__)
+
+
+@dataclass
+class EmbeddingsConfig:
+    # Core
+    enabled: bool = False
+    device: str = "cpu"  # 'auto'|'cpu'|'cuda'|'mps' (sklearn backend usa CPU)
+    batch_size: int = 16
+
+    # Embeddings sub-config
+    backend: str = "hashing"  # 'hashing' (fase 1, 100% offline)
+    dim: int = 256
+    lru_capacity: int = 10000
+
+    # Cache (diretório e TTL vêm da seção ai.cache)
+    cache_dir: Path = Path("cache/embeddings")
+    ttl_days: int = 30
 
 
 class EmbeddingsService:
-    """Implementação simples de embeddings via hashing de n-gramas.
+    def __init__(self, cfg: EmbeddingsConfig):
+        self.cfg = cfg
+        # Ajustes e validações
+        self.cfg.dim = max(1, int(self.cfg.dim))
+        self.cfg.batch_size = max(1, int(self.cfg.batch_size))
+        self.cfg.lru_capacity = max(1, int(self.cfg.lru_capacity))
 
-    Parâmetros de configuração relevantes (se existirem):
-    - ai.batch_size: int (default 16)
-    - ai.cache.enabled: bool (default True) [neste serviço apenas cache em memória]
-    - ai.cache.ttl_days: int (ignorado nesta implementação simples)
-    - ai.device: str (ignorado, sem aceleração nesta versão)
-    - ai.onnx.enabled/provider: ignorados nesta versão.
-    """
+        # Cache (memória + disco)
+        db_path = Path(self.cfg.cache_dir) / "embeddings_cache.sqlite"
+        memory = LRUCache(self.cfg.lru_capacity)
+        disk = DiskCache(db_path=db_path, ttl_days=self.cfg.ttl_days)
+        self.cache = CombinedCache(memory=memory, disk=disk)
 
-    def __init__(self, config: Optional[Any] = None, logger: Optional[logging.Logger] = None) -> None:
-        self.logger = logger or logging.getLogger(__name__)
-        self.config = config
+        # Métricas simples
+        self.metrics = {
+            "batch_latencies_ms": [],
+            "cache_hits": 0,
+            "cache_misses": 0,
+        }
 
-        # Parâmetros
-        self.batch_size: int = 16
-        try:
-            if self.config:
-                # config pode ser um ConfigManager ou dict com get
-                get = getattr(self.config, "get", None)
-                if callable(get):
-                    self.batch_size = int(self.config.get("ai.batch_size", 16))
-                else:
-                    # tenta acessar como dict
-                    ai = (self.config.get("ai") if isinstance(self.config, dict) else None) or {}
-                    self.batch_size = int(ai.get("batch_size", 16))
-        except Exception:
-            # fallback silencioso
-            self.batch_size = 16
+        # Backend
+        if self.cfg.backend != "hashing":
+            logger.warning(
+                "Backend '%s' não suportado nesta fase. Usando 'hashing'.",
+                self.cfg.backend,
+            )
+        self.backend = "hashing"
+        self._init_hashing_backend()
 
-        # Hiperparâmetros simples para hashing
-        self.dim: int = 384  # dimensão do vetor (compatível com uso leve)
-        self.min_n: int = 3  # n-gram mínimo
-        self.max_n: int = 5  # n-gram máximo
-        self._cache: Dict[str, List[float]] = {}
-
-        self.logger.info(
-            f"[EmbeddingsService] Inicializado (dim={self.dim}, ngrams={self.min_n}-{self.max_n}, batch_size={self.batch_size})"
+        logger.info(
+            "EmbeddingsService iniciado (backend=%s, dim=%d, batch_size=%d, cache_dir=%s)",
+            self.backend,
+            self.cfg.dim,
+            self.cfg.batch_size,
+            str(self.cfg.cache_dir),
         )
 
-    # ----------------------
-    # API pública
-    # ----------------------
+    def _init_hashing_backend(self):
+        # HashingVectorizer não precisa de fit; determinístico e 100% offline
+        self.vectorizer = HashingVectorizer(
+            n_features=self.cfg.dim,
+            alternate_sign=True,
+            norm=None,  # normalização manual após transform
+            ngram_range=(1, 2),
+            analyzer="word",
+            lowercase=True,
+            stop_words=None,
+        )
+
+    def _key_for(self, text: str) -> str:
+        # A chave inclui backend e dim para evitar colisão de versões/configs
+        base = f"{self.backend}:{self.cfg.dim}:".encode("utf-8")
+        return hashlib.sha256(base + text.encode("utf-8")).hexdigest()
+
+    def _embed_batch(self, texts: List[str]) -> List[List[float]]:
+        if not texts:
+            return []
+        X = self.vectorizer.transform(texts)  # sparse matrix
+        X = normalize(X, norm="l2", axis=1, copy=False)
+        # Converte para denso apenas para retorno (dim típico pequeno p/ fase 1)
+        dense = X.toarray().astype(np.float32)
+        return [row.tolist() for row in dense]
+
     def embed_texts(self, texts: List[str]) -> List[List[float]]:
         """Gera embeddings para uma lista de textos.
-
-        - Normaliza entradas nulas para string vazia.
-        - Usa cache em memória para textos idênticos no mesmo processo.
-        - Processa em pequenos batches para logs e eventual evolução futura.
+        - Usa cache (memória+disco) por item
+        - Faz batching para os misses
+        - Retorna na mesma ordem dos textos de entrada
         """
         if texts is None:
-            return []
+            texts = []
+        if not isinstance(texts, list):
+            raise TypeError("texts deve ser uma lista de strings")
 
-        start = time.time()
-        outputs: List[List[float]] = []
+        # Primeiro tenta recuperar do cache
+        results: List[Optional[List[float]]] = [None] * len(texts)
+        to_compute: List[Tuple[int, str]] = []
+        for i, t in enumerate(texts):
+            t = "" if t is None else str(t)
+            k = self._key_for(t)
+            v = self.cache.get(k)
+            if v is not None:
+                results[i] = v
+            else:
+                to_compute.append((i, t))
 
-        # Processamento em chunks
-        bs = max(1, int(self.batch_size))
-        total = len(texts)
-        for i in range(0, total, bs):
-            chunk = texts[i : i + bs]
-            for t in chunk:
-                s = (t or "").strip()
-                # Cache in-memory
-                if s in self._cache:
-                    outputs.append(self._cache[s])
-                    continue
-                vec = self._hash_embed(s)
-                self._cache[s] = vec
-                outputs.append(vec)
+        # Métricas de cache
+        self.metrics["cache_hits"] += self.cache.hits
+        self.metrics["cache_misses"] += self.cache.misses
+        # zera contadores internos para medição por chamada
+        self.cache.hits = 0
+        self.cache.misses = 0
 
-        dur_ms = (time.time() - start) * 1000.0
-        try:
-            self.logger.debug(
-                f"[EmbeddingsService] embed_texts: {len(texts)} itens em {dur_ms:.1f} ms (batch_size={bs})"
-            )
-        except Exception:
-            pass
-        return outputs
+        # Processa em lotes os itens faltantes
+        for start in range(0, len(to_compute), self.cfg.batch_size):
+            chunk = to_compute[start : start + self.cfg.batch_size]
+            batch_indices = [idx for idx, _ in chunk]
+            batch_texts = [t for _, t in chunk]
+            t0 = time.time()
+            batch_vecs = self._embed_batch(batch_texts)
+            latency_ms = (time.time() - t0) * 1000.0
+            self.metrics["batch_latencies_ms"].append(latency_ms)
 
-    # ----------------------
-    # Implementação interna
-    # ----------------------
-    def _hash_embed(self, text: str) -> List[float]:
-        """Converte texto em vetor por hashing de n-gramas e normalização L2."""
-        # Gera contagem de n-gramas com hashing em dimensão fixa
-        vec = [0.0] * self.dim
-        if not text:
-            return vec
+            # Salva no cache e no resultado
+            for idx, vec, text in zip(batch_indices, batch_vecs, batch_texts):
+                k = self._key_for(text)
+                self.cache.put(k, vec)
+                results[idx] = vec
 
-        # Normalização simples
-        s = text.lower()
+        # Por segurança, substitui qualquer None por vetor zero (não deve ocorrer)
+        zero = [0.0] * self.cfg.dim
+        return [r if r is not None else zero for r in results]
 
-        # Extração de n-gramas de caracteres
-        for n in range(self.min_n, self.max_n + 1):
-            if len(s) < n:
-                continue
-            for j in range(len(s) - n + 1):
-                ngram = s[j : j + n]
-                h = self._stable_hash(ngram)
-                idx = h % self.dim
-                vec[idx] += 1.0
 
-        # TF-like log scaling opcional + normalização L2
-        for k in range(self.dim):
-            if vec[k] > 0.0:
-                vec[k] = 1.0 + math.log(1.0 + vec[k])
-
-        self._l2_normalize(vec)
-        return vec
-
-    @staticmethod
-    def _stable_hash(s: str) -> int:
-        """Hash estável independente da execução (diferente de hash() nativo do Python)."""
-        # FNV-1a 64-bit
-        h = 1469598103934665603
-        fnv_prime = 1099511628211
-        for ch in s:
-            h ^= ord(ch)
-            h = (h * fnv_prime) & 0xFFFFFFFFFFFFFFFF
-        return h
-
-    @staticmethod
-    def _l2_normalize(vec: List[float]) -> None:
-        norm = math.sqrt(sum(x * x for x in vec))
-        if norm > 0:
-            inv = 1.0 / norm
-            for i in range(len(vec)):
-                vec[i] *= inv
+__all__ = [
+    "EmbeddingsConfig",
+    "EmbeddingsService",
+]
