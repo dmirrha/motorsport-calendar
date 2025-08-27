@@ -1,0 +1,52 @@
+{
+  "issue_number": 164,
+  "title": "F3 (opcional): ONNX e quantização para aceleração local",
+  "state": "open",
+  "labels": ["ai", "performance", "optional", "priority: P2"],
+  "created_at": "2025-08-26T16:56:53Z",
+  "updated_at": "2025-08-26T17:11:23Z",
+  "author": "dmirrha",
+  "links": {
+    "html": "https://github.com/dmirrha/motorsport-calendar/issues/164",
+    "epic": "https://github.com/dmirrha/motorsport-calendar/issues/157"
+  },
+  "context": {
+    "description": "Converter o modelo para ONNX e habilitar execução opcional via onnxruntime (providers auto: CPU/MPS/GPU). Avaliar ganhos de latência/throughput e qualidade.",
+    "expected_behavior": [
+      "Melhorar latência sem perder qualidade acima da tolerância definida no plano.",
+      "Manter fallback para execução padrão."
+    ],
+    "requirements": {
+      "ai.onnx.enabled": true,
+      "ai.onnx.providers": ["auto"]
+    },
+    "references": [
+      "docs/architecture/ai_implementation_plan.md",
+      "requirements.txt",
+      "src/ai/embeddings_service.py"
+    ]
+  },
+  "acceptance_criteria": [
+    "Execução ONNX habilitável por config; fallback seguro.",
+    "Benchmarks mostram ganhos claros ou decisão documentada.",
+    "Sem regressão de qualidade acima do limite."
+  ],
+  "implementation_plan": {
+    "config": [
+      "Adicionar ai.onnx.enabled, ai.onnx.providers, ai.onnx.model_path (opcional)",
+      "Documentar extras de instalação do onnxruntime"
+    ],
+    "code": [
+      "Integrar backend ORT opcional em src/ai/embeddings_service.py com fallback"
+    ],
+    "benchmarks": [
+      "Estender scripts/eval/benchmarks.py para comparar engines"
+    ],
+    "tests": [
+      "Unit (mocks/stubs) e integração de fallback"
+    ],
+    "docs": [
+      "Atualizar README.md, docs/CONFIGURATION_GUIDE.md, RELEASES.md, CHANGELOG.md"
+    ]
+  }
+}

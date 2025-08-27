@@ -482,8 +482,12 @@ def validate_ai_config(config: Dict[str, Any]) -> Dict[str, Any]:
         - dedup: float entre 0 e 1 (default 0.85)
     - onnx:
         - enabled: bool (default False)
-        - provider: str in {cpu,cuda,coreml} (default 'cpu')
+        - providers: list[str] in {cpu,cuda,coreml,mps} (default ['cpu'])
+        - provider: str legado (mantido para compatibilidade; convertido em lista)
         - opset: int >= 11 (default 17)
+        - model_path: str opcional (caminho para modelo ONNX local)
+        - intra_op_num_threads: int opcional >= 1
+        - inter_op_num_threads: int opcional >= 1
     - cache:
         - enabled: bool (default True)
         - dir: caminho gravável (default 'cache/embeddings')
@@ -547,14 +551,28 @@ def validate_ai_config(config: Dict[str, Any]) -> Dict[str, Any]:
     # onnx
     onnx = merged.get('onnx', {}) or {}
     onnx_enabled = bool(onnx.get('enabled', False))
-    provider = str(onnx.get('provider', 'cpu')).strip().lower()
-    allowed_providers = {'cpu', 'cuda', 'coreml'}
-    if provider not in allowed_providers:
-        raise ConfigValidationError(
-            f"Valor inválido para ai.onnx.provider: {provider}",
-            ErrorCode.CONFIG_VALIDATION_ERROR,
-            'ai.onnx.provider'
-        )
+    # Providers: aceitar lista nova ou string legado
+    allowed_providers = { 'cpu', 'cuda', 'coreml', 'mps' }
+    providers_val = onnx.get('providers')
+    if providers_val is None:
+        # compatibilidade: 'provider' (string)
+        prov_legacy = str(onnx.get('provider', 'cpu')).strip().lower()
+        providers: List[str] = [prov_legacy]
+    else:
+        if isinstance(providers_val, list):
+            providers = [str(p).strip().lower() for p in providers_val if p is not None]
+        else:
+            providers = [str(providers_val).strip().lower()]
+    # Filtra desconhecidos mantendo ordem
+    filtered_providers: List[str] = []
+    seen = set()
+    for p in providers:
+        if p in allowed_providers and p not in seen:
+            filtered_providers.append(p)
+            seen.add(p)
+    if not filtered_providers:
+        filtered_providers = ['cpu']
+    # opset (opcional, manter validação)
     try:
         opset = int(onnx.get('opset', 17))
         if opset < 11:
@@ -565,10 +583,28 @@ def validate_ai_config(config: Dict[str, Any]) -> Dict[str, Any]:
             ErrorCode.CONFIG_VALIDATION_ERROR,
             'ai.onnx.opset'
         ) from e
+    # Parâmetros opcionais
+    model_path = onnx.get('model_path')
+    intra_threads = onnx.get('intra_op_num_threads')
+    inter_threads = onnx.get('inter_op_num_threads')
+    try:
+        if intra_threads is not None:
+            intra_threads = max(1, int(intra_threads))
+        if inter_threads is not None:
+            inter_threads = max(1, int(inter_threads))
+    except (ValueError, TypeError) as e:
+        raise ConfigValidationError(
+            f"Valor inválido para parâmetros de threads em ai.onnx: {e}",
+            ErrorCode.CONFIG_VALIDATION_ERROR,
+            'ai.onnx.(intra|inter)_op_num_threads'
+        ) from e
     merged['onnx'] = {
         'enabled': onnx_enabled,
-        'provider': provider,
+        'providers': filtered_providers,
         'opset': opset,
+        'model_path': model_path,
+        'intra_op_num_threads': intra_threads,
+        'inter_op_num_threads': inter_threads,
     }
 
     # cache
