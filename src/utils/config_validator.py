@@ -548,11 +548,19 @@ def validate_ai_config(config: Dict[str, Any]) -> Dict[str, Any]:
             'ai.thresholds'
         ) from e
 
-    # onnx
-    onnx = merged.get('onnx', {}) or {}
+    # Inicializa a seção onnx se não existir
+    if 'onnx' not in merged:
+        merged['onnx'] = {}
+        
+    # Obtém a configuração onnx, garantindo que é um dicionário
+    onnx = merged['onnx']
+    if not isinstance(onnx, dict):
+        onnx = {}
+        
+    # Define valores padrão
     onnx_enabled = bool(onnx.get('enabled', False))
     # Providers: aceitar lista nova ou string legado
-    allowed_providers = { 'cpu', 'cuda', 'coreml', 'mps' }
+    allowed_providers = {'cpu', 'cuda', 'coreml', 'mps'}
     providers_val = onnx.get('providers')
     if providers_val is None:
         # compatibilidade: 'provider' (string)

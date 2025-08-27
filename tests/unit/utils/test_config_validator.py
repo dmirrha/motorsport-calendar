@@ -275,6 +275,11 @@ class TestConfigValidator(unittest.TestCase):
         self.assertEqual(cm.exception.error_code, ErrorCode.CONFIG_VALIDATION_ERROR)
 
     def test_validate_ai_config_invalid_onnx_provider(self):
+        # Test with an invalid provider
+        with self.assertRaises(ConfigValidationError) as cm:
+            validate_ai_config({'onnx': {'provider': 'invalid_provider'}})
+        self.assertEqual(cm.exception.error_code, ErrorCode.CONFIG_VALIDATION_ERROR)
+        # Also test with 'directml' for backward compatibility
         with self.assertRaises(ConfigValidationError) as cm:
             validate_ai_config({'onnx': {'provider': 'directml'}})
         self.assertEqual(cm.exception.error_code, ErrorCode.CONFIG_VALIDATION_ERROR)

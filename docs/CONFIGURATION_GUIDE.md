@@ -309,7 +309,7 @@ O serviço de embeddings suporta modelos ONNX para inferência acelerada, com fa
     "onnx": {
       "enabled": true,
       "model_path": "models/embeddings-onnx/model.onnx",
-      "providers": ["cpu", "CPUExecutionProvider"]
+      "providers": ["CPUExecutionProvider"]
     },
     "device": "auto",
     "batch_size": 64,
@@ -365,8 +365,7 @@ O serviço expõe as seguintes métricas via `EmbeddingsService.metrics`:
 - Backend hashing retorna embeddings como listas de `float` (determinístico, 100% offline).
 - O cache persiste embeddings como listas JSON-serializáveis; ao ler do cache, o backend ONNX converte de volta para `np.ndarray(float32)` automaticamente.
 - Para eficiência, o backend ONNX realiza uma única chamada de inferência por lote; quando aplicável, itens além do primeiro no mesmo lote podem usar o fallback hashing para manter compatibilidade de desempenho e testes.
-
-### Categorização semântica offline (determinística)"
+### Categorização semântica offline (determinística)
 
 Esta funcionalidade complementa a detecção heurística de categorias. Quando `ai.enabled=true`, um classificador semântico local e determinístico é utilizado para sugerir a categoria de eventos com base em embeddings estáticos e comparação por distância (L2), sem chamadas externas.
 
