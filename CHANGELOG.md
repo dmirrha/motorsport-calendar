@@ -12,6 +12,21 @@ Todas as mudanças notáveis neste projeto serão documentadas neste arquivo.
 O formato é baseado em [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 e este projeto adere ao [Versionamento Semântico](https://semver.org/spec/v2.0.0.html).
 
+## [Unreleased]
+### Quality — Detecção opcional de anomalias (Issue #159)
+- Nova funcionalidade opcional para sinalização leve de anomalias de eventos durante o processamento.
+- Regras iniciais em `src/utils/anomaly_detector.py`:
+  - Datas fora do fim de semana alvo.
+  - Horários improváveis (mín/máx configuráveis).
+  - Inconsistências de categoria (categoria bruta ausente e baixa confiança de detecção).
+  - Local ausente.
+- Integração: `EventProcessor.process_events()` executa a avaliação ao final do pipeline e registra um resumo agregado no logger. Não bloqueante.
+- Configuração (opcional) via `quality.anomaly_detection.*`:
+  - `enabled` (false por padrão)
+  - `hours.min` (6) e `hours.max` (23)
+  - `examples_per_type` (3)
+- Observabilidade: resumo estruturado com contagens e exemplos limitados por tipo.
+
 ## [0.6.9] - 2025-08-27
 ### Fix — Deduplicação Semântica (Issue #160)
 - **EventProcessor**: 

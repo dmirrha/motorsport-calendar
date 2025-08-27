@@ -3,6 +3,22 @@
 Este arquivo contém um registro acumulativo de todas as versões lançadas do projeto, com notas detalhadas sobre as mudanças em cada versão.
 
 ## Não Lançado
+Quality — Detecção opcional de anomalias (Issue #159)
+
+- Nova funcionalidade opcional para sinalização leve de anomalias de eventos durante o processamento.
+- Regras iniciais cobertas pelo `AnomalyDetector` (`src/utils/anomaly_detector.py`):
+  - Datas fora do fim de semana alvo.
+  - Horários improváveis (mín/máx configuráveis).
+  - Inconsistências de categoria (categoria bruta ausente e baixa confiança de detecção).
+  - Local ausente.
+- Integração: o `EventProcessor.process_events()` avalia anomalias ao final do pipeline e registra um resumo agregado via logger. Não bloqueia o processamento.
+- Configuração (opcional) via `quality.anomaly_detection.*` em JSON:
+  - `enabled` (boolean, padrão: `false`)
+  - `hours.min` (int, padrão: `6`)
+  - `hours.max` (int, padrão: `23`)
+  - `examples_per_type` (int, padrão: `3`)
+- Observabilidade: resumo estruturado de anomalias no log com contagens e exemplos limitados por tipo.
+- Compatibilidade: desabilitado por padrão; sem impacto no fluxo quando `enabled=false`.
 
 ## Versão 0.6.9 (2025-08-27)
 Fix — Deduplicação Semântica (Issue #160)

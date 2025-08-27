@@ -392,6 +392,28 @@ O arquivo `config/config.json` permite personalizar. Consulte o [Guia de Configu
 - **Sistema de logging**
 - **IA offline (embeddings determinísticos)** para categorização semântica
 
+### Qualidade — Detecção de Anomalias (opcional)
+
+Avaliação leve e opcional de anomalias de eventos após a normalização no `EventProcessor`.
+
+- Ativação via `quality.anomaly_detection.*` (desabilitado por padrão)
+- Regras: datas fora do fim de semana alvo, horários improváveis, inconsistência de categoria, local ausente
+- Logging de resumo agregado; execução não bloqueia o pipeline
+
+Exemplo mínimo (`config/config.json`):
+
+```json
+{
+  "quality": {
+    "anomaly_detection": {
+      "enabled": true,
+      "hours": { "min": 6, "max": 23 },
+      "examples_per_type": 3
+    }
+  }
+}
+```
+
 ### IA — Serviço de Embeddings Offline
 
 Este projeto inclui um serviço local de embeddings 100% offline, com batching e cache (memória + disco). Útil para recursos semânticos como categorização e deduplicação futuras, sem dependência de internet.
