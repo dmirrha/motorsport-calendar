@@ -171,8 +171,9 @@ def test_onnx_embedding_generation(tmp_path):
         # Verificações básicas
         assert len(embeddings) == len(texts)
         for emb in embeddings:
-            assert isinstance(emb, list)  # O serviço retorna listas, não arrays numpy
-            assert len(emb) == 384  # Dimensão configurada
+            assert isinstance(emb, np.ndarray)
+            assert emb.shape == (384,)
+            assert emb.dtype == np.float32
         
         # Verifica se o método run foi chamado corretamente
         # Como o _embed_batch_onnx atual é um stub, não podemos verificar chamadas específicas
@@ -280,8 +281,9 @@ def test_onnx_batching(tmp_path):
             
         # Verifica se os embeddings têm o formato correto
         for emb in embeddings:
-            assert isinstance(emb, list)  # O serviço retorna listas, não arrays numpy
-            assert len(emb) == 384  # Dimensão configurada
+            assert isinstance(emb, np.ndarray)
+            assert emb.shape == (384,)
+            assert emb.dtype == np.float32
 
 
 @pytest.mark.unit

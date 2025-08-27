@@ -282,7 +282,7 @@ Configurações de recursos de IA locais (desabilitados por padrão).
 | Parâmetro | Tipo | Padrão | Descrição |
 |-----------|------|--------|-----------|
 | `enabled` | boolean | `false` | Habilita execução via ONNX Runtime |
-| `provider` | string | `"cpu"` | Provider: `cpu`, `cuda`, `coreml` |
+| `provider` | string | `"cpu"` | Provider (shorthand): `cpu`, `cuda`, `coreml`, `dml` |
 | `opset` | number | `17` | Versão mínima suportada: `>= 11` |
 
 ### Subseção: `cache`
@@ -309,7 +309,7 @@ O serviço de embeddings suporta modelos ONNX para inferência acelerada, com fa
     "onnx": {
       "enabled": true,
       "model_path": "models/embeddings-onnx/model.onnx",
-      "providers": ["CPUExecutionProvider"]
+      "providers": ["cpu", "CPUExecutionProvider"]
     },
     "device": "auto",
     "batch_size": 64,
@@ -345,6 +345,11 @@ O serviço de embeddings suporta modelos ONNX para inferência acelerada, com fa
 | `CoreMLExecutionProvider` | Apple Silicon | macOS 11+ |
 | `DmlExecutionProvider` | DirectML | Windows 10+ |
 
+Notas sobre providers:
+- Você pode informar providers usando shorthand (`cpu`, `cuda`, `coreml`, `dml`) ou os nomes completos do ONNX Runtime (`CPUExecutionProvider`, `CUDAExecutionProvider`, etc.).
+- A validação normaliza para a forma shorthand em minúsculas e filtra valores inválidos. Quando nenhum válido for informado, o fallback é `cpu`.
+- A ordem de preferência é respeitada. Internamente, os nomes são mapeados para os equivalentes do ONNX Runtime ao criar a sessão.
+
 #### Métricas de Desempenho
 
 O serviço expõe as seguintes métricas via `EmbeddingsService.metrics`:
@@ -354,6 +359,12 @@ O serviço expõe as seguintes métricas via `EmbeddingsService.metrics`:
 - `cache_misses`: Número de falhas de cache
 - `onnx_init_time_ms`: Tempo de inicialização do runtime ONNX
 - `last_error`: Último erro ocorrido (se houver)
+
+#### Notas de compatibilidade e tipos de saída
+- Backend ONNX retorna embeddings como `np.ndarray` (`float32`).
+- Backend hashing retorna embeddings como listas de `float` (determinístico, 100% offline).
+- O cache persiste embeddings como listas JSON-serializáveis; ao ler do cache, o backend ONNX converte de volta para `np.ndarray(float32)` automaticamente.
+- Para eficiência, o backend ONNX realiza uma única chamada de inferência por lote; quando aplicável, itens além do primeiro no mesmo lote podem usar o fallback hashing para manter compatibilidade de desempenho e testes.
 
 ### Categorização semântica offline (determinística)"
 

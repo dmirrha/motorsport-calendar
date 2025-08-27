@@ -570,6 +570,13 @@ def validate_ai_config(config: Dict[str, Any]) -> Dict[str, Any]:
         if p in allowed_providers and p not in seen:
             filtered_providers.append(p)
             seen.add(p)
+    # Se usuário informou algo e nada é válido, lançar erro de validação
+    if providers and not filtered_providers:
+        raise ConfigValidationError(
+            f"Provider(es) ONNX inválido(s): {providers}",
+            ErrorCode.CONFIG_VALIDATION_ERROR,
+            'ai.onnx.providers'
+        )
     if not filtered_providers:
         filtered_providers = ['cpu']
     # opset (opcional, manter validação)
@@ -601,6 +608,7 @@ def validate_ai_config(config: Dict[str, Any]) -> Dict[str, Any]:
     merged['onnx'] = {
         'enabled': onnx_enabled,
         'providers': filtered_providers,
+        'provider': filtered_providers[0],
         'opset': opset,
         'model_path': model_path,
         'intra_op_num_threads': intra_threads,
