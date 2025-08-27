@@ -298,6 +298,72 @@ Notas:
 - `dir` é convertido para caminho absoluto e criado automaticamente; é exigida permissão de escrita. Falhas na preparação do diretório são reportadas como `OUTPUT-5000-ERROR`.
 - Quando `enabled=false`, a seção pode permanecer configurada para uso futuro, mas não será utilizada.
 
+### Configuração de Embeddings ONNX
+
+O serviço de embeddings suporta modelos ONNX para inferência acelerada, com fallback para o método de hashing padrão quando desabilitado.
+
+```json
+{
+  "ai": {
+    "enabled": true,
+    "onnx": {
+      "enabled": true,
+      "model_path": "models/embeddings-onnx/model.onnx",
+      "providers": ["CPUExecutionProvider"]
+    },
+    "device": "auto",
+    "batch_size": 64,
+    "cache": {
+      "enabled": true,
+      "dir": "cache/embeddings",
+      "ttl_days": 7
+    }
+  }
+}
+```
+
+#### Opções de Configuração
+
+| Seção | Parâmetro | Tipo | Padrão | Descrição |
+|-------|-----------|------|--------|-----------|
+| `ai` | `enabled` | boolean | `true` | Habilita/desabilita todo o subsistema de IA |
+| `ai.onnx` | `enabled` | boolean | `false` | Habilita o backend ONNX (requer modelo) |
+|  | `model_path` | string | - | Caminho para o arquivo .onnx (obrigatório se `enabled=true`) |
+|  | `providers` | array | `["CPUExecutionProvider"]` | Provedores de inferência em ordem de preferência |
+| `ai` | `device` | string | `"auto"` | Dispositivo para inferência (`auto`, `cpu`, `cuda`, `mps`) |
+|  | `batch_size` | integer | `64` | Tamanho do lote para processamento paralelo |
+| `ai.cache` | `enabled` | boolean | `true` | Habilita cache de embeddings |
+|  | `dir` | string | `"cache/embeddings"` | Diretório para armazenar o cache em disco |
+|  | `ttl_days` | integer | `7` | Dias até a expiração dos itens em cache |
+
+#### Provedores Suportados
+
+| Provedor | Plataforma | Requisitos |
+|----------|------------|-------------|
+| `CPUExecutionProvider` | CPU | - |
+| `CUDAExecutionProvider` | NVIDIA GPU | CUDA + cuDNN |
+| `CoreMLExecutionProvider` | Apple Silicon | macOS 11+ |
+| `DmlExecutionProvider` | DirectML | Windows 10+ |
+
+Notas sobre providers:
+- Você pode informar providers usando shorthand (`cpu`, `cuda`, `coreml`, `dml`) ou os nomes completos do ONNX Runtime (`CPUExecutionProvider`, `CUDAExecutionProvider`, etc.).
+- A validação normaliza para a forma shorthand em minúsculas e filtra valores inválidos. Quando nenhum válido for informado, o fallback é `cpu`.
+- A ordem de preferência é respeitada. Internamente, os nomes são mapeados para os equivalentes do ONNX Runtime ao criar a sessão.
+#### Métricas de Desempenho
+
+O serviço expõe as seguintes métricas via `EmbeddingsService.metrics`:
+
+- `batch_latencies_ms`: Lista de latências por lote (em milissegundos)
+- `cache_hits`: Número de acertos de cache
+- `cache_misses`: Número de falhas de cache
+- `onnx_init_time_ms`: Tempo de inicialização do runtime ONNX
+- `last_error`: Último erro ocorrido (se houver)
+
+#### Notas de compatibilidade e tipos de saída
+- Backend ONNX retorna embeddings como `np.ndarray` (`float32`).
+- Backend hashing retorna embeddings como listas de `float` (determinístico, 100% offline).
+- O cache persiste embeddings como listas JSON-serializáveis; ao ler do cache, o backend ONNX converte de volta para `np.ndarray(float32)` automaticamente.
+- Para eficiência, o backend ONNX realiza uma única chamada de inferência por lote; quando aplicável, itens além do primeiro no mesmo lote podem usar o fallback hashing para manter compatibilidade de desempenho e testes.
 ### Categorização semântica offline (determinística)
 
 Esta funcionalidade complementa a detecção heurística de categorias. Quando `ai.enabled=true`, um classificador semântico local e determinístico é utilizado para sugerir a categoria de eventos com base em embeddings estáticos e comparação por distância (L2), sem chamadas externas.
