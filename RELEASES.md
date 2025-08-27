@@ -2,6 +2,8 @@
 
 Este arquivo contém um registro acumulativo de todas as versões lançadas do projeto, com notas detalhadas sobre as mudanças em cada versão.
 
+## Não Lançado
+
 ## Versão 0.6.9 (2025-08-27)
 Fix — Deduplicação Semântica (Issue #160)
 
