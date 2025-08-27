@@ -519,7 +519,6 @@ O arquivo `config/config.json` permite personalizar. Consulte o [Guia de Configu
 - **IA offline (embeddings determinísticos)** para categorização semântica
 
 ### Qualidade — Detecção de Anomalias (opcional)
-
 Avaliação leve e opcional de anomalias de eventos após a normalização no `EventProcessor`.
 
 - Ativação via `quality.anomaly_detection.*` (desabilitado por padrão)
