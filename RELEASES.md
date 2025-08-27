@@ -3,6 +3,18 @@
 Este arquivo contém um registro acumulativo de todas as versões lançadas do projeto, com notas detalhadas sobre as mudanças em cada versão.
 
 ## Não Lançado
+
+## Versão 0.6.8 (2025-08-27)
+AI — Categorização Semântica Offline (Issue #163)
+
+- Integração do `EmbeddingsService` com `CategoryDetector` para classificação semântica de eventos.
+- Suporte a múltiplos idiomas (português e inglês) com detecção automática.
+- Threshold configurável via `ai.thresholds.category` (padrão: 0.75).
+- Combinação inteligente de sinais semânticos e heurísticos para maior precisão.
+- Métricas de confiança e origem da classificação (`category_confidence`, `category_source`).
+- Testes de integração abrangentes em `tests/integration/test_it_semantic_category_detector.py`.
+- Documentação atualizada em `docs/CONFIGURATION_GUIDE.md`.
+
 AI — Serviço de Embeddings offline (Issue #165)
 
 - Serviço local 100% offline baseado em hashing determinístico (multilíngue).

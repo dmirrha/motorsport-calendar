@@ -12,7 +12,16 @@ Todas as mudanças notáveis neste projeto serão documentadas neste arquivo.
 O formato é baseado em [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 e este projeto adere ao [Versionamento Semântico](https://semver.org/spec/v2.0.0.html).
 
-## [Unreleased]
+## [0.6.8] - 2025-08-27
+- Feature — AI: Categorização Semântica Offline (Issue #163)
+  - Integração do `CategoryDetector` com `EmbeddingsService` para classificação semântica de eventos
+  - Suporte a múltiplos idiomas (português e inglês) com detecção automática
+  - Threshold configurável via `ai.thresholds.category` (padrão: 0.75)
+  - Combinação inteligente de sinais semânticos e heurísticos
+  - Métricas de confiança e origem da classificação (`category_confidence`, `category_source`)
+  - Testes de integração abrangentes em `tests/integration/test_it_semantic_category_detector.py`
+  - Documentação atualizada em `docs/CONFIGURATION_GUIDE.md`
+
 - Feature — AI: Serviço de Embeddings offline (Issue #165)
   - Novo `EmbeddingsService` 100% offline com backend determinístico por hashing (multilíngue).
   - Batching configurável (`ai.batch_size`) com métricas: `batch_latencies_ms`, `cache_hits`, `cache_misses`.
