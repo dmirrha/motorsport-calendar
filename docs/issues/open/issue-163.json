@@ -1,0 +1,59 @@
+{
+  "id": 3356427465,
+  "number": 163,
+  "state": "open",
+  "title": "F1: Integração de categorização semântica (threshold 0.75)",
+  "milestone": null,
+  "epic": 157,
+  "url": "https://github.com/dmirrha/motorsport-calendar/issues/163",
+  "created_at": "2025-08-26T16:56:47Z",
+  "updated_at": "2025-08-26T17:09:16Z",
+  "labels": [
+    "enhancement",
+    "needs-triage",
+    "priority: P1",
+    "ai",
+    "category"
+  ],
+  "plan": {
+    "summary": "Integrar categorização semântica via embeddings no CategoryDetector com opt-in por ai.enabled e threshold configurável (ai.thresholds.category). Manter heurísticas como fallback e expor category_source/confidence.",
+    "files": [
+      "src/category_detector.py",
+      "src/utils/config_validator.py",
+      "motorsport_calendar.py",
+      "docs/architecture/ai_implementation_plan.md",
+      "docs/CONFIGURATION_GUIDE.md",
+      "tests/integration/",
+      "tests/unit/"
+    ],
+    "steps": [
+      "Adicionar modo com embeddings em detect_categories_batch() quando ai.enabled=true",
+      "Construir vetores de referência para categorias/aliases e cachear no serviço de embeddings",
+      "Calcular similaridade e aplicar threshold (default 0.75) configurável",
+      "Combinar com heurísticas atuais como fallback e registrar fonte+confiança",
+      "Expor category_source e category_confidence no resultado",
+      "Adicionar logs estruturados para auditoria e métricas básicas",
+      "Criar/ajustar testes de integração cobrindo idiomas e variações",
+      "Atualizar documentação e exemplos de configuração"
+    ]
+  },
+  "tasks": [
+    {"item": "Branch criada feat/163-semantic-categorization-integration", "done": true},
+    {"item": "Artefatos locais (md/json) criados em docs/issues/open/", "done": true},
+    {"item": "Plano de resolução definido e aguardando confirmação", "done": false},
+    {"item": "Implementação do modo semântico com fallback", "done": false},
+    {"item": "Testes unitários e de integração ajustados", "done": false},
+    {"item": "Documentação e release notes atualizadas", "done": false}
+  ],
+  "docs_updated": [
+    "docs/issues/open/issue-163.md",
+    "docs/issues/open/issue-163.json"
+  ],
+  "pr": null,
+  "acceptance": [
+    "Precisão não piora baseline; opt-in via ai.enabled",
+    "Campos category_source e category_confidence presentes",
+    "Threshold configurável em ai.thresholds.category (default 0.75)",
+    "Testes de integração verdes"
+  ]
+}

@@ -114,6 +114,18 @@ Testes — Property-based (Hypothesis)
   - Referências principais: `tests/property/test_prop_datetime_parsing_roundtrip.py`, `tests/property/test_prop_dedupe_invariants.py`, `tests/property/test_prop_ical_ordering_stability.py`.
   - Determinismo reforçado no CI com seed fixa de `pytest-randomly` e perfil Hypothesis dedicado.
 
+IA — Categorização semântica offline (determinística)
+
+- Nova funcionalidade opcional que complementa a detecção heurística de categorias, operando 100% offline com embeddings determinísticos (hashing n‑gram + distância L2) e cache local opcional.
+- Parâmetros principais em `ai`:
+  - `enabled` (false)
+  - `batch_size` (16)
+  - `thresholds.category` (0.75)
+  - `device` (auto|cpu|cuda|mps)
+  - `cache.enabled` (true)
+- Integração: aplicada somente quando `ai.enabled=true` e confiança ≥ `ai.thresholds.category`; aliases canônicos do `CategoryDetector` mantêm prioridade quando houver match alto.
+- Documentação atualizada: `README.md` (configuração), `docs/CONFIGURATION_GUIDE.md` (subseção detalhada), `CHANGELOG.md` ([Unreleased]).
+
  Fix — Markdown: Front matter seguro e integração no importador (Issue #142)
  
  - Utilitário: `src/utils/markdown_front_matter.py` com `split_front_matter(md_text)` e `strip_front_matter(md_text)`. Só considera front matter se a primeira linha for exatamente `'---'` e houver fechamento `'---'`. Em caso de YAML inválido ou fechamento ausente, retorna o texto original (fallback seguro, sem crash).

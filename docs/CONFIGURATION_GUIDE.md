@@ -258,18 +258,44 @@ Notas:
 - `dir` é convertido para caminho absoluto e criado automaticamente; é exigida permissão de escrita. Falhas na preparação do diretório são reportadas como `OUTPUT-5000-ERROR`.
 - Quando `enabled=false`, a seção pode permanecer configurada para uso futuro, mas não será utilizada.
 
-### Subseção: `embeddings`
+### Categorização semântica offline (determinística)
 
-| Parâmetro | Tipo | Padrão | Descrição |
-|-----------|------|--------|-----------|
-| `backend` | string | `"hashing"` | Backend de geração de embeddings (offline determinístico) |
-| `dim` | number | `256` | Dimensão do vetor de embeddings (≥ 1) |
-| `lru_capacity` | number | `10000` | Capacidade do cache LRU em memória (≥ 1) |
+Esta funcionalidade complementa a detecção heurística de categorias. Quando `ai.enabled=true`, um classificador semântico local e determinístico é utilizado para sugerir a categoria de eventos com base em embeddings estáticos e comparação por distância (L2), sem chamadas externas.
 
-Notas:
-- Backend suportado no snapshot atual: `hashing`.
-- A chave de cache inclui `backend` e `dim`; ao alterá-los, entradas antigas são invalidadas automaticamente.
-- Métricas disponíveis em runtime (via logs/serviço): `batch_latencies_ms`, `cache_hits`, `cache_misses`.
+- Parâmetros principais:
+  - `ai.enabled` (bool, padrão `false`): habilita recursos de IA locais, incluindo categorização semântica.
+  - `ai.thresholds.category` (float, padrão `0.75`): confiança mínima para aceitar a predição semântica.
+  - `ai.batch_size` (int, padrão `16`): tamanho de lote para inferência offline.
+  - `ai.device` (string, padrão `"auto"`): `auto`, `cpu`, `cuda`, `mps`.
+  - `ai.cache.enabled` (bool, padrão `true`): cache local de embeddings para acelerar execuções repetidas.
+
+- Natureza offline e determinística:
+  - Não realiza chamadas de rede; roda 100% on-device.
+  - Embeddings determinísticos via hashing n‑gram e comparação L2; resultados reprodutíveis com mesma entrada e configuração.
+
+- Integração com a heurística existente:
+  - A heurística continua sendo aplicada. A categorização semântica só é usada quando habilitada e quando a confiança calculada ultrapassa `ai.thresholds.category`.
+  - Aliases e mapeamentos canônicos existentes em `CategoryDetector` permanecem com prioridade quando há match de alta confiança.
+
+- Observabilidade em runtime:
+  - Respeita configurações de UI em `general.visual_interface` (barras de progresso, ícones, cores) quando disponíveis.
+  - Métricas e contadores de eventos são atualizados normalmente (sem telemetry externa).
+
+Exemplo mínimo de configuração:
+
+```json
+{
+  "ai": {
+    "enabled": true,
+    "device": "auto",
+    "batch_size": 16,
+    "thresholds": { "category": 0.75 },
+    "cache": { "enabled": true }
+  }
+}
+```
+
+Referências de implementação: `src/ai/embeddings_service.py` e integrações no `CategoryDetector`.
 
 ## Seção: `logging`
 

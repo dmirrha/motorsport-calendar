@@ -162,6 +162,18 @@
     }
   },
   
+  "ai": {
+    "enabled": false,
+    "device": "auto",
+    "batch_size": 16,
+    "thresholds": {
+      "category": 0.75
+    },
+    "cache": {
+      "enabled": true
+    }
+  },
+  
   "logging": {
     "file_structure": {
       "main_log": "logs/motorsport_calendar.log",
