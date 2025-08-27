@@ -13,6 +13,8 @@ from fuzzywuzzy import fuzz
 from unidecode import unidecode
 import jellyfish
 import logging
+import math
+from importlib import import_module
 
 
 class CategoryDetector:
@@ -43,11 +45,108 @@ class CategoryDetector:
         self.alias_map = self._load_alias_map()
         self.learned_variations = {}
         self.detection_stats = {}
+        # AI / embeddings settings
+        self.ai_enabled = False
+        self.ai_category_threshold = 0.75
+        self.ai_batch_size = 16
+        self._embeddings_service = None
+        self._semantic_ref_vectors: List[List[float]] = []
+        self._semantic_ref_labels: List[str] = []
+        self._semantic_label_to_category: Dict[str, str] = {}
         
         # Load custom mappings from config
         self._load_custom_mappings()
         
+        # Load AI configs if available
+        if self.config:
+            try:
+                self.ai_enabled = bool(self.config.get('ai.enabled', False))
+                self.ai_category_threshold = float(self.config.get('ai.thresholds.category', 0.75))
+                self.ai_batch_size = int(self.config.get('ai.batch_size', 16))
+            except Exception:
+                # Mantém defaults se houver qualquer problema de leitura
+                pass
+
         self.logger.info("🎯 Category Detector initialized with dynamic learning")
+
+    # --- Semantic categorization helpers ---
+    def _ensure_embeddings_service(self) -> bool:
+        """Lazy-load do EmbeddingsService se disponível. Retorna True se ok."""
+        if self._embeddings_service is not None:
+            return True
+        # Import dinâmico tolerante a diferentes layouts
+        EmbeddingsService = None
+        for mod_name in ('src.ai.embeddings_service', 'ai.embeddings_service'):
+            try:
+                mod = import_module(mod_name)
+                EmbeddingsService = getattr(mod, 'EmbeddingsService', None)
+                if EmbeddingsService:
+                    break
+            except Exception:
+                continue
+        if not EmbeddingsService:
+            if self.logger:
+                self.logger.warning("🤖 AI.enabled=true, mas EmbeddingsService não encontrado; usando heurísticas.")
+            return False
+        try:
+            # Instancia sem parâmetros obrigatórios; serviço lê config internamente se necessário
+            self._embeddings_service = EmbeddingsService(config=self.config, logger=self.logger)
+            return True
+        except Exception as e:
+            if self.logger:
+                self.logger.error(f"❌ Falha ao inicializar EmbeddingsService: {e}")
+            self._embeddings_service = None
+            return False
+
+    def _build_semantic_references(self) -> None:
+        """Gera e cacheia embeddings de referência para categorias e aliases."""
+        if self._semantic_ref_vectors:
+            return
+        if not self._ensure_embeddings_service():
+            return
+        # Coleta textos únicos (categoria canônica + variações)
+        texts: List[str] = []
+        labels: List[str] = []
+        label_to_category: Dict[str, str] = {}
+        seen: Set[str] = set()
+        for category, variations in self.category_mappings.items():
+            # inclui o nome da categoria canônica
+            candidates = [category] + list(variations)
+            for t in candidates:
+                norm = self.normalize_text(t)
+                if not norm or norm in seen:
+                    continue
+                seen.add(norm)
+                texts.append(norm)
+                labels.append(norm)
+                label_to_category[norm] = category
+        if not texts:
+            return
+        try:
+            vectors = self._embeddings_service.embed_texts(texts)
+        except Exception as e:
+            if self.logger:
+                self.logger.error(f"❌ Erro ao gerar embeddings de referência: {e}")
+            return
+        # Cache
+        self._semantic_ref_vectors = vectors
+        self._semantic_ref_labels = labels
+        self._semantic_label_to_category = label_to_category
+
+    @staticmethod
+    def _cosine_sim(u: List[float], v: List[float]) -> float:
+        """Similaridade do cosseno sem dependências externas."""
+        if not u or not v or len(u) != len(v):
+            return 0.0
+        dot = 0.0
+        nu = 0.0
+        nv = 0.0
+        for a, b in zip(u, v):
+            dot += a * b
+            nu += a * a
+            nv += b * b
+        den = math.sqrt(nu) * math.sqrt(nv)
+        return (dot / den) if den > 0 else 0.0
     
     def _load_alias_map(self) -> Dict[str, str]:
         """Load canonical alias mapping (normalized alias -> canonical category)."""
@@ -762,7 +861,144 @@ class CategoryDetector:
             List of category detection results
         """
         category_results = []
-        
+
+        # Caminho semântico (opt-in)
+        if self.ai_enabled:
+            # Garante que o serviço e referências estão prontos; caso contrário, cai em heurística
+            self._build_semantic_references()
+            if self._embeddings_service and self._semantic_ref_vectors:
+                # Prepara textos do batch
+                batch_texts: List[str] = []
+                per_event_payload: List[Dict[str, Any]] = []
+                for event in events:
+                    raw_category = event.get('raw_category', '') or event.get('category', '')
+                    event_name = event.get('name', '') or event.get('display_name', '')
+
+                    per_event_context: Dict[str, Any] = {
+                        'name': event_name,
+                        'display_name': event.get('display_name', ''),
+                        'official_url': event.get('official_url', ''),
+                        'timezone': event.get('timezone', ''),
+                        'country': event.get('country', ''),
+                        'location': event.get('location', ''),
+                        'session_type': event.get('session_type', ''),
+                        'date': event.get('date', ''),
+                    }
+                    # Merge optional nested context
+                    try:
+                        raw_data = event.get('raw_data', {}) or {}
+                        category_context = raw_data.get('category_context', {}) if isinstance(raw_data, dict) else {}
+                        if isinstance(category_context, dict):
+                            for k in [
+                                'page_title', 'page_url', 'official_url', 'location', 'country',
+                                'session_type'
+                            ]:
+                                if k in category_context and category_context[k]:
+                                    per_event_context[k] = category_context[k]
+                    except Exception:
+                        pass
+                    # Merge global context
+                    if context and isinstance(context, dict):
+                        per_event_context.update({k: v for k, v in context.items() if v})
+
+                    primary_text = raw_category if raw_category else event_name
+                    # Preserva regra: se há raw_category, não combina contexto
+                    if raw_category:
+                        text_for_semantic = primary_text
+                    else:
+                        # Evita duplicar o 'name'/'display_name' no contexto e valores idênticos ao primary_text
+                        ctx_vals: List[str] = []
+                        for k, v in per_event_context.items():
+                            if not v:
+                                continue
+                            s = str(v).strip()
+                            if not s:
+                                continue
+                            if k in ("name", "display_name"):
+                                continue
+                            if s == primary_text:
+                                continue
+                            ctx_vals.append(s)
+                        text_for_semantic = (primary_text + " " + " ".join(ctx_vals)).strip()
+                    norm_text = self.normalize_text(text_for_semantic)
+                    batch_texts.append(norm_text)
+                    per_event_payload.append({
+                        'has_raw': bool(raw_category),
+                    })
+
+                # Embeddings do batch
+                try:
+                    batch_vecs = self._embeddings_service.embed_texts(batch_texts)
+                except Exception as e:
+                    if self.logger:
+                        self.logger.error(f"❌ Erro ao gerar embeddings do batch: {e}")
+                    batch_vecs = None
+
+                if batch_vecs is not None:
+                    # Similaridade vs referências
+                    for vec, payload in zip(batch_vecs, per_event_payload):
+                        best_cat = 'Unknown'
+                        best_score = 0.0
+                        # varre todas referências
+                        for ref_vec, label in zip(self._semantic_ref_vectors, self._semantic_ref_labels):
+                            score = self._cosine_sim(vec, ref_vec)
+                            if score > best_score:
+                                best_score = score
+                                best_cat = self._semantic_label_to_category.get(label, 'Unknown')
+                        if best_score >= self.ai_category_threshold and best_cat != 'Unknown':
+                            if self.logger:
+                                try:
+                                    self.logger.debug(f"🧠 Semantic match: '{best_cat}' (score={best_score:.3f} ≥ thr={self.ai_category_threshold:.2f})")
+                                except Exception:
+                                    pass
+                            category_results.append({'category': best_cat, 'confidence': float(best_score), 'source': 'semantic'})
+                        else:
+                            # Fallback para heurística padrão
+                            use_source = 'pattern_matching' if payload.get('has_raw') else 'pattern_matching+context'
+                            category_results.append({'category': 'Unknown', 'confidence': 0.0, 'source': use_source})
+                    # Após preencher resultados, executa uma segunda passada de fallback para desconhecidos
+                    # Chamando detect_category apenas nos que ficaram Unknown
+                    for idx, res in enumerate(category_results):
+                        if res['category'] == 'Unknown':
+                            event = events[idx]
+                            raw_category = event.get('raw_category', '') or event.get('category', '')
+                            event_name = event.get('name', '') or event.get('display_name', '')
+                            source_name = event.get('source', 'unknown')
+
+                            per_event_context: Dict[str, Any] = {
+                                'name': event_name,
+                                'display_name': event.get('display_name', ''),
+                                'official_url': event.get('official_url', ''),
+                                'timezone': event.get('timezone', ''),
+                                'country': event.get('country', ''),
+                                'location': event.get('location', ''),
+                                'session_type': event.get('session_type', ''),
+                                'date': event.get('date', ''),
+                            }
+                            try:
+                                raw_data = event.get('raw_data', {}) or {}
+                                category_context = raw_data.get('category_context', {}) if isinstance(raw_data, dict) else {}
+                                if isinstance(category_context, dict):
+                                    for k in [
+                                        'page_title', 'page_url', 'official_url', 'location', 'country',
+                                        'session_type'
+                                    ]:
+                                        if k in category_context and k not in per_event_context and category_context[k]:
+                                            per_event_context[k] = category_context[k]
+                            except Exception:
+                                pass
+                            if context and isinstance(context, dict):
+                                per_event_context.update({k: v for k, v in context.items() if v})
+                            primary_text = raw_category if raw_category else event_name
+                            context_to_pass = None if raw_category else per_event_context
+                            cat, conf, _meta = self.detect_category(primary_text, source=source_name, context=context_to_pass)
+                            res['category'] = cat
+                            res['confidence'] = conf
+                            res['source'] = 'pattern_matching' if raw_category else 'pattern_matching+context'
+
+                    return category_results
+
+        # Caminho heurístico padrão (AI desativado ou indisponível)
         for event in events:
             # Build per-event context and detect using context-aware API
             raw_category = event.get('raw_category', '') or event.get('category', '')
@@ -810,5 +1046,5 @@ class CategoryDetector:
                 'confidence': conf,
                 'source': use_source
             })
-        
+
         return category_results
