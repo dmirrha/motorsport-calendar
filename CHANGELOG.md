@@ -56,6 +56,12 @@ e este projeto adere ao [Versionamento Semântico](https://semver.org/spec/v2.0.
  - Tests/ICS — Normalização de DESCRIPTION e unfolding de linhas (PR #148)
   - `tests/utils/ical_snapshots.py::normalize_ics_text`:
 
+- Feature — IA: Categorização semântica offline (determinística)
+  - Complementa a detecção heurística existente, rodando 100% offline com embeddings determinísticos (hashing n‑gram + distância L2) e cache opcional.
+  - Parâmetros principais em `ai`: `enabled` (false), `batch_size` (16), `thresholds.category` (0.75), `device` (auto|cpu|cuda|mps), `cache.enabled` (true).
+  - Integração: somente aplicada quando `ai.enabled=true` e confiança ≥ `ai.thresholds.category`; aliases canônicos do `CategoryDetector` mantêm prioridade quando houver match alto.
+  - Documentação atualizada: `README.md` (seção de configuração), `docs/CONFIGURATION_GUIDE.md` (subseção detalhada de IA), `RELEASES.md` (Não Lançado).
+
 ## [0.6.5] - 2025-08-25
 ### Category — Correções (Issue #2)
 

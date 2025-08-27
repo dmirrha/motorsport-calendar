@@ -390,6 +390,7 @@ O arquivo `config/config.json` permite personalizar. Consulte o [Guia de Configu
 - **Parâmetros iCal** (timezone, lembretes, etc.)
 - **Links de transmissão** por região
 - **Sistema de logging**
+- **IA offline (embeddings determinísticos)** para categorização semântica
 
 ### Exemplo rápido — ical_parameters
 
@@ -409,13 +410,13 @@ O arquivo `config/config.json` permite personalizar. Consulte o [Guia de Configu
 }
 ```
 
-Notas rápidas:
-- `ical_parameters.output.directory` afeta apenas a saída do arquivo `.ics` e tem precedência sobre `general.output_directory` para esse artefato específico.
-- Apenas `reminders.minutes` é utilizado no snapshot atual.
+### IA offline — Categorização Semântica
 
-## 🎨 Interface Visual
+A detecção de categorias pode utilizar um caminho semântico offline com embeddings determinísticos (sem chamadas externas). Esse caminho complementa os heurísticos existentes e só é usado quando habilitado e quando a confiança mínima é atendida.
 
-O script exibe uma interface colorida com:
+- Funcionamento: hashing determinístico de n-grams + distância L2 com cache em memória.
+- Ativação: `ai.enabled = true` e ajuste do limiar `ai.thresholds.category`.
+- Padrões: `enabled=false`, `thresholds.category=0.75`, `batch_size=16`.
 - Progress bars em tempo real
 - Status de cada fonte de dados
 - Contadores de eventos coletados
