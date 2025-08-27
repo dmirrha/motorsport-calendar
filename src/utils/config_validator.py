@@ -544,17 +544,29 @@ def validate_ai_config(config: Dict[str, Any]) -> Dict[str, Any]:
             'ai.thresholds'
         ) from e
 
-    # onnx
-    onnx = merged.get('onnx', {}) or {}
+    # Inicializa a seção onnx se não existir
+    if 'onnx' not in merged:
+        merged['onnx'] = {}
+        
+    # Obtém a configuração onnx, garantindo que é um dicionário
+    onnx = merged['onnx']
+    if not isinstance(onnx, dict):
+        onnx = {}
+        
+    # Define valores padrão
     onnx_enabled = bool(onnx.get('enabled', False))
     provider = str(onnx.get('provider', 'cpu')).strip().lower()
     allowed_providers = {'cpu', 'cuda', 'coreml'}
+    
+    # Valida o provider
     if provider not in allowed_providers:
         raise ConfigValidationError(
             f"Valor inválido para ai.onnx.provider: {provider}",
             ErrorCode.CONFIG_VALIDATION_ERROR,
             'ai.onnx.provider'
         )
+        
+    # Valida o opset
     try:
         opset = int(onnx.get('opset', 17))
         if opset < 11:
@@ -565,6 +577,8 @@ def validate_ai_config(config: Dict[str, Any]) -> Dict[str, Any]:
             ErrorCode.CONFIG_VALIDATION_ERROR,
             'ai.onnx.opset'
         ) from e
+    
+    # Atualiza o dicionário onnx com os valores validados
     merged['onnx'] = {
         'enabled': onnx_enabled,
         'provider': provider,
