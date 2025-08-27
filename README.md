@@ -472,6 +472,37 @@ A detecção de categorias pode utilizar um caminho semântico offline com embed
 - Contadores de eventos coletados
 - Indicadores visuais de sucesso/erro
 
+### IA offline — Deduplicação Semântica
+
+A remoção de duplicatas pode utilizar similaridade semântica offline baseada no mesmo serviço de embeddings determinísticos. Esse caminho complementa o algoritmo heurístico atual (ex.: nome/timestamps) e só é aplicado quando habilitado e quando o limiar de similaridade é atendido.
+
+- Funcionamento: geração de embeddings determinísticos e cálculo de similaridade para pares candidatos.
+- Ativação: `ai.enabled = true` e ajuste do limiar `ai.thresholds.dedup`.
+- Padrões: `enabled=false` (por seção `ai`), `thresholds.dedup=0.85`, `batch_size=16`.
+- Integração com heurística: a decisão final de deduplicar considera também as regras em `deduplication.*` (ex.: tolerância de horário, resolução por prioridade de fonte), quando configuradas.
+
+Exemplo de configuração mínima:
+
+```json
+{
+  "ai": {
+    "enabled": true,
+    "device": "auto",
+    "batch_size": 16,
+    "thresholds": { "dedup": 0.85 }
+  },
+  "deduplication": {
+    "algorithm": "fuzzy_matching",
+    "time_tolerance_minutes": 30,
+    "source_priority_resolution": true
+  }
+}
+```
+
+Observabilidade:
+- Logs exibem contagem de pares avaliados e decisões por limiar.
+- Métricas disponíveis no benchmarking: precision/recall/F1 para dedup (ver `scripts/eval/benchmarks.py`).
+
 ## 📊 Logging e Debug
 
 O sistema de logs avançado oferece monitoramento detalhado e solução de problemas:

@@ -12,7 +12,16 @@ Todas as mudanças notáveis neste projeto serão documentadas neste arquivo.
 O formato é baseado em [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 e este projeto adere ao [Versionamento Semântico](https://semver.org/spec/v2.0.0.html).
 
-## [Unreleased]
+## [0.6.8] - 2025-08-27
+- Feature — AI: Categorização Semântica Offline (Issue #163)
+  - Integração do `CategoryDetector` com `EmbeddingsService` para classificação semântica de eventos
+  - Suporte a múltiplos idiomas (português e inglês) com detecção automática
+  - Threshold configurável via `ai.thresholds.category` (padrão: 0.75)
+  - Combinação inteligente de sinais semânticos e heurísticos
+  - Métricas de confiança e origem da classificação (`category_confidence`, `category_source`)
+  - Testes de integração abrangentes em `tests/integration/test_it_semantic_category_detector.py`
+  - Documentação atualizada em `docs/CONFIGURATION_GUIDE.md`
+
 - Feature — AI: Serviço de Embeddings offline (Issue #165)
   - Novo `EmbeddingsService` 100% offline com backend determinístico por hashing (multilíngue).
   - Batching configurável (`ai.batch_size`) com métricas: `batch_latencies_ms`, `cache_hits`, `cache_misses`.
@@ -22,6 +31,15 @@ e este projeto adere ao [Versionamento Semântico](https://semver.org/spec/v2.0.
   - Testes unitários: `tests/unit/ai/test_embeddings_service.py` cobrindo determinismo, batching, cache e fallback de device.
   - Documentação atualizada: `README.md` e `docs/CONFIGURATION_GUIDE.md`.
   - Versionamento: `src/__init__.py` atualizado para `0.6.7`.
+ 
+ - Feature — IA: Deduplicação semântica offline (determinística) (Issue #160)
+   - Complementa a deduplicação heurística existente (ex.: `name_similarity`, `time_tolerance_minutes`, `source_priority_resolution`) aplicando similaridade semântica baseada em embeddings determinísticos, 100% offline.
+   - Ativação/controlos em `ai`: `enabled` (false por padrão), `thresholds.dedup` (padrão: 0.85), `batch_size` (16), `device` (`auto|mps|cuda|cpu`), `cache.*` (opcional para latência/throughput).
+   - Integração com regras em `deduplication.*`: a decisão final de consolidar eventos considera o limiar semântico e as regras de tempo/local/categoria e prioridade de fonte quando configuradas.
+   - Determinismo: embeddings e decisões são estáveis entre execuções com a mesma configuração/entrada; sem chamadas externas.
+   - Observabilidade: logs detalham pares avaliados, similaridade e motivo da decisão; métricas disponíveis via benchmarks de dedupe (precisão/recall/F1/TP/FP/FN e latências por item/lote).
+   - Documentação atualizada: `README.md` (seção “IA offline — Deduplicação Semântica”) e `docs/CONFIGURATION_GUIDE.md` (subseção com parâmetros e exemplos).
+
 - Fix — BaseSource: sleep/backoff compatível com testes (CI unit)
   - `sources/base_source.py::_sleep_with_cancel()` passa a usar `time.sleep(seconds)` com checagem de cancelamento antes/depois, em vez de `Event.wait(timeout)`.
   - Motivo: permitir que `monkeypatch` capture os delays no teste `tests/unit/sources/base_source/test_make_request.py::test_make_request_backoff_and_rate_limit_no_sleep` (esperado: `[0.5, 0.5, 1.0]`).

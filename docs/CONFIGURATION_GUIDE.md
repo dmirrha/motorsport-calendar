@@ -297,6 +297,52 @@ Exemplo mínimo de configuração:
 
 Referências de implementação: `src/ai/embeddings_service.py` e integrações no `CategoryDetector`.
 
+### Deduplicação semântica offline (determinística)
+
+Quando `ai.enabled=true`, o serviço de embeddings determinísticos também pode auxiliar na remoção de duplicatas, comparando similaridade semântica entre pares candidatos de eventos. Essa abordagem complementa o algoritmo heurístico de deduplicação (ex.: similaridade de nome/timestamps/local), não o substitui.
+
+- Parâmetros principais:
+  - `ai.enabled` (bool, padrão `false`): habilita os recursos de IA locais.
+  - `ai.thresholds.dedup` (float, padrão `0.85`): limiar mínimo de similaridade (0–1) para considerar dois eventos como duplicados do ponto de vista semântico.
+  - `ai.batch_size` (int, padrão `16`): tamanho de lote nas comparações.
+  - `ai.device` (string, padrão `"auto"`): `auto`, `cpu`, `cuda`, `mps`.
+  - `ai.cache.*`: acelera reavaliações mantendo embeddings localmente.
+
+- Integração com `deduplication.*`:
+  - O resultado semântico é combinado com as regras de `deduplication` (por exemplo `time_tolerance_minutes`, `source_priority_resolution`, `location_matching`, `category_matching`).
+  - A deduplicação é aplicada quando o escore semântico ≥ `ai.thresholds.dedup` e as demais condições configuradas são satisfeitas. Em conflitos, a resolução por prioridade de fonte (`source_priority_resolution=true`) define qual evento permanece.
+
+- Natureza offline/determinística:
+  - Não há chamadas externas; execução 100% on‑device.
+  - Embeddings determinísticos com hashing n‑gram e comparação por distância; resultados reprodutíveis para mesma entrada/configuração.
+
+Exemplo mínimo de configuração:
+
+```json
+{
+  "ai": {
+    "enabled": true,
+    "device": "auto",
+    "batch_size": 16,
+    "thresholds": { "dedup": 0.85 },
+    "cache": { "enabled": true, "dir": "cache/embeddings", "ttl_days": 30 }
+  },
+  "deduplication": {
+    "algorithm": "fuzzy_matching",
+    "name_similarity_threshold": 0.85,
+    "time_tolerance_minutes": 30,
+    "location_matching": true,
+    "category_matching": true,
+    "source_priority_resolution": true
+  }
+}
+```
+
+Observabilidade e validação:
+- Logs detalham pares avaliados, escores e decisões (INFO/DEBUG), respeitando `general.visual_interface` quando aplicável.
+- Benchmarks e métricas (precision, recall, F1) podem ser produzidos via `scripts/eval/benchmarks.py` (ver `README.md`).
+- Parâmetros são validados; valores fora de faixa geram erros de validação (consulte `src/utils/config_validator.py`).
+
 ## Seção: `logging`
 
 Configurações detalhadas de log.

@@ -1,0 +1,26 @@
+{
+  "id": 3356426557,
+  "number": 160,
+  "state": "open",
+  "title": "F1b: Deduplicação semântica (threshold 0.85)",
+  "url": "https://github.com/dmirrha/motorsport-calendar/issues/160",
+  "created_at": "2025-08-26T16:56:29Z",
+  "updated_at": "2025-08-26T17:09:12Z",
+  "labels": [
+    "enhancement",
+    "needs-triage",
+    "priority: P1",
+    "ai",
+    "dedup"
+  ],
+  "assignees": [],
+  "milestone": null,
+  "metadata": {
+    "priority": "P1",
+    "type": "feature",
+    "components": ["ai", "dedup"],
+    "threshold_default": 0.85,
+    "config_keys": ["ai.enabled", "ai.thresholds.dedup", "ai.batch_size"],
+    "related": [165, 157]
+  }
+}
