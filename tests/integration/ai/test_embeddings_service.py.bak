@@ -1,0 +1,217 @@
+"""Testes de integração para o serviço de embeddings.
+
+Este módulo contém testes de integração que verificam a interação entre o serviço de
+embeddings e seus componentes, incluindo cache, batch processing e backends.
+"""
+import os
+from pathlib import Path
+import time
+
+import numpy as np
+import pytest
+
+from src.ai.embeddings_service import EmbeddingsService, EmbeddingsConfig
+
+# Pular testes de ONNX se não estiver disponível
+SKIP_ONNX_TESTS = os.getenv("SKIP_ONNX_TESTS", "false").lower() == "true"
+
+# Caminho para o modelo ONNX de teste
+TEST_MODEL_PATH = Path("tests/data/onnx/model.onnx")
+
+
+def has_onnx() -> bool:
+    """Verifica se as dependências do ONNX estão instaladas."""
+    if SKIP_ONNX_TESTS:
+        return False
+    try:
+        import onnxruntime
+        return True
+    except ImportError:
+        return False
+
+
+@pytest.mark.integration
+class TestEmbeddingsServiceIntegration:
+    """Testes de integração para o serviço de embeddings."""
+
+    def test_hashing_backend_basic(self, tmp_path):
+        """Testa o funcionamento básico do backend de hashing."""
+        cfg = EmbeddingsConfig(
+            enabled=True,
+            device="cpu",
+            backend="hashing",
+            dim=128,
+            batch_size=4,
+            lru_capacity=100,
+            cache_dir=tmp_path / "cache",
+            ttl_days=1,
+        )
+        
+        svc = EmbeddingsService(cfg)
+        
+        # Textos de teste
+        texts = ["F1 Brasil", "MotoGP Argentina", "Stock Car Goiânia"]
+        
+        # Gera embeddings
+        embeddings = svc.embed_texts(texts)
+        
+        # Verificações básicas
+        assert len(embeddings) == len(texts)
+        for emb in embeddings:
+            assert isinstance(emb, np.ndarray)
+            assert emb.shape == (cfg.dim,)
+            assert emb.dtype == np.float32
+        
+        # Verifica se os embeddings são determinísticos
+        embeddings2 = svc.embed_texts(texts)
+        for e1, e2 in zip(embeddings, embeddings2):
+            assert np.allclose(e1, e2)
+    
+    @pytest.mark.skipif(not has_onnx(), reason="Requer dependências do ONNX")
+    @pytest.mark.skipif(not TEST_MODEL_PATH.exists(), 
+                       reason=f"Modelo ONNX não encontrado em {TEST_MODEL_PATH}")
+    def test_onnx_backend_basic(self, tmp_path):
+        """Testa o funcionamento básico do backend ONNX."""
+        cfg = EmbeddingsConfig(
+            enabled=True,
+            device="cpu",
+            backend="onnx",
+            dim=384,  # Dimensão do modelo de teste
+            batch_size=4,
+            lru_capacity=100,
+            cache_dir=tmp_path / "onnx_cache",
+            ttl_days=1,
+            onnx_enabled=True,
+            onnx_model_path=TEST_MODEL_PATH,
+            onnx_providers=["CPUExecutionProvider"],
+        )
+        
+        svc = EmbeddingsService(cfg)
+        
+        # Textos de teste
+        texts = ["F1 Brasil", "MotoGP Argentina", "Stock Car Goiânia"]
+        
+        # Gera embeddings
+        embeddings = svc.embed_texts(texts)
+        
+        # Verificações básicas
+        assert len(embeddings) == len(texts)
+        for emb in embeddings:
+            assert isinstance(emb, np.ndarray)
+            assert emb.shape == (cfg.dim,)
+            assert emb.dtype == np.float32
+        
+        # Verifica se os embeddings são determinísticos
+        embeddings2 = svc.embed_texts(texts)
+        for e1, e2 in zip(embeddings, embeddings2):
+            assert np.allclose(e1, e2)
+    
+    def test_cache_behavior(self, tmp_path):
+        """Testa o comportamento do cache LRU."""
+        cfg = EmbeddingsConfig(
+            enabled=True,
+            device="cpu",
+            backend="hashing",
+            dim=128,
+            batch_size=4,
+            lru_capacity=2,  # Cache pequeno para teste
+            cache_dir=tmp_path / "cache",
+            ttl_days=1,
+        )
+        
+        svc = EmbeddingsService(cfg)
+        
+        # Primeira execução - deve preencher o cache
+        texts1 = ["F1 Brasil", "MotoGP Argentina"]
+        emb1 = svc.embed_texts(texts1)
+        assert svc.metrics["cache_misses"] == 2
+        assert svc.metrics["cache_hits"] == 0
+        
+        # Segunda execução - deve usar o cache
+        emb2 = svc.embed_texts(texts1)
+        assert svc.metrics["cache_hits"] == 2
+        assert svc.metrics["cache_misses"] == 2  # Não deve incrementar
+        
+        # Deve retornar os mesmos embeddings
+        for e1, e2 in zip(emb1, emb2):
+            assert np.allclose(e1, e2)
+        
+        # Adiciona mais itens para testar a substituição LRU
+        texts2 = ["Stock Car Goiânia", "Fórmula E São Paulo"]
+        svc.embed_texts(texts2)  # Deve remover os itens mais antigos do cache
+        
+        # Verifica se o cache foi atualizado corretamente
+        assert svc.metrics["cache_misses"] == 4
+        assert svc.metrics["cache_hits"] == 2
+    
+    def test_batch_processing(self, tmp_path):
+        """Testa o processamento em lotes."""
+        batch_size = 3
+        num_texts = 7  # Testa com um número que não é múltiplo do batch_size
+        
+        cfg = EmbeddingsConfig(
+            enabled=True,
+            device="cpu",
+            backend="hashing",
+            dim=128,
+            batch_size=batch_size,
+            lru_capacity=100,
+            cache_dir=tmp_path / "cache",
+            ttl_days=1,
+        )
+        
+        svc = EmbeddingsService(cfg)
+        
+        # Gera textos de teste
+        texts = [f"Evento {i}" for i in range(num_texts)]
+        
+        # Gera embeddings
+        embeddings = svc.embed_texts(texts)
+        
+        # Verifica se todos os embeddings foram gerados
+        assert len(embeddings) == num_texts
+        
+        # Verifica se o número de lotes está correto
+        expected_batches = (num_texts + batch_size - 1) // batch_size
+        assert len(svc.metrics["batch_latencies_ms"]) == expected_batches
+    
+    @pytest.mark.skipif(not has_onnx(), reason="Requer dependências do ONNX")
+    @pytest.mark.skipif(not TEST_MODEL_PATH.exists(), 
+                       reason=f"Modelo ONNX não encontrado em {TEST_MODEL_PATH}")
+    def test_onnx_provider_fallback(self, tmp_path, monkeypatch):
+        """Testa o fallback de provedores ONNX."""
+        # Mock para simular falha no primeiro provedor
+        def mock_init(*args, **kwargs):
+            if kwargs.get("providers") and "CUDAExecutionProvider" in kwargs["providers"]:
+                raise RuntimeError("CUDA not available")
+            # Retorna uma sessão mockada para CPU
+            mock_session = MagicMock()
+            mock_session.get_providers.return_value = ["CPUExecutionProvider"]
+            mock_session.run.return_value = [np.random.rand(1, 384).astype(np.float32)]
+            return mock_session
+        
+        # Aplica o mock
+        monkeypatch.setattr('onnxruntime.InferenceSession', mock_init)
+        
+        cfg = EmbeddingsConfig(
+            enabled=True,
+            device="auto",
+            backend="onnx",
+            dim=384,
+            batch_size=4,
+            lru_capacity=100,
+            cache_dir=tmp_path / "onnx_cache",
+            ttl_days=1,
+            onnx_enabled=True,
+            onnx_model_path=TEST_MODEL_PATH,
+            onnx_providers=["CUDAExecutionProvider", "CPUExecutionProvider"],
+        )
+        
+        # Deve tentar CUDA primeiro, falhar e tentar CPU
+        svc = EmbeddingsService(cfg)
+        
+        # Verifica se o serviço está funcionando
+        texts = ["Teste de fallback de provedor"]
+        embeddings = svc.embed_texts(texts)
+        assert len(embeddings) == 1
+        assert embeddings[0].shape == (384,)

@@ -3,8 +3,15 @@ from pathlib import Path
 import sys
 import os
 import time
+from typing import Dict, Any, Optional, List
 
+import numpy as np
 import pytest
+
+# Adiciona o diretório raiz ao path para importar módulos do projeto
+ROOT_DIR = Path(__file__).resolve().parent.parent
+if str(ROOT_DIR) not in sys.path:
+    sys.path.insert(0, str(ROOT_DIR))
 
 ROOT = Path(__file__).resolve().parent.parent  # raiz do repositório
 SRC = ROOT / "src"
@@ -245,24 +252,105 @@ def fixed_uuid(monkeypatch):
             fixed_uuid()  # aplica padrão
             assert str(uuid.uuid4()) == "00000000-0000-0000-0000-000000000000"
     """
+    import uuid
+    from unittest.mock import patch
 
-    def _apply(sequence=None):
-        import uuid as _uuid
+    def _fixed_uuid(sequence=None):
+        if sequence is None:
+            sequence = [uuid.UUID(int=0)]  # 00000000-0000-0000-0000-000000000000
+        elif not sequence:
+            raise ValueError("sequence não pode estar vazia")
 
-        default_seq = [
-            _uuid.UUID("00000000-0000-0000-0000-000000000000"),
-        ]
-        seq = sequence or default_seq
-        iterator = iter(seq)
+        it = iter(sequence)
 
-        def _next_uuid():
+        def _uuid4():
             try:
-                return next(iterator)
+                return next(it)
             except StopIteration:
-                # Repete o último elemento para evitar StopIteration em chamadas extras
-                return seq[-1]
+                return sequence[-1]  # repete o último
 
-        monkeypatch.setattr("uuid.uuid4", lambda: _next_uuid())
-        return seq
+        patch_uuid = patch('uuid.uuid4', _uuid4)
+        patch_uuid.start()
+        return patch_uuid
 
-    return _apply
+    return _fixed_uuid
+
+
+@pytest.fixture
+def tmp_embeddings_dir(tmp_path):
+    """Cria um diretório temporário para armazenar embeddings em disco."""
+    cache_dir = tmp_path / "embeddings_cache"
+    cache_dir.mkdir(exist_ok=True)
+    return cache_dir
+
+
+@pytest.fixture
+def embeddings_config(tmp_embeddings_dir):
+    """Configuração padrão para o serviço de embeddings em testes."""
+    from src.ai.embeddings_service import EmbeddingsConfig
+    
+    return EmbeddingsConfig(
+        enabled=True,
+        device="cpu",
+        backend="hashing",  # Backend padrão para testes rápidos
+        dim=128,  # Dimensão para o hashing backend
+        batch_size=4,
+        lru_capacity=100,
+        cache_dir=tmp_embeddings_dir,
+        ttl_days=1,
+        onnx_enabled=False,  # Desativado por padrão, ativar apenas quando necessário
+    )
+
+
+@pytest.fixture
+def onnx_embeddings_config(tmp_embeddings_dir):
+    """Configuração para testes com backend ONNX."""
+    from src.ai.embeddings_service import EmbeddingsConfig
+    
+    return EmbeddingsConfig(
+        enabled=True,
+        device="cpu",
+        backend="onnx",
+        dim=384,  # Dimensão típica para modelos sentence-transformers
+        batch_size=4,
+        lru_capacity=100,
+        cache_dir=tmp_embeddings_dir,
+        ttl_days=1,
+        onnx_enabled=True,
+        onnx_model_path=Path("tests/data/onnx/model.onnx"),  # Caminho para o modelo de teste
+        onnx_providers=["CPUExecutionProvider"],
+    )
+
+
+@pytest.fixture
+def test_texts():
+    """Textos de exemplo para testes de embeddings."""
+    return [
+        "F1 Grande Prêmio do Brasil - Corrida",
+        "MotoGP Argentina - Treino Livre",
+        "Stock Car Brasil - Corrida em Goiânia",
+        "Fórmula E - E-Prix de São Paulo",
+        "WEC - 6 Horas de Spa-Francorchamps",
+    ]
+
+
+@pytest.fixture
+def mock_onnx_session():
+    """Cria uma sessão ONNX mockada para testes."""
+    from unittest.mock import MagicMock
+    
+    mock_session = MagicMock()
+    mock_session.get_providers.return_value = ["CPUExecutionProvider"]
+    mock_session.run.return_value = [
+        np.random.rand(1, 384).astype(np.float32)  # Dimensão para o modelo de teste
+    ]
+    return mock_session
+
+
+@pytest.fixture
+def patch_onnx_session(mock_onnx_session):
+    """Patch para substituir a criação de sessões ONNX por um mock."""
+    from unittest.mock import patch
+    
+    with patch('onnxruntime.InferenceSession', return_value=mock_onnx_session) as mock:
+        yield mock

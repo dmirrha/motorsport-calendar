@@ -88,6 +88,16 @@ Desenvolver e manter um sistema automatizado para coleta, processamento e export
 
 ## **Requisitos Não-Funcionais**
 
+### **Dependências Opcionais**
+
+### **Otimização ONNX (Para uso com Embeddings)**
+- `onnx>=1.15.0`: Formato de modelo aberto para inferência
+- `onnxruntime>=1.16.0`: Runtime para execução de modelos ONNX
+- `optimum>=1.17.0`: Exportação e otimização de modelos
+- `onnxconverter-common>=1.14.0`: Utilitários para conversão de modelos
+
+> **Nota**: Estas dependências são necessárias apenas para habilitar o backend ONNX no serviço de embeddings. O sistema funcionará normalmente sem elas, utilizando o backend de hashing padrão.
+
 ### **RNF01 - Desempenho**
 - Tempo de resposta aceitável (< 2s para operações comuns)
 - Baixo consumo de recursos (CPU < 5%, Memória < 100MB)
@@ -118,6 +128,7 @@ Desenvolver e manter um sistema automatizado para coleta, processamento e export
 ## **Manutenção**
 
 ### **Dependências**
+#### **Obrigatórias**
 - `requests` - Requisições HTTP
 - `beautifulsoup4` - Parsing HTML
 - `icalendar` - Geração de arquivos .ics
@@ -133,6 +144,12 @@ Desenvolver e manter um sistema automatizado para coleta, processamento e export
 - `coverage` - Cobertura de testes
 - `mypy` - Checagem estática de tipos
 - `black` - Formatação de código
+
+#### **Opcionais (para suporte a ONNX)**
+- `onnx` - Formato de modelo de rede neural
+- `onnxruntime` - Runtime para inferência de modelos ONNX
+- `optimum` - Otimização de modelos de IA
+- `onnxconverter-common` - Utilitários para conversão de modelos
 
 ### **Atualizações**
 - Verificar regularmente por atualizações de segurança

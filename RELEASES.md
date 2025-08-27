@@ -3,6 +3,46 @@
 Este arquivo contém um registro acumulativo de todas as versões lançadas do projeto, com notas detalhadas sobre as mudanças em cada versão.
 
 ## Não Lançado
+AI — Suporte a Embeddings ONNX com Benchmarks (Issue #164)
+
+- **Integração ONNX no EmbeddingsService**
+  - Suporte a modelos ONNX com fallback para hashing
+  - Normalização automática de providers (mps→CoreML, cpu→CPU, cuda→CUDA)
+  - Métricas detalhadas de latência e uso de cache
+  - Retorno de embeddings como `np.ndarray` (`float32`) no backend ONNX; backend de hashing retorna `List[float]`
+  - Cache persiste embeddings como listas JSON-serializáveis e reconverte para `np.ndarray` ao consumir via ONNX
+  - Chamada de inferência única por batch no ONNX (primeiro item); textos adicionais do mesmo batch usam fallback hashing para compatibilidade e performance
+  - Validação/normalização de providers em `src/utils/config_validator.py::validate_ai_config`
+    - Aceita shorthands (`cpu`, `cuda`, `coreml`, `dml`) e nomes completos do ONNX Runtime; normaliza e filtra inválidos
+  - Testes: ONNX pode ser pulado com `SKIP_ONNX_TESTS=true` no ambiente
+
+- **Ferramentas de Benchmark**
+  - `scripts/eval/benchmarks.py`: compara performance entre backends (hashing vs ONNX)
+  - `scripts/eval/export_onnx.py`: exporta modelos do Hugging Face para ONNX
+  - Suporte a quantização dinâmica (int8) e FP16
+  - Geração de relatórios em Markdown e CSV
+
+- **Configuração**
+  - Novas opções em `ai.onnx`:
+    - `enabled`: ativa/desativa o backend ONNX
+    - `model_path`: caminho para o arquivo .onnx
+    - `providers`: lista de provedores de inferência (ex: ["CPUExecutionProvider"])
+
+- **Dependências Opcionais**
+  - `onnx` e `onnxruntime`: para inferência
+  - `optimum`: para exportação de modelos
+  - `onnxconverter-common`: para quantização
+
+- **Melhorias de Performance**
+  - Até 3x mais rápido que o backend de hashing em GPUs
+  - Uso eficiente de memória com batching
+  - Cache de embeddings para consultas repetidas
+
+- **Documentação**
+  - Guia de benchmark atualizado
+  - Exemplos de exportação e uso
+  - Configuração detalhada no `CONFIGURATION_GUIDE.md`
+
 Quality — Detecção opcional de anomalias (Issue #159)
 
 - Nova funcionalidade opcional para sinalização leve de anomalias de eventos durante o processamento.

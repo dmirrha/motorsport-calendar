@@ -282,7 +282,7 @@ Configurações de recursos de IA locais (desabilitados por padrão).
 | Parâmetro | Tipo | Padrão | Descrição |
 |-----------|------|--------|-----------|
 | `enabled` | boolean | `false` | Habilita execução via ONNX Runtime |
-| `provider` | string | `"cpu"` | Provider: `cpu`, `cuda`, `coreml` |
+| `provider` | string | `"cpu"` | Provider (shorthand): `cpu`, `cuda`, `coreml`, `dml` |
 | `opset` | number | `17` | Versão mínima suportada: `>= 11` |
 
 ### Subseção: `cache`
@@ -349,7 +349,7 @@ Notas sobre providers:
 - Você pode informar providers usando shorthand (`cpu`, `cuda`, `coreml`, `dml`) ou os nomes completos do ONNX Runtime (`CPUExecutionProvider`, `CUDAExecutionProvider`, etc.).
 - A validação normaliza para a forma shorthand em minúsculas e filtra valores inválidos. Quando nenhum válido for informado, o fallback é `cpu`.
 - A ordem de preferência é respeitada. Internamente, os nomes são mapeados para os equivalentes do ONNX Runtime ao criar a sessão.
- 
+
 #### Métricas de Desempenho
 
 O serviço expõe as seguintes métricas via `EmbeddingsService.metrics`:
