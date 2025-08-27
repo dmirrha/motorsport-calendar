@@ -11,7 +11,7 @@ from __future__ import annotations
 import importlib
 from typing import Any
 
-__version__ = "0.6.8"
+__version__ = "0.6.9"
 __author__ = "Daniel Mirrha"
 __email__ = "dmirrha@gmail.com"
 

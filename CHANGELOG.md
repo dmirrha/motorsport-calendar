@@ -12,6 +12,14 @@ Todas as mudanças notáveis neste projeto serão documentadas neste arquivo.
 O formato é baseado em [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 e este projeto adere ao [Versionamento Semântico](https://semver.org/spec/v2.0.0.html).
 
+## [0.6.9] - 2025-08-27
+### Fix — Deduplicação Semântica (Issue #160)
+- **EventProcessor**: 
+  - Implementado `_fuzzy_ratio()` com import dinâmico de `fuzzywuzzy` para permitir stubs de teste
+  - Normalização do `similarity_threshold` (aceita 0..1 ou 0..100) no modo IA desabilitada
+  - Melhor tratamento de erros na comparação de similaridade
+  - Testes de integração atualizados para validar consistência
+
 ## [0.6.8] - 2025-08-27
 - Feature — AI: Categorização Semântica Offline (Issue #163)
   - Integração do `CategoryDetector` com `EmbeddingsService` para classificação semântica de eventos
