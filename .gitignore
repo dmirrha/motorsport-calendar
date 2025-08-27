@@ -121,3 +121,8 @@ test_results_*/
 .env.test
 .env.production
 
+# Cache de embeddings
+cache/embeddings/*.sqlite
+# Modelos ONNX
+models/embeddings-onnx/*
+!models/embeddings-onnx/README.md

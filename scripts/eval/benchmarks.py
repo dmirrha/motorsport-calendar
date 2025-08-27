@@ -1,19 +1,27 @@
 #!/usr/bin/env python3
 """
-Benchmarks (Issue #158): baseline vs IA
+Benchmarks (Issue #158 e #164): baseline vs IA e Embeddings Engines
 
 - Carrega um dataset CSV com eventos e ground-truth de categoria e grupos de duplicata
 - Executa cenários para:
-  * Categorização: baseline (heurístico) vs IA (CategoryDetector com contexto quando aplicável)
+  * Categorização: baseline (heurístico) vs IA (CategoryDetector)
   * Deduplicação: baseline (sem detector) vs IA (com detector)
+  * Embeddings (novo): comparação de throughput/latência entre engines `default` (hashing) e `onnx` (quando disponível)
 - Mede métricas e latência e exporta para CSV/Markdown
 
 Execução exemplo:
+  # Categoria + Dedup
   python scripts/eval/benchmarks.py \
     --task both --mode both \
     --input docs/tests/scenarios/data/eval_dataset.csv \
     --outdir docs/tests/audit/benchmarks \
     --seed 42
+
+  # Embeddings (sintético) comparando engines
+  python scripts/eval/benchmarks.py \
+    --task embeddings --engine both \
+    --emb-count 2000 --batch-size 64 \
+    --onnx-model /caminho/model.onnx --providers mps,cpu
 """
 from __future__ import annotations
 
@@ -33,28 +41,41 @@ if str(ROOT) not in sys.path:
 
 from src.event_processor import EventProcessor  # type: ignore
 from src.category_detector import CategoryDetector  # type: ignore
+from src.ai.embeddings_service import EmbeddingsService, EmbeddingsConfig  # type: ignore
 
 
 @dataclass
 class RunConfig:
-    task: str  # category|dedup|both
+    task: str  # category|dedup|both|embeddings
     mode: str  # baseline|ia|both
     input_path: Path
     outdir: Path
     seed: int
     batch_size: int
     threads: int | None
+    # embeddings-only
+    engine: str | None  # default|onnx|both
+    emb_count: int | None
+    texts: Path | None
+    onnx_model: Path | None
+    providers: List[str] | None
 
 
 def parse_args() -> RunConfig:
     p = argparse.ArgumentParser(description="Benchmarks baseline vs IA (Issue #158)")
-    p.add_argument("--task", choices=["category", "dedup", "both"], default="both")
+    p.add_argument("--task", choices=["category", "dedup", "both", "embeddings"], default="both")
     p.add_argument("--mode", choices=["baseline", "ia", "both"], default="both")
     p.add_argument("--input", required=True, help="Caminho do CSV do dataset")
     p.add_argument("--outdir", default="docs/tests/audit/benchmarks", help="Diretório de saída")
     p.add_argument("--seed", type=int, default=42)
     p.add_argument("--batch-size", type=int, default=64)
     p.add_argument("--threads", type=int, default=None, help="Opcional")
+    # embeddings-only
+    p.add_argument("--engine", choices=["default", "onnx", "both"], default="both")
+    p.add_argument("--emb-count", type=int, default=1000, help="Quantidade de textos sintéticos quando --texts não for usado")
+    p.add_argument("--texts", default=None, help="Arquivo com um texto por linha (opcional)")
+    p.add_argument("--onnx-model", default=None, help="Caminho para modelo ONNX (opcional)")
+    p.add_argument("--providers", default="cpu", help="Lista de providers ORT separados por vírgula (ex.: coreml,mps,cpu)")
     a = p.parse_args()
     return RunConfig(
         task=a.task,
@@ -64,6 +85,11 @@ def parse_args() -> RunConfig:
         seed=a.seed,
         batch_size=a.batch_size,
         threads=a.threads,
+        engine=a.engine,
+        emb_count=int(a.emb_count) if hasattr(a, "emb_count") else None,
+        texts=Path(a.texts) if a.texts else None,
+        onnx_model=Path(a.onnx_model) if a.onnx_model else None,
+        providers=[s.strip().lower() for s in str(a.providers).split(',') if s.strip()] if a.providers else None,
     )
 
 
@@ -344,7 +370,7 @@ def append_metrics_csv(outdir: Path, dataset: Path, task: str, detail: Dict[str,
             w.writerow(row)
 
 
-def write_report_md(outdir: Path, dataset: Path, cat_detail: Dict[str, Any] | None, du_detail: Dict[str, Any] | None) -> None:
+def write_report_md(outdir: Path, dataset: Path, cat_detail: Dict[str, Any] | None, du_detail: Dict[str, Any] | None, emb_detail: Dict[str, Any] | None = None) -> None:
     ensure_outdir(outdir)
     md = [
         "# Benchmarks — Baseline vs IA",
@@ -367,6 +393,11 @@ def write_report_md(outdir: Path, dataset: Path, cat_detail: Dict[str, Any] | No
                     f"{d.get('mode')} | acc={d.get('accuracy')} | cov={d.get('coverage')} | conf={d.get('avg_confidence')} | "
                     f"{d.get('total_items')} | {d.get('latency_ms_per_item')}"
                 )
+            elif title.startswith("Embeddings"):
+                md.append(
+                    f"{d.get('mode')} | hits={d.get('cache_hits')} | misses={d.get('cache_misses')} | dim={d.get('dim')} | "
+                    f"{d.get('total_items')} | {d.get('latency_ms_per_item')}"
+                )
             else:
                 md.append(
                     f"{d.get('mode')} | P={d.get('precision')} | R={d.get('recall')} | F1={d.get('f1')} | "
@@ -379,7 +410,124 @@ def write_report_md(outdir: Path, dataset: Path, cat_detail: Dict[str, Any] | No
     if du_detail:
         section("Deduplicação", du_detail)
 
+    if emb_detail:
+        section("Embeddings", emb_detail)
+
     (outdir / "report.md").write_text("\n".join(md), encoding="utf-8")
+
+
+# ----------------------
+# Embeddings benchmarks
+# ----------------------
+
+def _load_texts_from_file(path: Path) -> List[str]:
+    lines: List[str] = []
+    with path.open("r", encoding="utf-8") as f:
+        for ln in f:
+            s = ln.strip()
+            if s:
+                lines.append(s)
+    return lines
+
+
+def _gen_synthetic_texts(n: int) -> List[str]:
+    base = "Grand Prix at Circuit, Practice Session round #{i} with drivers A/B/C in 2025"
+    return [base.replace("{i}", str(i)) for i in range(n)]
+
+
+def _normalize_providers(providers: List[str] | None) -> List[str]:
+    if not providers:
+        return ["CPUExecutionProvider"]
+    mapping = {
+        "cpu": "CPUExecutionProvider",
+        "cpuexecutionprovider": "CPUExecutionProvider",
+        "cuda": "CUDAExecutionProvider",
+        "cudaexecutionprovider": "CUDAExecutionProvider",
+        "mps": "CoreMLExecutionProvider",  # apelido comum em macOS
+        "coreml": "CoreMLExecutionProvider",
+        "coremlexecutionprovider": "CoreMLExecutionProvider",
+    }
+    known = {"CPUExecutionProvider", "CUDAExecutionProvider", "CoreMLExecutionProvider", "AzureExecutionProvider"}
+    out: List[str] = []
+    for p in providers:
+        key = str(p).strip()
+        if not key:
+            continue
+        low = key.lower()
+        if low in mapping:
+            out.append(mapping[low])
+        elif key in known:
+            out.append(key)
+        else:
+            # desconhecido: ignora silenciosamente
+            pass
+    return out or ["CPUExecutionProvider"]
+
+
+def _emb_service(engine: str, batch_size: int, onnx_model: Path | None, providers: List[str] | None) -> EmbeddingsService:
+    # Config default hashing
+    cfg = EmbeddingsConfig(
+        enabled=True,
+        backend="hashing",
+        dim=256,
+        batch_size=batch_size,
+    )
+    if engine == "onnx" and onnx_model is not None:
+        cfg.onnx_enabled = True
+        cfg.onnx_model_path = onnx_model
+        cfg.onnx_providers = _normalize_providers(providers)
+    return EmbeddingsService(cfg)
+
+
+def eval_embeddings(cfg: RunConfig) -> Dict[str, Any]:
+    # Carrega textos
+    if cfg.texts and cfg.texts.exists():
+        texts = _load_texts_from_file(cfg.texts)
+    else:
+        texts = _gen_synthetic_texts(int(cfg.emb_count or 1000))
+
+    results: List[Dict[str, Any]] = []
+
+    def run(engine_label: str):
+        svc = _emb_service(engine_label, cfg.batch_size, cfg.onnx_model, cfg.providers)
+        # Primeira passada (sem cache)
+        t0 = time.perf_counter()
+        _ = svc.embed_texts(texts)
+        dt = time.perf_counter() - t0
+        total = len(texts)
+        results.append({
+            "mode": f"emb-{engine_label}",
+            "latency_ms_total": int(dt * 1000),
+            "latency_ms_per_item": round((dt * 1000) / max(1, total), 3),
+            "total_items": total,
+            "cache_hits": int(svc.metrics.get("cache_hits", 0)),
+            "cache_misses": int(svc.metrics.get("cache_misses", 0)),
+            "dim": int(svc.cfg.dim),
+        })
+
+        # Segunda passada (aquecido, para medir cache)
+        svc.metrics["batch_latencies_ms"] = []
+        svc.metrics["cache_hits"] = 0
+        svc.metrics["cache_misses"] = 0
+        t1 = time.perf_counter()
+        _ = svc.embed_texts(texts)
+        dt2 = time.perf_counter() - t1
+        results.append({
+            "mode": f"emb-{engine_label}-warm",
+            "latency_ms_total": int(dt2 * 1000),
+            "latency_ms_per_item": round((dt2 * 1000) / max(1, total), 3),
+            "total_items": total,
+            "cache_hits": int(svc.metrics.get("cache_hits", 0)),
+            "cache_misses": int(svc.metrics.get("cache_misses", 0)),
+            "dim": int(svc.cfg.dim),
+        })
+
+    if cfg.engine in ("default", "both"):
+        run("default")
+    if cfg.engine in ("onnx", "both"):
+        run("onnx")
+
+    return {"details": results}
 
 
 def main() -> None:
@@ -401,7 +549,14 @@ def main() -> None:
         du_detail = eval_dedup(rows, run_mode)
         append_metrics_csv(cfg.outdir, cfg.input_path, "dedup", du_detail)
 
-    write_report_md(cfg.outdir, cfg.input_path, cat_detail, du_detail)
+    # Embeddings engine benchmark
+    emb_detail = None
+    if cfg.task == "embeddings":
+        emb_detail = eval_embeddings(cfg)
+        # Persistir também em CSV usando a mesma estrutura
+        append_metrics_csv(cfg.outdir, cfg.texts or cfg.input_path, "embeddings", emb_detail)
+
+    write_report_md(cfg.outdir, cfg.input_path, cat_detail, du_detail, emb_detail)
     print(f"✅ Concluído. Relatórios em: {cfg.outdir}")
 
 
