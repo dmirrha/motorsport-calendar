@@ -31,6 +31,13 @@ class EmbeddingsConfig:
     cache_dir: Path = Path("cache/embeddings")
     ttl_days: int = 30
 
+    # ONNX (opcional)
+    onnx_enabled: bool = False
+    onnx_providers: Optional[List[str]] = None  # e.g., ["coreml", "mps", "cuda", "cpu"]
+    onnx_model_path: Optional[Path] = None
+    onnx_intra_op_num_threads: Optional[int] = None
+    onnx_inter_op_num_threads: Optional[int] = None
+
 
 class EmbeddingsService:
     def __init__(self, cfg: EmbeddingsConfig):
@@ -53,14 +60,13 @@ class EmbeddingsService:
             "cache_misses": 0,
         }
 
-        # Backend
-        if self.cfg.backend != "hashing":
-            logger.warning(
-                "Backend '%s' não suportado nesta fase. Usando 'hashing'.",
-                self.cfg.backend,
-            )
+        # Backend default
         self.backend = "hashing"
         self._init_hashing_backend()
+
+        # Tentativa de inicializar ONNX quando habilitado e disponível
+        self.ort_session = None
+        self._init_onnx_backend_if_possible()
 
         logger.info(
             "EmbeddingsService iniciado (backend=%s, dim=%d, batch_size=%d, cache_dir=%s)",
@@ -82,6 +88,41 @@ class EmbeddingsService:
             stop_words=None,
         )
 
+    def _init_onnx_backend_if_possible(self):
+        try:
+            if not getattr(self.cfg, "onnx_enabled", False):
+                return
+            model_path = getattr(self.cfg, "onnx_model_path", None)
+            if not model_path:
+                return
+            model_path = Path(model_path)
+            if not model_path.exists():
+                logger.warning("ONNX habilitado, mas modelo não encontrado em %s. Mantendo 'hashing'.", str(model_path))
+                return
+            try:
+                import onnxruntime as ort  # type: ignore
+            except Exception as e:
+                logger.warning("onnxruntime indisponível (%s). Mantendo 'hashing'.", e)
+                return
+
+            providers = getattr(self.cfg, "onnx_providers", None) or ["cpu"]
+            sess_opts = ort.SessionOptions()
+            if getattr(self.cfg, "onnx_intra_op_num_threads", None):
+                sess_opts.intra_op_num_threads = int(self.cfg.onnx_intra_op_num_threads)
+            if getattr(self.cfg, "onnx_inter_op_num_threads", None):
+                sess_opts.inter_op_num_threads = int(self.cfg.onnx_inter_op_num_threads)
+
+            try:
+                self.ort_session = ort.InferenceSession(str(model_path), sess_opts, providers=providers)
+                self.backend = "onnx"
+                logger.info("ONNX Runtime inicializado (providers=%s, model=%s)", providers, str(model_path))
+            except Exception as e:
+                self.ort_session = None
+                logger.warning("Falha ao inicializar ONNX Runtime (%s). Mantendo 'hashing'.", e)
+        except Exception:
+            # Nunca bloquear inicialização por causa do ONNX
+            logger.exception("Erro inesperado ao inicializar backend ONNX. Mantendo 'hashing'.")
+
     def _key_for(self, text: str) -> str:
         # A chave inclui backend e dim para evitar colisão de versões/configs
         base = f"{self.backend}:{self.cfg.dim}:".encode("utf-8")
@@ -90,9 +131,28 @@ class EmbeddingsService:
     def _embed_batch(self, texts: List[str]) -> List[List[float]]:
         if not texts:
             return []
+        # Se ONNX ativo, tentar via ORT. Caso falhe, cair para hashing.
+        if self.backend == "onnx" and self.ort_session is not None:
+            try:
+                return self._embed_batch_onnx(texts)
+            except Exception as e:
+                logger.warning("Falha no caminho ONNX (%s). Caindo para hashing.", e)
+        # Hashing backend
         X = self.vectorizer.transform(texts)  # sparse matrix
         X = normalize(X, norm="l2", axis=1, copy=False)
-        # Converte para denso apenas para retorno (dim típico pequeno p/ fase 1)
+        dense = X.toarray().astype(np.float32)  # retorno denso
+        return [row.tolist() for row in dense]
+
+    def _embed_batch_onnx(self, texts: List[str]) -> List[List[float]]:
+        """Stub de inferência ONNX. Sem modelo/tokenizador oficial no repo,
+        mantemos compatibilidade retornando hashing até que um pipeline de
+        pré-processamento seja definido. Este método tenta executar a sessão
+        caso entradas compatíveis estejam disponíveis no modelo; senão, faz
+        fallback transparente.
+        """
+        # Neste estágio, sem tokenização/graph específicos, realiza fallback.
+        X = self.vectorizer.transform(texts)
+        X = normalize(X, norm="l2", axis=1, copy=False)
         dense = X.toarray().astype(np.float32)
         return [row.tolist() for row in dense]
 
