@@ -1,6 +1,9 @@
 import math
 import pytest
 
+# Todos os testes deste módulo são de integração
+pytestmark = pytest.mark.integration
+
 from src.category_detector import CategoryDetector
 
 
