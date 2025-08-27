@@ -16,6 +16,7 @@ import numpy as np
 from unidecode import unidecode
 from src.silent_period import SilentPeriodManager
 from src.ai.embeddings_service import EmbeddingsService, EmbeddingsConfig
+from src.utils import AnomalyDetector, AnomalyConfig
 
 
 class _TzWithZone(tzinfo):
@@ -96,6 +97,9 @@ class EventProcessor:
         
         # AI/Embeddings
         self._embeddings_service: Optional[EmbeddingsService] = None
+        # Anomaly detection (opcional)
+        self._anomaly_cfg: AnomalyConfig = AnomalyConfig()
+        self._anomaly_detector: Optional[AnomalyDetector] = None
         
     def _fuzzy_ratio(self, a: str, b: str) -> int:
         """Dynamic fuzzy ratio to allow test stubs to override fuzzywuzzy.
@@ -152,6 +156,19 @@ class EventProcessor:
         except Exception:
             self.ai_dedup_threshold = 0.85
         self._ai_cfg: Dict[str, Any] = ai_cfg
+
+        # Quality/Anomaly settings (opcionais, não bloqueantes)
+        try:
+            q = self.config.get('quality', {}) or {}
+            ad = q.get('anomaly_detection', {}) or {}
+            enabled = bool(ad.get('enabled', False))
+            min_h = int(ad.get('hours', {}).get('min', 6) if isinstance(ad.get('hours', {}), dict) else ad.get('min_hour', 6))
+            max_h = int(ad.get('hours', {}).get('max', 23) if isinstance(ad.get('hours', {}), dict) else ad.get('max_hour', 23))
+            examples = int(ad.get('examples_per_type', 3))
+            self._anomaly_cfg = AnomalyConfig(enabled=enabled, min_hour=min_h, max_hour=max_h, examples_per_type=examples)
+        except Exception:
+            # Mantém defaults seguros
+            self._anomaly_cfg = AnomalyConfig()
 
     def _get_embeddings_service(self) -> EmbeddingsService:
         """Lazy-inicializa e retorna o EmbeddingsService conforme config ai.*"""
@@ -283,11 +300,31 @@ class EventProcessor:
         
         # Update final statistics
         self.processing_stats['processing_end_time'] = datetime.now().isoformat()
-        
+
+        # Optional: anomaly detection summary (não bloqueante)
+        try:
+            self._log_anomalies_summary(final_events, target_weekend)
+        except Exception:
+            # Nunca bloquear o pipeline por causa de relatório de anomalias
+            pass
+
         # Log processing summary
         self._log_processing_summary()
         
         return final_events
+
+    def _get_anomaly_detector(self) -> AnomalyDetector:
+        if self._anomaly_detector is None:
+            self._anomaly_detector = AnomalyDetector(self._anomaly_cfg)
+        return self._anomaly_detector
+
+    def _log_anomalies_summary(self, events: List[Dict[str, Any]], target_weekend: Optional[Tuple[datetime, datetime]]) -> None:
+        # Apenas se habilitado
+        if not isinstance(self._anomaly_cfg, AnomalyConfig) or not self._anomaly_cfg.enabled:
+            return
+        detector = self._get_anomaly_detector()
+        report = detector.evaluate(events, target_weekend=target_weekend)
+        detector.log_summary(report, logger=self.logger)
     
     def _normalize_events(self, raw_events: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
         """

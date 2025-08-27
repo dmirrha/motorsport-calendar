@@ -145,6 +145,46 @@ Configura a detecção de finais de semana.
 | `extend_to_thursday` | boolean | `false` | Estende para quinta-feira |
 | `extend_to_monday` | boolean | `false` | Estende para segunda-feira |
 
+## Seção: `quality`
+
+Configurações relacionadas a validações leves e observabilidade de qualidade.
+
+### Subseção: `anomaly_detection`
+
+Avaliação opcional de anomalias em eventos após a normalização no `EventProcessor.process_events()`.
+
+| Parâmetro | Tipo | Padrão | Descrição |
+|-----------|------|--------|-----------|
+| `enabled` | boolean | `false` | Habilita a detecção de anomalias |
+| `hours.min` | number | `6` | Hora mínima esperada (0–23) para flag de horário improvável |
+| `hours.max` | number | `23` | Hora máxima esperada (0–23) para flag de horário improvável |
+| `examples_per_type` | number | `3` | Número máximo de exemplos por tipo de anomalia no resumo de logs |
+
+Regras cobertas pelo `AnomalyDetector` (`src/utils/anomaly_detector.py`):
+- Datas fora do fim de semana alvo.
+- Horários improváveis (fora de `hours.min`–`hours.max`).
+- Inconsistências de categoria (categoria bruta ausente e baixa confiança).
+- Local ausente.
+
+Comportamento e observabilidade:
+- Execução ao final do pipeline de eventos; não bloqueia o processamento principal.
+- Resumo agregado por tipo de anomalia é registrado no logger.
+- Exceções durante a avaliação são capturadas e logadas; o fluxo segue normalmente.
+
+Exemplo mínimo de configuração:
+
+```json
+{
+  "quality": {
+    "anomaly_detection": {
+      "enabled": true,
+      "hours": { "min": 6, "max": 23 },
+      "examples_per_type": 3
+    }
+  }
+}
+```
+
 ## Seção: `ical_parameters`
 
 Configurações para geração de arquivos iCal.
